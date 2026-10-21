@@ -1,0 +1,28 @@
+/proto/                              @02240365
+/deploy/                             @sonamcho18
+
+/services/report-submission/         @sonamcho18
+/services/photo-media/               @sonamcho18
+/services/report-history/            @sonamcho18
+/services/location-taxonomy/         @sonamcho18
+/services/internal-notes/            @sonamcho18
+
+/services/routing-rules/             @02240365
+/services/routing-engine/            @02240365
+/services/department-directory/      @02240365
+/services/category-taxonomy/         @02240365
+/services/api-gateway/               @02240365
+
+/services/status-lifecycle/          @Ny3ndrak
+/services/sla-tracking/              @Ny3ndrak
+/services/sla-policy/                @Ny3ndrak
+/services/reassignment/              @Ny3ndrak
+/services/audit-log/                 @Ny3ndrak
+/services/sla-escalation-checker/    @Ny3ndrak
+
+/services/identity/                  @Gayley007
+/services/authorization/             @Gayley007
+/services/notification/              @Gayley007
+/services/feedback/                  @Gayley007
+/services/analytics/                 @Gayley007
+/services/digest-dispatcher/         @Gayley007

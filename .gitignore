@@ -1,0 +1,29 @@
+# Go
+*.exe
+*.test
+*.out
+vendor/
+bin/
+
+# Node / web
+node_modules/
+dist/
+build/
+.env
+.env.*
+
+# Secrets and local config
+*.pem
+*.key
+kubeconfig*
+secrets.yaml
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Coverage and test output
+coverage.out
+coverage/
