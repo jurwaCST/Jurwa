@@ -143,4 +143,4 @@ Owners for Cypress, JMeter, axe-core, Lighthouse and SonarQube setup are assigne
 
 ## 12. Reporting
 
-Test results, coverage and open bugs are reported at each sprint review and in the weekly progress update to the module tutor. Evidence (test output, screenshots) is saved in `docs/evidence/<name>/`.
+Test results, coverage and open bugs are reported at each sprint review and recorded in `docs/sprint-reviews/`. Evidence (test output, screenshots) is saved in `docs/evidence/<name>/`.
