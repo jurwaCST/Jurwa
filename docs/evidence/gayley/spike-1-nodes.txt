@@ -1,0 +1,3 @@
+$ kubectl get nodes
+NAME                 STATUS   ROLES           AGE    VERSION
+k3d-spike-server-0   Ready    control-plane   2m6s   v1.35.5+k3s1
