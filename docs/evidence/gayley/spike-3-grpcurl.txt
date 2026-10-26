@@ -1,0 +1,16 @@
+$ grpcurl -plaintext -d '{"name":"Gayley"}' localhost:50051 hello.v1.Greeter/SayHello
+{
+  "message": "Hello, Gayley!"
+}
+$ grpcurl -plaintext localhost:50051 grpc.health.v1.Health/Check
+{
+  "status": "SERVING"
+}
+$ grpcurl -plaintext localhost:50051 list
+grpc.health.v1.Health
+grpc.reflection.v1.ServerReflection
+grpc.reflection.v1alpha.ServerReflection
+hello.v1.Greeter
+$ kubectl logs deploy/hello
+{"time":"2026-10-26T05:28:37.895762662Z","level":"INFO","msg":"hello server started","port":"50051"}
+{"time":"2026-10-26T05:28:50.033082423Z","level":"INFO","msg":"SayHello called","name":"Gayley"}
