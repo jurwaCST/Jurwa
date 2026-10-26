@@ -11,6 +11,7 @@ dist/
 build/
 .env
 .env.*
+!.env.example
 
 # Secrets and local config
 *.pem
