@@ -1,0 +1,23 @@
+$ kubectl -n jurwa get pods,svc,cm
+NAME                           READY   STATUS    RESTARTS   AGE   IP          NODE                NOMINATED NODE   READINESS GATES
+pod/example-765fd6cbcc-wlv7d   1/1     Running   0          42s   10.42.1.4   k3d-jurwa-agent-0   <none>           <none>
+
+NAME              TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE   SELECTOR
+service/example   ClusterIP   10.43.254.224   <none>        9001/TCP   43s   app.kubernetes.io/name=example
+
+NAME                                  DATA   AGE
+configmap/example-config-fdh9t6cdbm   2      43s
+configmap/kube-root-ca.crt            1      43s
+
+$ kubectl -n jurwa describe pod (probes and events)
+    Liveness:   grpc <pod>:9001  delay=10s timeout=1s period=10s #success=1 #failure=3
+    Readiness:  grpc <pod>:9001  delay=2s timeout=1s period=5s #success=1 #failure=3
+    Environment Variables from:
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  42s   default-scheduler  Successfully assigned jurwa/example-765fd6cbcc-wlv7d to k3d-jurwa-agent-0
+  Normal  Pulling    41s   kubelet            spec.containers{example}: Pulling image "jurwa-registry:5050/agnhost:2.53"
+  Normal  Pulled     34s   kubelet            spec.containers{example}: Successfully pulled image "jurwa-registry:5050/agnhost:2.53" in 7.414s (7.415s including waiting). Image size: 52729794 bytes.
+  Normal  Created    34s   kubelet            spec.containers{example}: Container created
+  Normal  Started    33s   kubelet            spec.containers{example}: Container started

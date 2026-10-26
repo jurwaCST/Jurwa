@@ -1,0 +1,51 @@
+# Reusable pattern for every Jurwa gRPC service. Copy this folder to
+# deploy/k8s/services/<service-name>/ and replace "example", the image and the port.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example
+  labels:
+    app.kubernetes.io/name: example
+    app.kubernetes.io/part-of: jurwa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: example
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: example
+        app.kubernetes.io/part-of: jurwa
+    spec:
+      containers:
+        - name: example
+          # Placeholder: a public test image that serves the standard gRPC health
+          # check (grpc.health.v1). Real services use their own image, for example
+          # jurwa-registry:5050/report-submission:<tag>.
+          image: jurwa-registry:5050/agnhost:2.53
+          args: ["grpc-health-checking", "--port=$(PORT)"]
+          ports:
+            - name: grpc
+              containerPort: 9001
+          envFrom:
+            - configMapRef:
+                name: example-config
+          readinessProbe:
+            grpc:
+              port: 9001
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          livenessProbe:
+            grpc:
+              port: 9001
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi

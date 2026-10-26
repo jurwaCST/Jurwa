@@ -1,0 +1,7 @@
+$ kubectl get ns
+NAME              STATUS   AGE
+default           Active   79s
+jurwa             Active   43s
+kube-node-lease   Active   79s
+kube-public       Active   79s
+kube-system       Active   79s

@@ -1,0 +1,5 @@
+$ kubectl get nodes   (2026-10-26 22:20)
+NAME                 STATUS   ROLES           AGE   VERSION        INTERNAL-IP   EXTERNAL-IP   OS-IMAGE           KERNEL-VERSION    CONTAINER-RUNTIME
+k3d-jurwa-agent-0    Ready    <none>          72s   v1.35.5+k3s1   172.21.0.5    <none>        K3s v1.35.5+k3s1   7.0.12-linuxkit   containerd://2.2.3-k3s1
+k3d-jurwa-agent-1    Ready    <none>          72s   v1.35.5+k3s1   172.21.0.4    <none>        K3s v1.35.5+k3s1   7.0.12-linuxkit   containerd://2.2.3-k3s1
+k3d-jurwa-server-0   Ready    control-plane   76s   v1.35.5+k3s1   172.21.0.3    <none>        K3s v1.35.5+k3s1   7.0.12-linuxkit   containerd://2.2.3-k3s1
