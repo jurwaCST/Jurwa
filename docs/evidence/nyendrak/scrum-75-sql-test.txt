@@ -1,0 +1,14 @@
+OK    analytics.sql -> database analytics: report_facts
+OK    authorization.sql -> database authorization_db: roles, user_roles
+OK    category-taxonomy.sql -> database category_taxonomy: categories
+OK    department-directory.sql -> database department_directory: departments, positions
+OK    feedback.sql -> database feedback: feedback
+OK    identity.sql -> database identity: users
+OK    location-taxonomy.sql -> database location_taxonomy: locations
+OK    notification.sql -> database notification: notifications
+OK    reassignment.sql -> database reassignment: assignments
+OK    report-history.sql -> database report_history: report_summaries, report_timeline
+OK    routing-rules.sql -> database routing_rules: routing_rules
+OK    sla-policy.sql -> database sla_policy: sla_policies
+OK    status-lifecycle.sql -> database status_lifecycle: report_status
+All schema files ran with no errors.
