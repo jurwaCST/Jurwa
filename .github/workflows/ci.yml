@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  go:
+    name: Go checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      # Until the service template (SCRUM-73) adds go.mod, skip the Go steps instead of failing.
+      - name: Look for go.mod
+        id: gomod
+        run: |
+          if [ -f go.mod ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No go.mod at the repo root yet, Go checks skipped."
+          fi
+
+      - name: Set up Go (version from go.mod)
+        if: steps.gomod.outputs.present == 'true'
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: gofmt (must list no files)
+        if: steps.gomod.outputs.present == 'true'
+        run: |
+          unformatted="$(gofmt -l .)"
+          if [ -n "$unformatted" ]; then
+            echo "These files are not formatted. Run 'gofmt -w <file>' and commit:"
+            echo "$unformatted"
+            exit 1
+          fi
+
+      - name: go vet
+        if: steps.gomod.outputs.present == 'true'
+        run: go vet ./...
+
+      - name: go test with coverage
+        if: steps.gomod.outputs.present == 'true'
+        run: go test ./... -cover
+
+      - name: go build
+        if: steps.gomod.outputs.present == 'true'
+        run: go build ./...
