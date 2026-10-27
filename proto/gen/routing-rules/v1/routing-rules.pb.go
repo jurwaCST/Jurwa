@@ -33,7 +33,7 @@ type Rule struct {
 	Category       v1.Category            `protobuf:"varint,2,opt,name=category,proto3,enum=jurwa.common.v1.Category" json:"category,omitempty"`    // required
 	Building       string                 `protobuf:"bytes,3,opt,name=building,proto3" json:"building,omitempty"`                                   // "" means any building in the category
 	TargetPosition string                 `protobuf:"bytes,4,opt,name=target_position,json=targetPosition,proto3" json:"target_position,omitempty"` // required, position code in department-directory, for example "DSA"
-	Priority       int32                  `protobuf:"varint,5,opt,name=priority,proto3" json:"priority,omitempty"`                                  // higher wins when two rules match, default 0
+	Priority       int32                  `protobuf:"varint,5,opt,name=priority,proto3" json:"priority,omitempty"`                                  // lower wins when two rules are equally specific; 0 means the default, 100
 	Active         bool                   `protobuf:"varint,6,opt,name=active,proto3" json:"active,omitempty"`
 	UpdatedAt      *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields  protoimpl.UnknownFields
