@@ -43,14 +43,27 @@ jobs:
             exit 1
           fi
 
-      - name: go vet
+      # Go ignores folders starting with "_" (services/_template), so until the first
+      # real service is added, ./... matches nothing and go vet / go test would fail.
+      - name: Look for Go packages
+        id: gopkgs
         if: steps.gomod.outputs.present == 'true'
+        run: |
+          if [ -n "$(go list ./...)" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No Go packages yet, vet, test and build skipped."
+          fi
+
+      - name: go vet
+        if: steps.gopkgs.outputs.present == 'true'
         run: go vet ./...
 
       - name: go test with coverage
-        if: steps.gomod.outputs.present == 'true'
+        if: steps.gopkgs.outputs.present == 'true'
         run: go test ./... -cover
 
       - name: go build
-        if: steps.gomod.outputs.present == 'true'
+        if: steps.gopkgs.outputs.present == 'true'
         run: go build ./...
