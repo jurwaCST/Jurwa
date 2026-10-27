@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: example
+  labels:
+    app.kubernetes.io/name: example
+    app.kubernetes.io/part-of: jurwa
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: example
+  ports:
+    - name: grpc
+      port: 9001
+      targetPort: grpc
+      appProtocol: grpc
