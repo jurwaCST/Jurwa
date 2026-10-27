@@ -26,3 +26,11 @@
 /services/feedback/                  @Gayley007
 /services/analytics/                 @Gayley007
 /services/digest-dispatcher/         @Gayley007
+
+# Shared template and tooling
+/go.mod                              @02240365
+/go.sum                              @02240365
+/Makefile                            @02240365
+/scripts/                            @02240365
+/dev/                                @02240365
+/services/_template/                 @02240365
