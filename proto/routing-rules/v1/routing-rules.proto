@@ -27,7 +27,7 @@ message Rule {
   jurwa.common.v1.Category category = 2; // required
   string building = 3; // "" means any building in the category
   string target_position = 4; // required, position code in department-directory, for example "DSA"
-  int32 priority = 5; // higher wins when two rules match, default 0
+  int32 priority = 5; // lower wins when two rules are equally specific; 0 means the default, 100
   bool active = 6;
   google.protobuf.Timestamp updated_at = 7;
 }
