@@ -1,0 +1,6 @@
+?   	github.com/jurwaCST/Jurwa/services/template-check/adapters/in/grpc	[no test files]
+?   	github.com/jurwaCST/Jurwa/services/template-check/adapters/out	[no test files]
+?   	github.com/jurwaCST/Jurwa/services/template-check/application	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/template-check/cmd/server	(cached)	coverage: 10.7% of statements
+?   	github.com/jurwaCST/Jurwa/services/template-check/domain	[no test files]
+?   	github.com/jurwaCST/Jurwa/services/template-check/ports	[no test files]
