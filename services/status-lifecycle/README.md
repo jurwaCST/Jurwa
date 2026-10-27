@@ -51,7 +51,7 @@ Plus the standard `grpc.health.v1.Health/Check` and server reflection.
 
 ```powershell
 $env:SEED_REPORT_IDS = "11111111-1111-1111-1111-111111111111,33333333-3333-3333-3333-333333333333"
-make run SERVICE=status-lifecycle
+go run ./services/status-lifecycle/cmd/server
 ```
 
 In a second terminal:
@@ -67,9 +67,11 @@ The second call succeeds. The third returns `FailedPrecondition`. In Git Bash, u
 Docker:
 
 ```powershell
-make docker-build SERVICE=status-lifecycle
+docker build -f services/status-lifecycle/Dockerfile --build-arg SERVICE=status-lifecycle -t jurwa/status-lifecycle .
 docker run --rm -p 9011:9011 -e SEED_REPORT_IDS=11111111-1111-1111-1111-111111111111 jurwa/status-lifecycle
 ```
+
+`make run` and `make docker-build` work in Git Bash. In PowerShell, `make` uses cmd.exe and fails, so use the commands above.
 
 ## Test
 
