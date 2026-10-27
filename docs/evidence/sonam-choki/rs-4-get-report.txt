@@ -1,0 +1,16 @@
+$ grpcurl -plaintext -d '{"report_id":"eb8ba29b-345a-495d-aaf3-5ee16ebbed58"}' localhost:9001 jurwa.reportsubmission.v1.ReportSubmissionService/GetReport
+{
+  "report": {
+    "id": "eb8ba29b-345a-495d-aaf3-5ee16ebbed58",
+    "reporterId": "0b9e8d7c-6a5b-4c3d-9e2f-1a0b9c8d7e6f",
+    "category": "HOSTEL",
+    "location": {
+      "building": "Hostel B",
+      "wing": "Wing 2",
+      "area": "Bathroom 2"
+    },
+    "description": "Tap in the bathroom is leaking.",
+    "status": "OPEN",
+    "createdAt": "2026-10-27T05:55:58.719980Z"
+  }
+}
