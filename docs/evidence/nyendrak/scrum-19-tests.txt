@@ -1,0 +1,9 @@
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/adapters/in/grpc	4.798s	coverage: 100.0% of statements
+?   	github.com/jurwaCST/Jurwa/services/status-lifecycle/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/adapters/out/logpublisher	1.826s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/adapters/out/memory	0.949s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/application	1.854s	coverage: 97.1% of statements
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/cmd/server	4.838s	coverage: 9.4% of statements
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/domain	1.826s	coverage: 100.0% of statements
+?   	github.com/jurwaCST/Jurwa/services/status-lifecycle/ports	[no test files]
+domain subtests passed: 61
