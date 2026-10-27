@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+// sla-tracking runs one SLA timer per report in Redis and publishes sla.lapsed.
+// Owner: Nyendrak Yoezer Zangmo. Port 9012.
+package jurwa.slatracking.v1;
+
+import "common/v1/common.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/jurwaCST/Jurwa/proto/gen/sla-tracking/v1;slatrackingv1";
+
+service SlaTrackingService {
+  // Starts the timer when a report is routed. The deadline comes from sla-policy.
+  // Errors: ALREADY_EXISTS when a timer is already running for the report.
+  rpc StartTimer(StartTimerRequest) returns (StartTimerResponse);
+  // Stops the timer when the report is Resolved.
+  // Errors: NOT_FOUND when there is no timer.
+  rpc StopTimer(StopTimerRequest) returns (StopTimerResponse);
+  // Errors: NOT_FOUND when there is no timer.
+  rpc GetTimer(GetTimerRequest) returns (GetTimerResponse);
+  // Running timers whose deadline is at or before `now`. Called by the
+  // sla-escalation-checker function, which then marks them lapsed.
+  rpc ListDueTimers(ListDueTimersRequest) returns (ListDueTimersResponse);
+}
+
+enum TimerState {
+  TIMER_STATE_UNSPECIFIED = 0;
+  RUNNING = 1;
+  STOPPED = 2;
+  LAPSED = 3;
+}
+
+message Timer {
+  string report_id = 1;
+  jurwa.common.v1.Category category = 2;
+  google.protobuf.Timestamp started_at = 3;
+  google.protobuf.Timestamp deadline = 4;
+  TimerState state = 5;
+}
+
+message StartTimerRequest {
+  string report_id = 1; // required, UUID
+  jurwa.common.v1.Category category = 2; // required, used to look up the SLA window
+}
+
+message StartTimerResponse {
+  Timer timer = 1;
+}
+
+message StopTimerRequest {
+  string report_id = 1; // required, UUID
+}
+
+message StopTimerResponse {
+  Timer timer = 1;
+}
+
+message GetTimerRequest {
+  string report_id = 1; // required, UUID
+}
+
+message GetTimerResponse {
+  Timer timer = 1;
+}
+
+message ListDueTimersRequest {
+  google.protobuf.Timestamp now = 1; // optional, server time when not set
+  int32 limit = 2; // optional, 1 to 500, default 100
+}
+
+message ListDueTimersResponse {
+  repeated Timer timers = 1;
+}

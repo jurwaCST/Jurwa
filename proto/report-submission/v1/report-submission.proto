@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+// report-submission accepts new reports and stores them. Owner: Sonam Choki. Port 9001.
+package jurwa.reportsubmission.v1;
+
+import "common/v1/common.proto";
+
+option go_package = "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1;reportsubmissionv1";
+
+service ReportSubmissionService {
+  // Validates and stores a report with status OPEN, then publishes report.submitted.
+  // Errors: INVALID_ARGUMENT when a form rule below is broken.
+  rpc SubmitReport(SubmitReportRequest) returns (SubmitReportResponse);
+  // Errors: NOT_FOUND when the id is unknown.
+  rpc GetReport(GetReportRequest) returns (GetReportResponse);
+}
+
+// The report form.
+message SubmitReportRequest {
+  string reporter_id = 1; // required, UUID. Set by api-gateway from the JWT, never from the form
+  jurwa.common.v1.Category category = 2; // required, not CATEGORY_UNSPECIFIED
+  jurwa.common.v1.Location location = 3; // required, location.building required
+  string description = 4; // required, not blank, at most 500 characters. Never used for routing
+  optional string photo_id = 5; // optional, id returned by photo-media UploadPhoto (JPG or PNG, at most 5 MB)
+}
+
+message SubmitReportResponse {
+  jurwa.common.v1.Report report = 1;
+}
+
+message GetReportRequest {
+  string report_id = 1; // required, UUID
+}
+
+message GetReportResponse {
+  jurwa.common.v1.Report report = 1;
+}

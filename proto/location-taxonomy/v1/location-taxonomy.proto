@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+// location-taxonomy holds the list of valid locations per category.
+// Owner: Sonam Choki. Port 9004.
+package jurwa.locationtaxonomy.v1;
+
+import "common/v1/common.proto";
+
+option go_package = "github.com/jurwaCST/Jurwa/proto/gen/location-taxonomy/v1;locationtaxonomyv1";
+
+service LocationTaxonomyService {
+  // Active locations for one category, for the PWA drop-downs.
+  rpc ListLocations(ListLocationsRequest) returns (ListLocationsResponse);
+  // Checks that a location exists for a category. Called by report-submission.
+  rpc ValidateLocation(ValidateLocationRequest) returns (ValidateLocationResponse);
+}
+
+message LocationEntry {
+  string id = 1; // UUID
+  jurwa.common.v1.Category category = 2;
+  jurwa.common.v1.Location location = 3;
+}
+
+message ListLocationsRequest {
+  jurwa.common.v1.Category category = 1; // required, not CATEGORY_UNSPECIFIED
+}
+
+message ListLocationsResponse {
+  repeated LocationEntry locations = 1;
+}
+
+message ValidateLocationRequest {
+  jurwa.common.v1.Category category = 1; // required
+  jurwa.common.v1.Location location = 2; // required, building required
+}
+
+message ValidateLocationResponse {
+  bool valid = 1;
+  string reason = 2; // "" when valid, otherwise why, for example "unknown building"
+}

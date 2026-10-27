@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+// photo-media stores report photos in MongoDB GridFS. Owner: Sonam Choki. Port 9002.
+package jurwa.photomedia.v1;
+
+option go_package = "github.com/jurwaCST/Jurwa/proto/gen/photo-media/v1;photomediav1";
+
+service PhotoMediaService {
+  // Stores one photo and returns its id. The student uploads the photo first,
+  // then sends the photo_id with SubmitReport.
+  // gRPC accepts 4 MB messages by default, so this server must start with
+  // grpc.MaxRecvMsgSize(6 << 20) and api-gateway must allow the same size.
+  // Errors: INVALID_ARGUMENT for a wrong content type or a photo over 5 MB.
+  rpc UploadPhoto(UploadPhotoRequest) returns (UploadPhotoResponse);
+  // Errors: NOT_FOUND when the id is unknown.
+  rpc GetPhoto(GetPhotoRequest) returns (GetPhotoResponse);
+}
+
+message UploadPhotoRequest {
+  string uploader_id = 1; // required, UUID of the student (set by api-gateway from the JWT)
+  string content_type = 2; // required, "image/jpeg" or "image/png" only
+  bytes data = 3; // required, not empty, at most 5242880 bytes (5 MB)
+  string file_name = 4; // optional, original file name, for display only
+}
+
+message UploadPhotoResponse {
+  string photo_id = 1; // UUID
+}
+
+message GetPhotoRequest {
+  string photo_id = 1; // required, UUID
+}
+
+message GetPhotoResponse {
+  string photo_id = 1;
+  string content_type = 2; // "image/jpeg" or "image/png"
+  bytes data = 3;
+  int64 size_bytes = 4;
+  string uploader_id = 5;
+  optional string report_id = 6; // set once the report is created
+}

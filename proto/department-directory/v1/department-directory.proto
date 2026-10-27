@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+// department-directory knows the departments, positions (DSA, DAA, SSO, HoDs,
+// councillors, staff) and who holds each one. Owner: Sonam Zangmo. Port 9008.
+package jurwa.departmentdirectory.v1;
+
+option go_package = "github.com/jurwaCST/Jurwa/proto/gen/department-directory/v1;departmentdirectoryv1";
+
+service DepartmentDirectoryService {
+  // The 5 academic departments.
+  rpc ListDepartments(ListDepartmentsRequest) returns (ListDepartmentsResponse);
+  // The Head of Department position for one department.
+  // Errors: NOT_FOUND when the department or its HoD position is unknown.
+  rpc GetHoD(GetHoDRequest) returns (GetHoDResponse);
+  // One position and its holder, for example "DSA". Used by routing-engine.
+  // Errors: NOT_FOUND when the position code is unknown.
+  rpc GetStaff(GetStaffRequest) returns (GetStaffResponse);
+}
+
+message Department {
+  string code = 1; // for example "IT"
+  string name = 2;
+}
+
+message Position {
+  string code = 1; // for example "DSA", "DAA", "SSO", "HOD_IT"
+  string title = 2; // for example "Dean of Student Affairs"
+  string kind = 3; // CATEGORY_HEAD, HOD, COUNCILLOR or STAFF
+  string department_code = 4; // "" when not a department position
+  string holder_user_id = 5; // "" when nobody holds it yet
+  bool active = 6;
+}
+
+message ListDepartmentsRequest {}
+
+message ListDepartmentsResponse {
+  repeated Department departments = 1;
+}
+
+message GetHoDRequest {
+  string department_code = 1; // required
+}
+
+message GetHoDResponse {
+  Position position = 1;
+}
+
+message GetStaffRequest {
+  string position_code = 1; // required
+}
+
+message GetStaffResponse {
+  Position position = 1;
+}

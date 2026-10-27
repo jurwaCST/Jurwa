@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+// reassignment keeps who each report is assigned to, and the history of changes.
+// Owner: Nyendrak Yoezer Zangmo. Port 9014.
+package jurwa.reassignment.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/jurwaCST/Jurwa/proto/gen/reassignment/v1;reassignmentv1";
+
+service ReassignmentService {
+  // Assigns a report to another user and publishes report.reassigned.
+  // Errors: INVALID_ARGUMENT for a missing field, NOT_FOUND when the report has no assignment,
+  // PERMISSION_DENIED when the actor is not the current assignee or a Category Head.
+  rpc ReassignReport(ReassignReportRequest) returns (ReassignReportResponse);
+  // All assignments for a report, oldest first. The last one has current = true.
+  rpc ListReassignments(ListReassignmentsRequest) returns (ListReassignmentsResponse);
+}
+
+enum AssignmentKind {
+  ASSIGNMENT_KIND_UNSPECIFIED = 0;
+  ROUTED = 1; // first assignment by routing-engine
+  REASSIGNED = 2; // a person moved it
+  ESCALATED = 3; // the SLA lapsed (Saga step)
+  COMPENSATED = 4; // an escalation was undone (Saga compensation)
+}
+
+message Assignment {
+  string id = 1; // UUID
+  string report_id = 2;
+  string assignee_user_id = 3;
+  string assignee_position_code = 4; // "" when assigned to a person, not a position
+  AssignmentKind kind = 5;
+  optional string assigned_by = 6; // absent when the system acted
+  string reason = 7;
+  bool current = 8;
+  google.protobuf.Timestamp assigned_at = 9;
+}
+
+message ReassignReportRequest {
+  string report_id = 1; // required, UUID
+  string to_user_id = 2; // required, UUID of the new assignee
+  string reason = 3; // required, not blank, at most 500 characters
+  string actor_id = 4; // required, UUID of the user reassigning (set by api-gateway from the JWT)
+}
+
+message ReassignReportResponse {
+  Assignment assignment = 1;
+}
+
+message ListReassignmentsRequest {
+  string report_id = 1; // required, UUID
+}
+
+message ListReassignmentsResponse {
+  repeated Assignment assignments = 1;
+}

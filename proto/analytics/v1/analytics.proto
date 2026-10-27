@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+// analytics serves dashboard counts for the System Administrator and the read-only
+// College President view. Built from events only. Owner: Gayley Choden. Port 9020.
+package jurwa.analytics.v1;
+
+import "common/v1/common.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/jurwaCST/Jurwa/proto/gen/analytics/v1;analyticsv1";
+
+service AnalyticsService {
+  // Totals per status for reports created in the period.
+  rpc GetSummary(GetSummaryRequest) returns (GetSummaryResponse);
+  // The same counts split by category.
+  rpc GetCategoryBreakdown(GetCategoryBreakdownRequest) returns (GetCategoryBreakdownResponse);
+}
+
+// Period filter. Both ends optional; unset means no limit on that side.
+message Period {
+  google.protobuf.Timestamp from = 1;
+  google.protobuf.Timestamp to = 2;
+}
+
+message StatusCounts {
+  int64 total = 1;
+  int64 open = 2;
+  int64 assigned = 3;
+  int64 in_progress = 4;
+  int64 resolved = 5;
+  int64 escalated = 6; // reports escalated at least once
+}
+
+message GetSummaryRequest {
+  Period period = 1; // optional
+}
+
+message GetSummaryResponse {
+  StatusCounts counts = 1;
+  double average_resolution_hours = 2; // 0 when nothing is resolved
+}
+
+message CategoryCounts {
+  jurwa.common.v1.Category category = 1;
+  StatusCounts counts = 2;
+}
+
+message GetCategoryBreakdownRequest {
+  Period period = 1; // optional
+}
+
+message GetCategoryBreakdownResponse {
+  repeated CategoryCounts categories = 1;
+}

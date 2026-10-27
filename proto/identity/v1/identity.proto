@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+// identity holds user accounts, checks passwords and issues JWTs.
+// Owner: Gayley Choden. Port 9016.
+package jurwa.identity.v1;
+
+import "common/v1/common.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/jurwaCST/Jurwa/proto/gen/identity/v1;identityv1";
+
+service IdentityService {
+  // Creates an account. New accounts get the STUDENT role.
+  // Errors: INVALID_ARGUMENT for a bad email or short password, ALREADY_EXISTS for a used email.
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  // Checks email and password and returns a signed JWT.
+  // Errors: UNAUTHENTICATED for a wrong email or password (same message for both).
+  rpc Login(LoginRequest) returns (LoginResponse);
+  // Checks a JWT and returns who it belongs to. Called by api-gateway on every request.
+  // Errors: UNAUTHENTICATED for an invalid or expired token.
+  rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse);
+}
+
+message User {
+  string id = 1; // UUID
+  string email = 2;
+  string full_name = 3;
+  repeated jurwa.common.v1.Role roles = 4; // from authorization
+  bool active = 5;
+  google.protobuf.Timestamp created_at = 6;
+}
+
+message RegisterRequest {
+  string email = 1; // required, institutional email address
+  string full_name = 2; // required, not blank
+  string password = 3; // required, at least 8 characters. Stored only as a bcrypt hash, never logged
+}
+
+message RegisterResponse {
+  User user = 1;
+}
+
+message LoginRequest {
+  string email = 1; // required
+  string password = 2; // required, never logged
+}
+
+message LoginResponse {
+  string access_token = 1; // JWT
+  google.protobuf.Timestamp expires_at = 2;
+  User user = 3;
+}
+
+message ValidateTokenRequest {
+  string access_token = 1; // required, JWT without the "Bearer " prefix
+}
+
+message ValidateTokenResponse {
+  User user = 1; // includes roles
+}

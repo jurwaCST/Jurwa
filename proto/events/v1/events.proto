@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+// Payloads of the events on the Redis Streams bus. Each message is serialised with
+// protobuf and stored in the stream entry field "payload". Stream names are given
+// above each message. Every reading service uses a consumer group named after itself.
+package jurwa.events.v1;
+
+import "common/v1/common.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/jurwaCST/Jurwa/proto/gen/events/v1;eventsv1";
+
+// Fields every event carries.
+message EventMeta {
+  string event_id = 1; // UUID, lets readers ignore duplicates
+  google.protobuf.Timestamp occurred_at = 2;
+  string producer = 3; // service name, for example "sla-tracking"
+  string correlation_id = 4; // same value through one flow, for example one Saga run
+}
+
+// Stream events:report.submitted, published by report-submission.
+message ReportSubmitted {
+  EventMeta meta = 1;
+  jurwa.common.v1.Report report = 2;
+}
+
+// Stream events:report.routed, published by routing-engine.
+message ReportRouted {
+  EventMeta meta = 1;
+  string report_id = 2;
+  jurwa.common.v1.Category category = 3;
+  string category_head_id = 4;
+  string target_position = 5;
+  string rule_id = 6;
+}
+
+// Stream events:status.changed, published by status-lifecycle.
+message StatusChanged {
+  EventMeta meta = 1;
+  string report_id = 2;
+  jurwa.common.v1.Status from_status = 3;
+  jurwa.common.v1.Status to_status = 4;
+  optional string actor_id = 5; // absent when the system acted
+  int32 version = 6;
+}
+
+// Stream events:report.reassigned, published by reassignment.
+message ReportReassigned {
+  EventMeta meta = 1;
+  string report_id = 2;
+  string from_user_id = 3;
+  string to_user_id = 4;
+  string reason = 5;
+  optional string actor_id = 6; // absent when the system acted (escalation)
+}
+
+// Stream events:sla.lapsed, published by sla-tracking. Starts the escalation Saga:
+// reassignment escalates the assignee, status-lifecycle sets ESCALATED.
+message SlaLapsed {
+  EventMeta meta = 1;
+  string report_id = 2;
+  jurwa.common.v1.Category category = 3;
+  google.protobuf.Timestamp deadline = 4;
+}
+
+// Stream events:escalation.compensated, published by status-lifecycle or reassignment
+// when a later Saga step fails and an earlier step is undone.
+message EscalationCompensated {
+  EventMeta meta = 1;
+  string report_id = 2;
+  string failed_step = 3; // for example "status-lifecycle.set-escalated"
+  string undone_step = 4; // for example "reassignment.escalate"
+  string reason = 5;
+}
