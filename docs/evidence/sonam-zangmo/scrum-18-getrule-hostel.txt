@@ -1,0 +1,9 @@
+{
+  "rule": {
+    "id": "09d48c68-445a-499e-8403-b1a71146a3e3",
+    "category": "HOSTEL",
+    "targetPosition": "DSA",
+    "priority": 100,
+    "active": true
+  }
+}
