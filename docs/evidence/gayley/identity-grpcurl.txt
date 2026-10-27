@@ -1,0 +1,61 @@
+$ grpcurl -plaintext localhost:9016 grpc.health.v1.Health/Check
+{
+  "status": "SERVING"
+}
+$ grpcurl -plaintext -d '{"email":"02240340.cst@rub.edu.bt","full_name":"Gayley Choden","password":"secret123"}' localhost:9016 jurwa.identity.v1.IdentityService/Register
+{
+  "user": {
+    "id": "f0c00024-95b6-4df9-9360-d0067a47f519",
+    "email": "02240340.cst@rub.edu.bt",
+    "fullName": "Gayley Choden",
+    "roles": [
+      "STUDENT"
+    ],
+    "active": true,
+    "createdAt": "2026-10-27T06:02:48.623547671Z"
+  }
+}
+$ (same Register again: duplicate email)
+ERROR:
+  Code: AlreadyExists
+  Message: email is already registered
+$ grpcurl ... IdentityService/Login (wrong password)
+ERROR:
+  Code: Unauthenticated
+  Message: wrong email or password
+$ grpcurl -plaintext -d '{"email":"02240340.cst@rub.edu.bt","password":"secret123"}' localhost:9016 jurwa.identity.v1.IdentityService/Login
+{
+  "accessToken": "eyJhbGciOi...(shortened)",
+  "expiresAt": "2026-10-27T06:17:49.283764961Z",
+  "user": {
+    "id": "f0c00024-95b6-4df9-9360-d0067a47f519",
+    "email": "02240340.cst@rub.edu.bt",
+    "fullName": "Gayley Choden",
+    "roles": [
+      "STUDENT"
+    ],
+    "active": true,
+    "createdAt": "2026-10-27T06:02:48.623547671Z"
+  }
+}
+$ grpcurl -plaintext -d "{\"access_token\":\"$TOKEN\"}" localhost:9016 jurwa.identity.v1.IdentityService/ValidateToken
+{
+  "user": {
+    "id": "f0c00024-95b6-4df9-9360-d0067a47f519",
+    "email": "02240340.cst@rub.edu.bt",
+    "fullName": "Gayley Choden",
+    "roles": [
+      "STUDENT"
+    ],
+    "active": true,
+    "createdAt": "2026-10-27T06:02:48.623547671Z"
+  }
+}
+$ (ValidateToken with a tampered token)
+ERROR:
+  Code: Unauthenticated
+  Message: invalid or expired token
+$ docker logs identity
+{"time":"2026-10-27T06:02:41.413969871Z","level":"INFO","msg":"server started","service":"identity","port":"9016"}
+{"time":"2026-10-27T06:02:48.674526562Z","level":"INFO","msg":"user registered","service":"identity","user_id":"f0c00024-95b6-4df9-9360-d0067a47f519"}
+{"time":"2026-10-27T06:02:49.283959937Z","level":"INFO","msg":"user logged in","service":"identity","user_id":"f0c00024-95b6-4df9-9360-d0067a47f519"}
