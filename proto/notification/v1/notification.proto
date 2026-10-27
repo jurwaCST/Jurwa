@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+// notification sends email and in-app messages and keeps an outbox of them.
+// Owner: Gayley Choden. Port 9018.
+package jurwa.notification.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/jurwaCST/Jurwa/proto/gen/notification/v1;notificationv1";
+
+service NotificationService {
+  // Queues a message. Delivery happens in the background.
+  // Errors: INVALID_ARGUMENT for a missing recipient, channel or subject.
+  rpc SendNotification(SendNotificationRequest) returns (SendNotificationResponse);
+  // Messages for one user, newest first.
+  rpc ListNotifications(ListNotificationsRequest) returns (ListNotificationsResponse);
+}
+
+enum Channel {
+  CHANNEL_UNSPECIFIED = 0;
+  EMAIL = 1;
+  IN_APP = 2;
+}
+
+enum DeliveryStatus {
+  DELIVERY_STATUS_UNSPECIFIED = 0;
+  PENDING = 1;
+  SENT = 2;
+  FAILED = 3;
+}
+
+message Notification {
+  string id = 1; // UUID
+  string recipient_user_id = 2;
+  Channel channel = 3;
+  string event_type = 4; // event that caused it, for example "status.changed"
+  optional string report_id = 5;
+  string subject = 6;
+  string body = 7;
+  DeliveryStatus delivery_status = 8;
+  google.protobuf.Timestamp created_at = 9;
+  optional google.protobuf.Timestamp sent_at = 10;
+  optional google.protobuf.Timestamp read_at = 11;
+}
+
+message SendNotificationRequest {
+  string recipient_user_id = 1; // required, UUID
+  Channel channel = 2; // required, not CHANNEL_UNSPECIFIED
+  string event_type = 3; // required
+  optional string report_id = 4;
+  string subject = 5; // required, not blank
+  string body = 6; // required
+}
+
+message SendNotificationResponse {
+  Notification notification = 1;
+}
+
+message ListNotificationsRequest {
+  string recipient_user_id = 1; // required, UUID
+  bool unread_only = 2; // default false
+  int32 page_size = 3; // optional, 1 to 100, default 20
+  string page_token = 4; // optional
+}
+
+message ListNotificationsResponse {
+  repeated Notification notifications = 1;
+  string next_page_token = 2; // "" when there are no more pages
+}

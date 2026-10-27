@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+// audit-log is an append-only record of every action. Entries are never changed or deleted.
+// Owner: Nyendrak Yoezer Zangmo. Port 9015.
+package jurwa.auditlog.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/jurwaCST/Jurwa/proto/gen/audit-log/v1;auditlogv1";
+
+service AuditLogService {
+  // Errors: INVALID_ARGUMENT when service or action is missing.
+  rpc Append(AppendRequest) returns (AppendResponse);
+  // Entries for one report, oldest first.
+  rpc ListByReport(ListByReportRequest) returns (ListByReportResponse);
+}
+
+message AuditEvent {
+  string id = 1; // UUID, set by the server
+  google.protobuf.Timestamp occurred_at = 2; // when the action happened
+  string service = 3; // service that did it, for example "status-lifecycle"
+  string action = 4; // REPORT_SUBMITTED, ROUTED, STATUS_CHANGED, REASSIGNED, ESCALATED or COMPENSATED
+  optional string report_id = 5; // absent for actions not about a report
+  optional string actor_id = 6; // absent when the system acted
+  optional string on_behalf_of = 7; // staff member without email a supervisor acts for
+  map<string, string> details = 8; // action-specific, for example {"from": "OPEN", "to": "ASSIGNED"}
+}
+
+message AppendRequest {
+  AuditEvent event = 1; // required. id is ignored and set by the server
+}
+
+message AppendResponse {
+  string id = 1;
+}
+
+message ListByReportRequest {
+  string report_id = 1; // required, UUID
+}
+
+message ListByReportResponse {
+  repeated AuditEvent events = 1;
+}

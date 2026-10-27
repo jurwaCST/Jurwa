@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+// internal-notes stores staff-only notes on a report. Students never see them.
+// Owner: Sonam Choki. Port 9005.
+package jurwa.internalnotes.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/jurwaCST/Jurwa/proto/gen/internal-notes/v1;internalnotesv1";
+
+service InternalNotesService {
+  // Errors: INVALID_ARGUMENT for a blank body, PERMISSION_DENIED for students.
+  rpc AddNote(AddNoteRequest) returns (AddNoteResponse);
+  // Notes for one report, oldest first.
+  rpc ListNotes(ListNotesRequest) returns (ListNotesResponse);
+}
+
+message Note {
+  string id = 1; // UUID
+  string report_id = 2;
+  string author_id = 3; // Category Head or staff user
+  string body = 4;
+  google.protobuf.Timestamp created_at = 5;
+}
+
+message AddNoteRequest {
+  string report_id = 1; // required, UUID
+  string author_id = 2; // required, UUID (set by api-gateway from the JWT)
+  string body = 3; // required, not blank
+}
+
+message AddNoteResponse {
+  Note note = 1;
+}
+
+message ListNotesRequest {
+  string report_id = 1; // required, UUID
+}
+
+message ListNotesResponse {
+  repeated Note notes = 1;
+}

@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+// category-taxonomy holds the display names and order of the report categories.
+// Owner: Sonam Zangmo. Port 9009.
+package jurwa.categorytaxonomy.v1;
+
+import "common/v1/common.proto";
+
+option go_package = "github.com/jurwaCST/Jurwa/proto/gen/category-taxonomy/v1;categorytaxonomyv1";
+
+service CategoryTaxonomyService {
+  // Active categories in display order, for the PWA form.
+  rpc ListCategories(ListCategoriesRequest) returns (ListCategoriesResponse);
+  // Errors: INVALID_ARGUMENT for CATEGORY_UNSPECIFIED, NOT_FOUND when unknown.
+  rpc GetCategory(GetCategoryRequest) returns (GetCategoryResponse);
+}
+
+message CategoryInfo {
+  jurwa.common.v1.Category category = 1;
+  string name = 2; // for example "Academic Block"
+  string description = 3; // help text shown on the form
+  int32 sort_order = 4;
+  bool active = 5;
+}
+
+message ListCategoriesRequest {}
+
+message ListCategoriesResponse {
+  repeated CategoryInfo categories = 1;
+}
+
+message GetCategoryRequest {
+  jurwa.common.v1.Category category = 1; // required
+}
+
+message GetCategoryResponse {
+  CategoryInfo category = 1;
+}

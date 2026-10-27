@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+// sla-policy stores the SLA window (hours) for each category.
+// Owner: Nyendrak Yoezer Zangmo. Port 9013.
+package jurwa.slapolicy.v1;
+
+import "common/v1/common.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/jurwaCST/Jurwa/proto/gen/sla-policy/v1;slapolicyv1";
+
+service SlaPolicyService {
+  // Errors: INVALID_ARGUMENT for CATEGORY_UNSPECIFIED, NOT_FOUND when no policy is set.
+  rpc GetPolicy(GetPolicyRequest) returns (GetPolicyResponse);
+  // Creates or updates the window for a category. System Administrator only.
+  // Errors: INVALID_ARGUMENT when window_hours is not above 0.
+  rpc UpsertPolicy(UpsertPolicyRequest) returns (UpsertPolicyResponse);
+}
+
+message Policy {
+  jurwa.common.v1.Category category = 1;
+  int32 window_hours = 2; // greater than 0
+  optional string updated_by = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}
+
+message GetPolicyRequest {
+  jurwa.common.v1.Category category = 1; // required, not CATEGORY_UNSPECIFIED
+}
+
+message GetPolicyResponse {
+  Policy policy = 1;
+}
+
+message UpsertPolicyRequest {
+  jurwa.common.v1.Category category = 1; // required, not CATEGORY_UNSPECIFIED
+  int32 window_hours = 2; // required, greater than 0
+  string updated_by = 3; // required, UUID of the System Administrator
+}
+
+message UpsertPolicyResponse {
+  Policy policy = 1;
+}

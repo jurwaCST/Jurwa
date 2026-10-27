@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+// routing-rules stores which Category Head position receives each category.
+// Owner: Sonam Zangmo. Port 9006.
+package jurwa.routingrules.v1;
+
+import "common/v1/common.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/jurwaCST/Jurwa/proto/gen/routing-rules/v1;routingrulesv1";
+
+service RoutingRulesService {
+  // Finds the rule for a category and location. A rule for the exact building wins
+  // over the category rule (building ""). The description is never an input.
+  // Errors: INVALID_ARGUMENT for CATEGORY_UNSPECIFIED, NOT_FOUND when no active rule matches.
+  rpc GetRule(GetRuleRequest) returns (GetRuleResponse);
+  // All rules, for the System Administrator.
+  rpc ListRules(ListRulesRequest) returns (ListRulesResponse);
+  // Creates or updates the rule for (category, building). System Administrator only.
+  // Errors: INVALID_ARGUMENT for a missing category or target_position.
+  rpc UpsertRule(UpsertRuleRequest) returns (UpsertRuleResponse);
+}
+
+// Seeded rules: HOSTEL to DSA, ACADEMIC_BLOCK to DAA, OTHERS to SSO.
+message Rule {
+  string id = 1; // UUID
+  jurwa.common.v1.Category category = 2; // required
+  string building = 3; // "" means any building in the category
+  string target_position = 4; // required, position code in department-directory, for example "DSA"
+  int32 priority = 5; // higher wins when two rules match, default 0
+  bool active = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+message GetRuleRequest {
+  jurwa.common.v1.Category category = 1; // required, not CATEGORY_UNSPECIFIED
+  jurwa.common.v1.Location location = 2; // optional, only building is used
+}
+
+message GetRuleResponse {
+  Rule rule = 1;
+}
+
+message ListRulesRequest {
+  bool include_inactive = 1; // default false
+}
+
+message ListRulesResponse {
+  repeated Rule rules = 1;
+}
+
+message UpsertRuleRequest {
+  Rule rule = 1; // required. id is ignored; (category, building) identifies the rule
+}
+
+message UpsertRuleResponse {
+  Rule rule = 1;
+}

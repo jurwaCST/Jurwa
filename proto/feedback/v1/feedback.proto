@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+// feedback stores the student's rating of how a report was resolved.
+// Owner: Gayley Choden. Port 9019.
+package jurwa.feedback.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/jurwaCST/Jurwa/proto/gen/feedback/v1;feedbackv1";
+
+service FeedbackService {
+  // One rating per report, only by its reporter, only after it is RESOLVED.
+  // Errors: INVALID_ARGUMENT for a rating outside 1 to 5 or a long comment,
+  // ALREADY_EXISTS when the report already has feedback, FAILED_PRECONDITION when not resolved.
+  rpc SubmitFeedback(SubmitFeedbackRequest) returns (SubmitFeedbackResponse);
+  // Errors: NOT_FOUND when the report has no feedback.
+  rpc GetFeedback(GetFeedbackRequest) returns (GetFeedbackResponse);
+}
+
+message Feedback {
+  string id = 1; // UUID
+  string report_id = 2;
+  string student_user_id = 3;
+  int32 rating = 4; // 1 to 5
+  string comment = 5;
+  google.protobuf.Timestamp created_at = 6;
+}
+
+message SubmitFeedbackRequest {
+  string report_id = 1; // required, UUID
+  string student_user_id = 2; // required, UUID (set by api-gateway from the JWT)
+  int32 rating = 3; // required, 1 to 5
+  string comment = 4; // optional, at most 500 characters
+}
+
+message SubmitFeedbackResponse {
+  Feedback feedback = 1;
+}
+
+message GetFeedbackRequest {
+  string report_id = 1; // required, UUID
+}
+
+message GetFeedbackResponse {
+  Feedback feedback = 1;
+}

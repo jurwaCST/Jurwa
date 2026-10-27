@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+// Types shared by every Jurwa service.
+package jurwa.common.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/jurwaCST/Jurwa/proto/gen/common/v1;commonv1";
+
+// Category chosen by the student. Routing uses only category and location.
+// The names match the codes stored in the databases (HOSTEL, ACADEMIC_BLOCK, OTHERS).
+enum Category {
+  CATEGORY_UNSPECIFIED = 0; // invalid in every request
+  HOSTEL = 1; // routed to DSA
+  ACADEMIC_BLOCK = 2; // routed to DAA
+  OTHERS = 3; // campus-wide, routed to SSO
+}
+
+// Report status. Open, Assigned, In Progress, Resolved.
+// ESCALATED is set only by the system when the SLA window passes.
+enum Status {
+  STATUS_UNSPECIFIED = 0;
+  OPEN = 1;
+  ASSIGNED = 2;
+  IN_PROGRESS = 3;
+  RESOLVED = 4;
+  ESCALATED = 5;
+}
+
+// User role. Councillors, HoDs and estate staff reached by reassignment are STAFF.
+enum Role {
+  ROLE_UNSPECIFIED = 0;
+  STUDENT = 1;
+  CATEGORY_HEAD = 2;
+  STAFF = 3;
+  SYSTEM_ADMIN = 4;
+  PRESIDENT = 5; // read-only dashboard
+}
+
+// Where the problem is.
+message Location {
+  string building = 1; // required, for example "Hostel B" or "Academic Block 2"
+  string wing = 2; // optional, "" when not used
+  string area = 3; // optional, "" when not used, for example "Bathroom 2"
+}
+
+// A facility issue report.
+message Report {
+  string id = 1; // UUID
+  string reporter_id = 2; // UUID of the student (identity)
+  Category category = 3; // required
+  Location location = 4; // required
+  string description = 5; // required, at most 500 characters, never used for routing
+  optional string photo_id = 6; // UUID from photo-media, absent when no photo
+  Status status = 7; // OPEN on creation; status-lifecycle is the source of truth after that
+  google.protobuf.Timestamp created_at = 8; // set by the server
+}

@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+// status-lifecycle owns the current status of every report and enforces the status flow.
+// Owner: Nyendrak Yoezer Zangmo. Port 9011.
+package jurwa.statuslifecycle.v1;
+
+import "common/v1/common.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/jurwaCST/Jurwa/proto/gen/status-lifecycle/v1;statuslifecyclev1";
+
+service StatusLifecycleService {
+  // Moves a report to a new status and publishes status.changed.
+  // Flow: OPEN > ASSIGNED > IN_PROGRESS > RESOLVED. ESCALATED is set only by the system.
+  // Errors: FAILED_PRECONDITION for a transition the flow does not allow,
+  // ABORTED when expected_version does not match (someone changed it first),
+  // NOT_FOUND when the report is unknown.
+  rpc ChangeStatus(ChangeStatusRequest) returns (ChangeStatusResponse);
+  // Errors: NOT_FOUND when the report is unknown.
+  rpc GetStatus(GetStatusRequest) returns (GetStatusResponse);
+}
+
+message ReportStatus {
+  string report_id = 1;
+  jurwa.common.v1.Status status = 2;
+  jurwa.common.v1.Status previous_status = 3; // used by the Saga to undo an escalation
+  int32 version = 4; // goes up by 1 on every change
+  optional string updated_by = 5; // absent when the system acted
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+message ChangeStatusRequest {
+  string report_id = 1; // required, UUID
+  jurwa.common.v1.Status to_status = 2; // required, not STATUS_UNSPECIFIED
+  string actor_id = 3; // UUID of the user, "" when the system acts (escalation)
+  int32 expected_version = 4; // optional, 0 means do not check
+  string reason = 5; // optional, shown in the timeline
+}
+
+message ChangeStatusResponse {
+  ReportStatus status = 1;
+}
+
+message GetStatusRequest {
+  string report_id = 1; // required, UUID
+}
+
+message GetStatusResponse {
+  ReportStatus status = 1;
+}

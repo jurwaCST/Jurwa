@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+// authorization decides whether a role may perform an action on a resource.
+// Owner: Gayley Choden. Port 9017.
+package jurwa.authorization.v1;
+
+import "common/v1/common.proto";
+
+option go_package = "github.com/jurwaCST/Jurwa/proto/gen/authorization/v1;authorizationv1";
+
+service AuthorizationService {
+  // Errors: INVALID_ARGUMENT when role, action or resource is missing.
+  rpc CheckPermission(CheckPermissionRequest) returns (CheckPermissionResponse);
+}
+
+message CheckPermissionRequest {
+  jurwa.common.v1.Role role = 1; // required, not ROLE_UNSPECIFIED
+  string action = 2; // required, for example "report.reassign"
+  string resource = 3; // required, for example "report" or "report:<uuid>"
+}
+
+message CheckPermissionResponse {
+  bool allowed = 1;
+  string reason = 2; // why it was denied, "" when allowed
+}

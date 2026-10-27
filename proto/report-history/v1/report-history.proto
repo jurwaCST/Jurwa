@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+// report-history keeps a read model of reports and their timeline, built from events.
+// Owner: Sonam Choki. Port 9003.
+package jurwa.reporthistory.v1;
+
+import "common/v1/common.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/jurwaCST/Jurwa/proto/gen/report-history/v1;reporthistoryv1";
+
+service ReportHistoryService {
+  // Reports submitted by one student, newest first.
+  rpc ListReportsByReporter(ListReportsByReporterRequest) returns (ListReportsByReporterResponse);
+  // Every event for one report, oldest first.
+  // Errors: NOT_FOUND when the report is unknown.
+  rpc GetReportTimeline(GetReportTimelineRequest) returns (GetReportTimelineResponse);
+}
+
+message ReportSummary {
+  string report_id = 1;
+  string reporter_id = 2;
+  jurwa.common.v1.Category category = 3;
+  jurwa.common.v1.Location location = 4;
+  jurwa.common.v1.Status status = 5;
+  optional string current_assignee_id = 6; // absent until routed
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}
+
+message TimelineEntry {
+  string id = 1;
+  string event_type = 2; // for example "report.submitted", "status.changed"
+  jurwa.common.v1.Status from_status = 3; // STATUS_UNSPECIFIED when not a status change
+  jurwa.common.v1.Status to_status = 4; // STATUS_UNSPECIFIED when not a status change
+  optional string actor_id = 5; // absent when the system acted
+  string summary = 6; // short text for the PWA, for example "Assigned to DSA"
+  google.protobuf.Timestamp occurred_at = 7;
+}
+
+message ListReportsByReporterRequest {
+  string reporter_id = 1; // required, UUID
+  int32 page_size = 2; // optional, 1 to 100, default 20
+  string page_token = 3; // optional, next_page_token from the previous call
+}
+
+message ListReportsByReporterResponse {
+  repeated ReportSummary reports = 1;
+  string next_page_token = 2; // "" when there are no more pages
+}
+
+message GetReportTimelineRequest {
+  string report_id = 1; // required, UUID
+}
+
+message GetReportTimelineResponse {
+  repeated TimelineEntry entries = 1;
+}

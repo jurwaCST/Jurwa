@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+// routing-engine decides who receives a new report. Stateless: it asks routing-rules
+// for the rule and department-directory for the person holding the position.
+// Owner: Sonam Zangmo. Port 9007.
+package jurwa.routingengine.v1;
+
+import "common/v1/common.proto";
+
+option go_package = "github.com/jurwaCST/Jurwa/proto/gen/routing-engine/v1;routingenginev1";
+
+service RoutingEngineService {
+  // Routes a report using only category and location. There is no description field on
+  // purpose: routing never reads it. Publishes report.routed when report_id is set.
+  // Errors: INVALID_ARGUMENT for CATEGORY_UNSPECIFIED, NOT_FOUND when no rule matches,
+  // FAILED_PRECONDITION when the target position has no holder.
+  rpc RouteReport(RouteReportRequest) returns (RouteReportResponse);
+}
+
+message RouteReportRequest {
+  string report_id = 1; // optional, UUID. Empty for a dry run (no event published)
+  jurwa.common.v1.Category category = 2; // required, not CATEGORY_UNSPECIFIED
+  jurwa.common.v1.Location location = 3; // required, building required
+}
+
+message RouteReportResponse {
+  string category_head_id = 1; // UUID of the user holding the position
+  string target_position = 2; // for example "DSA"
+  string rule_id = 3; // rule that matched
+}
