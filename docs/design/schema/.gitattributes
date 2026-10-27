@@ -1,0 +1,2 @@
+# Keep Unix line endings so the script runs inside the Linux container.
+*.sh text eol=lf
