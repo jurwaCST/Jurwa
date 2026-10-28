@@ -1,51 +1,69 @@
 # EVM log: Sprint 1 (22 to 27 October 2026)
 
 Card: SCRUM-82. Author: Nyendrak Yoezer Zangmo. Baseline: `docs/pm/schedule-evm.md`.
-Data read from Jira (project SCRUM, open sprint) and GitHub on 27 October 2026.
+Planned hours per card were agreed by the team. Logged hours and statuses were read from Jira on 28 October 2026. All values are person-hours.
 
-## 1. Numbers
+## 1. Result
 
-| Metric | Value | Source |
+| Metric | Value | How |
 |---|---|---|
-| PV (Planned Value, Sprint 1) | 93.3 h | Baseline, section 3 (280 h / 3 sprints) |
-| EV (Earned Value) | **unknown** | Needs the original estimate of each Done card. No Sprint 1 card has an estimate in Jira |
-| AC (Actual Cost) | **unknown** | Needs logged hours. No hours are logged on any Sprint 1 card in Jira |
-| CPI = EV / AC | **cannot be calculated** | |
-| SPI = EV / PV | **cannot be calculated** | |
+| PV (Planned Value) | 93.3 h | Baseline: 280 h / 3 sprints |
+| EV (Earned Value) | 138 h | Sum of planned hours of the 18 cards that are Done |
+| AC (Actual Cost) | 90 h | Sum of hours logged in Jira |
+| CV = EV - AC | +48 h | |
+| SV = EV - PV | +44.7 h | |
+| **CPI = EV / AC** | **138 / 90 = 1.53** | Above 1: the finished work took fewer hours than planned |
+| **SPI = EV / PV** | **138 / 93.3 = 1.48** | Above 1: more planned work was finished than the baseline expected for Sprint 1 |
 
-The numbers are left blank on purpose. The baseline rule is that hours are never invented.
+## 2. Per card
 
-## 2. Progress by card count (what can be measured today)
+| Owner | Card | Planned (h) | Logged (h) | Status |
+|---|---|---|---|---|
+| Sonam Choki | SCRUM-77 charter | 5 | 5 | Done |
+| | SCRUM-78 requirements | 11 | 7 | Done |
+| | SCRUM-76 wireframes | 8 | 5 | Done |
+| | SCRUM-100 k3d cluster | 12 | 7 | Done |
+| | SCRUM-101 CI | 8 | 4 | Done |
+| | SCRUM-17 report-submission | 7 | **not logged** | Done |
+| | *Subtotal* | *51* | *28* | |
+| Sonam Zangmo | SCRUM-73 template | 10 | 8 | Done |
+| | SCRUM-74 contracts | 8 | 7 | Done |
+| | SCRUM-72 bounded contexts | 4 | 4 | Done |
+| | SCRUM-18 routing-rules | 7 | 4 | Done |
+| | *Subtotal* | *29* | *23* | |
+| Nyendrak | SCRUM-75 database schema | 7 | 6 | Done |
+| | SCRUM-79 schedule and EVM baseline | 8 | 5 | Done |
+| | SCRUM-19 status-lifecycle | 7 | 5 | Done |
+| | *Subtotal* | *22* | *16* | |
+| Gayley Choden | SCRUM-71 learning spike | 8 | 6 | Done |
+| | SCRUM-80 quality plan | 7 | 4 | Done |
+| | SCRUM-81 communications plan | 5 | 3 | Done |
+| | SCRUM-44 PM documentation | 9 | 4 | Done |
+| | SCRUM-13 identity | 7 | 6 | Done |
+| | *Subtotal* | *36* | *23* | |
+| **Team** | | **138** | **90** | |
 
-21 cards are in Sprint 1.
-
-| Jira status | Cards | Count |
-|---|---|---|
-| Done | SCRUM-13, 17, 44, 71, 72, 75, 76, 77, 78, 79, 80, 81, 100, 101 | 14 |
-| In Review | SCRUM-18 | 1 |
-| In Progress | SCRUM-19, 73, 74, 82, 90 | 5 |
-| To Do | SCRUM-38 | 1 |
-
-14 of 21 cards (67%) are Done in Jira. This is only a rough indicator, because cards differ in size. It is not EV.
-
-**Jira does not match GitHub.** The pull requests for SCRUM-18 (#24), SCRUM-73 (#11) and SCRUM-74 (#19) are merged, but the cards are not Done in Jira. Once those three are moved, 17 of 21 cards (81%) are Done. SCRUM-19 is waiting for review (pull request #25).
+Not counted (no planned hours, not Done): SCRUM-38 api-gateway (To Do), SCRUM-90 routing-engine (In Progress), SCRUM-82 this log (In Progress). All three carry over to Sprint 2.
 
 ## 3. Reading
 
-- **Schedule:** most Sprint 1 work is finished. The template (SCRUM-73) and contracts (SCRUM-74) landed on 27 Oct instead of 26 Oct, so the service thin slices were squeezed into the last day. SCRUM-38 (api-gateway) and SCRUM-90 (routing-engine) carry over to Sprint 2.
-- **Cost:** unknown. Without logged hours the team cannot tell whether Sprint 1 took more or less effort than planned. This is the main monitoring gap (risk R4).
+- **Schedule (SPI 1.48).** All 18 estimated cards were finished. SPI is high mainly because the cards the team planned for Sprint 1 add up to 138 h, while the baseline gave Sprint 1 only 93.3 h. Sprint 1 also carried the initiation, planning and design work (WP 1.1 to 1.3, 80 h in the proposal). This supports counting those 80 h inside the plan (open question 1 in the baseline). The baseline PV per sprint should be revised for Sprint 2.
+- **Cost (CPI 1.53).** The team used 90 h for work planned at 138 h. Treat this as optimistic, for three reasons:
+  1. The planned hours were entered at the end of the sprint, not before it started, so they may lean high.
+  2. SCRUM-17 has no logged hours, so AC is too low. Without SCRUM-17, CPI is 131 / 90 = 1.46.
+  3. AI assistance (allowed by the module) shortened some tasks.
+- **Delivery.** The template and contracts merged on the last day, so every service slice was squeezed into 27 October. Two of Sonam Zangmo's cards (SCRUM-38, SCRUM-90) carry over.
 
 ## 4. Actions for Sprint 2
 
-1. **Every owner adds an original estimate** to each Sprint 2 card before the sprint starts on 28 Oct, so the estimates add up to the Sprint 2 PV (93.3 h).
-2. **Every owner logs hours on their Sprint 1 cards by 28 Oct.** This log is then updated with real EV, AC, CPI and SPI.
-3. **Move cards to Done when their pull request merges** (SCRUM-18, 73, 74 now). The Scrum Master adds "log hours, move cards" to each stand-up.
+1. **Estimate before starting.** Every Sprint 2 card gets its planned hours on 28 October, before work begins.
+2. **Log hours daily**, and log SCRUM-17 now so this log can be corrected.
+3. **Revise the per-sprint PV** with the Scrum Master and Team Lead, using the Sprint 1 estimates (138 h) and the 360 h vs 280 h decision. Then update `docs/pm/schedule-evm.md`.
+4. **Merge shared blockers first.** Shared cards that block others (template, contracts) come first in each sprint.
 
-## 5. To fill in once hours are logged
+## 5. Check by hand
 
-| Card | Owner | Estimate (h) | Logged (h) | Done? |
-|---|---|---|---|---|
-| (one row per Sprint 1 card) | | | | |
-| **Total** | | EV = sum of estimates of Done cards | AC = sum of logged | |
-
-Then: CPI = EV / AC, SPI = EV / 93.3.
+- EV: 51 + 29 + 22 + 36 = 138
+- AC: 28 + 23 + 16 + 23 = 90
+- CPI: 138 / 90 = 1.533
+- SPI: 138 / 93.3 = 1.479
