@@ -1,55 +1,53 @@
 # location-taxonomy
 
-> Created from `services/_template`. Replace every TODO below, and delete this note.
-
-## Start a new service (template users)
-
-From the repo root, with your service name and port from the table below:
-
-```bash
-make new-service NAME=routing-rules PORT=9006
-```
-
-| Port | Service | Port | Service |
-|---|---|---|---|
-| 9001 | report-submission | 9011 | status-lifecycle |
-| 9002 | photo-media | 9012 | sla-tracking |
-| 9003 | report-history | 9013 | sla-policy |
-| 9004 | location-taxonomy | 9014 | reassignment |
-| 9005 | internal-notes | 9015 | audit-log |
-| 9006 | routing-rules | 9016 | identity |
-| 9007 | routing-engine | 9017 | authorization |
-| 9008 | department-directory | 9018 | notification |
-| 9009 | category-taxonomy | 9019 | feedback |
-| 9010 | api-gateway (gRPC; HTTP is 8080) | 9020 | analytics |
-
-This copies `services/_template` to `services/<name>` and fills in the name and port. Then:
-
-1. Run `make proto` so your generated code in `proto/gen/<name>/v1/` is up to date.
-2. Write domain tests first in `domain/`, then the domain code.
-3. Add ports (interfaces) in `ports/`, adapters in `adapters/out/`, gRPC handlers in `adapters/in/grpc/`.
-4. Register your gRPC service in `cmd/server/main.go` (see the TODO there).
-5. Run `make test`, `make lint` and `make run SERVICE=<name>`.
-
-Layout:
-
-```
-cmd/server/main.go     starts the gRPC server (health check, reflection, JSON logs, graceful shutdown)
-domain/                business rules, plain Go, no framework imports
-application/           use cases
-ports/                 interfaces the core depends on
-adapters/in/grpc/      gRPC handlers
-adapters/out/          database, Redis and other adapters
-Dockerfile             multi-stage image, built from the repo root
-```
+Owner: Sonam Choki. gRPC port 9004. Contract: `proto/location-taxonomy/v1/location-taxonomy.proto`.
 
 ## What it does
 
-TODO: one or two sentences on what this service owns and what it never does.
+Holds the list of valid locations for each category. The PWA uses it to fill the location drop-downs, and report-submission uses it to check that a submitted location exists. It never stores reports and never routes them.
+
+## Location hierarchy
+
+Each location is one row (category, building, wing, area), like the `locations` table in `docs/design/schema/location-taxonomy.sql`.
+
+| Category | Shape | Example |
+|---|---|---|
+| `HOSTEL` | building, wing, area | Hostel A / Wing 1 / Bathroom 1 |
+| `ACADEMIC_BLOCK` | building, wing, area | Academic Block 2 / Ground Floor / Lab 3 |
+| `OTHERS` | flat list of areas under building `Campus`, never a wing | Campus / Wi-Fi |
+
+**Sample data.** The design documents name no real CST buildings, so `adapters/out/memory/sample.go` holds a small sample set: two hostels, two academic blocks and the campus-wide areas (Wi-Fi, Estate, Canteen). Replace it with the real names when the team has them.
 
 ## RPCs
 
-TODO: list the RPCs from `proto/location-taxonomy/v1/`, one line each.
+| RPC | Does | Errors |
+|---|---|---|
+| `ListLocations` | Returns the active locations of one category, in list order | `INVALID_ARGUMENT` when the category is missing or unknown |
+| `ValidateLocation` | Returns `valid: true`, or `valid: false` with a `reason` | `INVALID_ARGUMENT` when the category is missing or unknown, or the building is empty |
+
+An unknown location is a normal answer, not an error, so report-submission can show the reason to the student.
+
+Rules (in `domain/location.go`, tested in `domain/location_test.go`):
+
+| Rule | Detail |
+|---|---|
+| Category | Required: `HOSTEL`, `ACADEMIC_BLOCK` or `OTHERS` |
+| Building | Required |
+| Wing and area | Optional, but each one given must belong to the building, and the area to the wing |
+| Case and spaces | Ignored, so `" hostel a "` matches `"Hostel A"` |
+| Inactive rows | Kept in the list but never listed or matched |
+| Reasons | `unknown building`, `unknown wing for this building`, `unknown area for this building` |
+
+## Layout
+
+```
+domain/location.go               Category, Location, Entry, the hierarchy and validation rules
+application/service.go           ListLocations and ValidateLocation use cases
+ports/ports.go                   LocationRepository interface
+adapters/in/grpc/handler.go      gRPC handler: protobuf <-> domain, errors -> gRPC codes
+adapters/out/memory/             in-memory repository and the sample list (sample.go)
+cmd/server/main.go               wires everything and starts the server
+```
 
 ## Configuration
 
@@ -58,15 +56,27 @@ TODO: list the RPCs from `proto/location-taxonomy/v1/`, one line each.
 | `PORT` | `9004` | gRPC port |
 | `SERVICE_NAME` | `location-taxonomy` | Name written in every log line |
 
-TODO: add `DATABASE_URL` and others when the service uses them. Never hard-code passwords.
+Storage is in memory in Sprint 2. Sprint 3 adds a PostgreSQL adapter (`DATABASE_URL`) for `docs/design/schema/location-taxonomy.sql`.
 
 ## Run
 
 ```bash
 make run SERVICE=location-taxonomy
-grpcurl -plaintext localhost:9004 grpc.health.v1.Health/Check
-grpcurl -plaintext localhost:9004 list
 ```
+
+In a second terminal:
+
+```bash
+grpcurl -plaintext localhost:9004 grpc.health.v1.Health/Check
+
+grpcurl -plaintext -d '{"category":"HOSTEL"}' \
+  localhost:9004 jurwa.locationtaxonomy.v1.LocationTaxonomyService/ListLocations
+
+grpcurl -plaintext -d '{"category":"HOSTEL","location":{"building":"Hostel A","wing":"Wing 1","area":"Bathroom 1"}}' \
+  localhost:9004 jurwa.locationtaxonomy.v1.LocationTaxonomyService/ValidateLocation
+```
+
+Expected: health `SERVING`; ListLocations returns the hostel rows; ValidateLocation returns `"valid": true`. For an unknown location grpcurl prints only `"reason"`, because protobuf JSON leaves out `valid` when it is `false`.
 
 Docker:
 
@@ -79,4 +89,7 @@ docker run --rm -p 9004:9004 jurwa/location-taxonomy
 
 ```bash
 make test
+go test ./services/location-taxonomy/... -cover
 ```
+
+Coverage: 100% on `domain`, `application` and both adapters. Evidence: `docs/evidence/sonam-choki/scrum-23-tests.txt` and `scrum-23-grpcurl.txt`.
