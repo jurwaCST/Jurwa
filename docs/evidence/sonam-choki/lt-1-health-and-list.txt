@@ -1,0 +1,15 @@
+$ grpcurl -plaintext localhost:9004 grpc.health.v1.Health/Check
+{
+  "status": "SERVING"
+}
+
+$ grpcurl -plaintext localhost:9004 list
+grpc.health.v1.Health
+grpc.reflection.v1.ServerReflection
+grpc.reflection.v1alpha.ServerReflection
+jurwa.locationtaxonomy.v1.LocationTaxonomyService
+
+$ grpcurl -plaintext localhost:9004 list jurwa.locationtaxonomy.v1.LocationTaxonomyService
+jurwa.locationtaxonomy.v1.LocationTaxonomyService.ListLocations
+jurwa.locationtaxonomy.v1.LocationTaxonomyService.ValidateLocation
+
