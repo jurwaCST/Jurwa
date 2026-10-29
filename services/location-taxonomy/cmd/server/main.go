@@ -13,6 +13,11 @@ import (
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
+
+	locationtaxonomyv1 "github.com/jurwaCST/Jurwa/proto/gen/location-taxonomy/v1"
+	grpcadapter "github.com/jurwaCST/Jurwa/services/location-taxonomy/adapters/in/grpc"
+	"github.com/jurwaCST/Jurwa/services/location-taxonomy/adapters/out/memory"
+	"github.com/jurwaCST/Jurwa/services/location-taxonomy/application"
 )
 
 // Defaults used when the environment variables are not set.
@@ -41,8 +46,9 @@ func main() {
 	hs := health.NewServer()
 	healthpb.RegisterHealthServer(srv, hs)
 
-	// TODO: register your service here, for example:
-	// routingrulesv1.RegisterRoutingRulesServiceServer(srv, grpcadapter.NewHandler(app))
+	// In-memory sample list for Sprint 2; the PostgreSQL adapter replaces it in Sprint 3.
+	app := application.NewService(memory.NewRepository(memory.SampleEntries()))
+	locationtaxonomyv1.RegisterLocationTaxonomyServiceServer(srv, grpcadapter.NewHandler(app))
 
 	// Reflection lets grpcurl list and call methods without the .proto files.
 	reflection.Register(srv)
