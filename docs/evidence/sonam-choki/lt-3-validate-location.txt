@@ -1,0 +1,15 @@
+$ grpcurl -plaintext -d '{"category":"HOSTEL","location":{"building":"Hostel B","wing":"Wing 2","area":"Bathroom 2"}}' localhost:9004 jurwa.locationtaxonomy.v1.LocationTaxonomyService/ValidateLocation
+{
+  "valid": true
+}
+
+$ grpcurl -plaintext -d '{"category":"HOSTEL","location":{"building":"Hostel Z"}}' localhost:9004 jurwa.locationtaxonomy.v1.LocationTaxonomyService/ValidateLocation
+{
+  "reason": "unknown building"
+}
+
+$ grpcurl -plaintext -d '{"category":"HOSTEL","location":{"building":"Hostel B","wing":"Wing 2","area":"Roof"}}' localhost:9004 jurwa.locationtaxonomy.v1.LocationTaxonomyService/ValidateLocation
+{
+  "reason": "unknown wing or area for this building"
+}
+
