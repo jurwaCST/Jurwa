@@ -1,0 +1,6 @@
+# github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient [github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient.test]
+services/api-gateway/adapters/out/authzclient/client_test.go:38:7: undefined: New
+services/api-gateway/adapters/out/authzclient/client_test.go:55:14: undefined: New
+services/api-gateway/adapters/out/authzclient/client_test.go:66:13: undefined: New
+FAIL	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient [build failed]
+FAIL
