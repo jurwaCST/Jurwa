@@ -174,6 +174,17 @@ func TestPeriodFilter(t *testing.T) {
 	}
 }
 
+func TestBreakdownUsesThePeriod(t *testing.T) {
+	p := NewProjection()
+	apply(p,
+		submitted("old", Hostel, time.Date(2026, 10, 1, 0, 0, 0, 0, time.UTC)),
+		submitted("new", Hostel, time.Date(2026, 11, 2, 0, 0, 0, 0, time.UTC)),
+	)
+	from := time.Date(2026, 11, 1, 0, 0, 0, 0, time.UTC)
+	b := Breakdown(p.Reports(), Period{From: &from})
+	assert.Equal(t, int64(1), b[0].Counts.Total)
+}
+
 func TestPeriodValidate(t *testing.T) {
 	a := t0
 	b := t0.Add(time.Hour)
@@ -197,6 +208,9 @@ func TestStringNames(t *testing.T) {
 	assert.Equal(t, "OTHERS", Others.String())
 	assert.Equal(t, "CATEGORY_UNSPECIFIED", Category(9).String())
 	assert.Equal(t, "OPEN", Open.String())
+	assert.Equal(t, "ASSIGNED", Assigned.String())
+	assert.Equal(t, "IN_PROGRESS", InProgress.String())
+	assert.Equal(t, "RESOLVED", Resolved.String())
 	assert.Equal(t, "ESCALATED", Escalated.String())
 	assert.Equal(t, "STATUS_UNSPECIFIED", Status(9).String())
 }
