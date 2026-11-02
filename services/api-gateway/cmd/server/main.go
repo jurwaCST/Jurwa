@@ -21,13 +21,14 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	"github.com/jurwaCST/Jurwa/pkg/resilience"
+	authorizationv1 "github.com/jurwaCST/Jurwa/proto/gen/authorization/v1"
 	categorytaxonomyv1 "github.com/jurwaCST/Jurwa/proto/gen/category-taxonomy/v1"
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
 	locationtaxonomyv1 "github.com/jurwaCST/Jurwa/proto/gen/location-taxonomy/v1"
 	reportsubmissionv1 "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1"
 	httpadapter "github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http"
+	"github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient"
 	"github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients"
-	"github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/staticauthz"
 	"github.com/jurwaCST/Jurwa/services/api-gateway/application"
 	"github.com/jurwaCST/Jurwa/services/api-gateway/domain"
 )
@@ -59,6 +60,7 @@ func main() {
 	conns := map[string]*grpc.ClientConn{}
 	for name, addr := range map[string]string{
 		"identity":          envOr("IDENTITY_ADDR", "localhost:9016"),
+		"authorization":     envOr("AUTHORIZATION_ADDR", authzclient.DefaultAddr),
 		"category-taxonomy": envOr("CATEGORY_TAXONOMY_ADDR", "localhost:9009"),
 		"location-taxonomy": envOr("LOCATION_TAXONOMY_ADDR", "localhost:9004"),
 		"report-submission": envOr("REPORT_SUBMISSION_ADDR", "localhost:9001"),
@@ -74,9 +76,7 @@ func main() {
 
 	identity := grpcclients.Identity{C: identityv1.NewIdentityServiceClient(conns["identity"])}
 	router := httpadapter.NewRouter(httpadapter.Deps{
-		// TODO(SCRUM-38): use authorization CheckPermission (AUTHORIZATION_ADDR,
-		// localhost:9017) instead of staticauthz once Gayley's service is merged.
-		Auth:       application.NewAuth(identity, staticauthz.New()),
+		Auth:       application.NewAuth(identity, authzclient.New(authorizationv1.NewAuthorizationServiceClient(conns["authorization"]))),
 		Identity:   identity,
 		Categories: grpcclients.Categories{C: categorytaxonomyv1.NewCategoryTaxonomyServiceClient(conns["category-taxonomy"])},
 		Locations:  grpcclients.Locations{C: locationtaxonomyv1.NewLocationTaxonomyServiceClient(conns["location-taxonomy"])},
