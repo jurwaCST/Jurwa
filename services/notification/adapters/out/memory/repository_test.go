@@ -20,7 +20,30 @@ const (
 var start = time.Date(2026, 11, 2, 9, 0, 0, 0, time.UTC)
 
 func note(id, user string, minute int) domain.Notification {
-	return domain.Notification{ID: id, RecipientUserID: user, CreatedAt: start.Add(time.Duration(minute) * time.Minute)}
+	return domain.Notification{ID: id, RecipientUserID: user, Status: domain.Sent, CreatedAt: start.Add(time.Duration(minute) * time.Minute)}
+}
+
+func TestListHidesPendingAndFailed(t *testing.T) {
+	r := New()
+	ctx := context.Background()
+	failed := note("failed", alice, 1)
+	failed.Status = domain.Failed
+	pending := note("pending", alice, 2)
+	pending.Status = domain.Pending
+	require.NoError(t, r.Save(ctx, failed))
+	require.NoError(t, r.Save(ctx, pending))
+	require.NoError(t, r.Save(ctx, note("sent", alice, 3)))
+
+	list, _, err := r.ListByRecipient(ctx, alice, false, 0, 10)
+	require.NoError(t, err)
+	assert.Equal(t, []string{"sent"}, ids(list), "the user only sees messages that were delivered")
+
+	got, ok := r.Get("failed")
+	require.True(t, ok, "the failed message is still in the outbox")
+	assert.Equal(t, domain.Failed, got.Status)
+
+	_, ok = r.Get("missing")
+	assert.False(t, ok)
 }
 
 func ids(list []domain.Notification) []string {
@@ -90,6 +113,7 @@ func TestSaveReplacesSameID(t *testing.T) {
 	r := New()
 	ctx := context.Background()
 	n := note("a1", alice, 1)
+	n.Status = domain.Pending
 	require.NoError(t, r.Save(ctx, n))
 	require.NoError(t, r.Save(ctx, n.MarkSent(start)))
 

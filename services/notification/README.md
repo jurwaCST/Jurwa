@@ -18,9 +18,9 @@ In Sprint 2 the `Sender` only writes a log line. Real email delivery is out of s
 | `report_id` is optional, but must be a UUID when given | otherwise `INVALID_ARGUMENT` |
 | `subject` is required, not blank | otherwise `INVALID_ARGUMENT` |
 | `body` is required, at most 200 characters (counted as letters, so Dzongkha works) | empty or 201+ gives `INVALID_ARGUMENT` |
-| The sender fails | stored as `FAILED`, call returns `UNAVAILABLE` |
+| The sender fails | stored as `FAILED` (kept for a retry in Sprint 3), call returns `UNAVAILABLE` |
 | Sent | stored as `SENT` with `sent_at` |
-| `ListNotifications` | only that user's messages, newest first |
+| `ListNotifications` | only that user's `SENT` messages, newest first. Failed ones are hidden because the user never received them |
 | `page_size` | 0 means 20; 1 to 100; otherwise `INVALID_ARGUMENT` |
 
 Event types are the stream names in `proto/events/v1/events.proto`, plus the digest:

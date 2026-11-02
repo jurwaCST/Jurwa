@@ -40,12 +40,24 @@ func (r *Repository) Save(_ context.Context, n domain.Notification) error {
 	return nil
 }
 
+// Get returns one notification by id, whatever its status. Used by tests to
+// check the outbox; it is not part of the port.
+func (r *Repository) Get(id string) (domain.Notification, bool) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	e, ok := r.data[id]
+	return e.n, ok
+}
+
 func (r *Repository) ListByRecipient(_ context.Context, userID string, unreadOnly bool, offset, limit int) ([]domain.Notification, bool, error) {
 	r.mu.RLock()
 	var found []entry
 	for _, e := range r.data {
 		if e.n.RecipientUserID != userID {
 			continue
+		}
+		if e.n.Status != domain.Sent {
+			continue // the user never received pending or failed messages
 		}
 		if unreadOnly && e.n.ReadAt != nil {
 			continue

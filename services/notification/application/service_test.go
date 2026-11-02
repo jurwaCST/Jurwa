@@ -89,18 +89,23 @@ func TestSendBadInputDoesNotCallSender(t *testing.T) {
 
 func TestSenderFailureIsUnavailableAndNotStoredAsSent(t *testing.T) {
 	sender := &fakeSender{err: errors.New("smtp down")}
-	svc, _ := newTestService(sender)
+	repo := memory.New()
+	svc := NewService(repo, sender)
+	svc.newID = func() string { return "00000000-0000-4000-8000-000000000001" }
 	ctx := context.Background()
 
 	_, err := svc.Send(ctx, validInput())
 	assert.ErrorIs(t, err, ErrUnavailable)
 	assert.Equal(t, 1, sender.calls)
 
+	stored, ok := repo.Get("00000000-0000-4000-8000-000000000001")
+	require.True(t, ok, "the failed message stays in the outbox")
+	assert.Equal(t, domain.Failed, stored.Status, "it is stored as FAILED, not SENT")
+	assert.Nil(t, stored.SentAt)
+
 	list, _, err := svc.List(ctx, alice, false, 0, "")
 	require.NoError(t, err)
-	require.Len(t, list, 1, "the failed message stays in the outbox")
-	assert.Equal(t, domain.Failed, list[0].Status, "it is stored as FAILED, not SENT")
-	assert.Nil(t, list[0].SentAt)
+	assert.Empty(t, list, "the user does not see a message they never received")
 }
 
 func TestSendStoreError(t *testing.T) {

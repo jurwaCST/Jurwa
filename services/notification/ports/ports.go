@@ -10,7 +10,7 @@ import (
 // In-memory for now; a database in Sprint 3.
 type NotificationRepository interface {
 	Save(ctx context.Context, n domain.Notification) error
-	// ListByRecipient returns one user's notifications, newest first,
+	// ListByRecipient returns one user's SENT notifications, newest first,
 	// skipping offset and returning at most limit. more is true when there
 	// are more after this page.
 	ListByRecipient(ctx context.Context, userID string, unreadOnly bool, offset, limit int) (list []domain.Notification, more bool, err error)
