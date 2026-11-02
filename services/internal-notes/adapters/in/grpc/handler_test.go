@@ -80,6 +80,19 @@ func TestPermissionDenied(t *testing.T) {
 	}
 }
 
+func TestSystemAdminReadsButCannotAdd(t *testing.T) {
+	h := newTestHandler()
+	_, err := h.AddNote(as("STAFF"), addReq("Plumber booked for Monday."))
+	require.NoError(t, err)
+
+	_, err = h.AddNote(as("SYSTEM_ADMIN"), addReq("Admin note"))
+	assert.Equal(t, codes.PermissionDenied, status.Code(err), "only Category Head and Staff add notes")
+
+	list, err := h.ListNotes(as("SYSTEM_ADMIN"), &internalnotesv1.ListNotesRequest{ReportId: reportA})
+	require.NoError(t, err)
+	assert.Len(t, list.GetNotes(), 1)
+}
+
 func TestInvalidArgument(t *testing.T) {
 	h := newTestHandler()
 

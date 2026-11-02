@@ -99,18 +99,21 @@ func TestNewNoteBodyLengthBoundaries(t *testing.T) {
 	}
 }
 
+// TestWhoMayUseNotes follows docs/design/api-routes.md: Category Head and Staff
+// add notes; Category Head, Staff and System Admin read them.
 func TestWhoMayUseNotes(t *testing.T) {
 	tests := []struct {
 		role    Role
-		allowed bool
+		mayAdd  bool
+		mayList bool
 	}{
-		{role: RoleStaff, allowed: true},
-		{role: RoleCategoryHead, allowed: true},
-		{role: RoleSystemAdmin, allowed: true},
-		{role: RoleStudent, allowed: false},
-		{role: RolePresident, allowed: false},
-		{role: "", allowed: false},
-		{role: "JANITOR", allowed: false},
+		{role: RoleStaff, mayAdd: true, mayList: true},
+		{role: RoleCategoryHead, mayAdd: true, mayList: true},
+		{role: RoleSystemAdmin, mayAdd: false, mayList: true},
+		{role: RoleStudent, mayAdd: false, mayList: false},
+		{role: RolePresident, mayAdd: false, mayList: false},
+		{role: "", mayAdd: false, mayList: false},
+		{role: "JANITOR", mayAdd: false, mayList: false},
 	}
 	for _, tt := range tests {
 		t.Run(string(tt.role)+" add", func(t *testing.T) {
@@ -119,7 +122,7 @@ func TestWhoMayUseNotes(t *testing.T) {
 
 			_, err := NewNote(noteID, in, t0)
 
-			if tt.allowed {
+			if tt.mayAdd {
 				assert.NoError(t, err)
 			} else {
 				assert.ErrorIs(t, err, ErrPermissionDenied)
@@ -128,7 +131,7 @@ func TestWhoMayUseNotes(t *testing.T) {
 		t.Run(string(tt.role)+" list", func(t *testing.T) {
 			err := CheckCanList(tt.role)
 
-			if tt.allowed {
+			if tt.mayList {
 				assert.NoError(t, err)
 			} else {
 				assert.ErrorIs(t, err, ErrPermissionDenied)
