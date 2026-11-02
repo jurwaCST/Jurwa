@@ -24,9 +24,13 @@ const (
 	RolePresident    Role = "PRESIDENT"
 )
 
-// noteRoles may add and list notes. Notes are internal: students never see
-// them (FR-21), and the College President's dashboard does not show them.
-var noteRoles = []Role{RoleStaff, RoleCategoryHead, RoleSystemAdmin}
+// Who may use notes, as in docs/design/api-routes.md and the authorization
+// policy. Notes are internal: students never see them (FR-21), and the College
+// President's dashboard does not show them. System Admin may read but not add.
+var (
+	addRoles  = []Role{RoleStaff, RoleCategoryHead}
+	listRoles = []Role{RoleStaff, RoleCategoryHead, RoleSystemAdmin}
+)
 
 // Note is one staff-only note on a report.
 type Note struct {
@@ -58,7 +62,12 @@ var (
 )
 
 // ErrPermissionDenied is returned when the role may not add or read notes.
-var ErrPermissionDenied = errors.New("only staff, category heads and system administrators may use internal notes")
+var ErrPermissionDenied = errors.New("permission denied")
+
+var (
+	errCannotAdd  = fmt.Errorf("%w: only staff and category heads may add internal notes", ErrPermissionDenied)
+	errCannotList = fmt.Errorf("%w: only staff, category heads and system administrators may read internal notes", ErrPermissionDenied)
+)
 
 var uuidPattern = regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`)
 
@@ -69,8 +78,8 @@ func IsUUID(s string) bool {
 
 // CheckCanList returns ErrPermissionDenied unless the role may read notes.
 func CheckCanList(role Role) error {
-	if !slices.Contains(noteRoles, role) {
-		return ErrPermissionDenied
+	if !slices.Contains(listRoles, role) {
+		return errCannotList
 	}
 	return nil
 }
@@ -78,8 +87,8 @@ func CheckCanList(role Role) error {
 // NewNote checks the role first, then the input, and returns the note.
 // The role is checked first so a student learns nothing about the rules.
 func NewNote(id string, in NewNoteInput, now time.Time) (Note, error) {
-	if !slices.Contains(noteRoles, in.Role) {
-		return Note{}, ErrPermissionDenied
+	if !slices.Contains(addRoles, in.Role) {
+		return Note{}, errCannotAdd
 	}
 	body := strings.TrimSpace(in.Body)
 	switch {

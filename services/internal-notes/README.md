@@ -10,8 +10,8 @@ Stores staff-only notes on a report, for example "Plumber booked for Monday". No
 
 | RPC | Does | Errors |
 |---|---|---|
-| `AddNote` | Stores one note and returns it | `PERMISSION_DENIED` for a student or a missing role, `INVALID_ARGUMENT` for a bad id or a blank or too long body |
-| `ListNotes` | Notes of one report, oldest first (empty when the report has none) | `PERMISSION_DENIED` for a student or a missing role, `INVALID_ARGUMENT` when the report id is not a UUID |
+| `AddNote` | Stores one note and returns it | `PERMISSION_DENIED` for any role except Category Head and Staff, `INVALID_ARGUMENT` for a bad id or a blank or too long body |
+| `ListNotes` | Notes of one report, oldest first (empty when the report has none) | `PERMISSION_DENIED` for a student, the President or a missing role, `INVALID_ARGUMENT` when the report id is not a UUID |
 
 ## Caller role
 
@@ -19,8 +19,11 @@ The proto messages have no role field, so the caller's role travels in the gRPC 
 
 | Role | Add | List |
 |---|---|---|
-| `STAFF`, `CATEGORY_HEAD`, `SYSTEM_ADMIN` | yes | yes |
+| `STAFF`, `CATEGORY_HEAD` | yes | yes |
+| `SYSTEM_ADMIN` | no | yes |
 | `STUDENT`, `PRESIDENT`, missing | no | no |
+
+These are the same rules as `docs/design/api-routes.md` and the authorization policy, so api-gateway and this service agree.
 
 The role is checked before anything else, so a student learns nothing about the note rules.
 
@@ -71,7 +74,7 @@ grpcurl -plaintext -H 'x-user-role: CATEGORY_HEAD' -d '{"report_id":"6f1c2a7e-3b
   localhost:9005 jurwa.internalnotes.v1.InternalNotesService/ListNotes
 ```
 
-Expected: health `SERVING`; AddNote returns the note; ListNotes returns it. With `-H 'x-user-role: STUDENT'` both return `PermissionDenied`.
+Expected: health `SERVING`; AddNote returns the note; ListNotes returns it. With `-H 'x-user-role: STUDENT'` both return `PermissionDenied`; with `SYSTEM_ADMIN` AddNote returns `PermissionDenied` and ListNotes works.
 
 Docker:
 
