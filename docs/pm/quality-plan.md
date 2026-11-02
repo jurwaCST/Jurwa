@@ -24,7 +24,7 @@ Many fast unit tests at the bottom, fewer slow end-to-end tests at the top.
 
 | Level | What it covers | Tools | Runs |
 |---|---|---|---|
-| Unit | Domain logic in each service: routing, SLA policy, status flow, validation, identity | Go `testing`, Testify, table-driven tests, gomock and Testify mocks | Every push, in CI |
+| Unit | Domain logic in each service: routing, SLA policy, status flow, validation, identity | Go `testing`, Testify for assertions, table-driven tests; hand-written fakes and in-memory adapters by default, gomock for interaction checks on chosen ports | Every push, in CI |
 | Integration | One service against real PostgreSQL, MongoDB and Redis | Testcontainers | Every pull request touching adapters |
 | System and end-to-end | The full flow in the browser: submit, route, update, resolve, escalate | Cypress | Before each sprint review, from Sprint 2 |
 | Non-functional | Load on report submission; accessibility of the PWA | Apache JMeter; axe-core and Lighthouse | Week 6 and 7 |
@@ -36,10 +36,11 @@ Every testing tool named in the proposal.
 | Tool | Where it is used |
 |---|---|
 | Go `testing` | All unit tests in every service (`*_test.go` next to the code) |
-| Testify | Assertions (`assert`, `require`) in all Go tests; Testify mocks for simple fakes |
+| Testify | Assertions only (`assert`, `require`) in all Go tests |
+| Hand-written fakes and in-memory adapters | The default test doubles for ports: small Go structs in the test file (for example `fakeStatus` in feedback, `fakeSender` in notification) and each service's `adapters/out/memory`, so domain and application logic is tested without a database or network |
 | Table-driven tests | Specification-based tests: equivalence classes and boundary values for the report form (description about 500 characters, photo about 5 MB, required fields) and routing rules; state transition tables for the status flow |
 | `go test -cover` | Structural coverage on routing, SLA and status-flow packages; target at least 70% |
-| gomock | Test doubles for ports (repositories, publishers, gRPC clients) so routing and SLA logic is tested without a database or network |
+| gomock | Interaction checks on chosen ports, where a test must prove a call happened with the right arguments or in the right order (for example the escalation Saga's steps) |
 | gopter | Property-based tests of SLA time-window logic (sla-policy, sla-tracking) with random timestamps, for example "a report older than its SLA window is always overdue" |
 | Testcontainers | Integration tests that start real PostgreSQL, MongoDB and Redis containers for each service's adapters |
 | Cypress | End-to-end tests of the PWA: submit a report, route it, update its status, resolve it |
