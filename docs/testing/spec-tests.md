@@ -2,7 +2,7 @@
 
 Card: SCRUM-93. Owner: Sonam Zangmo. Code: `tests/spec/`. Run with `go test ./tests/spec/... -v`.
 
-The tests call the domain packages of report-submission, routing-rules and status-lifecycle directly. The expected results are written from the requirements (`docs/pm/requirements.md`) and the agreed decisions, not copied from the code. Result of the run on 2 November 2026: **110 passed, 0 failed** (`docs/evidence/sonam-zangmo/scrum-93-tests.txt`).
+The tests call the domain packages of report-submission, photo-media, routing-rules and status-lifecycle directly. The expected results are written from the requirements (`docs/pm/requirements.md`) and the agreed decisions, not copied from the code. Result of the run on 2 November 2026: **132 passed, 0 failed**. The first 110 are from SCRUM-93 (`docs/evidence/sonam-zangmo/scrum-93-tests.txt`), and the photo cases in section 1b were added after photo-media (SCRUM-28) was merged.
 
 ## 1. Report form (`report_form_test.go`)
 
@@ -51,7 +51,7 @@ Technique: equivalence classes and boundary values. Each case starts from a vali
 | Empty photo id | `""` | invalid photo | Pass |
 | Blank photo id | `"  "` | invalid photo | Pass |
 
-**Not yet covered:** photo size (0 bytes, 1 byte, exactly 5 MB, 5 MB + 1 byte) and type (JPG, PNG, other). These rules are checked by photo-media on upload, not by report-submission, and photo-media is not merged yet. The cases are added to this file when it is.
+These are the report form's photo id rules. The photo file itself is checked by photo-media on upload, in section 1b.
 
 ### Reporter: from the JWT, must be a UUID
 
@@ -62,6 +62,36 @@ Technique: equivalence classes and boundary values. Each case starts from a vali
 | UUID | a UUID | valid | Pass |
 
 Every invalid case also wraps `ErrInvalidReport`, so the gRPC handler maps all of them to INVALID_ARGUMENT (HTTP 400 at the gateway).
+
+## 1b. Photo upload (`photo_test.go`)
+
+Technique: boundary values and equivalence classes on photo-media `NewPhoto`. 5 MB means 5 x 1024 x 1024 = 5,242,880 bytes. photo-media also checks the file's first bytes (its signature), so a file must really be a JPG or PNG, not only be labelled as one.
+
+### Size: at most 5 MB (each case run once for JPG and once for PNG)
+
+| Test | Input | Expected | Result |
+|---|---|---|---|
+| 0 bytes | empty file | invalid: photo is empty | Pass (JPG, PNG) |
+| 1 byte | 1 byte | invalid: bytes do not match the type (a 1-byte file cannot be a real image) | Pass (JPG, PNG) |
+| Smallest real file | the signature only (3 bytes JPG, 4 bytes PNG) | valid | Pass (JPG, PNG) |
+| 5 MB - 1 byte | 5,242,879 bytes | valid | Pass (JPG, PNG) |
+| Exactly 5 MB (upper bound) | 5,242,880 bytes | valid | Pass (JPG, PNG) |
+| 5 MB + 1 byte (just over) | 5,242,881 bytes | invalid: larger than 5 MB | Pass (JPG, PNG) |
+
+### Type: JPG or PNG only
+
+| Test | Input | Expected | Result |
+|---|---|---|---|
+| JPG | `image/jpeg`, JPG bytes | valid | Pass |
+| PNG | `image/png`, PNG bytes | valid | Pass |
+| Upper case and spaces | ` IMAGE/PNG `, PNG bytes | valid | Pass |
+| GIF | `image/gif` | invalid: type must be JPG or PNG | Pass |
+| PDF | `application/pdf` | invalid: type must be JPG or PNG | Pass |
+| No type | `""` | invalid: type must be JPG or PNG | Pass |
+| Says JPG, holds PNG | `image/jpeg`, PNG bytes | invalid: bytes do not match the type | Pass |
+| Says PNG, holds a PDF | `image/png`, PDF bytes | invalid: bytes do not match the type | Pass |
+
+Every invalid case wraps `ErrInvalidPhoto`, so photo-media returns INVALID_ARGUMENT (HTTP 400 at the gateway).
 
 ## 2. Routing rules (`routing_rules_test.go`)
 
