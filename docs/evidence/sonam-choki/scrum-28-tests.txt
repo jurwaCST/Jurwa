@@ -1,0 +1,58 @@
+go test ./... -cover
+	github.com/jurwaCST/Jurwa/proto/gen/analytics/v1		coverage: 0.0% of statements
+	github.com/jurwaCST/Jurwa/proto/gen/audit-log/v1		coverage: 0.0% of statements
+	github.com/jurwaCST/Jurwa/proto/gen/authorization/v1		coverage: 0.0% of statements
+	github.com/jurwaCST/Jurwa/proto/gen/category-taxonomy/v1		coverage: 0.0% of statements
+	github.com/jurwaCST/Jurwa/proto/gen/common/v1		coverage: 0.0% of statements
+	github.com/jurwaCST/Jurwa/proto/gen/department-directory/v1		coverage: 0.0% of statements
+	github.com/jurwaCST/Jurwa/proto/gen/events/v1		coverage: 0.0% of statements
+	github.com/jurwaCST/Jurwa/proto/gen/feedback/v1		coverage: 0.0% of statements
+	github.com/jurwaCST/Jurwa/proto/gen/identity/v1		coverage: 0.0% of statements
+	github.com/jurwaCST/Jurwa/proto/gen/internal-notes/v1		coverage: 0.0% of statements
+	github.com/jurwaCST/Jurwa/proto/gen/location-taxonomy/v1		coverage: 0.0% of statements
+	github.com/jurwaCST/Jurwa/proto/gen/notification/v1		coverage: 0.0% of statements
+	github.com/jurwaCST/Jurwa/proto/gen/photo-media/v1		coverage: 0.0% of statements
+	github.com/jurwaCST/Jurwa/proto/gen/reassignment/v1		coverage: 0.0% of statements
+	github.com/jurwaCST/Jurwa/proto/gen/report-history/v1		coverage: 0.0% of statements
+	github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1		coverage: 0.0% of statements
+	github.com/jurwaCST/Jurwa/proto/gen/routing-engine/v1		coverage: 0.0% of statements
+	github.com/jurwaCST/Jurwa/proto/gen/routing-rules/v1		coverage: 0.0% of statements
+	github.com/jurwaCST/Jurwa/proto/gen/sla-policy/v1		coverage: 0.0% of statements
+	github.com/jurwaCST/Jurwa/proto/gen/sla-tracking/v1		coverage: 0.0% of statements
+	github.com/jurwaCST/Jurwa/proto/gen/status-lifecycle/v1		coverage: 0.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/identity/adapters/in/grpc	1.885s	coverage: 92.0% of statements
+	github.com/jurwaCST/Jurwa/services/identity/adapters/out/memory		coverage: 0.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/identity/application	1.633s	coverage: 87.5% of statements
+ok  	github.com/jurwaCST/Jurwa/services/identity/cmd/server	0.640s	coverage: 22.5% of statements
+ok  	github.com/jurwaCST/Jurwa/services/identity/domain	2.361s	coverage: 94.2% of statements
+?   	github.com/jurwaCST/Jurwa/services/identity/ports	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/photo-media/adapters/in/grpc	2.634s	coverage: 100.0% of statements
+?   	github.com/jurwaCST/Jurwa/services/photo-media/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/photo-media/adapters/out/memory	(cached)	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/photo-media/application	(cached)	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/photo-media/cmd/server	3.226s	coverage: 10.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/photo-media/domain	(cached)	coverage: 100.0% of statements
+?   	github.com/jurwaCST/Jurwa/services/photo-media/ports	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/adapters/in/grpc	4.062s	coverage: 100.0% of statements
+?   	github.com/jurwaCST/Jurwa/services/report-submission/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/memory	4.604s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/uuid	5.184s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/application	5.693s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/cmd/server	5.854s	coverage: 10.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/domain	5.364s	coverage: 100.0% of statements
+?   	github.com/jurwaCST/Jurwa/services/report-submission/ports	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/routing-rules/adapters/in/grpc	5.473s	coverage: 97.0% of statements
+?   	github.com/jurwaCST/Jurwa/services/routing-rules/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/routing-rules/adapters/out/memory	5.583s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-rules/application	5.782s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-rules/cmd/server	5.623s	coverage: 10.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-rules/domain	5.332s	coverage: 100.0% of statements
+?   	github.com/jurwaCST/Jurwa/services/routing-rules/ports	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/adapters/in/grpc	5.141s	coverage: 100.0% of statements
+?   	github.com/jurwaCST/Jurwa/services/status-lifecycle/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/adapters/out/logpublisher	5.123s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/adapters/out/memory	5.063s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/application	4.882s	coverage: 96.9% of statements
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/cmd/server	4.823s	coverage: 28.2% of statements
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/domain	4.871s	coverage: 100.0% of statements
+?   	github.com/jurwaCST/Jurwa/services/status-lifecycle/ports	[no test files]
