@@ -31,6 +31,10 @@ $ grpcurl -plaintext localhost:9008 jurwa.departmentdirectory.v1.DepartmentDirec
     {
       "code": "MECH",
       "name": "Mechanical Engineering"
+    },
+    {
+      "code": "SH",
+      "name": "Science \u0026 Humanities"
     }
   ]
 }
@@ -42,6 +46,17 @@ $ grpcurl -plaintext -d '{"department_code":"CT"}' localhost:9008 jurwa.departme
     "title": "Head of Department, Computing Technologies",
     "kind": "HOD",
     "departmentCode": "CT",
+    "active": true
+  }
+}
+
+$ grpcurl -plaintext -d '{"department_code":"MECH"}' localhost:9008 jurwa.departmentdirectory.v1.DepartmentDirectoryService/GetHoD
+{
+  "position": {
+    "code": "HOD_MECH",
+    "title": "Head of Department, Mechanical Engineering",
+    "kind": "HOD",
+    "departmentCode": "MECH",
     "active": true
   }
 }

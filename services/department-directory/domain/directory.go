@@ -58,10 +58,11 @@ func (p Position) Validate() error {
 	return nil
 }
 
-// DefaultDepartments are the 5 engineering departments of CST, named as on
-// https://cst.edu.bt/department/. Each has one HoD. Science & Humanities is left
-// out: it runs no engineering programme, and the proposal says the 10
-// engineering programmes sit under 5 departmental HoDs.
+// DefaultDepartments are the 6 academic departments of CST, named as on
+// https://cst.edu.bt/department/. Each gets one HoD position. On 2 November 2026
+// the staff directory (https://cst.edu.bt/staff-directory/) listed an HoD for
+// every department except Mechanical Engineering, so HOD_MECH stays vacant until
+// the System Administrator assigns a holder.
 func DefaultDepartments() []Department {
 	return []Department{
 		{Code: "ARCH", Name: "Architecture"},
@@ -69,6 +70,7 @@ func DefaultDepartments() []Department {
 		{Code: "CT", Name: "Computing Technologies"},
 		{Code: "EEE", Name: "Electrical & Electronics Engineering"},
 		{Code: "MECH", Name: "Mechanical Engineering"},
+		{Code: "SH", Name: "Science & Humanities"},
 	}
 }
 

@@ -20,11 +20,11 @@ go test ./... -cover
 	github.com/jurwaCST/Jurwa/proto/gen/sla-policy/v1		coverage: 0.0% of statements
 	github.com/jurwaCST/Jurwa/proto/gen/sla-tracking/v1		coverage: 0.0% of statements
 	github.com/jurwaCST/Jurwa/proto/gen/status-lifecycle/v1		coverage: 0.0% of statements
-ok  	github.com/jurwaCST/Jurwa/services/department-directory/adapters/in/grpc	1.254s	coverage: 95.5% of statements
+ok  	github.com/jurwaCST/Jurwa/services/department-directory/adapters/in/grpc	1.180s	coverage: 95.5% of statements
 ?   	github.com/jurwaCST/Jurwa/services/department-directory/adapters/out	[no test files]
 ok  	github.com/jurwaCST/Jurwa/services/department-directory/adapters/out/memory	(cached)	coverage: 100.0% of statements
 ok  	github.com/jurwaCST/Jurwa/services/department-directory/application	(cached)	coverage: 100.0% of statements
-ok  	github.com/jurwaCST/Jurwa/services/department-directory/cmd/server	0.654s	coverage: 10.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/department-directory/cmd/server	0.607s	coverage: 10.0% of statements
 ok  	github.com/jurwaCST/Jurwa/services/department-directory/domain	(cached)	coverage: 100.0% of statements
 ?   	github.com/jurwaCST/Jurwa/services/department-directory/ports	[no test files]
 ok  	github.com/jurwaCST/Jurwa/services/identity/adapters/in/grpc	(cached)	coverage: 92.0% of statements

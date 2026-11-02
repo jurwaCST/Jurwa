@@ -7,23 +7,24 @@ Knows the 5 academic departments and every position a report can be routed or re
 | Kind | Positions |
 |---|---|
 | `CATEGORY_HEAD` | `DSA` (Hostel), `DAA` (Academic Block), `SSO` (Others) |
-| `HOD` | `HOD_ARCH`, `HOD_CIVIL`, `HOD_CT`, `HOD_EEE`, `HOD_MECH`, one per department |
+| `HOD` | `HOD_ARCH`, `HOD_CIVIL`, `HOD_CT`, `HOD_EEE`, `HOD_MECH`, `HOD_SH`, one per department |
 | `STAFF` | `SSO_MALE`, `SSO_FEMALE` |
 | `COUNCILLOR` | `BLOCK_COUNCILLOR`, `MAINTENANCE_COUNCILLOR`, `DEPUTY_CHIEF_COUNCILLOR_MESS`, `CHIEF_COUNCILLOR` |
 
 routing-engine calls `GetStaff` to find who holds the Category Head position of a rule. reassignment uses `GetHoD` and `GetStaff` to find the person a report is reassigned to. Position codes are case-insensitive (`dsa` finds `DSA`).
 
-**Departments:** the 5 engineering departments of CST, named as on https://cst.edu.bt/department/:
+**Departments:** the 6 academic departments of CST, named as on https://cst.edu.bt/department/:
 
-| Code | Name |
-|---|---|
-| `ARCH` | Architecture |
-| `CIVIL` | Civil & Environmental Engineering |
-| `CT` | Computing Technologies |
-| `EEE` | Electrical & Electronics Engineering |
-| `MECH` | Mechanical Engineering |
+| Code | Name | HoD on the staff directory (2 Nov 2026) |
+|---|---|---|
+| `ARCH` | Architecture | yes |
+| `CIVIL` | Civil & Environmental Engineering | yes |
+| `CT` | Computing Technologies | yes |
+| `EEE` | Electrical & Electronics Engineering | yes |
+| `MECH` | Mechanical Engineering | none listed (only a Programme Leader) |
+| `SH` | Science & Humanities | yes |
 
-The college website also lists Science & Humanities. It is left out because it runs no engineering programme, and the proposal says CST's 10 engineering programmes sit under 5 departmental HoDs.
+The proposal mentions 5 departmental HoDs, and https://cst.edu.bt/staff-directory/ lists exactly 5. Mechanical Engineering has none listed. Its HoD position is still seeded so the DAA can reassign Mechanical reports once the System Administrator assigns a holder. Staff names are not stored here: holders are user ids from identity.
 
 **Demo holders:** identity has no seeded users yet, so DSA, DAA and SSO are given fixed demo user ids (`00000000-0000-4000-8000-00000000000{1,2,3}`) to let a report be routed end to end. Every other position has no holder. Real holders are entered by the System Administrator in Sprint 3.
 
@@ -35,7 +36,7 @@ Contract: `proto/department-directory/v1/department-directory.proto`, service `j
 
 | RPC | What it does | Errors |
 |---|---|---|
-| `ListDepartments` | The 5 departments | none |
+| `ListDepartments` | The 6 academic departments | none |
 | `GetHoD` | The HoD position of one department | INVALID_ARGUMENT for an empty `department_code`, NOT_FOUND for an unknown department |
 | `GetStaff` | One position and its holder | INVALID_ARGUMENT for an empty `position_code`, NOT_FOUND for an unknown code |
 

@@ -7,22 +7,21 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// The 5 engineering departments of CST (https://cst.edu.bt/department/). Science &
-// Humanities is not one of them: it runs no engineering programme, and the proposal
-// says the 10 engineering programmes sit under 5 departmental HoDs.
-func TestDefaultDepartmentsAreCSTEngineeringDepartments(t *testing.T) {
+// The 6 academic departments of CST, as on https://cst.edu.bt/department/.
+func TestDefaultDepartmentsAreCSTDepartments(t *testing.T) {
 	assert.Equal(t, []Department{
 		{Code: "ARCH", Name: "Architecture"},
 		{Code: "CIVIL", Name: "Civil & Environmental Engineering"},
 		{Code: "CT", Name: "Computing Technologies"},
 		{Code: "EEE", Name: "Electrical & Electronics Engineering"},
 		{Code: "MECH", Name: "Mechanical Engineering"},
+		{Code: "SH", Name: "Science & Humanities"},
 	}, DefaultDepartments())
 }
 
 func TestDefaultDepartments(t *testing.T) {
 	depts := DefaultDepartments()
-	require.Len(t, depts, 5, "CST's 10 programmes sit under 5 departmental HoDs")
+	require.Len(t, depts, 6)
 	seen := map[string]bool{}
 	for _, d := range depts {
 		assert.NotEmpty(t, d.Code)

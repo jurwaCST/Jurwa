@@ -34,7 +34,7 @@ func newService() *Service {
 func TestListDepartments(t *testing.T) {
 	got, err := newService().ListDepartments(context.Background())
 	require.NoError(t, err)
-	assert.Len(t, got, 5)
+	assert.Len(t, got, 6)
 }
 
 func TestGetHoD(t *testing.T) {

@@ -24,7 +24,7 @@ func newHandler() *Handler {
 func TestListDepartments(t *testing.T) {
 	resp, err := newHandler().ListDepartments(context.Background(), &departmentdirectoryv1.ListDepartmentsRequest{})
 	require.NoError(t, err)
-	require.Len(t, resp.GetDepartments(), 5)
+	require.Len(t, resp.GetDepartments(), 6)
 	assert.Equal(t, "ARCH", resp.GetDepartments()[0].GetCode())
 }
 

@@ -118,7 +118,7 @@ Seeded with the three agreed rules: HOSTEL to DSA, ACADEMIC_BLOCK to DAA, OTHERS
 | departments | code TEXT, name TEXT, created_at | all | code | none |
 | positions | code TEXT, title TEXT, kind TEXT, department_code TEXT, holder_user_id UUID, is_active BOOLEAN, updated_at | code, title, kind | code | kind in CATEGORY_HEAD, HOD, COUNCILLOR, STAFF; index on holder_user_id and active kind |
 
-Seeded with the DSA, DAA and SSO positions. The 5 HoD departments are the engineering departments on https://cst.edu.bt/department/: Architecture (`ARCH`), Civil & Environmental Engineering (`CIVIL`), Computing Technologies (`CT`), Electrical & Electronics Engineering (`EEE`) and Mechanical Engineering (`MECH`). Position holders are entered by the System Administrator.
+Seeded with the DSA, DAA and SSO positions and the 6 academic departments on https://cst.edu.bt/department/, each with one HoD position: Architecture (`ARCH`), Civil & Environmental Engineering (`CIVIL`), Computing Technologies (`CT`), Electrical & Electronics Engineering (`EEE`), Mechanical Engineering (`MECH`) and Science & Humanities (`SH`). The staff directory lists 5 HoDs (none for Mechanical), so `HOD_MECH` starts vacant. Position holders are entered by the System Administrator.
 
 ### category-taxonomy (`category-taxonomy.sql`)
 
