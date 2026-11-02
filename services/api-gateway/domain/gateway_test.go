@@ -90,3 +90,14 @@ func TestCanReadReport(t *testing.T) {
 	assert.True(t, CanReadReport(Principal{UserID: "s", Roles: []string{"STAFF"}}, "u2"))
 	assert.False(t, CanReadReport(Principal{UserID: "p", Roles: []string{"PRESIDENT"}}, "u2"))
 }
+
+func TestLimiterDropsFullBucketsWhenCrowded(t *testing.T) {
+	clock := &fakeClock{t: time.Date(2026, 11, 2, 9, 0, 0, 0, time.UTC)}
+	l := NewLimiter(20, clock.Now)
+	for i := 0; i < maxBuckets; i++ {
+		l.Allow(time.Duration(i).String())
+	}
+	clock.Advance(time.Second) // every bucket is full again
+	assert.True(t, l.Allow("new-ip"))
+	assert.Len(t, l.buckets, 1, "full buckets were dropped, only the new one is left")
+}
