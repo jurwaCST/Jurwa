@@ -61,8 +61,6 @@ Demo: each owner runs their thin slice and calls it with grpcurl.
 | routing-rules | Sonam Zangmo | GetRule |
 | status-lifecycle | Nyendrak Yoezer Zangmo | Valid and invalid status changes |
 
-Feedback from the review: _add after the meeting._
-
 ## 6. Retrospective
 
 ### What went well
