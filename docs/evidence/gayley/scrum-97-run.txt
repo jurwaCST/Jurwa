@@ -1,0 +1,35 @@
+# Live run: analytics (9020, SEED_DEMO_DATA=true), department-directory (9008), notification (9018), digest-dispatcher (PORT=8082)
+
+$ curl -i http://localhost:8082/
+HTTP/1.1 200 OK
+Content-Type: application/json
+Date: Mon, 02 Nov 2026 14:56:07 GMT
+Content-Length: 25
+
+{"digests":3,"errors":0}
+
+$ notification ListNotifications for the DSA (00000000-0000-4000-8000-000000000001)
+{
+  "notifications": [
+    {
+      "id": "50879bf1-c84c-4cd0-970a-d7db26544248",
+      "recipientUserId": "00000000-0000-4000-8000-000000000001",
+      "channel": "IN_APP",
+      "eventType": "digest.daily",
+      "subject": "Daily digest: Hostel",
+      "body": "Hostel: 1 unresolved (1 open, 0 assigned, 0 in progress), 0 escalated. Please check Jurwa.",
+      "deliveryStatus": "SENT",
+      "createdAt": "2026-11-02T14:56:07.046980100Z",
+      "sentAt": "2026-11-02T14:56:07.046980100Z"
+    }
+  ]
+}
+
+# analytics stopped
+$ curl -i http://localhost:8082/
+HTTP/1.1 503 Service Unavailable
+Content-Type: application/json
+Date: Mon, 02 Nov 2026 14:56:07 GMT
+Content-Length: 25
+
+{"digests":0,"errors":1}
