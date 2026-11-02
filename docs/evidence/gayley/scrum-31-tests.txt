@@ -1,0 +1,7 @@
+ok  	github.com/jurwaCST/Jurwa/services/analytics/adapters/in/grpc	3.582s	coverage: 100.0% of statements
+?   	github.com/jurwaCST/Jurwa/services/analytics/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/analytics/adapters/out/memory	3.574s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/analytics/application	3.263s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/analytics/cmd/server	1.906s	coverage: 19.1% of statements
+ok  	github.com/jurwaCST/Jurwa/services/analytics/domain	(cached)	coverage: 100.0% of statements
+?   	github.com/jurwaCST/Jurwa/services/analytics/ports	[no test files]
