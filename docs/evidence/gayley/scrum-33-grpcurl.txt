@@ -1,0 +1,69 @@
+# Live run: status-lifecycle (9011, seeded with 2 OPEN reports) and feedback (9019)
+
+$ grpcurl -plaintext localhost:9019 grpc.health.v1.Health/Check
+{
+  "status": "SERVING"
+}
+
+$ grpcurl -plaintext localhost:9019 list
+grpc.health.v1.Health
+grpc.reflection.v1.ServerReflection
+grpc.reflection.v1alpha.ServerReflection
+jurwa.feedback.v1.FeedbackService
+
+$ SubmitFeedback on report 33333333-3333-3333-3333-333333333333 while it is OPEN (expect FailedPrecondition)
+ERROR:
+  Code: FailedPrecondition
+  Message: feedback is allowed only after the report is RESOLVED
+
+$ status-lifecycle: move 33333333-3333-3333-3333-333333333333 OPEN > ASSIGNED > IN_PROGRESS > RESOLVED
+  "status": {
+    "status": "ASSIGNED",
+  "status": {
+    "status": "IN_PROGRESS",
+  "status": {
+    "status": "RESOLVED",
+
+$ SubmitFeedback on 33333333-3333-3333-3333-333333333333 now that it is RESOLVED
+{
+  "feedback": {
+    "id": "ffde5e87-86a7-4d93-a592-93e9b4074f4b",
+    "reportId": "33333333-3333-3333-3333-333333333333",
+    "studentUserId": "22222222-2222-2222-2222-222222222222",
+    "rating": 4,
+    "comment": "Fixed within a day, thank you.",
+    "createdAt": "2026-11-02T13:23:04.707043600Z"
+  }
+}
+
+$ SubmitFeedback on 33333333-3333-3333-3333-333333333333 again (expect AlreadyExists)
+ERROR:
+  Code: AlreadyExists
+  Message: this report already has feedback
+
+$ GetFeedback 33333333-3333-3333-3333-333333333333
+{
+  "feedback": {
+    "id": "ffde5e87-86a7-4d93-a592-93e9b4074f4b",
+    "reportId": "33333333-3333-3333-3333-333333333333",
+    "studentUserId": "22222222-2222-2222-2222-222222222222",
+    "rating": 4,
+    "comment": "Fixed within a day, thank you.",
+    "createdAt": "2026-11-02T13:23:04.707043600Z"
+  }
+}
+
+$ GetFeedback 44444444-4444-4444-4444-444444444444 (no feedback, expect NotFound)
+ERROR:
+  Code: NotFound
+  Message: this report has no feedback
+
+$ SubmitFeedback with rating 6 (expect InvalidArgument)
+ERROR:
+  Code: InvalidArgument
+  Message: rating must be 1 to 5
+
+$ status-lifecycle stopped; SubmitFeedback on 44444444-4444-4444-4444-444444444444 (expect Unavailable)
+ERROR:
+  Code: Unavailable
+  Message: status-lifecycle is unavailable

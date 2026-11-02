@@ -1,55 +1,48 @@
 # feedback
 
-> Created from `services/_template`. Replace every TODO below, and delete this note.
-
-## Start a new service (template users)
-
-From the repo root, with your service name and port from the table below:
-
-```bash
-make new-service NAME=routing-rules PORT=9006
-```
-
-| Port | Service | Port | Service |
-|---|---|---|---|
-| 9001 | report-submission | 9011 | status-lifecycle |
-| 9002 | photo-media | 9012 | sla-tracking |
-| 9003 | report-history | 9013 | sla-policy |
-| 9004 | location-taxonomy | 9014 | reassignment |
-| 9005 | internal-notes | 9015 | audit-log |
-| 9006 | routing-rules | 9016 | identity |
-| 9007 | routing-engine | 9017 | authorization |
-| 9008 | department-directory | 9018 | notification |
-| 9009 | category-taxonomy | 9019 | feedback |
-| 9010 | api-gateway (gRPC; HTTP is 8080) | 9020 | analytics |
-
-This copies `services/_template` to `services/<name>` and fills in the name and port. Then:
-
-1. Run `make proto` so your generated code in `proto/gen/<name>/v1/` is up to date.
-2. Write domain tests first in `domain/`, then the domain code.
-3. Add ports (interfaces) in `ports/`, adapters in `adapters/out/`, gRPC handlers in `adapters/in/grpc/`.
-4. Register your gRPC service in `cmd/server/main.go` (see the TODO there).
-5. Run `make test`, `make lint` and `make run SERVICE=<name>`.
-
-Layout:
-
-```
-cmd/server/main.go     starts the gRPC server (health check, reflection, JSON logs, graceful shutdown)
-domain/                business rules, plain Go, no framework imports
-application/           use cases
-ports/                 interfaces the core depends on
-adapters/in/grpc/      gRPC handlers
-adapters/out/          database, Redis and other adapters
-Dockerfile             multi-stage image, built from the repo root
-```
+Owner: Gayley Choden. gRPC port 9019. Contract: `proto/feedback/v1/feedback.proto`.
 
 ## What it does
 
-TODO: one or two sentences on what this service owns and what it never does.
+Stores the student's rating (1 to 5, with an optional comment) of how a report was resolved. It asks status-lifecycle whether the report is RESOLVED before it accepts feedback. It never changes a report's status.
+
+## Rules
+
+| Rule | Result |
+|---|---|
+| `report_id` and `student_user_id` must be UUIDs | otherwise `INVALID_ARGUMENT` |
+| `rating` must be 1 to 5 (0 and 6 are rejected) | otherwise `INVALID_ARGUMENT` |
+| `comment` is optional, at most 500 characters (counted as letters, so Dzongkha works) | 501+ gives `INVALID_ARGUMENT` |
+| One feedback per report | a second one gives `ALREADY_EXISTS`, the first is kept |
+| The report must be RESOLVED in status-lifecycle | otherwise `FAILED_PRECONDITION` |
+| status-lifecycle cannot be reached | `UNAVAILABLE` (never a wrong "not resolved") |
+| `GetFeedback` for a report with no feedback | `NOT_FOUND` |
+
+The comment limit is 500 because that is what the `.proto` contract says (the Sprint 2 guide said 300).
+
+Checks run in this order: the input, then "already has feedback" (local), then "is it RESOLVED" (a network call). Bad input never causes a call to status-lifecycle.
+
+Whether the student is the person who reported it ("Student (own report)" in `docs/design/api-routes.md`) is checked by the api-gateway, which has the JWT.
 
 ## RPCs
 
-TODO: list the RPCs from `proto/feedback/v1/`, one line each.
+| RPC | What it does | Errors |
+|---|---|---|
+| `SubmitFeedback` | Stores the rating for a resolved report | `INVALID_ARGUMENT`, `ALREADY_EXISTS`, `FAILED_PRECONDITION`, `UNAVAILABLE` |
+| `GetFeedback` | Returns the feedback for a report | `INVALID_ARGUMENT`, `NOT_FOUND` |
+
+Plus `grpc.health.v1.Health/Check` and server reflection.
+
+## Layout
+
+| Folder | Content |
+|---|---|
+| `domain/` | `Feedback`, `NewFeedback` rules (100% tested) |
+| `application/` | Use cases: `Submit`, `Get` |
+| `ports/` | `FeedbackRepository` and `StatusChecker` interfaces |
+| `adapters/in/grpc/` | gRPC handler, maps errors to gRPC codes |
+| `adapters/out/memory/` | In-memory store (a database in Sprint 3) |
+| `adapters/out/statusclient/` | `StatusChecker` that calls status-lifecycle `GetStatus`, with `pkg/resilience` (timeout, retries, circuit breaker) |
 
 ## Configuration
 
@@ -57,26 +50,42 @@ TODO: list the RPCs from `proto/feedback/v1/`, one line each.
 |---|---|---|
 | `PORT` | `9019` | gRPC port |
 | `SERVICE_NAME` | `feedback` | Name written in every log line |
+| `STATUS_LIFECYCLE_ADDR` | `localhost:9011` | Address of status-lifecycle |
 
-TODO: add `DATABASE_URL` and others when the service uses them. Never hard-code passwords.
+## Run (PowerShell)
 
-## Run
+Terminal 1, status-lifecycle with one demo report:
 
-```bash
-make run SERVICE=feedback
-grpcurl -plaintext localhost:9019 grpc.health.v1.Health/Check
-grpcurl -plaintext localhost:9019 list
+```powershell
+$env:SEED_REPORT_IDS = "33333333-3333-3333-3333-333333333333"
+go run ./services/status-lifecycle/cmd/server
 ```
 
-Docker:
+Terminal 2, feedback:
 
-```bash
-make docker-build SERVICE=feedback
-docker run --rm -p 9019:9019 jurwa/feedback
+```powershell
+go run ./services/feedback/cmd/server
+```
+
+Terminal 3, resolve the report, then give feedback:
+
+```powershell
+grpcurl -plaintext -d '{\"report_id\":\"33333333-3333-3333-3333-333333333333\",\"to_status\":\"ASSIGNED\",\"actor_id\":\"22222222-2222-2222-2222-222222222222\"}' localhost:9011 jurwa.statuslifecycle.v1.StatusLifecycleService/ChangeStatus
+grpcurl -plaintext -d '{\"report_id\":\"33333333-3333-3333-3333-333333333333\",\"to_status\":\"IN_PROGRESS\",\"actor_id\":\"22222222-2222-2222-2222-222222222222\"}' localhost:9011 jurwa.statuslifecycle.v1.StatusLifecycleService/ChangeStatus
+grpcurl -plaintext -d '{\"report_id\":\"33333333-3333-3333-3333-333333333333\",\"to_status\":\"RESOLVED\",\"actor_id\":\"22222222-2222-2222-2222-222222222222\"}' localhost:9011 jurwa.statuslifecycle.v1.StatusLifecycleService/ChangeStatus
+grpcurl -plaintext -d '{\"report_id\":\"33333333-3333-3333-3333-333333333333\",\"student_user_id\":\"22222222-2222-2222-2222-222222222222\",\"rating\":4,\"comment\":\"Fixed within a day\"}' localhost:9019 jurwa.feedback.v1.FeedbackService/SubmitFeedback
+grpcurl -plaintext -d '{\"report_id\":\"33333333-3333-3333-3333-333333333333\"}' localhost:9019 jurwa.feedback.v1.FeedbackService/GetFeedback
+```
+
+Docker (from the repo root):
+
+```powershell
+docker build -f services/feedback/Dockerfile --build-arg SERVICE=feedback -t jurwa/feedback .
+docker run --rm -p 9019:9019 -e STATUS_LIFECYCLE_ADDR=host.docker.internal:9011 jurwa/feedback
 ```
 
 ## Test
 
-```bash
-make test
+```powershell
+go test ./services/feedback/... -cover
 ```
