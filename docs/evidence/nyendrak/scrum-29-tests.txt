@@ -1,0 +1,7 @@
+ok  	github.com/jurwaCST/Jurwa/services/sla-policy/adapters/in/grpc	0.589s	coverage: 100.0% of statements
+?   	github.com/jurwaCST/Jurwa/services/sla-policy/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/sla-policy/adapters/out/memory	2.813s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-policy/application	2.837s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-policy/cmd/server	0.423s	coverage: 2.9% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-policy/domain	2.808s	coverage: 100.0% of statements
+?   	github.com/jurwaCST/Jurwa/services/sla-policy/ports	[no test files]
