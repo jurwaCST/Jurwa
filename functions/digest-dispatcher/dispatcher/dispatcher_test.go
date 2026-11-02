@@ -3,6 +3,7 @@ package dispatcher
 import (
 	"context"
 	"errors"
+	"math"
 	"strings"
 	"testing"
 
@@ -167,11 +168,18 @@ func TestAnalyticsDownFailsTheWholeRun(t *testing.T) {
 }
 
 func TestMessageIsAtMost200Characters(t *testing.T) {
-	huge := Counts{Total: 999999999, Open: 333333333, Assigned: 333333333, InProgress: 333333333, Escalated: 999999999}
-	for _, c := range Categories {
-		body := Body(c, huge)
-		assert.LessOrEqual(t, len([]rune(body)), MaxBodyChars, "body for %s: %q", c, body)
-		assert.NotEmpty(t, strings.TrimSpace(body))
+	// The longest numbers int64 can print: 19 digits, or 20 with a minus sign
+	// (Unresolved is negative when Resolved is bigger than Total).
+	worst := []Counts{
+		{Total: math.MaxInt64, Open: math.MaxInt64, Assigned: math.MaxInt64, InProgress: math.MaxInt64, Escalated: math.MaxInt64},
+		{Total: math.MinInt64 + 1, Resolved: math.MaxInt64, Open: math.MinInt64, Assigned: math.MinInt64, InProgress: math.MinInt64, Escalated: math.MinInt64},
+	}
+	for _, n := range worst {
+		for _, c := range Categories {
+			body := Body(c, n)
+			assert.LessOrEqual(t, len([]rune(body)), MaxBodyChars, "body for %s: %q", c, body)
+			assert.NotEmpty(t, strings.TrimSpace(body))
+		}
 	}
 }
 
