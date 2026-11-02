@@ -1,0 +1,6 @@
+--- PASS: TestListDueTimers_PublishesThenSavesInOrder (0.00s)
+--- PASS: TestListDueTimers_PublishFails_NothingSaved (0.00s)
+--- PASS: TestListDueTimers_BadLimit_NoCalls (0.00s)
+--- PASS: TestStartTimer_AsksPolicyOnceThenCreates (0.00s)
+--- PASS: TestStartTimer_PolicyDown_NoCreate (0.00s)
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/application	2.570s

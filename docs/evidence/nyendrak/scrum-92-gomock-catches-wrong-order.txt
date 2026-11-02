@@ -1,0 +1,21 @@
+Mistake put in on purpose: in ListDueTimers, save the timer BEFORE publishing sla.lapsed (wrong order).
+> go test ./services/sla-tracking/application/ -run TestListDueTimers_PublishesThenSavesInOrder
+--- FAIL: TestListDueTimers_PublishesThenSavesInOrder (0.00s)
+    service.go:131: Unexpected call to *mocks.MockTimerRepository.Update([context.Background {11111111-1111-1111-1111-111111111111 HOSTEL 2026-11-02 08:00:00 +0000 UTC 2026-11-02 09:00:00 +0000 UTC LAPSED}]) at services/sla-tracking/application/service.go:131 because: 
+        expected call at services/sla-tracking/application/service_gomock_test.go:64 doesn't have a prerequisite call satisfied:
+        *mocks.MockEventPublisher.PublishSLALapsed(is equal to context.Background (context.backgroundCtx), is equal to {11111111-1111-1111-1111-111111111111 HOSTEL 2026-11-02 09:00:00 +0000 UTC 2026-11-02 11:00:00 +0000 UTC} (ports.SLALapsed)) services/sla-tracking/application/service_gomock_test.go:63
+        should be called before:
+        *mocks.MockTimerRepository.Update(is equal to context.Background (context.backgroundCtx), is equal to {11111111-1111-1111-1111-111111111111 HOSTEL 2026-11-02 08:00:00 +0000 UTC 2026-11-02 09:00:00 +0000 UTC LAPSED} (domain.Timer)) services/sla-tracking/application/service_gomock_test.go:64
+        expected call at services/sla-tracking/application/service_gomock_test.go:66 doesn't match the argument at index 1.
+        Got: {11111111-1111-1111-1111-111111111111 HOSTEL 2026-11-02 08:00:00 +0000 UTC 2026-11-02 09:00:00 +0000 UTC LAPSED} (domain.Timer)
+        Want: is equal to {22222222-2222-2222-2222-222222222222 HOSTEL 2026-11-02 09:00:00 +0000 UTC 2026-11-02 10:00:00 +0000 UTC LAPSED} (domain.Timer)
+    controller.go:97: missing call(s) to *mocks.MockEventPublisher.PublishSLALapsed(is equal to context.Background (context.backgroundCtx), is equal to {11111111-1111-1111-1111-111111111111 HOSTEL 2026-11-02 09:00:00 +0000 UTC 2026-11-02 11:00:00 +0000 UTC} (ports.SLALapsed)) services/sla-tracking/application/service_gomock_test.go:63
+    controller.go:97: missing call(s) to *mocks.MockEventPublisher.PublishSLALapsed(is equal to context.Background (context.backgroundCtx), is equal to {22222222-2222-2222-2222-222222222222 HOSTEL 2026-11-02 10:00:00 +0000 UTC 2026-11-02 11:00:00 +0000 UTC} (ports.SLALapsed)) services/sla-tracking/application/service_gomock_test.go:65
+    controller.go:97: missing call(s) to *mocks.MockTimerRepository.Update(is equal to context.Background (context.backgroundCtx), is equal to {11111111-1111-1111-1111-111111111111 HOSTEL 2026-11-02 08:00:00 +0000 UTC 2026-11-02 09:00:00 +0000 UTC LAPSED} (domain.Timer)) services/sla-tracking/application/service_gomock_test.go:64
+    controller.go:97: missing call(s) to *mocks.MockTimerRepository.Update(is equal to context.Background (context.backgroundCtx), is equal to {22222222-2222-2222-2222-222222222222 HOSTEL 2026-11-02 09:00:00 +0000 UTC 2026-11-02 10:00:00 +0000 UTC LAPSED} (domain.Timer)) services/sla-tracking/application/service_gomock_test.go:66
+    controller.go:97: aborting test due to missing call(s)
+FAIL
+FAIL	github.com/jurwaCST/Jurwa/services/sla-tracking/application	3.068s
+FAIL
+
+The mistake was then removed (git checkout of service.go) and all tests pass again.

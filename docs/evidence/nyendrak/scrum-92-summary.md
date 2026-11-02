@@ -33,4 +33,18 @@ SCRUM-19 status-lifecycle and SCRUM-29 sla-policy were also written test first, 
 ## Tools
 
 - Go `testing` and Testify (`assert`, `require`) in every test, table-driven for the rules (transitions, SLA windows, timer due times, roles).
-- Test doubles: every service uses small hand-written fakes for its ports (repositories, publishers, gRPC clients), and `bufconn` for real gRPC calls in memory. **gomock is not used yet.** The quality plan lists it, but adding it changes the shared `go.mod`, so it is a team decision: either add `go.uber.org/mock` for the ports, or change the quality plan to say hand-written fakes.
+- Test doubles, as the team agreed on 2 Nov: hand-written fakes are the default (they check results), and gomock (`go.uber.org/mock` v0.6.0) is used for a few ports where the calls themselves matter. `bufconn` is used for real gRPC calls in memory.
+
+## gomock in sla-tracking
+
+Mocks are generated from `services/sla-tracking/ports/ports.go` into `ports/mocks/` (`go generate ./services/sla-tracking/ports/`). The tests are in `services/sla-tracking/application/service_gomock_test.go`:
+
+| Test | What it checks that a fake cannot |
+|---|---|
+| `TestListDueTimers_PublishesThenSavesInOrder` | For each due timer, `sla.lapsed` is published before the timer is saved as LAPSED, one timer at a time (`gomock.InOrder`) |
+| `TestListDueTimers_PublishFails_NothingSaved` | When publishing fails, `Update` is never called and the next timer is not touched |
+| `TestListDueTimers_BadLimit_NoCalls` | Bad input is rejected before any port is called |
+| `TestStartTimer_AsksPolicyOnceThenCreates` | sla-policy is asked exactly once, then the timer is created with that deadline |
+| `TestStartTimer_PolicyDown_NoCreate` | If sla-policy fails, no timer is created |
+
+Evidence: `scrum-92-gomock-tests.txt` (all pass), and `scrum-92-gomock-catches-wrong-order.txt`: saving before publishing was put in on purpose, the order test failed with "should be called before", and the mistake was removed.

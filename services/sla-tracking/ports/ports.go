@@ -1,5 +1,9 @@
 package ports
 
+// Mocks for interaction tests (gomock), next to the hand-written fakes.
+// Regenerate with: go generate ./services/sla-tracking/ports/
+//go:generate mockgen -source=ports.go -destination=mocks/ports_mock.go -package=mocks
+
 import (
 	"context"
 	"errors"
