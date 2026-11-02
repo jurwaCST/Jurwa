@@ -1,0 +1,14 @@
+# github.com/jurwaCST/Jurwa/services/analytics/domain [github.com/jurwaCST/Jurwa/services/analytics/domain.test]
+services\analytics\domain\projection_test.go:17:33: undefined: Category
+services\analytics\domain\projection_test.go:17:57: undefined: Event
+services\analytics\domain\projection_test.go:19:9: undefined: Event
+services\analytics\domain\projection_test.go:19:52: undefined: ReportSubmitted
+services\analytics\domain\projection_test.go:22:32: undefined: Status
+services\analytics\domain\projection_test.go:22:54: undefined: Event
+services\analytics\domain\projection_test.go:24:9: undefined: Event
+services\analytics\domain\projection_test.go:24:52: undefined: StatusChanged
+services\analytics\domain\projection_test.go:27:15: undefined: Projection
+services\analytics\domain\projection_test.go:27:37: undefined: Event
+services\analytics\domain\projection_test.go:24:52: too many errors
+FAIL	github.com/jurwaCST/Jurwa/services/analytics/domain [build failed]
+FAIL
