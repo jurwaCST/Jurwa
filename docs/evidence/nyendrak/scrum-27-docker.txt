@@ -1,0 +1,10 @@
+> docker build -f functions/sla-escalation-checker/Dockerfile -t jurwa/sla-escalation-checker .
+#17 unpacking to docker.io/jurwa/sla-escalation-checker:latest
+#17 unpacking to docker.io/jurwa/sla-escalation-checker:latest 0.1s done
+#17 DONE 0.9s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/ury959cimgjicmuih2s593me1
+
+> docker images jurwa/sla-escalation-checker
+REPOSITORY                     TAG       IMAGE ID       CREATED         SIZE
+jurwa/sla-escalation-checker   latest    cf75b37da21a   2 seconds ago   23MB
