@@ -1,55 +1,58 @@
 # notification
 
-> Created from `services/_template`. Replace every TODO below, and delete this note.
-
-## Start a new service (template users)
-
-From the repo root, with your service name and port from the table below:
-
-```bash
-make new-service NAME=routing-rules PORT=9006
-```
-
-| Port | Service | Port | Service |
-|---|---|---|---|
-| 9001 | report-submission | 9011 | status-lifecycle |
-| 9002 | photo-media | 9012 | sla-tracking |
-| 9003 | report-history | 9013 | sla-policy |
-| 9004 | location-taxonomy | 9014 | reassignment |
-| 9005 | internal-notes | 9015 | audit-log |
-| 9006 | routing-rules | 9016 | identity |
-| 9007 | routing-engine | 9017 | authorization |
-| 9008 | department-directory | 9018 | notification |
-| 9009 | category-taxonomy | 9019 | feedback |
-| 9010 | api-gateway (gRPC; HTTP is 8080) | 9020 | analytics |
-
-This copies `services/_template` to `services/<name>` and fills in the name and port. Then:
-
-1. Run `make proto` so your generated code in `proto/gen/<name>/v1/` is up to date.
-2. Write domain tests first in `domain/`, then the domain code.
-3. Add ports (interfaces) in `ports/`, adapters in `adapters/out/`, gRPC handlers in `adapters/in/grpc/`.
-4. Register your gRPC service in `cmd/server/main.go` (see the TODO there).
-5. Run `make test`, `make lint` and `make run SERVICE=<name>`.
-
-Layout:
-
-```
-cmd/server/main.go     starts the gRPC server (health check, reflection, JSON logs, graceful shutdown)
-domain/                business rules, plain Go, no framework imports
-application/           use cases
-ports/                 interfaces the core depends on
-adapters/in/grpc/      gRPC handlers
-adapters/out/          database, Redis and other adapters
-Dockerfile             multi-stage image, built from the repo root
-```
+Owner: Gayley Choden. gRPC port 9018. Contract: `proto/notification/v1/notification.proto`.
 
 ## What it does
 
-TODO: one or two sentences on what this service owns and what it never does.
+Sends in-app messages to users and keeps an outbox of them, so the PWA can show "your report is In Progress" or "a report was assigned to you". Event consumers (Sprint 3) and the `digest-dispatcher` function call `SendNotification`. It never decides who should be told: the caller chooses the recipient.
+
+In Sprint 2 the `Sender` only writes a log line. Real email delivery is out of scope.
+
+## Rules
+
+| Rule | Result |
+|---|---|
+| `recipient_user_id` must be a UUID | otherwise `INVALID_ARGUMENT` |
+| `channel` must be `EMAIL` or `IN_APP` | otherwise `INVALID_ARGUMENT` |
+| `event_type` must be a known event (below) | otherwise `INVALID_ARGUMENT` |
+| `report_id` is optional, but must be a UUID when given | otherwise `INVALID_ARGUMENT` |
+| `subject` is required, not blank | otherwise `INVALID_ARGUMENT` |
+| `body` is required, at most 200 characters (counted as letters, so Dzongkha works) | empty or 201+ gives `INVALID_ARGUMENT` |
+| The sender fails | stored as `FAILED`, call returns `UNAVAILABLE` |
+| Sent | stored as `SENT` with `sent_at` |
+| `ListNotifications` | only that user's messages, newest first |
+| `page_size` | 0 means 20; 1 to 100; otherwise `INVALID_ARGUMENT` |
+
+Event types are the stream names in `proto/events/v1/events.proto`, plus the digest:
+
+| `event_type` | When |
+|---|---|
+| `report.submitted` | the student's report was received |
+| `report.routed` | a report was assigned to a Category Head |
+| `status.changed` | the report status changed |
+| `report.reassigned` | the report was given to someone else |
+| `sla.lapsed` | the report was escalated |
+| `digest.daily` | the daily digest from `digest-dispatcher` |
 
 ## RPCs
 
-TODO: list the RPCs from `proto/notification/v1/`, one line each.
+| RPC | What it does | Errors |
+|---|---|---|
+| `SendNotification` | Delivers and stores one message | `INVALID_ARGUMENT`, `UNAVAILABLE` |
+| `ListNotifications` | One user's messages, newest first, with paging | `INVALID_ARGUMENT` |
+
+Plus `grpc.health.v1.Health/Check` and server reflection.
+
+## Layout
+
+| Folder | Content |
+|---|---|
+| `domain/` | `Notification`, `NewNotification` rules, `MarkSent`, `MarkFailed` (100% tested) |
+| `application/` | Use cases: `Send`, `List` |
+| `ports/` | `NotificationRepository` and `Sender` interfaces |
+| `adapters/in/grpc/` | gRPC handler, maps errors to gRPC codes |
+| `adapters/out/memory/` | In-memory outbox (a database in Sprint 3) |
+| `adapters/out/logsender/` | `Sender` that writes a JSON log line (the body is not logged) |
 
 ## Configuration
 
@@ -58,25 +61,29 @@ TODO: list the RPCs from `proto/notification/v1/`, one line each.
 | `PORT` | `9018` | gRPC port |
 | `SERVICE_NAME` | `notification` | Name written in every log line |
 
-TODO: add `DATABASE_URL` and others when the service uses them. Never hard-code passwords.
+## Run (PowerShell)
 
-## Run
-
-```bash
-make run SERVICE=notification
-grpcurl -plaintext localhost:9018 grpc.health.v1.Health/Check
-grpcurl -plaintext localhost:9018 list
+```powershell
+go run ./services/notification/cmd/server
 ```
 
-Docker:
+In a second terminal:
 
-```bash
-make docker-build SERVICE=notification
+```powershell
+grpcurl -plaintext localhost:9018 grpc.health.v1.Health/Check
+grpcurl -plaintext -d '{\"recipient_user_id\":\"22222222-2222-2222-2222-222222222222\",\"channel\":\"IN_APP\",\"event_type\":\"status.changed\",\"subject\":\"Report updated\",\"body\":\"Your report is now In Progress.\"}' localhost:9018 jurwa.notification.v1.NotificationService/SendNotification
+grpcurl -plaintext -d '{\"recipient_user_id\":\"22222222-2222-2222-2222-222222222222\"}' localhost:9018 jurwa.notification.v1.NotificationService/ListNotifications
+```
+
+Docker (from the repo root):
+
+```powershell
+docker build -f services/notification/Dockerfile --build-arg SERVICE=notification -t jurwa/notification .
 docker run --rm -p 9018:9018 jurwa/notification
 ```
 
 ## Test
 
-```bash
-make test
+```powershell
+go test ./services/notification/... -cover
 ```

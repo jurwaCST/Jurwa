@@ -13,6 +13,12 @@ import (
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
+
+	notificationv1 "github.com/jurwaCST/Jurwa/proto/gen/notification/v1"
+	grpcadapter "github.com/jurwaCST/Jurwa/services/notification/adapters/in/grpc"
+	"github.com/jurwaCST/Jurwa/services/notification/adapters/out/logsender"
+	"github.com/jurwaCST/Jurwa/services/notification/adapters/out/memory"
+	"github.com/jurwaCST/Jurwa/services/notification/application"
 )
 
 // Defaults used when the environment variables are not set.
@@ -41,8 +47,9 @@ func main() {
 	hs := health.NewServer()
 	healthpb.RegisterHealthServer(srv, hs)
 
-	// TODO: register your service here, for example:
-	// routingrulesv1.RegisterRoutingRulesServiceServer(srv, grpcadapter.NewHandler(app))
+	// In-memory outbox and a log sender for now; a database in Sprint 3.
+	app := application.NewService(memory.New(), logsender.New(logger))
+	notificationv1.RegisterNotificationServiceServer(srv, grpcadapter.NewHandler(app))
 
 	// Reflection lets grpcurl list and call methods without the .proto files.
 	reflection.Register(srv)
