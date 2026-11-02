@@ -40,7 +40,7 @@ Every testing tool named in the proposal.
 | Hand-written fakes and in-memory adapters | The default test doubles for ports: small Go structs in the test file (for example `fakeStatus` in feedback, `fakeSender` in notification) and each service's `adapters/out/memory`, so domain and application logic is tested without a database or network |
 | Table-driven tests | Specification-based tests: equivalence classes and boundary values for the report form (description about 500 characters, photo about 5 MB, required fields) and routing rules; state transition tables for the status flow |
 | `go test -cover` | Structural coverage on routing, SLA and status-flow packages; target at least 70% |
-| gomock | Interaction checks on chosen ports, where a test must prove a call happened with the right arguments or in the right order (for example the escalation Saga's steps) |
+| gomock | Only for interaction checks on chosen ports, where a test must prove a call happened with the right arguments or the right number of times: sla-tracking (SCRUM-92) and retry in `pkg/resilience`. Not used for other port doubles |
 | gopter | Property-based tests of SLA time-window logic (sla-policy, sla-tracking) with random timestamps, for example "a report older than its SLA window is always overdue" |
 | Testcontainers | Integration tests that start real PostgreSQL, MongoDB and Redis containers for each service's adapters |
 | Cypress | End-to-end tests of the PWA: submit a report, route it, update its status, resolve it |
