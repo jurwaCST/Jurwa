@@ -1,0 +1,75 @@
+# Run 1: no events yet
+
+$ grpcurl -plaintext localhost:9020 grpc.health.v1.Health/Check
+{
+  "status": "SERVING"
+}
+
+$ grpcurl -plaintext localhost:9020 list
+grpc.health.v1.Health
+grpc.reflection.v1.ServerReflection
+grpc.reflection.v1alpha.ServerReflection
+jurwa.analytics.v1.AnalyticsService
+
+$ GetSummary (no events: every count is 0)
+{
+  "counts": {
+    "total": "0",
+    "open": "0",
+    "assigned": "0",
+    "inProgress": "0",
+    "resolved": "0",
+    "escalated": "0"
+  },
+  "averageResolutionHours": 0
+}
+
+# Run 2: SEED_DEMO_DATA=true (6 demo reports, see cmd/server/demo.go)
+
+$ GetSummary
+{
+  "counts": {
+    "total": "6",
+    "open": "1",
+    "assigned": "1",
+    "inProgress": "1",
+    "resolved": "2",
+    "escalated": "1"
+  },
+  "averageResolutionHours": 9
+}
+
+$ GetCategoryBreakdown
+{
+  "categories": [
+    {
+      "category": "HOSTEL",
+      "counts": {
+        "total": "2",
+        "open": "1",
+        "resolved": "1"
+      }
+    },
+    {
+      "category": "ACADEMIC_BLOCK",
+      "counts": {
+        "total": "2",
+        "inProgress": "1",
+        "escalated": "1"
+      }
+    },
+    {
+      "category": "OTHERS",
+      "counts": {
+        "total": "2",
+        "assigned": "1",
+        "resolved": "1"
+      }
+    }
+  ]
+}
+
+$ GetSummary with period.from after period.to (expect InvalidArgument)
+ERROR:
+  Code: InvalidArgument
+  Message: period.from must not be after period.to
