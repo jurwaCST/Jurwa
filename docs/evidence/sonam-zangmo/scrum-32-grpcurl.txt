@@ -1,0 +1,99 @@
+$ grpcurl -plaintext localhost:9008 grpc.health.v1.Health/Check
+{
+  "status": "SERVING"
+}
+
+$ grpcurl -plaintext localhost:9008 list
+grpc.health.v1.Health
+grpc.reflection.v1.ServerReflection
+grpc.reflection.v1alpha.ServerReflection
+jurwa.departmentdirectory.v1.DepartmentDirectoryService
+
+$ grpcurl -plaintext localhost:9008 jurwa.departmentdirectory.v1.DepartmentDirectoryService/ListDepartments
+{
+  "departments": [
+    {
+      "code": "ARCH",
+      "name": "Architecture"
+    },
+    {
+      "code": "CIVIL",
+      "name": "Civil \u0026 Environmental Engineering"
+    },
+    {
+      "code": "CT",
+      "name": "Computing Technologies"
+    },
+    {
+      "code": "EEE",
+      "name": "Electrical \u0026 Electronics Engineering"
+    },
+    {
+      "code": "MECH",
+      "name": "Mechanical Engineering"
+    },
+    {
+      "code": "SH",
+      "name": "Science \u0026 Humanities"
+    }
+  ]
+}
+
+$ grpcurl -plaintext -d '{"department_code":"CT"}' localhost:9008 jurwa.departmentdirectory.v1.DepartmentDirectoryService/GetHoD
+{
+  "position": {
+    "code": "HOD_CT",
+    "title": "Head of Department, Computing Technologies",
+    "kind": "HOD",
+    "departmentCode": "CT",
+    "active": true
+  }
+}
+
+$ grpcurl -plaintext -d '{"department_code":"MECH"}' localhost:9008 jurwa.departmentdirectory.v1.DepartmentDirectoryService/GetHoD
+{
+  "position": {
+    "code": "HOD_MECH",
+    "title": "Head of Department, Mechanical Engineering",
+    "kind": "HOD",
+    "departmentCode": "MECH",
+    "active": true
+  }
+}
+
+$ grpcurl -plaintext -d '{"position_code":"DSA"}' localhost:9008 jurwa.departmentdirectory.v1.DepartmentDirectoryService/GetStaff
+{
+  "position": {
+    "code": "DSA",
+    "title": "Dean of Student Affairs",
+    "kind": "CATEGORY_HEAD",
+    "holderUserId": "00000000-0000-4000-8000-000000000001",
+    "active": true
+  }
+}
+
+$ grpcurl -plaintext -d '{"position_code":"CHIEF_COUNCILLOR"}' localhost:9008 jurwa.departmentdirectory.v1.DepartmentDirectoryService/GetStaff
+{
+  "position": {
+    "code": "CHIEF_COUNCILLOR",
+    "title": "Chief Councillor",
+    "kind": "COUNCILLOR",
+    "active": true
+  }
+}
+
+$ grpcurl -plaintext -d '{"department_code":""}' localhost:9008 jurwa.departmentdirectory.v1.DepartmentDirectoryService/GetHoD
+ERROR:
+  Code: InvalidArgument
+  Message: code is required
+
+$ grpcurl -plaintext -d '{"department_code":"PHYSICS"}' localhost:9008 jurwa.departmentdirectory.v1.DepartmentDirectoryService/GetHoD
+ERROR:
+  Code: NotFound
+  Message: not found: department "PHYSICS"
+
+$ grpcurl -plaintext -d '{"position_code":"PRINCIPAL"}' localhost:9008 jurwa.departmentdirectory.v1.DepartmentDirectoryService/GetStaff
+ERROR:
+  Code: NotFound
+  Message: not found: position "PRINCIPAL"
+

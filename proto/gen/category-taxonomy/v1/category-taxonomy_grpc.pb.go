@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	CategoryTaxonomyService_ListCategories_FullMethodName = "/jurwa.categorytaxonomy.v1.CategoryTaxonomyService/ListCategories"
 	CategoryTaxonomyService_GetCategory_FullMethodName    = "/jurwa.categorytaxonomy.v1.CategoryTaxonomyService/GetCategory"
+	CategoryTaxonomyService_UpsertCategory_FullMethodName = "/jurwa.categorytaxonomy.v1.CategoryTaxonomyService/UpsertCategory"
 )
 
 // CategoryTaxonomyServiceClient is the client API for CategoryTaxonomyService service.
@@ -34,6 +35,11 @@ type CategoryTaxonomyServiceClient interface {
 	ListCategories(ctx context.Context, in *ListCategoriesRequest, opts ...grpc.CallOption) (*ListCategoriesResponse, error)
 	// Errors: INVALID_ARGUMENT for CATEGORY_UNSPECIFIED, NOT_FOUND when unknown.
 	GetCategory(ctx context.Context, in *GetCategoryRequest, opts ...grpc.CallOption) (*GetCategoryResponse, error)
+	// Changes the display name (and help text) of one of the three categories.
+	// System Administrator only. The three categories cannot be added or removed.
+	// Errors: INVALID_ARGUMENT for CATEGORY_UNSPECIFIED or a blank name,
+	// PERMISSION_DENIED when actor_role is not SYSTEM_ADMIN, NOT_FOUND when unknown.
+	UpsertCategory(ctx context.Context, in *UpsertCategoryRequest, opts ...grpc.CallOption) (*UpsertCategoryResponse, error)
 }
 
 type categoryTaxonomyServiceClient struct {
@@ -64,6 +70,16 @@ func (c *categoryTaxonomyServiceClient) GetCategory(ctx context.Context, in *Get
 	return out, nil
 }
 
+func (c *categoryTaxonomyServiceClient) UpsertCategory(ctx context.Context, in *UpsertCategoryRequest, opts ...grpc.CallOption) (*UpsertCategoryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpsertCategoryResponse)
+	err := c.cc.Invoke(ctx, CategoryTaxonomyService_UpsertCategory_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CategoryTaxonomyServiceServer is the server API for CategoryTaxonomyService service.
 // All implementations must embed UnimplementedCategoryTaxonomyServiceServer
 // for forward compatibility.
@@ -72,6 +88,11 @@ type CategoryTaxonomyServiceServer interface {
 	ListCategories(context.Context, *ListCategoriesRequest) (*ListCategoriesResponse, error)
 	// Errors: INVALID_ARGUMENT for CATEGORY_UNSPECIFIED, NOT_FOUND when unknown.
 	GetCategory(context.Context, *GetCategoryRequest) (*GetCategoryResponse, error)
+	// Changes the display name (and help text) of one of the three categories.
+	// System Administrator only. The three categories cannot be added or removed.
+	// Errors: INVALID_ARGUMENT for CATEGORY_UNSPECIFIED or a blank name,
+	// PERMISSION_DENIED when actor_role is not SYSTEM_ADMIN, NOT_FOUND when unknown.
+	UpsertCategory(context.Context, *UpsertCategoryRequest) (*UpsertCategoryResponse, error)
 	mustEmbedUnimplementedCategoryTaxonomyServiceServer()
 }
 
@@ -87,6 +108,9 @@ func (UnimplementedCategoryTaxonomyServiceServer) ListCategories(context.Context
 }
 func (UnimplementedCategoryTaxonomyServiceServer) GetCategory(context.Context, *GetCategoryRequest) (*GetCategoryResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetCategory not implemented")
+}
+func (UnimplementedCategoryTaxonomyServiceServer) UpsertCategory(context.Context, *UpsertCategoryRequest) (*UpsertCategoryResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpsertCategory not implemented")
 }
 func (UnimplementedCategoryTaxonomyServiceServer) mustEmbedUnimplementedCategoryTaxonomyServiceServer() {
 }
@@ -146,6 +170,24 @@ func _CategoryTaxonomyService_GetCategory_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CategoryTaxonomyService_UpsertCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertCategoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryTaxonomyServiceServer).UpsertCategory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryTaxonomyService_UpsertCategory_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryTaxonomyServiceServer).UpsertCategory(ctx, req.(*UpsertCategoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CategoryTaxonomyService_ServiceDesc is the grpc.ServiceDesc for CategoryTaxonomyService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -160,6 +202,10 @@ var CategoryTaxonomyService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetCategory",
 			Handler:    _CategoryTaxonomyService_GetCategory_Handler,
+		},
+		{
+			MethodName: "UpsertCategory",
+			Handler:    _CategoryTaxonomyService_UpsertCategory_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

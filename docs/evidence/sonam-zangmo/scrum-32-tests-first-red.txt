@@ -1,0 +1,14 @@
+# github.com/jurwaCST/Jurwa/services/department-directory/domain [github.com/jurwaCST/Jurwa/services/department-directory/domain.test]
+services/department-directory/domain/directory_test.go:11:11: undefined: DefaultDepartments
+services/department-directory/domain/directory_test.go:23:22: undefined: DefaultDepartments
+services/department-directory/domain/directory_test.go:23:44: undefined: DefaultPositions
+services/department-directory/domain/directory_test.go:27:16: undefined: FindHoD
+services/department-directory/domain/directory_test.go:29:20: undefined: KindHoD
+services/department-directory/domain/directory_test.go:40:41: undefined: ErrInvalidCode
+services/department-directory/domain/directory_test.go:41:44: undefined: ErrInvalidCode
+services/department-directory/domain/directory_test.go:42:57: undefined: ErrNotFound
+services/department-directory/domain/directory_test.go:46:14: undefined: FindHoD
+services/department-directory/domain/directory_test.go:52:12: undefined: FindHoD
+services/department-directory/domain/directory_test.go:52:12: too many errors
+FAIL	github.com/jurwaCST/Jurwa/services/department-directory/domain [build failed]
+FAIL
