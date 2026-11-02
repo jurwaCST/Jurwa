@@ -1,0 +1,69 @@
+SCRUM-27 real lapse run, started 2026-11-02 21:31:25 +0600
+Reports seeded OPEN in status-lifecycle: R1=11111111-1111-1111-1111-111111111111 (left open), R2=22222222-aaaa-4aaa-8aaa-222222222222 (resolved before the run), R3=33333333-bbbb-4bbb-8bbb-333333333333 (timer stopped in time)
+
+# HOSTEL window 1 hour
+    "windowHours": 1,
+
+# StartTimer 11111111-1111-1111-1111-111111111111
+    "deadline": "2026-11-02T16:31:25.797850500Z",
+    "state": "RUNNING"
+
+# StartTimer 22222222-aaaa-4aaa-8aaa-222222222222
+    "deadline": "2026-11-02T16:31:25.942706400Z",
+    "state": "RUNNING"
+
+# StartTimer 33333333-bbbb-4bbb-8bbb-333333333333
+    "deadline": "2026-11-02T16:31:26.054706300Z",
+    "state": "RUNNING"
+
+# R3 is resolved in time: StopTimer
+    "state": "STOPPED"
+
+# R2 moves ASSIGNED, IN_PROGRESS, RESOLVED (but its timer is left running, as if the stop event was lost)
+    "status": "ASSIGNED",
+    "status": "IN_PROGRESS",
+    "status": "RESOLVED",
+
+# 22:31:56: deadline passed. One run of the function
+> curl -i -X POST http://localhost:8090/
+HTTP/1.1 200 OK
+{"lapsed":2,"escalated":1,"skipped":1,"errors":0}
+
+# Second run straight after: nothing is escalated twice
+{"lapsed":0,"escalated":0,"skipped":0,"errors":0}
+
+# GetStatus 11111111-1111-1111-1111-111111111111
+    "status": "ESCALATED",
+    "previousStatus": "OPEN",
+    "version": 2,
+# GetTimer 11111111-1111-1111-1111-111111111111
+    "state": "LAPSED"
+
+# GetStatus 22222222-aaaa-4aaa-8aaa-222222222222
+    "status": "RESOLVED",
+    "previousStatus": "IN_PROGRESS",
+    "version": 4,
+    "updatedBy": "99999999-9999-4999-8999-999999999999",
+# GetTimer 22222222-aaaa-4aaa-8aaa-222222222222
+    "state": "LAPSED"
+
+# GetStatus 33333333-bbbb-4bbb-8bbb-333333333333
+    "status": "OPEN",
+    "version": 1,
+# GetTimer 33333333-bbbb-4bbb-8bbb-333333333333
+    "state": "STOPPED"
+
+# sla.lapsed events (sla-tracking log)
+{"level":"INFO","msg":"event published","service":"sla-tracking","event":"sla.lapsed","report_id":"11111111-1111-1111-1111-111111111111","category":"HOSTEL","deadline":"2026-11-02T16:31:25Z","lapsed_at":"2026-11-02T16:31:56Z"}
+{"level":"INFO","msg":"event published","service":"sla-tracking","event":"sla.lapsed","report_id":"22222222-aaaa-4aaa-8aaa-222222222222","category":"HOSTEL","deadline":"2026-11-02T16:31:25Z","lapsed_at":"2026-11-02T16:31:56Z"}
+
+# status.changed to ESCALATED (status-lifecycle log)
+{"level":"INFO","msg":"event published","service":"status-lifecycle","event":"status.changed","report_id":"11111111-1111-1111-1111-111111111111","from_status":"OPEN","to_status":"ESCALATED","actor_id":"","version":2,"reason":"SLA lapsed: deadline was 2026-11-02T16:31:25Z"}
+
+# function log
+{"level":"INFO","msg":"report escalated","service":"sla-escalation-checker","report_id":"11111111-1111-1111-1111-111111111111","deadline":"2026-11-02T16:31:25.7978505Z"}
+{"level":"INFO","msg":"report not escalated","service":"sla-escalation-checker","report_id":"22222222-aaaa-4aaa-8aaa-222222222222","reason":"report cannot be escalated: invalid status transition: RESOLVED to ESCALATED"}
+{"level":"INFO","msg":"escalation run finished","service":"sla-escalation-checker","lapsed":2,"escalated":1,"skipped":1,"errors":0}
+{"level":"INFO","msg":"escalation run finished","service":"sla-escalation-checker","lapsed":0,"escalated":0,"skipped":0,"errors":0}
+
+finished 2026-11-02 22:31:58 +0600
