@@ -92,6 +92,32 @@ Expected: `{ "status": "SERVING" }`.
 
 Service owners: ask Sonam Choki through a pull request for changes under `deploy/`.
 
+## Build all images
+
+`scripts/docker-build-all.sh` runs `make docker-build SERVICE=<name>` for every folder in `services/` except `_template`, prints OK or FAILED per service and exits non-zero if any failed. Docker Desktop must be running.
+
+```bash
+bash scripts/docker-build-all.sh
+```
+
+Expected: one `OK` line per service, then `Built N image(s), 0 failed.` A failed build prints the path of its log. Send that log to the service owner; if every service fails, the template Dockerfile is the problem (Sonam Zangmo).
+
+Check that one image really runs (report-submission, port 9001):
+
+```bash
+docker run --rm -p 9001:9001 jurwa/report-submission
+grpcurl -plaintext localhost:9001 grpc.health.v1.Health/Check   # in a second terminal
+```
+
+Expected: `"status": "SERVING"`. Stop the container with Ctrl+C.
+
+To use an image in the cluster, tag and push it to the local registry:
+
+```bash
+docker tag jurwa/report-submission localhost:5050/report-submission:dev
+docker push localhost:5050/report-submission:dev
+```
+
 ## Delete the cluster
 
 ```bash
