@@ -1,0 +1,115 @@
+SCRUM-42 audit-log: grpcurl run against :9015, 2026-11-02 21:48 +0600
+
+# health
+> grpcurl -plaintext localhost:9015 grpc.health.v1.Health/Check
+{
+  "status": "SERVING"
+}
+
+# list services
+> grpcurl -plaintext localhost:9015 list
+grpc.health.v1.Health
+grpc.reflection.v1.ServerReflection
+grpc.reflection.v1alpha.ServerReflection
+jurwa.auditlog.v1.AuditLogService
+
+# Append: report submitted
+> grpcurl -plaintext -d {"event":{"occurred_at":"2026-11-02T09:00:00Z","service":"report-submission","action":"REPORT_SUBMITTED","report_id":"11111111-1111-1111-1111-111111111111","actor_id":"22222222-2222-2222-2222-222222222222"}} localhost:9015 jurwa.auditlog.v1.AuditLogService/Append
+{
+  "id": "e5a89f47-8a2d-4859-887b-b12beaa958f2"
+}
+
+# Append: status changed, with details
+> grpcurl -plaintext -d {"event":{"occurred_at":"2026-11-02T09:05:00Z","service":"status-lifecycle","action":"STATUS_CHANGED","report_id":"11111111-1111-1111-1111-111111111111","details":{"from":"OPEN","to":"ASSIGNED"}}} localhost:9015 jurwa.auditlog.v1.AuditLogService/Append
+{
+  "id": "270e63a6-6627-42a6-9915-5b10383a7603"
+}
+
+# Append: escalation by the system, no time sent (server time used), id sent is ignored
+> grpcurl -plaintext -d {"event":{"id":"my-own-id","service":"sla-escalation-checker","action":"ESCALATED","report_id":"11111111-1111-1111-1111-111111111111","details":{"reason":"SLA lapsed"}}} localhost:9015 jurwa.auditlog.v1.AuditLogService/Append
+{
+  "id": "00065ccf-690b-46eb-b622-12161577964f"
+}
+
+# Append: supervisor acting for a cook without email (FR-24)
+> grpcurl -plaintext -d {"event":{"occurred_at":"2026-11-02T09:10:00Z","service":"reassignment","action":"REASSIGNED","report_id":"11111111-1111-1111-1111-111111111111","actor_id":"22222222-2222-2222-2222-222222222222","on_behalf_of":"Cook, Hostel A kitchen"}} localhost:9015 jurwa.auditlog.v1.AuditLogService/Append
+{
+  "id": "1461551a-efc9-4764-862c-464494312bb7"
+}
+
+# Append without service: INVALID_ARGUMENT
+> grpcurl -plaintext -d {"event":{"action":"ROUTED"}} localhost:9015 jurwa.auditlog.v1.AuditLogService/Append
+ERROR:
+  Code: InvalidArgument
+  Message: invalid audit event: service is required, at most 64 characters
+
+# Append with an unknown action: INVALID_ARGUMENT
+> grpcurl -plaintext -d {"event":{"service":"x","action":"DELETED"}} localhost:9015 jurwa.auditlog.v1.AuditLogService/Append
+ERROR:
+  Code: InvalidArgument
+  Message: invalid audit event: unknown action "DELETED"
+
+# ListByReport as SYSTEM_ADMIN: oldest first
+> grpcurl -plaintext -H x-user-role: SYSTEM_ADMIN -d {"report_id":"11111111-1111-1111-1111-111111111111"} localhost:9015 jurwa.auditlog.v1.AuditLogService/ListByReport
+{
+  "events": [
+    {
+      "id": "e5a89f47-8a2d-4859-887b-b12beaa958f2",
+      "occurredAt": "2026-11-02T09:00:00Z",
+      "service": "report-submission",
+      "action": "REPORT_SUBMITTED",
+      "reportId": "11111111-1111-1111-1111-111111111111",
+      "actorId": "22222222-2222-2222-2222-222222222222"
+    },
+    {
+      "id": "270e63a6-6627-42a6-9915-5b10383a7603",
+      "occurredAt": "2026-11-02T09:05:00Z",
+      "service": "status-lifecycle",
+      "action": "STATUS_CHANGED",
+      "reportId": "11111111-1111-1111-1111-111111111111",
+      "details": {
+        "from": "OPEN",
+        "to": "ASSIGNED"
+      }
+    },
+    {
+      "id": "1461551a-efc9-4764-862c-464494312bb7",
+      "occurredAt": "2026-11-02T09:10:00Z",
+      "service": "reassignment",
+      "action": "REASSIGNED",
+      "reportId": "11111111-1111-1111-1111-111111111111",
+      "actorId": "22222222-2222-2222-2222-222222222222",
+      "onBehalfOf": "Cook, Hostel A kitchen"
+    },
+    {
+      "id": "00065ccf-690b-46eb-b622-12161577964f",
+      "occurredAt": "2026-11-02T15:48:29.441222600Z",
+      "service": "sla-escalation-checker",
+      "action": "ESCALATED",
+      "reportId": "11111111-1111-1111-1111-111111111111",
+      "details": {
+        "reason": "SLA lapsed"
+      }
+    }
+  ]
+}
+
+# ListByReport as CATEGORY_HEAD: PERMISSION_DENIED
+> grpcurl -plaintext -H x-user-role: CATEGORY_HEAD -d {"report_id":"11111111-1111-1111-1111-111111111111"} localhost:9015 jurwa.auditlog.v1.AuditLogService/ListByReport
+ERROR:
+  Code: PermissionDenied
+  Message: permission denied: only the System Administrator can read the audit log
+
+# ListByReport with a bad id: INVALID_ARGUMENT
+> grpcurl -plaintext -H x-user-role: SYSTEM_ADMIN -d {"report_id":"abc"} localhost:9015 jurwa.auditlog.v1.AuditLogService/ListByReport
+ERROR:
+  Code: InvalidArgument
+  Message: invalid argument: report_id must be a UUID
+
+# There is no RPC to change or delete an entry
+> grpcurl -plaintext localhost:9015 describe jurwa.auditlog.v1.AuditLogService
+jurwa.auditlog.v1.AuditLogService is a service:
+service AuditLogService {
+  rpc Append ( .jurwa.auditlog.v1.AppendRequest ) returns ( .jurwa.auditlog.v1.AppendResponse );
+  rpc ListByReport ( .jurwa.auditlog.v1.ListByReportRequest ) returns ( .jurwa.auditlog.v1.ListByReportResponse );
+}

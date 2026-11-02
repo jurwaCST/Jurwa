@@ -1,0 +1,28 @@
+--- PASS: TestAppendThenList (0.00s)
+--- PASS: TestErrorCodes (0.00s)
+--- PASS: TestToStatusError_Internal (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/audit-log/adapters/in/grpc	0.530s	coverage: 100.0% of statements
+--- PASS: TestAppendAndList (0.00s)
+--- PASS: TestListReturnsCopies (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/audit-log/adapters/out/memory	2.568s	coverage: 100.0% of statements
+--- PASS: TestAppendThenList (0.00s)
+--- PASS: TestAppend_Invalid (0.00s)
+--- PASS: TestListByReport_Errors (0.00s)
+--- PASS: TestStoreErrors (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/audit-log/application	2.583s	coverage: 100.0% of statements
+--- PASS: TestEnvOr (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/audit-log/cmd/server	0.383s	coverage: 2.9% of statements
+--- PASS: TestNewEvent (0.00s)
+--- PASS: TestNewEvent_Defaults (0.00s)
+--- PASS: TestNewEvent_CopiesDetails (0.00s)
+--- PASS: TestNewEvent_Errors (0.00s)
+--- PASS: TestNewEvent_Boundaries (0.00s)
+--- PASS: TestAllActionsAccepted (0.00s)
+--- PASS: TestCheckCanList (0.00s)
+--- PASS: TestIsUUID (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/audit-log/domain	2.570s	coverage: 100.0% of statements
