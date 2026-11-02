@@ -1,0 +1,10 @@
+> docker build -f services/audit-log/Dockerfile --build-arg SERVICE=audit-log -t jurwa/audit-log .
+#16 unpacking to docker.io/jurwa/audit-log:latest
+#16 unpacking to docker.io/jurwa/audit-log:latest 0.2s done
+#16 DONE 0.9s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/jtc099p0iy1fxns1s1aokk7jq
+
+> docker images jurwa/audit-log
+REPOSITORY        TAG       IMAGE ID       CREATED         SIZE
+jurwa/audit-log   latest    b25d109b66d8   3 seconds ago   21.5MB
