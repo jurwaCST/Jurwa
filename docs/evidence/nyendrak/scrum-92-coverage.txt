@@ -1,0 +1,47 @@
+SCRUM-92 coverage run, 2026-11-02 21:55 +0600, commit af2bf2b on main
+
+# Quality plan section 6: domain packages of routing-rules, routing-engine, sla-policy, sla-tracking, status-lifecycle (target at least 70%)
+> go test ./services/routing-rules/domain ./services/routing-engine/domain ./services/sla-policy/domain ./services/sla-tracking/domain ./services/status-lifecycle/domain -count=1 -coverprofile=domain.out
+ok  	github.com/jurwaCST/Jurwa/services/routing-rules/domain	3.116s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/domain	3.115s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-policy/domain	3.132s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/domain	3.106s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/domain	3.100s	coverage: 100.0% of statements
+> go tool cover -func=domain.out (total line)
+total:										(statements)	100.0%
+
+# All packages of the same services, plus sla-escalation-checker
+> go test ./services/routing-rules/... ./services/routing-engine/... ./services/sla-policy/... ./services/sla-tracking/... ./services/status-lifecycle/... ./functions/sla-escalation-checker/... -count=1 -cover
+ok  	github.com/jurwaCST/Jurwa/services/routing-rules/adapters/in/grpc	1.090s	coverage: 97.4% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-rules/adapters/out/memory	3.564s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-rules/application	3.545s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-rules/cmd/server	1.196s	coverage: 2.9% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-rules/domain	3.489s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/adapters/in/grpc	0.946s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/adapters/out/directoryclient	0.938s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/adapters/out/logpublisher	2.642s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/adapters/out/rulesclient	0.849s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/application	2.538s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/cmd/server	0.846s	coverage: 3.9% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/domain	1.795s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-policy/adapters/in/grpc	0.962s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-policy/adapters/out/memory	5.023s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-policy/application	5.067s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-policy/cmd/server	0.703s	coverage: 2.9% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-policy/domain	4.195s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/in/grpc	0.722s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/out/logpublisher	5.121s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/out/memory	5.137s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/out/slapolicy	1.114s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/application	4.599s	coverage: 98.2% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/cmd/server	0.825s	coverage: 3.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/domain	4.474s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/adapters/in/grpc	0.862s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/adapters/out/logpublisher	4.218s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/adapters/out/memory	3.157s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/application	3.735s	coverage: 97.1% of statements
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/cmd/server	0.781s	coverage: 9.4% of statements
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/domain	3.314s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/functions/sla-escalation-checker	0.615s	coverage: 25.3% of statements
+ok  	github.com/jurwaCST/Jurwa/functions/sla-escalation-checker/checker	3.229s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/functions/sla-escalation-checker/clients	0.491s	coverage: 100.0% of statements
