@@ -13,6 +13,11 @@ import (
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
+
+	authorizationv1 "github.com/jurwaCST/Jurwa/proto/gen/authorization/v1"
+	grpcadapter "github.com/jurwaCST/Jurwa/services/authorization/adapters/in/grpc"
+	"github.com/jurwaCST/Jurwa/services/authorization/adapters/out/memory"
+	"github.com/jurwaCST/Jurwa/services/authorization/application"
 )
 
 // Defaults used when the environment variables are not set.
@@ -41,8 +46,9 @@ func main() {
 	hs := health.NewServer()
 	healthpb.RegisterHealthServer(srv, hs)
 
-	// TODO: register your service here, for example:
-	// routingrulesv1.RegisterRoutingRulesServiceServer(srv, grpcadapter.NewHandler(app))
+	// In-memory role table for now; a database in Sprint 3.
+	app := application.NewService(memory.New())
+	authorizationv1.RegisterAuthorizationServiceServer(srv, grpcadapter.NewHandler(app))
 
 	// Reflection lets grpcurl list and call methods without the .proto files.
 	reflection.Register(srv)

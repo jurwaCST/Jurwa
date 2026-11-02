@@ -1,0 +1,7 @@
+ok  	github.com/jurwaCST/Jurwa/services/authorization/adapters/in/grpc	(cached)	coverage: 100.0% of statements
+?   	github.com/jurwaCST/Jurwa/services/authorization/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/authorization/adapters/out/memory	(cached)	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/authorization/application	(cached)	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/authorization/cmd/server	(cached)	coverage: 2.9% of statements
+ok  	github.com/jurwaCST/Jurwa/services/authorization/domain	(cached)	coverage: 100.0% of statements
+?   	github.com/jurwaCST/Jurwa/services/authorization/ports	[no test files]
