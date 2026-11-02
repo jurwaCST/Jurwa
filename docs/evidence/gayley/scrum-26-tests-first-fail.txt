@@ -1,0 +1,14 @@
+# github.com/jurwaCST/Jurwa/services/notification/domain [github.com/jurwaCST/Jurwa/services/notification/domain.test]
+services\notification\domain\notification_test.go:20:19: undefined: Input
+services\notification\domain\notification_test.go:21:9: undefined: Input
+services\notification\domain\notification_test.go:23:20: undefined: InApp
+services\notification\domain\notification_test.go:24:20: undefined: EventStatusChanged
+services\notification\domain\notification_test.go:32:12: undefined: NewNotification
+services\notification\domain\notification_test.go:36:18: undefined: InApp
+services\notification\domain\notification_test.go:37:18: undefined: EventStatusChanged
+services\notification\domain\notification_test.go:39:18: undefined: Pending
+services\notification\domain\notification_test.go:47:17: undefined: Input
+services\notification\domain\notification_test.go:51:34: undefined: Input
+services\notification\domain\notification_test.go:51:34: too many errors
+FAIL	github.com/jurwaCST/Jurwa/services/notification/domain [build failed]
+FAIL
