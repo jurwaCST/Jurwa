@@ -1,0 +1,106 @@
+# terminal 1: SEED_SAMPLE=true make run SERVICE=report-history
+
+$ grpcurl -plaintext localhost:9003 grpc.health.v1.Health/Check
+{
+  "status": "SERVING"
+}
+
+$ grpcurl -plaintext localhost:9003 list
+grpc.health.v1.Health
+grpc.reflection.v1.ServerReflection
+grpc.reflection.v1alpha.ServerReflection
+jurwa.reporthistory.v1.ReportHistoryService
+
+$ grpcurl -plaintext -d '{"reporter_id":"1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d"}' localhost:9003 jurwa.reporthistory.v1.ReportHistoryService/ListReportsByReporter
+{
+  "reports": [
+    {
+      "reportId": "9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d",
+      "reporterId": "1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d",
+      "category": "OTHERS",
+      "location": {
+        "building": "Campus",
+        "area": "Wi-Fi"
+      },
+      "status": "OPEN",
+      "createdAt": "2026-10-31T09:00:00Z",
+      "updatedAt": "2026-10-31T09:00:00Z"
+    },
+    {
+      "reportId": "6f1c2a7e-3b4d-4c5e-8f90-1a2b3c4d5e6f",
+      "reporterId": "1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d",
+      "category": "HOSTEL",
+      "location": {
+        "building": "Hostel A",
+        "wing": "Wing 1",
+        "area": "Bathroom 1"
+      },
+      "status": "IN_PROGRESS",
+      "createdAt": "2026-10-30T09:00:00Z",
+      "updatedAt": "2026-10-30T12:00:00Z"
+    }
+  ]
+}
+
+$ grpcurl -plaintext -d '{"reporter_id":"1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d","page_size":1}' localhost:9003 jurwa.reporthistory.v1.ReportHistoryService/ListReportsByReporter
+{
+  "reports": [
+    {
+      "reportId": "9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d",
+      "reporterId": "1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d",
+      "category": "OTHERS",
+      "location": {
+        "building": "Campus",
+        "area": "Wi-Fi"
+      },
+      "status": "OPEN",
+      "createdAt": "2026-10-31T09:00:00Z",
+      "updatedAt": "2026-10-31T09:00:00Z"
+    }
+  ],
+  "nextPageToken": "1"
+}
+
+$ grpcurl -plaintext -d '{"report_id":"6f1c2a7e-3b4d-4c5e-8f90-1a2b3c4d5e6f"}' localhost:9003 jurwa.reporthistory.v1.ReportHistoryService/GetReportTimeline
+{
+  "entries": [
+    {
+      "id": "8e0c2669-2242-4b2b-b361-fe631e049336",
+      "eventType": "report.submitted",
+      "toStatus": "OPEN",
+      "actorId": "1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d",
+      "summary": "Report submitted",
+      "occurredAt": "2026-10-30T09:00:00Z"
+    },
+    {
+      "id": "1a0fa2cd-b613-444a-af61-0267243525d0",
+      "eventType": "status.changed",
+      "fromStatus": "OPEN",
+      "toStatus": "ASSIGNED",
+      "summary": "Assigned to DSA",
+      "occurredAt": "2026-10-30T09:01:00Z"
+    },
+    {
+      "id": "5274c656-9682-481d-b09f-f610cc54702c",
+      "eventType": "status.changed",
+      "fromStatus": "ASSIGNED",
+      "toStatus": "IN_PROGRESS",
+      "actorId": "4e5f6071-8293-4d0e-9f2a-3b4c5d6e7f80",
+      "summary": "Plumber is on the way",
+      "occurredAt": "2026-10-30T12:00:00Z"
+    }
+  ]
+}
+
+# unknown report
+$ grpcurl -plaintext -d '{"report_id":"00000000-0000-4000-8000-000000000000"}' localhost:9003 jurwa.reporthistory.v1.ReportHistoryService/GetReportTimeline
+ERROR:
+  Code: NotFound
+  Message: report not found
+
+# missing reporter id
+$ grpcurl -plaintext -d '{}' localhost:9003 jurwa.reporthistory.v1.ReportHistoryService/ListReportsByReporter
+ERROR:
+  Code: InvalidArgument
+  Message: invalid input: reporter id must be a UUID
+
