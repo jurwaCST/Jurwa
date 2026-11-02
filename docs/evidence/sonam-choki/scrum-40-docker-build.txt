@@ -1,23 +1,29 @@
-# SCRUM-40 build run, 2026-11-02 18:59 +06, branch SCRUM-40-containerize (main + the script)
-# The 4 services of Sonam Choki are not merged yet; they are built and checked from their own branches in section 3.
+# SCRUM-40 build run, 2026-11-02 19:33 +06, branch SCRUM-40-containerize (main + the script)
+# All Sprint 2 services merged so far are on main, including location-taxonomy, photo-media, report-history and internal-notes.
 
-## 1. Build every service on main
+## 1. Build every service
 
 $ bash scripts/docker-build-all.sh
 building api-gateway ... OK
+building authorization ... OK
 building category-taxonomy ... OK
 building department-directory ... OK
 building identity ... OK
+building internal-notes ... OK
+building location-taxonomy ... OK
+building photo-media ... OK
+building report-history ... OK
 building report-submission ... OK
 building routing-engine ... OK
 building routing-rules ... OK
 building sla-policy ... OK
 building status-lifecycle ... OK
 
-Built 9 image(s), 0 failed.
+Built 14 image(s), 0 failed.
 
 $ docker images (jurwa/*)
 jurwa/api-gateway:latest  22.7MB
+jurwa/authorization:latest  20.5MB
 jurwa/category-taxonomy:latest  20.6MB
 jurwa/department-directory:latest  20.5MB
 jurwa/identity:latest  20.9MB
@@ -31,27 +37,35 @@ jurwa/routing-rules:latest  20.6MB
 jurwa/sla-policy:latest  20.6MB
 jurwa/status-lifecycle:latest  20.6MB
 
-## 2. One container passes the health check
+## 2. Containers pass the gRPC health check
 
-$ docker run --rm -p 9001:9001 jurwa/report-submission   (terminal 1)
-
+$ docker run --rm -p 9001:9001 jurwa/report-submission
 $ grpcurl -plaintext localhost:9001 grpc.health.v1.Health/Check
 {
   "status": "SERVING"
 }
 
-$ grpcurl -plaintext localhost:9001 list
-grpc.health.v1.Health
-grpc.reflection.v1.ServerReflection
-grpc.reflection.v1alpha.ServerReflection
-jurwa.reportsubmission.v1.ReportSubmissionService
+$ docker run --rm -p 9004:9004 jurwa/location-taxonomy
+$ grpcurl -plaintext localhost:9004 grpc.health.v1.Health/Check
+{
+  "status": "SERVING"
+}
 
-$ docker logs (first lines)
-{"time":"2026-11-02T12:57:55.577225667Z","level":"INFO","msg":"server started","service":"report-submission","port":"9001"}
+$ docker run --rm -p 9002:9002 jurwa/photo-media
+$ grpcurl -plaintext localhost:9002 grpc.health.v1.Health/Check
+{
+  "status": "SERVING"
+}
 
-## 3. Sonam Choki's services, built from their branches (make docker-build, docker run, grpcurl health check)
+$ docker run --rm -p 9003:9003 jurwa/report-history
+$ grpcurl -plaintext localhost:9003 grpc.health.v1.Health/Check
+{
+  "status": "SERVING"
+}
 
-location-taxonomy (branch SCRUM-23-location-taxonomy, port 9004): build OK, health {"status":"SERVING"}
-photo-media (branch SCRUM-28-photo-media, port 9002): build OK, health {"status":"SERVING"}
-report-history (branch SCRUM-22-report-history, port 9003): build OK, health {"status":"SERVING"}
-internal-notes (branch SCRUM-21-internal-notes, port 9005): build OK, health {"status":"SERVING"}
+$ docker run --rm -p 9005:9005 jurwa/internal-notes
+$ grpcurl -plaintext localhost:9005 grpc.health.v1.Health/Check
+{
+  "status": "SERVING"
+}
+
