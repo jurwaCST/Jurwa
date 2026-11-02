@@ -90,4 +90,4 @@ make test
 go test ./services/internal-notes/... -cover
 ```
 
-Coverage: 100% on `domain`, `application` and both adapters. Evidence: `docs/evidence/sonam-choki/scrum-21-tests.txt` and `scrum-21-grpcurl.txt`.
+Coverage: 100% on `domain`, `application` and both adapters. Evidence: `docs/evidence/sonam-choki/scrum-21-tests.txt` and `scrum-21-grpcurl.txt`; the add rule for System Admin (SCRUM-116) in `scrum-116-tests.txt` and `scrum-116-grpcurl.txt`.

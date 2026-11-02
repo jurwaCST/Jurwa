@@ -14,22 +14,22 @@ jurwa.internalnotes.v1.InternalNotesService
 $ grpcurl -plaintext -H 'x-user-role: CATEGORY_HEAD' -d '{"report_id":"6f1c2a7e-3b4d-4c5e-8f90-1a2b3c4d5e6f","author_id":"1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d","body":"Forwarded to the maintenance councillor."}' localhost:9005 jurwa.internalnotes.v1.InternalNotesService/AddNote
 {
   "note": {
-    "id": "fef54b6a-567d-4bf3-b5df-d73345f03210",
+    "id": "1c9b7f5c-69f6-4bbb-b6e5-7c2b9b9cb7a4",
     "reportId": "6f1c2a7e-3b4d-4c5e-8f90-1a2b3c4d5e6f",
     "authorId": "1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d",
     "body": "Forwarded to the maintenance councillor.",
-    "createdAt": "2026-11-02T13:47:02.940373Z"
+    "createdAt": "2026-11-02T10:51:14.750208Z"
   }
 }
 
 $ grpcurl -plaintext -H 'x-user-role: STAFF' -d '{"report_id":"6f1c2a7e-3b4d-4c5e-8f90-1a2b3c4d5e6f","author_id":"1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d","body":"Plumber booked for Monday."}' localhost:9005 jurwa.internalnotes.v1.InternalNotesService/AddNote
 {
   "note": {
-    "id": "9b253e01-4a66-4ce4-810e-073fa686814a",
+    "id": "82247672-99c8-4971-acda-36021ef32582",
     "reportId": "6f1c2a7e-3b4d-4c5e-8f90-1a2b3c4d5e6f",
     "authorId": "1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d",
     "body": "Plumber booked for Monday.",
-    "createdAt": "2026-11-02T13:47:02.950466Z"
+    "createdAt": "2026-11-02T10:51:14.759702Z"
   }
 }
 
@@ -37,18 +37,18 @@ $ grpcurl -plaintext -H 'x-user-role: SYSTEM_ADMIN' -d '{"report_id":"6f1c2a7e-3
 {
   "notes": [
     {
-      "id": "fef54b6a-567d-4bf3-b5df-d73345f03210",
+      "id": "1c9b7f5c-69f6-4bbb-b6e5-7c2b9b9cb7a4",
       "reportId": "6f1c2a7e-3b4d-4c5e-8f90-1a2b3c4d5e6f",
       "authorId": "1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d",
       "body": "Forwarded to the maintenance councillor.",
-      "createdAt": "2026-11-02T13:47:02.940373Z"
+      "createdAt": "2026-11-02T10:51:14.750208Z"
     },
     {
-      "id": "9b253e01-4a66-4ce4-810e-073fa686814a",
+      "id": "82247672-99c8-4971-acda-36021ef32582",
       "reportId": "6f1c2a7e-3b4d-4c5e-8f90-1a2b3c4d5e6f",
       "authorId": "1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d",
       "body": "Plumber booked for Monday.",
-      "createdAt": "2026-11-02T13:47:02.950466Z"
+      "createdAt": "2026-11-02T10:51:14.759702Z"
     }
   ]
 }
@@ -57,22 +57,16 @@ $ grpcurl -plaintext -H 'x-user-role: SYSTEM_ADMIN' -d '{"report_id":"6f1c2a7e-3
 $ grpcurl -plaintext -H 'x-user-role: STUDENT' -d '{"report_id":"6f1c2a7e-3b4d-4c5e-8f90-1a2b3c4d5e6f"}' localhost:9005 jurwa.internalnotes.v1.InternalNotesService/ListNotes
 ERROR:
   Code: PermissionDenied
-  Message: permission denied: only staff, category heads and system administrators may read internal notes
+  Message: only staff, category heads and system administrators may use internal notes
 
 $ grpcurl -plaintext -H 'x-user-role: STUDENT' -d '{"report_id":"6f1c2a7e-3b4d-4c5e-8f90-1a2b3c4d5e6f","author_id":"1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d","body":"Any update?"}' localhost:9005 jurwa.internalnotes.v1.InternalNotesService/AddNote
 ERROR:
   Code: PermissionDenied
-  Message: permission denied: only staff and category heads may add internal notes
+  Message: only staff, category heads and system administrators may use internal notes
 
 # blank body
 $ grpcurl -plaintext -H 'x-user-role: STAFF' -d '{"report_id":"6f1c2a7e-3b4d-4c5e-8f90-1a2b3c4d5e6f","author_id":"1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d","body":"   "}' localhost:9005 jurwa.internalnotes.v1.InternalNotesService/AddNote
 ERROR:
   Code: InvalidArgument
   Message: invalid input: note body must not be blank
-
-# system admin may read notes but not add them (api-routes.md)
-$ grpcurl -plaintext -H 'x-user-role: SYSTEM_ADMIN' -d '{"report_id":"6f1c2a7e-3b4d-4c5e-8f90-1a2b3c4d5e6f","author_id":"1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d","body":"Admin note"}' localhost:9005 jurwa.internalnotes.v1.InternalNotesService/AddNote
-ERROR:
-  Code: PermissionDenied
-  Message: permission denied: only staff and category heads may add internal notes
 
