@@ -1,0 +1,8 @@
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/in/grpc	2.148s	coverage: 100.0% of statements
+?   	github.com/jurwaCST/Jurwa/services/notification/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/out/logsender	(cached)	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/out/memory	3.374s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/notification/application	3.366s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/notification/cmd/server	(cached)	coverage: 2.9% of statements
+ok  	github.com/jurwaCST/Jurwa/services/notification/domain	(cached)	coverage: 100.0% of statements
+?   	github.com/jurwaCST/Jurwa/services/notification/ports	[no test files]

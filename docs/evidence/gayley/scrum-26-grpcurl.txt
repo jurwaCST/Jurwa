@@ -1,0 +1,75 @@
+$ grpcurl -plaintext localhost:9018 grpc.health.v1.Health/Check
+{
+  "status": "SERVING"
+}
+
+$ grpcurl -plaintext localhost:9018 list
+grpc.health.v1.Health
+grpc.reflection.v1.ServerReflection
+grpc.reflection.v1alpha.ServerReflection
+jurwa.notification.v1.NotificationService
+
+$ SendNotification (status.changed)
+{
+  "notification": {
+    "id": "6697676e-ec36-4e02-9905-ca715ba46be8",
+    "recipientUserId": "22222222-2222-2222-2222-222222222222",
+    "channel": "IN_APP",
+    "eventType": "status.changed",
+    "reportId": "33333333-3333-3333-3333-333333333333",
+    "subject": "Report updated",
+    "body": "Your report is now In Progress.",
+    "deliveryStatus": "SENT",
+    "createdAt": "2026-11-02T13:00:35.308145500Z",
+    "sentAt": "2026-11-02T13:00:35.308145500Z"
+  }
+}
+
+$ SendNotification (report.routed)
+{
+  "notification": {
+    "id": "c7d6a16d-ab5e-4299-9e82-c99932655fb4",
+    "recipientUserId": "22222222-2222-2222-2222-222222222222",
+    "channel": "IN_APP",
+    "eventType": "report.routed",
+    "subject": "Report assigned",
+    "body": "A hostel report was assigned to you.",
+    "deliveryStatus": "SENT",
+    "createdAt": "2026-11-02T13:00:35.403088700Z",
+    "sentAt": "2026-11-02T13:00:35.403088700Z"
+  }
+}
+
+$ ListNotifications (newest first)
+{
+  "notifications": [
+    {
+      "id": "c7d6a16d-ab5e-4299-9e82-c99932655fb4",
+      "recipientUserId": "22222222-2222-2222-2222-222222222222",
+      "channel": "IN_APP",
+      "eventType": "report.routed",
+      "subject": "Report assigned",
+      "body": "A hostel report was assigned to you.",
+      "deliveryStatus": "SENT",
+      "createdAt": "2026-11-02T13:00:35.403088700Z",
+      "sentAt": "2026-11-02T13:00:35.403088700Z"
+    },
+    {
+      "id": "6697676e-ec36-4e02-9905-ca715ba46be8",
+      "recipientUserId": "22222222-2222-2222-2222-222222222222",
+      "channel": "IN_APP",
+      "eventType": "status.changed",
+      "reportId": "33333333-3333-3333-3333-333333333333",
+      "subject": "Report updated",
+      "body": "Your report is now In Progress.",
+      "deliveryStatus": "SENT",
+      "createdAt": "2026-11-02T13:00:35.308145500Z",
+      "sentAt": "2026-11-02T13:00:35.308145500Z"
+    }
+  ]
+}
+
+$ SendNotification with empty body (expect InvalidArgument)
+ERROR:
+  Code: InvalidArgument
+  Message: body is required and at most 200 characters
