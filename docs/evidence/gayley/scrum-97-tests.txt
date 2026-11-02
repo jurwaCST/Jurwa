@@ -1,0 +1,3 @@
+ok  	github.com/jurwaCST/Jurwa/functions/digest-dispatcher	1.789s	coverage: 22.8% of statements
+ok  	github.com/jurwaCST/Jurwa/functions/digest-dispatcher/clients	(cached)	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/functions/digest-dispatcher/dispatcher	(cached)	coverage: 100.0% of statements

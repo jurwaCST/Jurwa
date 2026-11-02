@@ -1,0 +1,14 @@
+# github.com/jurwaCST/Jurwa/functions/digest-dispatcher/dispatcher [github.com/jurwaCST/Jurwa/functions/digest-dispatcher/dispatcher.test]
+functions\digest-dispatcher\dispatcher\dispatcher_test.go:15:13: undefined: Category
+functions\digest-dispatcher\dispatcher\dispatcher_test.go:15:22: undefined: Counts
+functions\digest-dispatcher\dispatcher\dispatcher_test.go:19:58: undefined: Category
+functions\digest-dispatcher\dispatcher\dispatcher_test.go:19:67: undefined: Counts
+functions\digest-dispatcher\dispatcher\dispatcher_test.go:63:14: undefined: Category
+functions\digest-dispatcher\dispatcher\dispatcher_test.go:63:23: undefined: Counts
+functions\digest-dispatcher\dispatcher\dispatcher_test.go:65:29: undefined: Category
+functions\digest-dispatcher\dispatcher\dispatcher_test.go:65:38: undefined: Counts
+functions\digest-dispatcher\dispatcher\dispatcher_test.go:66:33: undefined: Category
+functions\digest-dispatcher\dispatcher\dispatcher_test.go:66:42: undefined: Counts
+functions\digest-dispatcher\dispatcher\dispatcher_test.go:66:42: too many errors
+FAIL	github.com/jurwaCST/Jurwa/functions/digest-dispatcher/dispatcher [build failed]
+FAIL
