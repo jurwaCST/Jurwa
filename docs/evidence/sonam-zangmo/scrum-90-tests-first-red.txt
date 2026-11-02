@@ -1,0 +1,27 @@
+# github.com/jurwaCST/Jurwa/services/routing-engine/application [github.com/jurwaCST/Jurwa/services/routing-engine/application.test]
+services/routing-engine/application/service_test.go:17:19: undefined: domain.Category
+services/routing-engine/application/service_test.go:17:35: undefined: domain.Rule
+services/routing-engine/application/service_test.go:22:57: undefined: domain.Category
+services/routing-engine/application/service_test.go:22:85: undefined: domain.Rule
+services/routing-engine/application/service_test.go:25:17: undefined: domain.Rule
+services/routing-engine/application/service_test.go:29:17: undefined: domain.Rule
+services/routing-engine/application/service_test.go:29:32: undefined: domain.ErrRuleNotFound
+services/routing-engine/application/service_test.go:49:17: undefined: ports.ReportRouted
+services/routing-engine/application/service_test.go:53:73: undefined: ports.ReportRouted
+services/routing-engine/application/service_test.go:59:38: undefined: domain.Category
+services/routing-engine/application/service_test.go:59:38: too many errors
+# github.com/jurwaCST/Jurwa/services/routing-engine/domain [github.com/jurwaCST/Jurwa/services/routing-engine/domain.test]
+services/routing-engine/domain/route_test.go:14:11: undefined: Request
+services/routing-engine/domain/route_test.go:17:25: undefined: Request
+services/routing-engine/domain/route_test.go:17:43: undefined: Hostel
+services/routing-engine/domain/route_test.go:18:33: undefined: Request
+services/routing-engine/domain/route_test.go:18:51: undefined: AcademicBlock
+services/routing-engine/domain/route_test.go:19:25: undefined: Request
+services/routing-engine/domain/route_test.go:19:43: undefined: Others
+services/routing-engine/domain/route_test.go:20:33: undefined: Request
+services/routing-engine/domain/route_test.go:20:67: undefined: Others
+services/routing-engine/domain/route_test.go:21:39: undefined: Request
+services/routing-engine/domain/route_test.go:21:39: too many errors
+FAIL	github.com/jurwaCST/Jurwa/services/routing-engine/domain [build failed]
+FAIL	github.com/jurwaCST/Jurwa/services/routing-engine/application [build failed]
+FAIL
