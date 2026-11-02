@@ -237,6 +237,12 @@ func writeError(w http.ResponseWriter, err error) {
 		writeJSONError(w, http.StatusInternalServerError, "internal error")
 		return
 	}
+	if code == http.StatusServiceUnavailable || code == http.StatusGatewayTimeout {
+		// The message names internal addresses; keep it in the log only.
+		slog.Warn("upstream service unavailable", "error", err)
+		writeJSONError(w, code, "service temporarily unavailable, try again")
+		return
+	}
 	writeJSONError(w, code, st.Message())
 }
 

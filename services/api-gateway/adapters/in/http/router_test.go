@@ -287,3 +287,11 @@ func TestRateLimit(t *testing.T) {
 func TestUnknownRouteIs404(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, newEnv().do("GET", "/nope", "student-token", "").Code)
 }
+
+func TestUnavailableHidesAddress(t *testing.T) {
+	e := newEnv()
+	e.reports.getErr = status.Error(codes.Unavailable, "dial tcp 127.0.0.1:9001: connection refused")
+	rec := e.do("GET", "/reports/r1", "head-token", "")
+	assert.Equal(t, http.StatusServiceUnavailable, rec.Code)
+	assert.NotContains(t, rec.Body.String(), "127.0.0.1")
+}

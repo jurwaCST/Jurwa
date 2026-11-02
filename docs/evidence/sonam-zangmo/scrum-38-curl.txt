@@ -1,0 +1,122 @@
+# api-gateway live run. Running: identity 9016, category-taxonomy 9009, report-submission 9001, api-gateway 8080/9010.
+# location-taxonomy (9004) is NOT running (not merged yet).
+
+$ grpcurl -plaintext localhost:9010 grpc.health.v1.Health/Check
+{
+  "status": "SERVING"
+}
+
+## Public route
+$ curl -i http://localhost:8080/health
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 15
+
+{"status":"ok"}
+
+
+## Protected routes without a token: 401
+$ curl -i http://localhost:8080/categories
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+Content-Length: 33
+
+{"error":"missing bearer token"}
+
+
+$ curl -i -X POST http://localhost:8080/reports
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+Content-Length: 33
+
+{"error":"missing bearer token"}
+
+
+## Invalid token: 401
+$ curl -i http://localhost:8080/categories -H 'Authorization: Bearer not-a-real-token'
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+Content-Length: 37
+
+{"error":"invalid or expired token"}
+
+
+## Register and log in (public)
+$ curl -i -X POST http://localhost:8080/auth/register -d '{"email":"student1@rub.edu.bt","fullName":"Test Student","password":"secret123"}'
+HTTP/1.1 201 Created
+Content-Type: application/json
+Content-Length: 186
+
+{"user":{"id":"dab0e150-2e3c-43f3-98b1-a5f3f2036840","email":"student1@rub.edu.bt","fullName":"Test Student","roles":["STUDENT"],"active":true,"createdAt":"2026-11-02T10:41:57.289592Z"}}
+
+
+$ curl -s -X POST http://localhost:8080/auth/login -d '{"email":"student1@rub.edu.bt","password":"secret123"}'
+(200, returns accessToken; token is used below as $TOKEN and not saved here)
+
+## Valid token reaches category-taxonomy: 200 with the three categories
+$ curl -i http://localhost:8080/categories -H "Authorization: Bearer $TOKEN"
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 439
+
+{"categories":[{"category":"HOSTEL","name":"Hostel","description":"Rooms, bathrooms, water and electricity in the hostels","sortOrder":1,"active":true},{"category":"ACADEMIC_BLOCK","name":"Academic Block","description":"Classrooms, labs and equipment in the academic blocks","sortOrder":2,"active":true},{"category":"OTHERS","name":"Others","description":"Campus-wide issues such as Wi-Fi, roads and grounds","sortOrder":3,"active":true}]}
+
+
+## Student submits a report: 201 (reporterId comes from the JWT)
+$ curl -i -X POST http://localhost:8080/reports -H "Authorization: Bearer $TOKEN" -d '{"category":"HOSTEL","location":{"building":"Hostel B","area":"Bathroom 2"},"description":"Tap leaking in bathroom 2"}'
+HTTP/1.1 201 Created
+Content-Type: application/json
+Content-Length: 283
+
+{"report":{"id":"8d382483-ecd1-489e-9eba-d1484e084b6d","reporterId":"dab0e150-2e3c-43f3-98b1-a5f3f2036840","category":"HOSTEL","location":{"building":"Hostel B","area":"Bathroom 2"},"description":"Tap leaking in bathroom 2","status":"OPEN","createdAt":"2026-11-02T10:41:57.587661Z"}}
+
+
+## Read it back: 200
+$ curl -i http://localhost:8080/reports/8d382483-ecd1-489e-9eba-d1484e084b6d -H "Authorization: Bearer $TOKEN"
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 272
+
+{"id":"8d382483-ecd1-489e-9eba-d1484e084b6d","reporterId":"dab0e150-2e3c-43f3-98b1-a5f3f2036840","category":"HOSTEL","location":{"building":"Hostel B","area":"Bathroom 2"},"description":"Tap leaking in bathroom 2","status":"OPEN","createdAt":"2026-11-02T10:41:57.587661Z"}
+
+
+## Bad JSON: 400
+$ curl -i -X POST http://localhost:8080/reports -H "Authorization: Bearer $TOKEN" -d '{"category":'
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Content-Length: 30
+
+{"error":"invalid JSON body"}
+
+
+## Service rejects input (InvalidArgument): 400
+$ curl -i -X POST http://localhost:8080/reports -H "Authorization: Bearer $TOKEN" -d '{"category":"HOSTEL","location":{"building":"Hostel B"},"description":""}'
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Content-Length: 52
+
+{"error":"invalid report: description is required"}
+
+
+## Unknown report (NotFound): 404
+$ curl -i http://localhost:8080/reports/00000000-0000-4000-8000-0000000000ff -H "Authorization: Bearer $TOKEN"
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+Content-Length: 29
+
+{"error":"report not found"}
+
+
+## location-taxonomy not running (Unavailable, after retries and timeout): 503
+$ curl -i http://localhost:8080/categories/HOSTEL/locations -H "Authorization: Bearer $TOKEN"
+HTTP/1.1 503 Service Unavailable
+Content-Type: application/json
+Content-Length: 55
+
+{"error":"service temporarily unavailable, try again"}
+
+
+## Rate limit: 25 requests at once from one IP, the limit is 20 a second
+# (20 tokens at once, plus the tokens refilled while curl runs the loop: 20 a second = 1 every 50 ms, so a few more than 20 OKs, then 429)
+$ for i in $(seq 1 25); do curl -s -o /dev/null -w '%{http_code} ' http://localhost:8080/health; done
+200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 429 429 
