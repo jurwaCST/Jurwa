@@ -1,0 +1,14 @@
+# github.com/jurwaCST/Jurwa/services/audit-log/domain [github.com/jurwaCST/Jurwa/services/audit-log/domain.test]
+services\audit-log\domain\event_test.go:19:19: undefined: Input
+services\audit-log\domain\event_test.go:20:9: undefined: Input
+services\audit-log\domain\event_test.go:33:12: undefined: NewEvent
+services\audit-log\domain\event_test.go:35:18: undefined: Event
+services\audit-log\domain\event_test.go:36:85: undefined: StatusChanged
+services\audit-log\domain\event_test.go:42:8: undefined: Input
+services\audit-log\domain\event_test.go:43:12: undefined: NewEvent
+services\audit-log\domain\event_test.go:53:12: undefined: NewEvent
+services\audit-log\domain\event_test.go:62:19: undefined: Input
+services\audit-log\domain\event_test.go:64:32: undefined: Input
+services\audit-log\domain\event_test.go:64:32: too many errors
+FAIL	github.com/jurwaCST/Jurwa/services/audit-log/domain [build failed]
+FAIL
