@@ -25,7 +25,7 @@ func TestListDepartments(t *testing.T) {
 	resp, err := newHandler().ListDepartments(context.Background(), &departmentdirectoryv1.ListDepartmentsRequest{})
 	require.NoError(t, err)
 	require.Len(t, resp.GetDepartments(), 5)
-	assert.Equal(t, "DEPT_A", resp.GetDepartments()[0].GetCode())
+	assert.Equal(t, "ARCH", resp.GetDepartments()[0].GetCode())
 }
 
 func TestGetHoD(t *testing.T) {
@@ -35,9 +35,9 @@ func TestGetHoD(t *testing.T) {
 		want     string
 		wantCode codes.Code
 	}{
-		{name: "known department", code: "DEPT_B", want: "HOD_DEPT_B"},
+		{name: "known department", code: "EEE", want: "HOD_EEE"},
 		{name: "empty id", code: "", wantCode: codes.InvalidArgument},
-		{name: "unknown department", code: "DEPT_Z", wantCode: codes.NotFound},
+		{name: "unknown department", code: "PHYSICS", wantCode: codes.NotFound},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

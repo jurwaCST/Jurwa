@@ -7,6 +7,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// The 5 engineering departments of CST (https://cst.edu.bt/department/). Science &
+// Humanities is not one of them: it runs no engineering programme, and the proposal
+// says the 10 engineering programmes sit under 5 departmental HoDs.
+func TestDefaultDepartmentsAreCSTEngineeringDepartments(t *testing.T) {
+	assert.Equal(t, []Department{
+		{Code: "ARCH", Name: "Architecture"},
+		{Code: "CIVIL", Name: "Civil & Environmental Engineering"},
+		{Code: "CT", Name: "Computing Technologies"},
+		{Code: "EEE", Name: "Electrical & Electronics Engineering"},
+		{Code: "MECH", Name: "Mechanical Engineering"},
+	}, DefaultDepartments())
+}
+
 func TestDefaultDepartments(t *testing.T) {
 	depts := DefaultDepartments()
 	require.Len(t, depts, 5, "CST's 10 programmes sit under 5 departmental HoDs")
@@ -39,7 +52,7 @@ func TestFindHoD(t *testing.T) {
 	}{
 		{name: "empty id", code: "", wantErr: ErrInvalidCode},
 		{name: "blank id", code: "   ", wantErr: ErrInvalidCode},
-		{name: "unknown department", code: "DEPT_Z", wantErr: ErrNotFound},
+		{name: "unknown department", code: "PHYSICS", wantErr: ErrNotFound},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -49,7 +62,7 @@ func TestFindHoD(t *testing.T) {
 	}
 
 	// A department whose HoD position is missing is also not found.
-	_, err := FindHoD(depts, nil, "DEPT_A")
+	_, err := FindHoD(depts, nil, "CT")
 	assert.ErrorIs(t, err, ErrNotFound)
 }
 

@@ -28,7 +28,7 @@ type Department struct {
 	Name string
 }
 
-// Position is a role someone holds, for example "DSA" or "HOD_DEPT_A".
+// Position is a role someone holds, for example "DSA" or "HOD_CT".
 type Position struct {
 	Code           string
 	Title          string
@@ -58,15 +58,17 @@ func (p Position) Validate() error {
 	return nil
 }
 
-// DefaultDepartments are placeholders for the 5 departments: the real names are
-// not written in the requirements yet. The System Administrator renames them.
+// DefaultDepartments are the 5 engineering departments of CST, named as on
+// https://cst.edu.bt/department/. Each has one HoD. Science & Humanities is left
+// out: it runs no engineering programme, and the proposal says the 10
+// engineering programmes sit under 5 departmental HoDs.
 func DefaultDepartments() []Department {
 	return []Department{
-		{Code: "DEPT_A", Name: "Department A"},
-		{Code: "DEPT_B", Name: "Department B"},
-		{Code: "DEPT_C", Name: "Department C"},
-		{Code: "DEPT_D", Name: "Department D"},
-		{Code: "DEPT_E", Name: "Department E"},
+		{Code: "ARCH", Name: "Architecture"},
+		{Code: "CIVIL", Name: "Civil & Environmental Engineering"},
+		{Code: "CT", Name: "Computing Technologies"},
+		{Code: "EEE", Name: "Electrical & Electronics Engineering"},
+		{Code: "MECH", Name: "Mechanical Engineering"},
 	}
 }
 
@@ -85,7 +87,7 @@ func DefaultPositions() []Position {
 		{Code: "CHIEF_COUNCILLOR", Title: "Chief Councillor", Kind: KindCouncillor},
 	}
 	for _, d := range DefaultDepartments() {
-		ps = append(ps, Position{Code: "HOD_" + d.Code, Title: "Head of " + d.Name, Kind: KindHoD, DepartmentCode: d.Code})
+		ps = append(ps, Position{Code: "HOD_" + d.Code, Title: "Head of Department, " + d.Name, Kind: KindHoD, DepartmentCode: d.Code})
 	}
 	for i := range ps {
 		ps[i].Active = true

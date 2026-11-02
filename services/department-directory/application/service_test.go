@@ -39,13 +39,13 @@ func TestListDepartments(t *testing.T) {
 
 func TestGetHoD(t *testing.T) {
 	ctx := context.Background()
-	got, err := newService().GetHoD(ctx, "DEPT_C")
+	got, err := newService().GetHoD(ctx, "CT")
 	require.NoError(t, err)
-	assert.Equal(t, "HOD_DEPT_C", got.Code)
+	assert.Equal(t, "HOD_CT", got.Code)
 
 	_, err = newService().GetHoD(ctx, "")
 	assert.ErrorIs(t, err, domain.ErrInvalidCode)
-	_, err = newService().GetHoD(ctx, "DEPT_Z")
+	_, err = newService().GetHoD(ctx, "PHYSICS")
 	assert.ErrorIs(t, err, domain.ErrNotFound)
 }
 
@@ -69,11 +69,11 @@ func TestRepositoryErrorsArePassedOn(t *testing.T) {
 	s := NewService(failingRepo{})
 	_, err := s.ListDepartments(ctx)
 	assert.ErrorIs(t, err, errDB)
-	_, err = s.GetHoD(ctx, "DEPT_A")
+	_, err = s.GetHoD(ctx, "ARCH")
 	assert.ErrorIs(t, err, errDB)
 	_, err = s.GetStaff(ctx, "DSA")
 	assert.ErrorIs(t, err, errDB)
 
-	_, err = NewService(positionsFailRepo{}).GetHoD(ctx, "DEPT_A")
+	_, err = NewService(positionsFailRepo{}).GetHoD(ctx, "ARCH")
 	assert.ErrorIs(t, err, errDB)
 }

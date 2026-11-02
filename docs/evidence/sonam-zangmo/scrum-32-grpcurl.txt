@@ -13,35 +13,35 @@ $ grpcurl -plaintext localhost:9008 jurwa.departmentdirectory.v1.DepartmentDirec
 {
   "departments": [
     {
-      "code": "DEPT_A",
-      "name": "Department A"
+      "code": "ARCH",
+      "name": "Architecture"
     },
     {
-      "code": "DEPT_B",
-      "name": "Department B"
+      "code": "CIVIL",
+      "name": "Civil \u0026 Environmental Engineering"
     },
     {
-      "code": "DEPT_C",
-      "name": "Department C"
+      "code": "CT",
+      "name": "Computing Technologies"
     },
     {
-      "code": "DEPT_D",
-      "name": "Department D"
+      "code": "EEE",
+      "name": "Electrical \u0026 Electronics Engineering"
     },
     {
-      "code": "DEPT_E",
-      "name": "Department E"
+      "code": "MECH",
+      "name": "Mechanical Engineering"
     }
   ]
 }
 
-$ grpcurl -plaintext -d '{"department_code":"DEPT_A"}' localhost:9008 jurwa.departmentdirectory.v1.DepartmentDirectoryService/GetHoD
+$ grpcurl -plaintext -d '{"department_code":"CT"}' localhost:9008 jurwa.departmentdirectory.v1.DepartmentDirectoryService/GetHoD
 {
   "position": {
-    "code": "HOD_DEPT_A",
-    "title": "Head of Department A",
+    "code": "HOD_CT",
+    "title": "Head of Department, Computing Technologies",
     "kind": "HOD",
-    "departmentCode": "DEPT_A",
+    "departmentCode": "CT",
     "active": true
   }
 }
@@ -71,6 +71,11 @@ $ grpcurl -plaintext -d '{"department_code":""}' localhost:9008 jurwa.department
 ERROR:
   Code: InvalidArgument
   Message: code is required
+
+$ grpcurl -plaintext -d '{"department_code":"PHYSICS"}' localhost:9008 jurwa.departmentdirectory.v1.DepartmentDirectoryService/GetHoD
+ERROR:
+  Code: NotFound
+  Message: not found: department "PHYSICS"
 
 $ grpcurl -plaintext -d '{"position_code":"PRINCIPAL"}' localhost:9008 jurwa.departmentdirectory.v1.DepartmentDirectoryService/GetStaff
 ERROR:
