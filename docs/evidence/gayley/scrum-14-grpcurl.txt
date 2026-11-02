@@ -1,0 +1,25 @@
+$ grpcurl -plaintext localhost:9017 grpc.health.v1.Health/Check
+{
+  "status": "SERVING"
+}
+
+$ grpcurl -plaintext localhost:9017 list
+grpc.health.v1.Health
+grpc.reflection.v1.ServerReflection
+grpc.reflection.v1alpha.ServerReflection
+jurwa.authorization.v1.AuthorizationService
+
+$ CheckPermission STUDENT report.submit
+{
+  "allowed": true
+}
+
+$ CheckPermission PRESIDENT report.reassign
+{
+  "reason": "PRESIDENT may not report.reassign"
+}
+
+$ CheckPermission ROLE_UNSPECIFIED (expect InvalidArgument)
+ERROR:
+  Code: InvalidArgument
+  Message: role is required

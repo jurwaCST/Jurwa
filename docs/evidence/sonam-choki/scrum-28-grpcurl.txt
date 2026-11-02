@@ -1,0 +1,34 @@
+$ grpcurl -plaintext localhost:9002 grpc.health.v1.Health/Check
+{
+  "status": "SERVING"
+}
+
+$ grpcurl -plaintext localhost:9002 list
+grpc.health.v1.Health
+grpc.reflection.v1.ServerReflection
+grpc.reflection.v1alpha.ServerReflection
+jurwa.photomedia.v1.PhotoMediaService
+
+$ grpcurl -plaintext -d '{"uploader_id":"1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d","content_type":"image/jpeg","data":"/9j/4AAQ","file_name":"tap.jpg"}' localhost:9002 jurwa.photomedia.v1.PhotoMediaService/UploadPhoto
+{
+  "photoId": "7afe4e46-a2c7-4350-98db-c331810cc1be"
+}
+
+$ grpcurl -plaintext -d '{"photo_id":"7afe4e46-a2c7-4350-98db-c331810cc1be"}' localhost:9002 jurwa.photomedia.v1.PhotoMediaService/GetPhoto
+{
+  "photoId": "7afe4e46-a2c7-4350-98db-c331810cc1be",
+  "contentType": "image/jpeg",
+  "data": "/9j/4AAQ",
+  "sizeBytes": "6",
+  "uploaderId": "1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d"
+}
+
+$ grpcurl ... UploadPhoto with content_type image/gif (rejected)
+ERROR:
+  Code: InvalidArgument
+  Message: invalid photo: content type must be image/jpeg or image/png
+
+$ grpcurl ... GetPhoto with an unknown id (not found)
+ERROR:
+  Code: NotFound
+  Message: photo not found

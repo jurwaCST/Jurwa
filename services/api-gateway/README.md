@@ -8,7 +8,7 @@ For every request it:
 
 1. **Rate limits**: at most 20 requests a second per client IP (in-memory token bucket, `RATE_LIMIT_PER_SECOND`). The 21st gets `429` with `Retry-After: 1`. Redis counters replace this in Sprint 3 so several gateway pods share one limit.
 2. **Checks the JWT** on every route except `/health`, `/auth/register` and `/auth/login`: `Authorization: Bearer <token>` is sent to identity `ValidateToken`. A missing or invalid token is `401`.
-3. **Checks the role** for the route's action. Until Gayley's authorization service is merged, `adapters/out/staticauthz` applies the role table from `api-routes.md` (TODO in `cmd/server/main.go`). A student may read only their own report.
+3. **Checks the role** for the route's action with authorization `CheckPermission` (Gayley's service, `AUTHORIZATION_ADDR`). A denial is `403`. If authorization cannot be reached the request is refused with `503`, never let through. A student may read only their own report (checked in the gateway, which has the report).
 4. **Forwards** the call. User ids such as `reporter_id` come from the JWT, never from the body. Bodies are decoded strictly: bad JSON, an unknown field or an unknown enum value is `400`.
 5. **Maps gRPC errors to HTTP**, and never passes internal error text to the browser.
 
@@ -58,8 +58,7 @@ Error bodies are `{"error": "<message>"}`.
 | `CATEGORY_TAXONOMY_ADDR` | `localhost:9009` | category-taxonomy |
 | `LOCATION_TAXONOMY_ADDR` | `localhost:9004` | location-taxonomy |
 | `REPORT_SUBMISSION_ADDR` | `localhost:9001` | report-submission |
-
-`AUTHORIZATION_ADDR` (`localhost:9017`) is added with the authorization client.
+| `AUTHORIZATION_ADDR` | `localhost:9017` | authorization |
 
 ## Run
 
@@ -67,6 +66,7 @@ Start the services the routes need, each in its own terminal (identity needs a `
 
 ```bash
 JWT_SECRET=<any long random string> make run SERVICE=identity
+make run SERVICE=authorization
 make run SERVICE=category-taxonomy
 make run SERVICE=report-submission
 make run SERVICE=api-gateway
