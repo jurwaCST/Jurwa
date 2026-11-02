@@ -1,0 +1,14 @@
+# github.com/jurwaCST/Jurwa/services/authorization/domain [github.com/jurwaCST/Jurwa/services/authorization/domain.test]
+services\authorization\domain\policy_test.go:12:7: undefined: Student
+services\authorization\domain\policy_test.go:13:7: undefined: CategoryHead
+services\authorization\domain\policy_test.go:14:7: undefined: Staff
+services\authorization\domain\policy_test.go:15:7: undefined: SystemAdmin
+services\authorization\domain\policy_test.go:16:7: undefined: President
+services\authorization\domain\policy_test.go:21:29: undefined: Role
+services\authorization\domain\policy_test.go:22:2: undefined: ActionMeRead
+services\authorization\domain\policy_test.go:23:2: undefined: ActionCategoryList
+services\authorization\domain\policy_test.go:24:2: undefined: ActionLocationList
+services\authorization\domain\policy_test.go:25:2: undefined: ActionNotificationList
+services\authorization\domain\policy_test.go:25:2: too many errors
+FAIL	github.com/jurwaCST/Jurwa/services/authorization/domain [build failed]
+FAIL
