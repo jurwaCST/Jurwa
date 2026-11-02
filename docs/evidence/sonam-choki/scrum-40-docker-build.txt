@@ -1,0 +1,17 @@
+# SCRUM-40 build run, 2026-11-02 17:20 +06, branch SCRUM-40-containerize (= main + script)
+# Services on main at this time: identity, report-submission, routing-rules, status-lifecycle.
+# The full run with every service is repeated after the Sprint 2 pull requests are merged.
+
+$ bash scripts/docker-build-all.sh
+building identity ... OK
+building report-submission ... OK
+building routing-rules ... OK
+building status-lifecycle ... OK
+
+Built 4 image(s), 0 failed.
+
+$ docker images (jurwa/*)
+jurwa/status-lifecycle:latest  20.6MB
+jurwa/routing-rules:latest  20.6MB
+jurwa/identity:latest  20.9MB
+jurwa/report-submission:latest  20.6MB
