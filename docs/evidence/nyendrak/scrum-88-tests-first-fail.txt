@@ -1,0 +1,14 @@
+# github.com/jurwaCST/Jurwa/services/reassignment/domain [github.com/jurwaCST/Jurwa/services/reassignment/domain.test]
+services\reassignment\domain\assignment_test.go:21:15: undefined: Assignment
+services\reassignment\domain\assignment_test.go:22:9: undefined: NewRouted
+services\reassignment\domain\assignment_test.go:27:18: undefined: Assignment
+services\reassignment\domain\assignment_test.go:29:9: undefined: Routed
+services\reassignment\domain\assignment_test.go:38:15: undefined: Reassign
+services\reassignment\domain\assignment_test.go:40:18: undefined: Assignment
+services\reassignment\domain\assignment_test.go:41:64: undefined: Reassigned
+services\reassignment\domain\assignment_test.go:53:36: undefined: ErrInvalidReason
+services\reassignment\domain\assignment_test.go:54:64: undefined: ErrInvalidReason
+services\reassignment\domain\assignment_test.go:55:42: undefined: ErrSameAssignee
+services\reassignment\domain\assignment_test.go:55:42: too many errors
+FAIL	github.com/jurwaCST/Jurwa/services/reassignment/domain [build failed]
+FAIL

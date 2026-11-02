@@ -1,0 +1,32 @@
+--- PASS: TestReassignAndList (0.00s)
+--- PASS: TestErrorCodes (0.00s)
+--- PASS: TestToStatusError (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/adapters/in/grpc	0.561s	coverage: 100.0% of statements
+--- PASS: TestPublishReportReassigned_WritesJSONLine (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/adapters/out/logpublisher	2.631s	coverage: 100.0% of statements
+--- PASS: TestReplaceAndList (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/adapters/out/memory	2.585s	coverage: 100.0% of statements
+--- PASS: TestRecordRouted (0.00s)
+--- PASS: TestReassignReport_HeadThenStaff (0.00s)
+--- PASS: TestReassignReport_Errors (0.00s)
+--- PASS: TestListReassignments_Errors (0.00s)
+--- PASS: TestReassignReport_PublishFails (0.00s)
+--- PASS: TestReassignReport_StoreErrors (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/application	2.584s	coverage: 100.0% of statements
+--- PASS: TestEnvOr (0.00s)
+--- PASS: TestSeedAssignments (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/cmd/server	0.381s	coverage: 12.4% of statements
+--- PASS: TestNewRouted (0.00s)
+--- PASS: TestReassign (0.00s)
+--- PASS: TestReassign_Errors (0.00s)
+--- PASS: TestCheckCanReassign (0.00s)
+--- PASS: TestCheckCanList (0.00s)
+--- PASS: TestIsUUID (0.00s)
+--- PASS: TestKindString (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/domain	2.582s	coverage: 100.0% of statements
