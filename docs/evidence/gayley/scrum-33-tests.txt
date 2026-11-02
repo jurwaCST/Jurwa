@@ -1,0 +1,8 @@
+ok  	github.com/jurwaCST/Jurwa/services/feedback/adapters/in/grpc	3.098s	coverage: 100.0% of statements
+?   	github.com/jurwaCST/Jurwa/services/feedback/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/feedback/adapters/out/memory	(cached)	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/feedback/adapters/out/statusclient	(cached)	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/feedback/application	3.704s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/feedback/cmd/server	2.304s	coverage: 3.1% of statements
+ok  	github.com/jurwaCST/Jurwa/services/feedback/domain	(cached)	coverage: 100.0% of statements
+?   	github.com/jurwaCST/Jurwa/services/feedback/ports	[no test files]
