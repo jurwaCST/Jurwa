@@ -1,0 +1,11 @@
+> docker build -f services/sla-tracking/Dockerfile --build-arg SERVICE=sla-tracking -t jurwa/sla-tracking .
+#16 exporting manifest list sha256:70b318e70b5a4deec8047811ba57323b1628d25fa0615fb6fb819dd02d1310fc 0.0s done
+#16 naming to docker.io/jurwa/sla-tracking:latest done
+#16 unpacking to docker.io/jurwa/sla-tracking:latest 0.1s done
+#16 DONE 0.8s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/jaftyphuaz5yyp35snqf443sx
+
+> docker images jurwa/sla-tracking
+REPOSITORY           TAG       IMAGE ID       CREATED         SIZE
+jurwa/sla-tracking   latest    70b318e70b5a   2 seconds ago   21.7MB

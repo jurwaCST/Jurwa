@@ -1,0 +1,40 @@
+--- PASS: TestTimerLifecycle (0.00s)
+--- PASS: TestListDueTimers_ExplicitNow (0.00s)
+--- PASS: TestErrorCodes (0.00s)
+--- PASS: TestToStatusError (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/in/grpc	0.573s	coverage: 100.0% of statements
+--- PASS: TestPublishSLALapsed_WritesJSONLine (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/out/logpublisher	2.693s	coverage: 100.0% of statements
+--- PASS: TestCreateGetUpdate (0.00s)
+--- PASS: TestListDue (0.00s)
+--- PASS: TestListDue_SameDeadlineOrderedByID (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/out/memory	2.671s	coverage: 100.0% of statements
+--- PASS: TestWindow (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/out/slapolicy	0.398s	coverage: 100.0% of statements
+--- PASS: TestStartTimer (0.00s)
+--- PASS: TestStartTimer_Errors (0.00s)
+--- PASS: TestStopTimer (0.00s)
+--- PASS: TestGetTimer_Errors (0.00s)
+--- PASS: TestListDueTimers_LapsesAndPublishes (0.00s)
+--- PASS: TestListDueTimers_NowAndLimit (0.00s)
+--- PASS: TestListDueTimers_Errors (0.00s)
+--- PASS: TestListDueTimers_PublishFails (0.00s)
+--- PASS: TestStoreErrors (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/application	2.705s	coverage: 98.2% of statements
+--- PASS: TestEnvOr (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/cmd/server	0.591s	coverage: 3.0% of statements
+--- PASS: TestNewTimer (0.00s)
+--- PASS: TestNewTimer_Errors (0.00s)
+--- PASS: TestIsDue (0.00s)
+--- PASS: TestLapse (0.00s)
+--- PASS: TestStop (0.00s)
+--- PASS: TestCategory (0.00s)
+--- PASS: TestStateString (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/domain	2.489s	coverage: 100.0% of statements
