@@ -1,0 +1,14 @@
+# github.com/jurwaCST/Jurwa/services/feedback/domain [github.com/jurwaCST/Jurwa/services/feedback/domain.test]
+services\feedback\domain\feedback_test.go:21:12: undefined: NewFeedback
+services\feedback\domain\feedback_test.go:36:8: undefined: ErrInvalidRating
+services\feedback\domain\feedback_test.go:37:7: undefined: ErrInvalidRating
+services\feedback\domain\feedback_test.go:43:7: undefined: ErrInvalidRating
+services\feedback\domain\feedback_test.go:47:14: undefined: NewFeedback
+services\feedback\domain\feedback_test.go:67:48: undefined: ErrCommentTooLong
+services\feedback\domain\feedback_test.go:69:56: undefined: ErrCommentTooLong
+services\feedback\domain\feedback_test.go:73:14: undefined: NewFeedback
+services\feedback\domain\feedback_test.go:84:12: undefined: NewFeedback
+services\feedback\domain\feedback_test.go:90:12: undefined: NewFeedback
+services\feedback\domain\feedback_test.go:90:12: too many errors
+FAIL	github.com/jurwaCST/Jurwa/services/feedback/domain [build failed]
+FAIL
