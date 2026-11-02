@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -43,7 +44,7 @@ func TestRatingBoundaries(t *testing.T) {
 		{6, ErrInvalidRating}, // above the highest
 	}
 	for _, tt := range tests {
-		t.Run(string(rune('0'+tt.rating)), func(t *testing.T) {
+		t.Run(fmt.Sprintf("rating %d", tt.rating), func(t *testing.T) {
 			_, err := NewFeedback(feedbackID, reportID, studentID, tt.rating, "", now)
 			if tt.wantErr != nil {
 				assert.ErrorIs(t, err, tt.wantErr)
