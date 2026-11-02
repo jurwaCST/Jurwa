@@ -1,0 +1,52 @@
+# 1. routing-engine alone (routing-rules and department-directory NOT running)
+$ grpcurl -plaintext localhost:9007 grpc.health.v1.Health/Check
+{
+  "status": "SERVING"
+}
+
+$ grpcurl -plaintext -d '{"category":"HOSTEL","location":{"building":"Hostel B"}}' localhost:9007 jurwa.routingengine.v1.RoutingEngineService/RouteReport
+ERROR:
+  Code: Unavailable
+  Message: a service routing depends on is unavailable: routing-rules: connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9006: connect: connection refused"
+
+# 2. routing-rules (9006), department-directory (9008) and routing-engine (9007) running
+$ grpcurl -plaintext localhost:9007 list
+grpc.health.v1.Health
+grpc.reflection.v1.ServerReflection
+grpc.reflection.v1alpha.ServerReflection
+jurwa.routingengine.v1.RoutingEngineService
+
+$ grpcurl -plaintext -d '{"report_id":"6f1c2a9e-1b7d-4c55-9a43-2f1e0b9d7c11","category":"HOSTEL","location":{"building":"Hostel B"}}' localhost:9007 jurwa.routingengine.v1.RoutingEngineService/RouteReport
+{
+  "categoryHeadId": "00000000-0000-4000-8000-000000000001",
+  "targetPosition": "DSA",
+  "ruleId": "3bb3e57e-dbd9-4237-81a6-8f6947fe21f6"
+}
+
+$ grpcurl -plaintext -d '{"report_id":"0b3e8d52-77aa-4f0e-8c1d-5d2a6e9f4b20","category":"ACADEMIC_BLOCK","location":{"building":"Academic Block 2"}}' localhost:9007 jurwa.routingengine.v1.RoutingEngineService/RouteReport
+{
+  "categoryHeadId": "00000000-0000-4000-8000-000000000002",
+  "targetPosition": "DAA",
+  "ruleId": "0417590a-838e-46fa-a26f-c5e5cee4f6f1"
+}
+
+$ grpcurl -plaintext -d '{"category":"OTHERS","location":{"building":"Football Ground"}}' localhost:9007 jurwa.routingengine.v1.RoutingEngineService/RouteReport
+{
+  "categoryHeadId": "00000000-0000-4000-8000-000000000003",
+  "targetPosition": "SSO",
+  "ruleId": "25db6cea-6960-45de-a9a6-a9b319e30a85"
+}
+
+$ grpcurl -plaintext -d '{"location":{"building":"Hostel B"}}' localhost:9007 jurwa.routingengine.v1.RoutingEngineService/RouteReport
+ERROR:
+  Code: InvalidArgument
+  Message: invalid category: ""
+
+$ grpcurl -plaintext -d '{"category":"HOSTEL"}' localhost:9007 jurwa.routingengine.v1.RoutingEngineService/RouteReport
+ERROR:
+  Code: InvalidArgument
+  Message: location building is required
+
+# report.routed events in the routing-engine log:
+{"time":"2026-11-02T16:32:25.433225+06:00","level":"INFO","msg":"event published","service":"routing-engine","event":"report.routed","stream":"events:report.routed","report_id":"6f1c2a9e-1b7d-4c55-9a43-2f1e0b9d7c11","category":"HOSTEL","category_head_id":"00000000-0000-4000-8000-000000000001","target_position":"DSA","rule_id":"3bb3e57e-dbd9-4237-81a6-8f6947fe21f6"}
+{"time":"2026-11-02T16:32:25.457276+06:00","level":"INFO","msg":"event published","service":"routing-engine","event":"report.routed","stream":"events:report.routed","report_id":"0b3e8d52-77aa-4f0e-8c1d-5d2a6e9f4b20","category":"ACADEMIC_BLOCK","category_head_id":"00000000-0000-4000-8000-000000000002","target_position":"DAA","rule_id":"0417590a-838e-46fa-a26f-c5e5cee4f6f1"}

@@ -10,9 +10,19 @@ import (
 	"syscall"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
+
+	departmentdirectoryv1 "github.com/jurwaCST/Jurwa/proto/gen/department-directory/v1"
+	routingenginev1 "github.com/jurwaCST/Jurwa/proto/gen/routing-engine/v1"
+	routingrulesv1 "github.com/jurwaCST/Jurwa/proto/gen/routing-rules/v1"
+	grpcadapter "github.com/jurwaCST/Jurwa/services/routing-engine/adapters/in/grpc"
+	"github.com/jurwaCST/Jurwa/services/routing-engine/adapters/out/directoryclient"
+	"github.com/jurwaCST/Jurwa/services/routing-engine/adapters/out/logpublisher"
+	"github.com/jurwaCST/Jurwa/services/routing-engine/adapters/out/rulesclient"
+	"github.com/jurwaCST/Jurwa/services/routing-engine/application"
 )
 
 // Defaults used when the environment variables are not set.
@@ -41,8 +51,28 @@ func main() {
 	hs := health.NewServer()
 	healthpb.RegisterHealthServer(srv, hs)
 
-	// TODO: register your service here, for example:
-	// routingrulesv1.RegisterRoutingRulesServiceServer(srv, grpcadapter.NewHandler(app))
+	// routing-engine is stateless: it asks routing-rules for the rule and
+	// department-directory for the holder. Events go to the log until Redis
+	// Streams arrives in Sprint 3.
+	rulesConn, err := dial(envOr("ROUTING_RULES_ADDR", rulesclient.DefaultAddr))
+	if err != nil {
+		slog.Error("cannot create routing-rules client", "error", err)
+		os.Exit(1)
+	}
+	defer rulesConn.Close()
+	dirConn, err := dial(envOr("DEPARTMENT_DIRECTORY_ADDR", directoryclient.DefaultAddr))
+	if err != nil {
+		slog.Error("cannot create department-directory client", "error", err)
+		os.Exit(1)
+	}
+	defer dirConn.Close()
+
+	app := application.NewService(
+		rulesclient.New(routingrulesv1.NewRoutingRulesServiceClient(rulesConn)),
+		directoryclient.New(departmentdirectoryv1.NewDepartmentDirectoryServiceClient(dirConn)),
+		logpublisher.New(logger),
+	)
+	routingenginev1.RegisterRoutingEngineServiceServer(srv, grpcadapter.NewHandler(app))
 
 	// Reflection lets grpcurl list and call methods without the .proto files.
 	reflection.Register(srv)
@@ -74,4 +104,10 @@ func envOr(key, fallback string) string {
 		return v
 	}
 	return fallback
+}
+
+// dial creates a client connection. gRPC connects lazily, so a service that is
+// not running yet makes calls fail with Unavailable instead of stopping the server.
+func dial(addr string) (*grpc.ClientConn, error) {
+	return grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 }
