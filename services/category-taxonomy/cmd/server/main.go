@@ -13,6 +13,12 @@ import (
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
+
+	categorytaxonomyv1 "github.com/jurwaCST/Jurwa/proto/gen/category-taxonomy/v1"
+	grpcadapter "github.com/jurwaCST/Jurwa/services/category-taxonomy/adapters/in/grpc"
+	"github.com/jurwaCST/Jurwa/services/category-taxonomy/adapters/out/memory"
+	"github.com/jurwaCST/Jurwa/services/category-taxonomy/application"
+	"github.com/jurwaCST/Jurwa/services/category-taxonomy/domain"
 )
 
 // Defaults used when the environment variables are not set.
@@ -41,8 +47,10 @@ func main() {
 	hs := health.NewServer()
 	healthpb.RegisterHealthServer(srv, hs)
 
-	// TODO: register your service here, for example:
-	// routingrulesv1.RegisterRoutingRulesServiceServer(srv, grpcadapter.NewHandler(app))
+	// Sprint 2 keeps the three categories in memory. The PostgreSQL adapter
+	// (DATABASE_URL) replaces it in Sprint 3.
+	repo := memory.NewRepository(domain.DefaultCategories())
+	categorytaxonomyv1.RegisterCategoryTaxonomyServiceServer(srv, grpcadapter.NewHandler(application.NewService(repo)))
 
 	// Reflection lets grpcurl list and call methods without the .proto files.
 	reflection.Register(srv)

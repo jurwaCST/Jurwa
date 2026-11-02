@@ -32,6 +32,7 @@ type CategoryInfo struct {
 	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"` // help text shown on the form
 	SortOrder     int32                  `protobuf:"varint,4,opt,name=sort_order,json=sortOrder,proto3" json:"sort_order,omitempty"`
 	Active        bool                   `protobuf:"varint,5,opt,name=active,proto3" json:"active,omitempty"`
+	HeadPosition  string                 `protobuf:"bytes,6,opt,name=head_position,json=headPosition,proto3" json:"head_position,omitempty"` // Category Head position code: "DSA", "DAA" or "SSO"
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -99,6 +100,13 @@ func (x *CategoryInfo) GetActive() bool {
 		return x.Active
 	}
 	return false
+}
+
+func (x *CategoryInfo) GetHeadPosition() string {
+	if x != nil {
+		return x.HeadPosition
+	}
+	return ""
 }
 
 type ListCategoriesRequest struct {
@@ -269,18 +277,131 @@ func (x *GetCategoryResponse) GetCategory() *CategoryInfo {
 	return nil
 }
 
+type UpsertCategoryRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Category      v1.Category            `protobuf:"varint,1,opt,name=category,proto3,enum=jurwa.common.v1.Category" json:"category,omitempty"`                // required
+	DisplayName   string                 `protobuf:"bytes,2,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`                      // required, not blank
+	ActorRole     v1.Role                `protobuf:"varint,3,opt,name=actor_role,json=actorRole,proto3,enum=jurwa.common.v1.Role" json:"actor_role,omitempty"` // set by api-gateway from the JWT, must be SYSTEM_ADMIN
+	Description   string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`                                         // optional, "" keeps the current help text
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpsertCategoryRequest) Reset() {
+	*x = UpsertCategoryRequest{}
+	mi := &file_category_taxonomy_v1_category_taxonomy_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpsertCategoryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpsertCategoryRequest) ProtoMessage() {}
+
+func (x *UpsertCategoryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_category_taxonomy_v1_category_taxonomy_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpsertCategoryRequest.ProtoReflect.Descriptor instead.
+func (*UpsertCategoryRequest) Descriptor() ([]byte, []int) {
+	return file_category_taxonomy_v1_category_taxonomy_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *UpsertCategoryRequest) GetCategory() v1.Category {
+	if x != nil {
+		return x.Category
+	}
+	return v1.Category(0)
+}
+
+func (x *UpsertCategoryRequest) GetDisplayName() string {
+	if x != nil {
+		return x.DisplayName
+	}
+	return ""
+}
+
+func (x *UpsertCategoryRequest) GetActorRole() v1.Role {
+	if x != nil {
+		return x.ActorRole
+	}
+	return v1.Role(0)
+}
+
+func (x *UpsertCategoryRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+type UpsertCategoryResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Category      *CategoryInfo          `protobuf:"bytes,1,opt,name=category,proto3" json:"category,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpsertCategoryResponse) Reset() {
+	*x = UpsertCategoryResponse{}
+	mi := &file_category_taxonomy_v1_category_taxonomy_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpsertCategoryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpsertCategoryResponse) ProtoMessage() {}
+
+func (x *UpsertCategoryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_category_taxonomy_v1_category_taxonomy_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpsertCategoryResponse.ProtoReflect.Descriptor instead.
+func (*UpsertCategoryResponse) Descriptor() ([]byte, []int) {
+	return file_category_taxonomy_v1_category_taxonomy_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *UpsertCategoryResponse) GetCategory() *CategoryInfo {
+	if x != nil {
+		return x.Category
+	}
+	return nil
+}
+
 var File_category_taxonomy_v1_category_taxonomy_proto protoreflect.FileDescriptor
 
 const file_category_taxonomy_v1_category_taxonomy_proto_rawDesc = "" +
 	"\n" +
-	",category-taxonomy/v1/category-taxonomy.proto\x12\x19jurwa.categorytaxonomy.v1\x1a\x16common/v1/common.proto\"\xb2\x01\n" +
+	",category-taxonomy/v1/category-taxonomy.proto\x12\x19jurwa.categorytaxonomy.v1\x1a\x16common/v1/common.proto\"\xd7\x01\n" +
 	"\fCategoryInfo\x125\n" +
 	"\bcategory\x18\x01 \x01(\x0e2\x19.jurwa.common.v1.CategoryR\bcategory\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x1d\n" +
 	"\n" +
 	"sort_order\x18\x04 \x01(\x05R\tsortOrder\x12\x16\n" +
-	"\x06active\x18\x05 \x01(\bR\x06active\"\x17\n" +
+	"\x06active\x18\x05 \x01(\bR\x06active\x12#\n" +
+	"\rhead_position\x18\x06 \x01(\tR\fheadPosition\"\x17\n" +
 	"\x15ListCategoriesRequest\"a\n" +
 	"\x16ListCategoriesResponse\x12G\n" +
 	"\n" +
@@ -289,10 +410,19 @@ const file_category_taxonomy_v1_category_taxonomy_proto_rawDesc = "" +
 	"\x12GetCategoryRequest\x125\n" +
 	"\bcategory\x18\x01 \x01(\x0e2\x19.jurwa.common.v1.CategoryR\bcategory\"Z\n" +
 	"\x13GetCategoryResponse\x12C\n" +
-	"\bcategory\x18\x01 \x01(\v2'.jurwa.categorytaxonomy.v1.CategoryInfoR\bcategory2\xfe\x01\n" +
+	"\bcategory\x18\x01 \x01(\v2'.jurwa.categorytaxonomy.v1.CategoryInfoR\bcategory\"\xc9\x01\n" +
+	"\x15UpsertCategoryRequest\x125\n" +
+	"\bcategory\x18\x01 \x01(\x0e2\x19.jurwa.common.v1.CategoryR\bcategory\x12!\n" +
+	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\x124\n" +
+	"\n" +
+	"actor_role\x18\x03 \x01(\x0e2\x15.jurwa.common.v1.RoleR\tactorRole\x12 \n" +
+	"\vdescription\x18\x04 \x01(\tR\vdescription\"]\n" +
+	"\x16UpsertCategoryResponse\x12C\n" +
+	"\bcategory\x18\x01 \x01(\v2'.jurwa.categorytaxonomy.v1.CategoryInfoR\bcategory2\xf5\x02\n" +
 	"\x17CategoryTaxonomyService\x12u\n" +
 	"\x0eListCategories\x120.jurwa.categorytaxonomy.v1.ListCategoriesRequest\x1a1.jurwa.categorytaxonomy.v1.ListCategoriesResponse\x12l\n" +
-	"\vGetCategory\x12-.jurwa.categorytaxonomy.v1.GetCategoryRequest\x1a..jurwa.categorytaxonomy.v1.GetCategoryResponseBMZKgithub.com/jurwaCST/Jurwa/proto/gen/category-taxonomy/v1;categorytaxonomyv1b\x06proto3"
+	"\vGetCategory\x12-.jurwa.categorytaxonomy.v1.GetCategoryRequest\x1a..jurwa.categorytaxonomy.v1.GetCategoryResponse\x12u\n" +
+	"\x0eUpsertCategory\x120.jurwa.categorytaxonomy.v1.UpsertCategoryRequest\x1a1.jurwa.categorytaxonomy.v1.UpsertCategoryResponseBMZKgithub.com/jurwaCST/Jurwa/proto/gen/category-taxonomy/v1;categorytaxonomyv1b\x06proto3"
 
 var (
 	file_category_taxonomy_v1_category_taxonomy_proto_rawDescOnce sync.Once
@@ -306,29 +436,37 @@ func file_category_taxonomy_v1_category_taxonomy_proto_rawDescGZIP() []byte {
 	return file_category_taxonomy_v1_category_taxonomy_proto_rawDescData
 }
 
-var file_category_taxonomy_v1_category_taxonomy_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_category_taxonomy_v1_category_taxonomy_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_category_taxonomy_v1_category_taxonomy_proto_goTypes = []any{
 	(*CategoryInfo)(nil),           // 0: jurwa.categorytaxonomy.v1.CategoryInfo
 	(*ListCategoriesRequest)(nil),  // 1: jurwa.categorytaxonomy.v1.ListCategoriesRequest
 	(*ListCategoriesResponse)(nil), // 2: jurwa.categorytaxonomy.v1.ListCategoriesResponse
 	(*GetCategoryRequest)(nil),     // 3: jurwa.categorytaxonomy.v1.GetCategoryRequest
 	(*GetCategoryResponse)(nil),    // 4: jurwa.categorytaxonomy.v1.GetCategoryResponse
-	(v1.Category)(0),               // 5: jurwa.common.v1.Category
+	(*UpsertCategoryRequest)(nil),  // 5: jurwa.categorytaxonomy.v1.UpsertCategoryRequest
+	(*UpsertCategoryResponse)(nil), // 6: jurwa.categorytaxonomy.v1.UpsertCategoryResponse
+	(v1.Category)(0),               // 7: jurwa.common.v1.Category
+	(v1.Role)(0),                   // 8: jurwa.common.v1.Role
 }
 var file_category_taxonomy_v1_category_taxonomy_proto_depIdxs = []int32{
-	5, // 0: jurwa.categorytaxonomy.v1.CategoryInfo.category:type_name -> jurwa.common.v1.Category
-	0, // 1: jurwa.categorytaxonomy.v1.ListCategoriesResponse.categories:type_name -> jurwa.categorytaxonomy.v1.CategoryInfo
-	5, // 2: jurwa.categorytaxonomy.v1.GetCategoryRequest.category:type_name -> jurwa.common.v1.Category
-	0, // 3: jurwa.categorytaxonomy.v1.GetCategoryResponse.category:type_name -> jurwa.categorytaxonomy.v1.CategoryInfo
-	1, // 4: jurwa.categorytaxonomy.v1.CategoryTaxonomyService.ListCategories:input_type -> jurwa.categorytaxonomy.v1.ListCategoriesRequest
-	3, // 5: jurwa.categorytaxonomy.v1.CategoryTaxonomyService.GetCategory:input_type -> jurwa.categorytaxonomy.v1.GetCategoryRequest
-	2, // 6: jurwa.categorytaxonomy.v1.CategoryTaxonomyService.ListCategories:output_type -> jurwa.categorytaxonomy.v1.ListCategoriesResponse
-	4, // 7: jurwa.categorytaxonomy.v1.CategoryTaxonomyService.GetCategory:output_type -> jurwa.categorytaxonomy.v1.GetCategoryResponse
-	6, // [6:8] is the sub-list for method output_type
-	4, // [4:6] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	7,  // 0: jurwa.categorytaxonomy.v1.CategoryInfo.category:type_name -> jurwa.common.v1.Category
+	0,  // 1: jurwa.categorytaxonomy.v1.ListCategoriesResponse.categories:type_name -> jurwa.categorytaxonomy.v1.CategoryInfo
+	7,  // 2: jurwa.categorytaxonomy.v1.GetCategoryRequest.category:type_name -> jurwa.common.v1.Category
+	0,  // 3: jurwa.categorytaxonomy.v1.GetCategoryResponse.category:type_name -> jurwa.categorytaxonomy.v1.CategoryInfo
+	7,  // 4: jurwa.categorytaxonomy.v1.UpsertCategoryRequest.category:type_name -> jurwa.common.v1.Category
+	8,  // 5: jurwa.categorytaxonomy.v1.UpsertCategoryRequest.actor_role:type_name -> jurwa.common.v1.Role
+	0,  // 6: jurwa.categorytaxonomy.v1.UpsertCategoryResponse.category:type_name -> jurwa.categorytaxonomy.v1.CategoryInfo
+	1,  // 7: jurwa.categorytaxonomy.v1.CategoryTaxonomyService.ListCategories:input_type -> jurwa.categorytaxonomy.v1.ListCategoriesRequest
+	3,  // 8: jurwa.categorytaxonomy.v1.CategoryTaxonomyService.GetCategory:input_type -> jurwa.categorytaxonomy.v1.GetCategoryRequest
+	5,  // 9: jurwa.categorytaxonomy.v1.CategoryTaxonomyService.UpsertCategory:input_type -> jurwa.categorytaxonomy.v1.UpsertCategoryRequest
+	2,  // 10: jurwa.categorytaxonomy.v1.CategoryTaxonomyService.ListCategories:output_type -> jurwa.categorytaxonomy.v1.ListCategoriesResponse
+	4,  // 11: jurwa.categorytaxonomy.v1.CategoryTaxonomyService.GetCategory:output_type -> jurwa.categorytaxonomy.v1.GetCategoryResponse
+	6,  // 12: jurwa.categorytaxonomy.v1.CategoryTaxonomyService.UpsertCategory:output_type -> jurwa.categorytaxonomy.v1.UpsertCategoryResponse
+	10, // [10:13] is the sub-list for method output_type
+	7,  // [7:10] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_category_taxonomy_v1_category_taxonomy_proto_init() }
@@ -342,7 +480,7 @@ func file_category_taxonomy_v1_category_taxonomy_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_category_taxonomy_v1_category_taxonomy_proto_rawDesc), len(file_category_taxonomy_v1_category_taxonomy_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

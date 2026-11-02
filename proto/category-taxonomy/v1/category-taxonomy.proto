@@ -13,6 +13,11 @@ service CategoryTaxonomyService {
   rpc ListCategories(ListCategoriesRequest) returns (ListCategoriesResponse);
   // Errors: INVALID_ARGUMENT for CATEGORY_UNSPECIFIED, NOT_FOUND when unknown.
   rpc GetCategory(GetCategoryRequest) returns (GetCategoryResponse);
+  // Changes the display name (and help text) of one of the three categories.
+  // System Administrator only. The three categories cannot be added or removed.
+  // Errors: INVALID_ARGUMENT for CATEGORY_UNSPECIFIED or a blank name,
+  // PERMISSION_DENIED when actor_role is not SYSTEM_ADMIN, NOT_FOUND when unknown.
+  rpc UpsertCategory(UpsertCategoryRequest) returns (UpsertCategoryResponse);
 }
 
 message CategoryInfo {
@@ -21,6 +26,7 @@ message CategoryInfo {
   string description = 3; // help text shown on the form
   int32 sort_order = 4;
   bool active = 5;
+  string head_position = 6; // Category Head position code: "DSA", "DAA" or "SSO"
 }
 
 message ListCategoriesRequest {}
@@ -34,5 +40,16 @@ message GetCategoryRequest {
 }
 
 message GetCategoryResponse {
+  CategoryInfo category = 1;
+}
+
+message UpsertCategoryRequest {
+  jurwa.common.v1.Category category = 1; // required
+  string display_name = 2; // required, not blank
+  jurwa.common.v1.Role actor_role = 3; // set by api-gateway from the JWT, must be SYSTEM_ADMIN
+  string description = 4; // optional, "" keeps the current help text
+}
+
+message UpsertCategoryResponse {
   CategoryInfo category = 1;
 }

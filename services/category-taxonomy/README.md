@@ -1,55 +1,30 @@
 # category-taxonomy
 
-> Created from `services/_template`. Replace every TODO below, and delete this note.
-
-## Start a new service (template users)
-
-From the repo root, with your service name and port from the table below:
-
-```bash
-make new-service NAME=routing-rules PORT=9006
-```
-
-| Port | Service | Port | Service |
-|---|---|---|---|
-| 9001 | report-submission | 9011 | status-lifecycle |
-| 9002 | photo-media | 9012 | sla-tracking |
-| 9003 | report-history | 9013 | sla-policy |
-| 9004 | location-taxonomy | 9014 | reassignment |
-| 9005 | internal-notes | 9015 | audit-log |
-| 9006 | routing-rules | 9016 | identity |
-| 9007 | routing-engine | 9017 | authorization |
-| 9008 | department-directory | 9018 | notification |
-| 9009 | category-taxonomy | 9019 | feedback |
-| 9010 | api-gateway (gRPC; HTTP is 8080) | 9020 | analytics |
-
-This copies `services/_template` to `services/<name>` and fills in the name and port. Then:
-
-1. Run `make proto` so your generated code in `proto/gen/<name>/v1/` is up to date.
-2. Write domain tests first in `domain/`, then the domain code.
-3. Add ports (interfaces) in `ports/`, adapters in `adapters/out/`, gRPC handlers in `adapters/in/grpc/`.
-4. Register your gRPC service in `cmd/server/main.go` (see the TODO there).
-5. Run `make test`, `make lint` and `make run SERVICE=<name>`.
-
-Layout:
-
-```
-cmd/server/main.go     starts the gRPC server (health check, reflection, JSON logs, graceful shutdown)
-domain/                business rules, plain Go, no framework imports
-application/           use cases
-ports/                 interfaces the core depends on
-adapters/in/grpc/      gRPC handlers
-adapters/out/          database, Redis and other adapters
-Dockerfile             multi-stage image, built from the repo root
-```
-
 ## What it does
 
-TODO: one or two sentences on what this service owns and what it never does.
+Holds the three report categories shown on the PWA form, in a fixed order, with their display name, help text and Category Head position:
+
+| Order | Category | Name | Category Head |
+|---|---|---|---|
+| 1 | `HOSTEL` | Hostel | DSA |
+| 2 | `ACADEMIC_BLOCK` | Academic Block | DAA |
+| 3 | `OTHERS` | Others | SSO |
+
+A System Administrator can change the display name and help text (`UpsertCategory`). The category codes, their order and their Category Head never change, and none of the three can be removed, because routing-rules and the report form depend on them. Who holds each head position is kept in department-directory, not here.
+
+Sprint 2 keeps the categories in memory (`adapters/out/memory`), so a rename is lost on restart. The PostgreSQL adapter from `docs/design/schema/category-taxonomy.sql` comes in Sprint 3.
 
 ## RPCs
 
-TODO: list the RPCs from `proto/category-taxonomy/v1/`, one line each.
+Contract: `proto/category-taxonomy/v1/category-taxonomy.proto`, service `jurwa.categorytaxonomy.v1.CategoryTaxonomyService`.
+
+| RPC | What it does | Errors |
+|---|---|---|
+| `ListCategories` | The three categories in display order | none |
+| `GetCategory` | One category with its name and Category Head | INVALID_ARGUMENT for `CATEGORY_UNSPECIFIED`, NOT_FOUND for a value not in the list |
+| `UpsertCategory` | Change the display name (and help text) of a category | INVALID_ARGUMENT for an unspecified category or a blank name, PERMISSION_DENIED unless `actor_role` is `SYSTEM_ADMIN`, NOT_FOUND for a new category |
+
+`actor_role` is filled in by api-gateway from the caller's JWT.
 
 ## Configuration
 
@@ -58,7 +33,7 @@ TODO: list the RPCs from `proto/category-taxonomy/v1/`, one line each.
 | `PORT` | `9009` | gRPC port |
 | `SERVICE_NAME` | `category-taxonomy` | Name written in every log line |
 
-TODO: add `DATABASE_URL` and others when the service uses them. Never hard-code passwords.
+`DATABASE_URL` is added with the PostgreSQL adapter in Sprint 3.
 
 ## Run
 
@@ -66,6 +41,9 @@ TODO: add `DATABASE_URL` and others when the service uses them. Never hard-code 
 make run SERVICE=category-taxonomy
 grpcurl -plaintext localhost:9009 grpc.health.v1.Health/Check
 grpcurl -plaintext localhost:9009 list
+grpcurl -plaintext localhost:9009 jurwa.categorytaxonomy.v1.CategoryTaxonomyService/ListCategories
+grpcurl -plaintext -d '{"category":"HOSTEL"}' localhost:9009 jurwa.categorytaxonomy.v1.CategoryTaxonomyService/GetCategory
+grpcurl -plaintext -d '{"category":"HOSTEL","display_name":"Hostels","actor_role":"SYSTEM_ADMIN"}' localhost:9009 jurwa.categorytaxonomy.v1.CategoryTaxonomyService/UpsertCategory
 ```
 
 Docker:
@@ -79,4 +57,7 @@ docker run --rm -p 9009:9009 jurwa/category-taxonomy
 
 ```bash
 make test
+go test ./services/category-taxonomy/... -cover
 ```
+
+The domain (`domain/`) is written test-first (commit "SCRUM-24 tests first") and has 100% statement coverage.

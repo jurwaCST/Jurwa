@@ -1,0 +1,74 @@
+$ grpcurl -plaintext localhost:9009 grpc.health.v1.Health/Check
+{
+  "status": "SERVING"
+}
+
+$ grpcurl -plaintext localhost:9009 list
+grpc.health.v1.Health
+grpc.reflection.v1.ServerReflection
+grpc.reflection.v1alpha.ServerReflection
+jurwa.categorytaxonomy.v1.CategoryTaxonomyService
+
+$ grpcurl -plaintext localhost:9009 jurwa.categorytaxonomy.v1.CategoryTaxonomyService/ListCategories
+{
+  "categories": [
+    {
+      "category": "HOSTEL",
+      "name": "Hostel",
+      "description": "Rooms, bathrooms, water and electricity in the hostels",
+      "sortOrder": 1,
+      "active": true,
+      "headPosition": "DSA"
+    },
+    {
+      "category": "ACADEMIC_BLOCK",
+      "name": "Academic Block",
+      "description": "Classrooms, labs and equipment in the academic blocks",
+      "sortOrder": 2,
+      "active": true,
+      "headPosition": "DAA"
+    },
+    {
+      "category": "OTHERS",
+      "name": "Others",
+      "description": "Campus-wide issues such as Wi-Fi, roads and grounds",
+      "sortOrder": 3,
+      "active": true,
+      "headPosition": "SSO"
+    }
+  ]
+}
+
+$ grpcurl -plaintext -d '{"category":"ACADEMIC_BLOCK"}' localhost:9009 jurwa.categorytaxonomy.v1.CategoryTaxonomyService/GetCategory
+{
+  "category": {
+    "category": "ACADEMIC_BLOCK",
+    "name": "Academic Block",
+    "description": "Classrooms, labs and equipment in the academic blocks",
+    "sortOrder": 2,
+    "active": true,
+    "headPosition": "DAA"
+  }
+}
+
+$ grpcurl -plaintext -d '{}' localhost:9009 jurwa.categorytaxonomy.v1.CategoryTaxonomyService/GetCategory
+ERROR:
+  Code: InvalidArgument
+  Message: invalid category
+
+$ grpcurl -plaintext -d '{"category":"HOSTEL","display_name":"Hostels","actor_role":"STUDENT"}' localhost:9009 jurwa.categorytaxonomy.v1.CategoryTaxonomyService/UpsertCategory
+ERROR:
+  Code: PermissionDenied
+  Message: only a system administrator can change categories
+
+$ grpcurl -plaintext -d '{"category":"HOSTEL","display_name":"Hostels","actor_role":"SYSTEM_ADMIN"}' localhost:9009 jurwa.categorytaxonomy.v1.CategoryTaxonomyService/UpsertCategory
+{
+  "category": {
+    "category": "HOSTEL",
+    "name": "Hostels",
+    "description": "Rooms, bathrooms, water and electricity in the hostels",
+    "sortOrder": 1,
+    "active": true,
+    "headPosition": "DSA"
+  }
+}
