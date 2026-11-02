@@ -8,11 +8,18 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
+	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
+
+	internalnotesv1 "github.com/jurwaCST/Jurwa/proto/gen/internal-notes/v1"
+	grpcadapter "github.com/jurwaCST/Jurwa/services/internal-notes/adapters/in/grpc"
+	"github.com/jurwaCST/Jurwa/services/internal-notes/adapters/out/memory"
+	"github.com/jurwaCST/Jurwa/services/internal-notes/application"
 )
 
 // Defaults used when the environment variables are not set.
@@ -41,8 +48,9 @@ func main() {
 	hs := health.NewServer()
 	healthpb.RegisterHealthServer(srv, hs)
 
-	// TODO: register your service here, for example:
-	// routingrulesv1.RegisterRoutingRulesServiceServer(srv, grpcadapter.NewHandler(app))
+	// In-memory store for Sprint 2; the MongoDB adapter replaces it in Sprint 3.
+	app := application.NewService(memory.NewRepository(), uuid.NewString, time.Now)
+	internalnotesv1.RegisterInternalNotesServiceServer(srv, grpcadapter.NewHandler(app))
 
 	// Reflection lets grpcurl list and call methods without the .proto files.
 	reflection.Register(srv)
