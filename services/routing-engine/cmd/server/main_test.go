@@ -23,3 +23,10 @@ func TestEnvOr(t *testing.T) {
 		})
 	}
 }
+
+func TestDialIsLazy(t *testing.T) {
+	// Nothing listens on this port: dial must still succeed, calls fail later with Unavailable.
+	conn, err := dial("localhost:1")
+	assert.NoError(t, err)
+	assert.NoError(t, conn.Close())
+}
