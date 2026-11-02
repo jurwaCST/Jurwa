@@ -9,8 +9,8 @@ The React PWA calls only the api-gateway over HTTP (port 8080, JSON). The gatewa
 1. Every route except `GET /health`, `POST /auth/register` and `POST /auth/login` needs `Authorization: Bearer <JWT>`. The gateway calls identity `ValidateToken`, then authorization `CheckPermission` for the user's role.
 2. User ids such as `reporter_id`, `uploader_id`, `author_id` and `actor_id` are taken from the JWT, never from the request body.
 3. JSON field names are the proto field names in lowerCamelCase (for example `photoId`). Enums are sent as their names (for example `"HOSTEL"`).
-4. gRPC errors map to HTTP: INVALID_ARGUMENT 400, UNAUTHENTICATED 401, PERMISSION_DENIED 403, NOT_FOUND 404, ALREADY_EXISTS 409, ABORTED 409, FAILED_PRECONDITION 422, RESOURCE_EXHAUSTED 429, anything else 500.
-5. Rate limit: counters in Redis (`ratelimit:<user or ip>:<minute>`). The limit itself is set in Sprint 2.
+4. gRPC errors map to HTTP: INVALID_ARGUMENT 400, UNAUTHENTICATED 401, PERMISSION_DENIED 403, NOT_FOUND 404, ALREADY_EXISTS 409, ABORTED 409, FAILED_PRECONDITION 422, RESOURCE_EXHAUSTED 429, UNAVAILABLE 503, DEADLINE_EXCEEDED 504, anything else 500.
+5. Rate limit: 20 requests a second per client IP (Sprint 2: in-memory token bucket in the gateway, `RATE_LIMIT_PER_SECOND`). Sprint 3 moves the counters to Redis (`ratelimit:<user or ip>:<minute>`) so all gateway pods share them.
 
 ## Routes
 
@@ -65,3 +65,7 @@ These RPCs are called only between services or by the serverless functions:
 ## Sprint 1 thin slice
 
 Only `GET /health` and one forwarded route (`GET /categories` or `POST /reports`) are built in Sprint 1 (SCRUM-38). JWT checks and rate limiting come in Sprint 2.
+
+## Sprint 2 slice
+
+SCRUM-38 adds the JWT check (identity `ValidateToken`), the rate limit, `pkg/resilience` on every client and these routes: `GET /health`, `POST /auth/register`, `POST /auth/login`, `GET /me`, `GET /categories`, `GET /categories/{category}/locations`, `POST /reports` and `GET /reports/{reportId}`. Role checks use the table above through a stand-in until authorization `CheckPermission` is merged. See `services/api-gateway/README.md`.

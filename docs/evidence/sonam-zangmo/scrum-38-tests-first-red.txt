@@ -1,0 +1,23 @@
+# github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http
+services/api-gateway/adapters/in/http/router_test.go:23:2: no required module provides package github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/staticauthz; to add it:
+	go get github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/staticauthz
+FAIL	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http [setup failed]
+?   	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/grpc	[no test files]
+?   	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out	[no test files]
+?   	github.com/jurwaCST/Jurwa/services/api-gateway/application	[no test files]
+# github.com/jurwaCST/Jurwa/services/api-gateway/domain [github.com/jurwaCST/Jurwa/services/api-gateway/domain.test]
+services/api-gateway/domain/gateway_test.go:18:7: undefined: NewLimiter
+services/api-gateway/domain/gateway_test.go:29:7: undefined: NewLimiter
+services/api-gateway/domain/gateway_test.go:56:42: undefined: ErrMissingToken
+services/api-gateway/domain/gateway_test.go:57:65: undefined: ErrMalformedToken
+services/api-gateway/domain/gateway_test.go:58:50: undefined: ErrMalformedToken
+services/api-gateway/domain/gateway_test.go:59:52: undefined: ErrMalformedToken
+services/api-gateway/domain/gateway_test.go:63:16: undefined: BearerToken
+services/api-gateway/domain/gateway_test.go:75:7: undefined: Principal
+services/api-gateway/domain/gateway_test.go:79:18: undefined: Principal
+services/api-gateway/domain/gateway_test.go:84:13: undefined: Principal
+services/api-gateway/domain/gateway_test.go:84:13: too many errors
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/cmd/server	0.957s
+FAIL	github.com/jurwaCST/Jurwa/services/api-gateway/domain [build failed]
+?   	github.com/jurwaCST/Jurwa/services/api-gateway/ports	[no test files]
+FAIL
