@@ -1,0 +1,10 @@
+> docker build -f services/reassignment/Dockerfile --build-arg SERVICE=reassignment -t jurwa/reassignment .
+#16 naming to docker.io/jurwa/reassignment:latest done
+#16 unpacking to docker.io/jurwa/reassignment:latest 0.1s done
+#16 DONE 0.8s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/i58wds5r2my9nkmy8tk48hrgt
+
+> docker images jurwa/reassignment
+REPOSITORY           TAG       IMAGE ID       CREATED        SIZE
+jurwa/reassignment   latest    2325d8bf8545   1 second ago   21.5MB

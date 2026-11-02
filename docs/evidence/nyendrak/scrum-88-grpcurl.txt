@@ -1,0 +1,135 @@
+SCRUM-88 reassignment: grpcurl run against :9014, 2026-11-02 21:20 +0600
+Started with SEED_ASSIGNMENTS=11111111-1111-1111-1111-111111111111:22222222-2222-2222-2222-222222222222:DSA (report routed to the Category Head, position DSA)
+
+# health
+> grpcurl -plaintext localhost:9014 grpc.health.v1.Health/Check
+{
+  "status": "SERVING"
+}
+
+# list services
+> grpcurl -plaintext localhost:9014 list
+grpc.health.v1.Health
+grpc.reflection.v1.ServerReflection
+grpc.reflection.v1alpha.ServerReflection
+jurwa.reassignment.v1.ReassignmentService
+
+# ListReassignments as SYSTEM_ADMIN: the ROUTED row
+> grpcurl -plaintext -H x-user-role: SYSTEM_ADMIN -d {"report_id":"11111111-1111-1111-1111-111111111111"} localhost:9014 jurwa.reassignment.v1.ReassignmentService/ListReassignments
+{
+  "assignments": [
+    {
+      "id": "231bedf1-704b-4ed6-ace8-5b935d039952",
+      "reportId": "11111111-1111-1111-1111-111111111111",
+      "assigneeUserId": "22222222-2222-2222-2222-222222222222",
+      "assigneePositionCode": "DSA",
+      "kind": "ROUTED",
+      "current": true,
+      "assignedAt": "2026-11-02T15:20:35.033402400Z"
+    }
+  ]
+}
+
+# ReassignReport without a role: PERMISSION_DENIED
+> grpcurl -plaintext -d {"report_id":"11111111-1111-1111-1111-111111111111","to_user_id":"33333333-3333-3333-3333-333333333333","reason":"Plumbing, needs estate staff","actor_id":"22222222-2222-2222-2222-222222222222"} localhost:9014 jurwa.reassignment.v1.ReassignmentService/ReassignReport
+ERROR:
+  Code: PermissionDenied
+  Message: permission denied: only a Category Head or the current assignee can reassign
+
+# ReassignReport as STAFF who is not the assignee: PERMISSION_DENIED
+> grpcurl -plaintext -H x-user-role: STAFF -d {"report_id":"11111111-1111-1111-1111-111111111111","to_user_id":"44444444-4444-4444-4444-444444444444","reason":"Not mine","actor_id":"33333333-3333-3333-3333-333333333333"} localhost:9014 jurwa.reassignment.v1.ReassignmentService/ReassignReport
+ERROR:
+  Code: PermissionDenied
+  Message: permission denied: only a Category Head or the current assignee can reassign
+
+# ReassignReport with a blank reason: INVALID_ARGUMENT
+> grpcurl -plaintext -H x-user-role: CATEGORY_HEAD -d {"report_id":"11111111-1111-1111-1111-111111111111","to_user_id":"33333333-3333-3333-3333-333333333333","reason":"  ","actor_id":"22222222-2222-2222-2222-222222222222"} localhost:9014 jurwa.reassignment.v1.ReassignmentService/ReassignReport
+ERROR:
+  Code: InvalidArgument
+  Message: reason must not be blank and at most 500 characters
+
+# ReassignReport as CATEGORY_HEAD to staff
+> grpcurl -plaintext -H x-user-role: CATEGORY_HEAD -d {"report_id":"11111111-1111-1111-1111-111111111111","to_user_id":"33333333-3333-3333-3333-333333333333","reason":"Plumbing, needs estate staff","actor_id":"22222222-2222-2222-2222-222222222222"} localhost:9014 jurwa.reassignment.v1.ReassignmentService/ReassignReport
+{
+  "assignment": {
+    "id": "6ad6aa3c-549f-448d-a835-f4f1babff4d2",
+    "reportId": "11111111-1111-1111-1111-111111111111",
+    "assigneeUserId": "33333333-3333-3333-3333-333333333333",
+    "kind": "REASSIGNED",
+    "assignedBy": "22222222-2222-2222-2222-222222222222",
+    "reason": "Plumbing, needs estate staff",
+    "current": true,
+    "assignedAt": "2026-11-02T15:20:37.778142900Z"
+  }
+}
+
+# ReassignReport as STAFF who is now the assignee
+> grpcurl -plaintext -H x-user-role: STAFF -d {"report_id":"11111111-1111-1111-1111-111111111111","to_user_id":"44444444-4444-4444-4444-444444444444","reason":"Electrical, not plumbing","actor_id":"33333333-3333-3333-3333-333333333333"} localhost:9014 jurwa.reassignment.v1.ReassignmentService/ReassignReport
+{
+  "assignment": {
+    "id": "1e149a55-6a90-4b09-85b9-05cbb8c340d7",
+    "reportId": "11111111-1111-1111-1111-111111111111",
+    "assigneeUserId": "44444444-4444-4444-4444-444444444444",
+    "kind": "REASSIGNED",
+    "assignedBy": "33333333-3333-3333-3333-333333333333",
+    "reason": "Electrical, not plumbing",
+    "current": true,
+    "assignedAt": "2026-11-02T15:20:37.874257700Z"
+  }
+}
+
+# ReassignReport to the same assignee: INVALID_ARGUMENT
+> grpcurl -plaintext -H x-user-role: CATEGORY_HEAD -d {"report_id":"11111111-1111-1111-1111-111111111111","to_user_id":"44444444-4444-4444-4444-444444444444","reason":"again","actor_id":"22222222-2222-2222-2222-222222222222"} localhost:9014 jurwa.reassignment.v1.ReassignmentService/ReassignReport
+ERROR:
+  Code: InvalidArgument
+  Message: report is already assigned to this user
+
+# ReassignReport for a report with no assignment: NOT_FOUND
+> grpcurl -plaintext -H x-user-role: CATEGORY_HEAD -d {"report_id":"44444444-4444-4444-4444-444444444444","to_user_id":"33333333-3333-3333-3333-333333333333","reason":"x","actor_id":"22222222-2222-2222-2222-222222222222"} localhost:9014 jurwa.reassignment.v1.ReassignmentService/ReassignReport
+ERROR:
+  Code: NotFound
+  Message: report has no assignment
+
+# ListReassignments as STAFF: full history, oldest first
+> grpcurl -plaintext -H x-user-role: STAFF -d {"report_id":"11111111-1111-1111-1111-111111111111"} localhost:9014 jurwa.reassignment.v1.ReassignmentService/ListReassignments
+{
+  "assignments": [
+    {
+      "id": "231bedf1-704b-4ed6-ace8-5b935d039952",
+      "reportId": "11111111-1111-1111-1111-111111111111",
+      "assigneeUserId": "22222222-2222-2222-2222-222222222222",
+      "assigneePositionCode": "DSA",
+      "kind": "ROUTED",
+      "assignedAt": "2026-11-02T15:20:35.033402400Z"
+    },
+    {
+      "id": "6ad6aa3c-549f-448d-a835-f4f1babff4d2",
+      "reportId": "11111111-1111-1111-1111-111111111111",
+      "assigneeUserId": "33333333-3333-3333-3333-333333333333",
+      "kind": "REASSIGNED",
+      "assignedBy": "22222222-2222-2222-2222-222222222222",
+      "reason": "Plumbing, needs estate staff",
+      "assignedAt": "2026-11-02T15:20:37.778142900Z"
+    },
+    {
+      "id": "1e149a55-6a90-4b09-85b9-05cbb8c340d7",
+      "reportId": "11111111-1111-1111-1111-111111111111",
+      "assigneeUserId": "44444444-4444-4444-4444-444444444444",
+      "kind": "REASSIGNED",
+      "assignedBy": "33333333-3333-3333-3333-333333333333",
+      "reason": "Electrical, not plumbing",
+      "current": true,
+      "assignedAt": "2026-11-02T15:20:37.874257700Z"
+    }
+  ]
+}
+
+# ListReassignments as STUDENT: PERMISSION_DENIED
+> grpcurl -plaintext -H x-user-role: STUDENT -d {"report_id":"11111111-1111-1111-1111-111111111111"} localhost:9014 jurwa.reassignment.v1.ReassignmentService/ListReassignments
+ERROR:
+  Code: PermissionDenied
+  Message: permission denied: role "STUDENT" cannot view assignments
+
+# report.reassigned events in the server log
+{"time":"2026-11-02T21:20:37.7781429+06:00","level":"INFO","msg":"event published","service":"reassignment","event":"report.reassigned","assignment_id":"6ad6aa3c-549f-448d-a835-f4f1babff4d2","report_id":"11111111-1111-1111-1111-111111111111","from_user_id":"22222222-2222-2222-2222-222222222222","to_user_id":"33333333-3333-3333-3333-333333333333","actor_id":"22222222-2222-2222-2222-222222222222","reason":"Plumbing, needs estate staff","assigned_at":"2026-11-02T15:20:37Z"}
+{"time":"2026-11-02T21:20:37.8742577+06:00","level":"INFO","msg":"event published","service":"reassignment","event":"report.reassigned","assignment_id":"1e149a55-6a90-4b09-85b9-05cbb8c340d7","report_id":"11111111-1111-1111-1111-111111111111","from_user_id":"33333333-3333-3333-3333-333333333333","to_user_id":"44444444-4444-4444-4444-444444444444","actor_id":"33333333-3333-3333-3333-333333333333","reason":"Electrical, not plumbing","assigned_at":"2026-11-02T15:20:37Z"}
