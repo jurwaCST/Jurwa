@@ -1,0 +1,22 @@
+# Call 1 makes 3 attempts (retry), call 2 makes 2 more: 5 failures in a row open the breaker.
+# From then on calls fail fast with "circuit breaker is open" and routing-rules is not dialled.
+
+# routing-engine with pkg/resilience, routing-rules NOT running. 6 calls in a row:
+$ grpcurl -plaintext -d '{"category":"HOSTEL","location":{"building":"Hostel B"}}' localhost:9007 jurwa.routingengine.v1.RoutingEngineService/RouteReport   (call 1)
+  Code: Unavailable
+  Message: a service routing depends on is unavailable: routing-rules: connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:9006: connect: connection refused"
+$ grpcurl -plaintext -d '{"category":"HOSTEL","location":{"building":"Hostel B"}}' localhost:9007 jurwa.routingengine.v1.RoutingEngineService/RouteReport   (call 2)
+  Code: Unavailable
+  Message: a service routing depends on is unavailable: routing-rules: circuit breaker is open
+$ grpcurl -plaintext -d '{"category":"HOSTEL","location":{"building":"Hostel B"}}' localhost:9007 jurwa.routingengine.v1.RoutingEngineService/RouteReport   (call 3)
+  Code: Unavailable
+  Message: a service routing depends on is unavailable: routing-rules: circuit breaker is open
+$ grpcurl -plaintext -d '{"category":"HOSTEL","location":{"building":"Hostel B"}}' localhost:9007 jurwa.routingengine.v1.RoutingEngineService/RouteReport   (call 4)
+  Code: Unavailable
+  Message: a service routing depends on is unavailable: routing-rules: circuit breaker is open
+$ grpcurl -plaintext -d '{"category":"HOSTEL","location":{"building":"Hostel B"}}' localhost:9007 jurwa.routingengine.v1.RoutingEngineService/RouteReport   (call 5)
+  Code: Unavailable
+  Message: a service routing depends on is unavailable: routing-rules: circuit breaker is open
+$ grpcurl -plaintext -d '{"category":"HOSTEL","location":{"building":"Hostel B"}}' localhost:9007 jurwa.routingengine.v1.RoutingEngineService/RouteReport   (call 6)
+  Code: Unavailable
+  Message: a service routing depends on is unavailable: routing-rules: circuit breaker is open

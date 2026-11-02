@@ -1,0 +1,34 @@
+> Health/Check
+{
+  "status": "SERVING"
+}
+
+> GetPolicy HOSTEL before any policy is set (must be NotFound)
+ERROR:
+  Code: NotFound
+  Message: no policy set for this category
+
+> UpsertPolicy HOSTEL 48 hours
+{
+  "policy": {
+    "category": "HOSTEL",
+    "windowHours": 48,
+    "updatedBy": "22222222-2222-2222-2222-222222222222",
+    "updatedAt": "2026-11-02T11:39:53.822342900Z"
+  }
+}
+
+> GetPolicy HOSTEL
+{
+  "policy": {
+    "category": "HOSTEL",
+    "windowHours": 48,
+    "updatedBy": "22222222-2222-2222-2222-222222222222",
+    "updatedAt": "2026-11-02T11:39:53.822342900Z"
+  }
+}
+
+> UpsertPolicy HOSTEL 0 hours (must be InvalidArgument)
+ERROR:
+  Code: InvalidArgument
+  Message: window_hours must be greater than 0: got 0

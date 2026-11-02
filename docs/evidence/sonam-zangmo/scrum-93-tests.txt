@@ -1,0 +1,222 @@
+=== RUN   TestDescriptionBoundaries
+=== RUN   TestDescriptionBoundaries/0_characters_(empty)
+=== RUN   TestDescriptionBoundaries/only_spaces
+=== RUN   TestDescriptionBoundaries/1_character_(lower_bound)
+=== RUN   TestDescriptionBoundaries/499_characters
+=== RUN   TestDescriptionBoundaries/500_characters_(upper_bound)
+=== RUN   TestDescriptionBoundaries/501_characters_(just_over)
+=== RUN   TestDescriptionBoundaries/500_Dzongkha_characters_(counted_as_characters,_not_bytes)
+=== RUN   TestDescriptionBoundaries/501_Dzongkha_characters
+--- PASS: TestDescriptionBoundaries (0.00s)
+    --- PASS: TestDescriptionBoundaries/0_characters_(empty) (0.00s)
+    --- PASS: TestDescriptionBoundaries/only_spaces (0.00s)
+    --- PASS: TestDescriptionBoundaries/1_character_(lower_bound) (0.00s)
+    --- PASS: TestDescriptionBoundaries/499_characters (0.00s)
+    --- PASS: TestDescriptionBoundaries/500_characters_(upper_bound) (0.00s)
+    --- PASS: TestDescriptionBoundaries/501_characters_(just_over) (0.00s)
+    --- PASS: TestDescriptionBoundaries/500_Dzongkha_characters_(counted_as_characters,_not_bytes) (0.00s)
+    --- PASS: TestDescriptionBoundaries/501_Dzongkha_characters (0.00s)
+=== RUN   TestCategoryClasses
+=== RUN   TestCategoryClasses/missing_(unspecified)
+=== RUN   TestCategoryClasses/HOSTEL
+=== RUN   TestCategoryClasses/ACADEMIC_BLOCK
+=== RUN   TestCategoryClasses/OTHERS
+=== RUN   TestCategoryClasses/unknown_value
+=== RUN   TestCategoryClasses/wrong_case
+--- PASS: TestCategoryClasses (0.00s)
+    --- PASS: TestCategoryClasses/missing_(unspecified) (0.00s)
+    --- PASS: TestCategoryClasses/HOSTEL (0.00s)
+    --- PASS: TestCategoryClasses/ACADEMIC_BLOCK (0.00s)
+    --- PASS: TestCategoryClasses/OTHERS (0.00s)
+    --- PASS: TestCategoryClasses/unknown_value (0.00s)
+    --- PASS: TestCategoryClasses/wrong_case (0.00s)
+=== RUN   TestLocationClasses
+=== RUN   TestLocationClasses/missing
+=== RUN   TestLocationClasses/building_only_spaces
+=== RUN   TestLocationClasses/wing_and_area_without_building
+=== RUN   TestLocationClasses/building_only
+=== RUN   TestLocationClasses/building,_wing_and_area
+--- PASS: TestLocationClasses (0.00s)
+    --- PASS: TestLocationClasses/missing (0.00s)
+    --- PASS: TestLocationClasses/building_only_spaces (0.00s)
+    --- PASS: TestLocationClasses/wing_and_area_without_building (0.00s)
+    --- PASS: TestLocationClasses/building_only (0.00s)
+    --- PASS: TestLocationClasses/building,_wing_and_area (0.00s)
+=== RUN   TestPhotoClasses
+=== RUN   TestPhotoClasses/no_photo
+=== RUN   TestPhotoClasses/photo_id_given
+=== RUN   TestPhotoClasses/empty_photo_id
+=== RUN   TestPhotoClasses/blank_photo_id
+--- PASS: TestPhotoClasses (0.00s)
+    --- PASS: TestPhotoClasses/no_photo (0.00s)
+    --- PASS: TestPhotoClasses/photo_id_given (0.00s)
+    --- PASS: TestPhotoClasses/empty_photo_id (0.00s)
+    --- PASS: TestPhotoClasses/blank_photo_id (0.00s)
+=== RUN   TestReporterClasses
+=== RUN   TestReporterClasses/missing
+=== RUN   TestReporterClasses/not_a_UUID
+=== RUN   TestReporterClasses/UUID
+--- PASS: TestReporterClasses (0.00s)
+    --- PASS: TestReporterClasses/missing (0.00s)
+    --- PASS: TestReporterClasses/not_a_UUID (0.00s)
+    --- PASS: TestReporterClasses/UUID (0.00s)
+=== RUN   TestRoutingEveryCategoryAndLocation
+=== RUN   TestRoutingEveryCategoryAndLocation/OTHERS_at_"Hostel_A"
+=== RUN   TestRoutingEveryCategoryAndLocation/OTHERS_at_"Hostel_B"
+=== RUN   TestRoutingEveryCategoryAndLocation/OTHERS_at_"Academic_Block_2"
+=== RUN   TestRoutingEveryCategoryAndLocation/OTHERS_at_"Football_Ground"
+=== RUN   TestRoutingEveryCategoryAndLocation/OTHERS_at_""
+=== RUN   TestRoutingEveryCategoryAndLocation/HOSTEL_at_"Hostel_A"
+=== RUN   TestRoutingEveryCategoryAndLocation/HOSTEL_at_"Hostel_B"
+=== RUN   TestRoutingEveryCategoryAndLocation/HOSTEL_at_"Academic_Block_2"
+=== RUN   TestRoutingEveryCategoryAndLocation/HOSTEL_at_"Football_Ground"
+=== RUN   TestRoutingEveryCategoryAndLocation/HOSTEL_at_""
+=== RUN   TestRoutingEveryCategoryAndLocation/ACADEMIC_BLOCK_at_"Hostel_A"
+=== RUN   TestRoutingEveryCategoryAndLocation/ACADEMIC_BLOCK_at_"Hostel_B"
+=== RUN   TestRoutingEveryCategoryAndLocation/ACADEMIC_BLOCK_at_"Academic_Block_2"
+=== RUN   TestRoutingEveryCategoryAndLocation/ACADEMIC_BLOCK_at_"Football_Ground"
+=== RUN   TestRoutingEveryCategoryAndLocation/ACADEMIC_BLOCK_at_""
+--- PASS: TestRoutingEveryCategoryAndLocation (0.00s)
+    --- PASS: TestRoutingEveryCategoryAndLocation/OTHERS_at_"Hostel_A" (0.00s)
+    --- PASS: TestRoutingEveryCategoryAndLocation/OTHERS_at_"Hostel_B" (0.00s)
+    --- PASS: TestRoutingEveryCategoryAndLocation/OTHERS_at_"Academic_Block_2" (0.00s)
+    --- PASS: TestRoutingEveryCategoryAndLocation/OTHERS_at_"Football_Ground" (0.00s)
+    --- PASS: TestRoutingEveryCategoryAndLocation/OTHERS_at_"" (0.00s)
+    --- PASS: TestRoutingEveryCategoryAndLocation/HOSTEL_at_"Hostel_A" (0.00s)
+    --- PASS: TestRoutingEveryCategoryAndLocation/HOSTEL_at_"Hostel_B" (0.00s)
+    --- PASS: TestRoutingEveryCategoryAndLocation/HOSTEL_at_"Academic_Block_2" (0.00s)
+    --- PASS: TestRoutingEveryCategoryAndLocation/HOSTEL_at_"Football_Ground" (0.00s)
+    --- PASS: TestRoutingEveryCategoryAndLocation/HOSTEL_at_"" (0.00s)
+    --- PASS: TestRoutingEveryCategoryAndLocation/ACADEMIC_BLOCK_at_"Hostel_A" (0.00s)
+    --- PASS: TestRoutingEveryCategoryAndLocation/ACADEMIC_BLOCK_at_"Hostel_B" (0.00s)
+    --- PASS: TestRoutingEveryCategoryAndLocation/ACADEMIC_BLOCK_at_"Academic_Block_2" (0.00s)
+    --- PASS: TestRoutingEveryCategoryAndLocation/ACADEMIC_BLOCK_at_"Football_Ground" (0.00s)
+    --- PASS: TestRoutingEveryCategoryAndLocation/ACADEMIC_BLOCK_at_"" (0.00s)
+=== RUN   TestRoutingUnspecifiedCategory
+=== RUN   TestRoutingUnspecifiedCategory/""_at_"Hostel_B"
+=== RUN   TestRoutingUnspecifiedCategory/""_at_""
+=== RUN   TestRoutingUnspecifiedCategory/"LIBRARY"_at_"Hostel_B"
+=== RUN   TestRoutingUnspecifiedCategory/"LIBRARY"_at_""
+=== RUN   TestRoutingUnspecifiedCategory/"hostel"_at_"Hostel_B"
+=== RUN   TestRoutingUnspecifiedCategory/"hostel"_at_""
+--- PASS: TestRoutingUnspecifiedCategory (0.00s)
+    --- PASS: TestRoutingUnspecifiedCategory/""_at_"Hostel_B" (0.00s)
+    --- PASS: TestRoutingUnspecifiedCategory/""_at_"" (0.00s)
+    --- PASS: TestRoutingUnspecifiedCategory/"LIBRARY"_at_"Hostel_B" (0.00s)
+    --- PASS: TestRoutingUnspecifiedCategory/"LIBRARY"_at_"" (0.00s)
+    --- PASS: TestRoutingUnspecifiedCategory/"hostel"_at_"Hostel_B" (0.00s)
+    --- PASS: TestRoutingUnspecifiedCategory/"hostel"_at_"" (0.00s)
+=== RUN   TestDescriptionNeverChangesRouting
+--- PASS: TestDescriptionNeverChangesRouting (0.00s)
+=== RUN   TestTransitionTableByUser
+=== RUN   TestTransitionTableByUser/OPEN_to_OPEN
+=== RUN   TestTransitionTableByUser/OPEN_to_ASSIGNED
+=== RUN   TestTransitionTableByUser/OPEN_to_IN_PROGRESS
+=== RUN   TestTransitionTableByUser/OPEN_to_RESOLVED
+=== RUN   TestTransitionTableByUser/OPEN_to_ESCALATED
+=== RUN   TestTransitionTableByUser/ASSIGNED_to_OPEN
+=== RUN   TestTransitionTableByUser/ASSIGNED_to_ASSIGNED
+=== RUN   TestTransitionTableByUser/ASSIGNED_to_IN_PROGRESS
+=== RUN   TestTransitionTableByUser/ASSIGNED_to_RESOLVED
+=== RUN   TestTransitionTableByUser/ASSIGNED_to_ESCALATED
+=== RUN   TestTransitionTableByUser/IN_PROGRESS_to_OPEN
+=== RUN   TestTransitionTableByUser/IN_PROGRESS_to_ASSIGNED
+=== RUN   TestTransitionTableByUser/IN_PROGRESS_to_IN_PROGRESS
+=== RUN   TestTransitionTableByUser/IN_PROGRESS_to_RESOLVED
+=== RUN   TestTransitionTableByUser/IN_PROGRESS_to_ESCALATED
+=== RUN   TestTransitionTableByUser/RESOLVED_to_OPEN
+=== RUN   TestTransitionTableByUser/RESOLVED_to_ASSIGNED
+=== RUN   TestTransitionTableByUser/RESOLVED_to_IN_PROGRESS
+=== RUN   TestTransitionTableByUser/RESOLVED_to_RESOLVED
+=== RUN   TestTransitionTableByUser/RESOLVED_to_ESCALATED
+=== RUN   TestTransitionTableByUser/ESCALATED_to_OPEN
+=== RUN   TestTransitionTableByUser/ESCALATED_to_ASSIGNED
+=== RUN   TestTransitionTableByUser/ESCALATED_to_IN_PROGRESS
+=== RUN   TestTransitionTableByUser/ESCALATED_to_RESOLVED
+=== RUN   TestTransitionTableByUser/ESCALATED_to_ESCALATED
+--- PASS: TestTransitionTableByUser (0.00s)
+    --- PASS: TestTransitionTableByUser/OPEN_to_OPEN (0.00s)
+    --- PASS: TestTransitionTableByUser/OPEN_to_ASSIGNED (0.00s)
+    --- PASS: TestTransitionTableByUser/OPEN_to_IN_PROGRESS (0.00s)
+    --- PASS: TestTransitionTableByUser/OPEN_to_RESOLVED (0.00s)
+    --- PASS: TestTransitionTableByUser/OPEN_to_ESCALATED (0.00s)
+    --- PASS: TestTransitionTableByUser/ASSIGNED_to_OPEN (0.00s)
+    --- PASS: TestTransitionTableByUser/ASSIGNED_to_ASSIGNED (0.00s)
+    --- PASS: TestTransitionTableByUser/ASSIGNED_to_IN_PROGRESS (0.00s)
+    --- PASS: TestTransitionTableByUser/ASSIGNED_to_RESOLVED (0.00s)
+    --- PASS: TestTransitionTableByUser/ASSIGNED_to_ESCALATED (0.00s)
+    --- PASS: TestTransitionTableByUser/IN_PROGRESS_to_OPEN (0.00s)
+    --- PASS: TestTransitionTableByUser/IN_PROGRESS_to_ASSIGNED (0.00s)
+    --- PASS: TestTransitionTableByUser/IN_PROGRESS_to_IN_PROGRESS (0.00s)
+    --- PASS: TestTransitionTableByUser/IN_PROGRESS_to_RESOLVED (0.00s)
+    --- PASS: TestTransitionTableByUser/IN_PROGRESS_to_ESCALATED (0.00s)
+    --- PASS: TestTransitionTableByUser/RESOLVED_to_OPEN (0.00s)
+    --- PASS: TestTransitionTableByUser/RESOLVED_to_ASSIGNED (0.00s)
+    --- PASS: TestTransitionTableByUser/RESOLVED_to_IN_PROGRESS (0.00s)
+    --- PASS: TestTransitionTableByUser/RESOLVED_to_RESOLVED (0.00s)
+    --- PASS: TestTransitionTableByUser/RESOLVED_to_ESCALATED (0.00s)
+    --- PASS: TestTransitionTableByUser/ESCALATED_to_OPEN (0.00s)
+    --- PASS: TestTransitionTableByUser/ESCALATED_to_ASSIGNED (0.00s)
+    --- PASS: TestTransitionTableByUser/ESCALATED_to_IN_PROGRESS (0.00s)
+    --- PASS: TestTransitionTableByUser/ESCALATED_to_RESOLVED (0.00s)
+    --- PASS: TestTransitionTableByUser/ESCALATED_to_ESCALATED (0.00s)
+=== RUN   TestTransitionTableBySystem
+=== RUN   TestTransitionTableBySystem/OPEN_to_OPEN
+=== RUN   TestTransitionTableBySystem/OPEN_to_ASSIGNED
+=== RUN   TestTransitionTableBySystem/OPEN_to_IN_PROGRESS
+=== RUN   TestTransitionTableBySystem/OPEN_to_RESOLVED
+=== RUN   TestTransitionTableBySystem/OPEN_to_ESCALATED
+=== RUN   TestTransitionTableBySystem/ASSIGNED_to_OPEN
+=== RUN   TestTransitionTableBySystem/ASSIGNED_to_ASSIGNED
+=== RUN   TestTransitionTableBySystem/ASSIGNED_to_IN_PROGRESS
+=== RUN   TestTransitionTableBySystem/ASSIGNED_to_RESOLVED
+=== RUN   TestTransitionTableBySystem/ASSIGNED_to_ESCALATED
+=== RUN   TestTransitionTableBySystem/IN_PROGRESS_to_OPEN
+=== RUN   TestTransitionTableBySystem/IN_PROGRESS_to_ASSIGNED
+=== RUN   TestTransitionTableBySystem/IN_PROGRESS_to_IN_PROGRESS
+=== RUN   TestTransitionTableBySystem/IN_PROGRESS_to_RESOLVED
+=== RUN   TestTransitionTableBySystem/IN_PROGRESS_to_ESCALATED
+=== RUN   TestTransitionTableBySystem/RESOLVED_to_OPEN
+=== RUN   TestTransitionTableBySystem/RESOLVED_to_ASSIGNED
+=== RUN   TestTransitionTableBySystem/RESOLVED_to_IN_PROGRESS
+=== RUN   TestTransitionTableBySystem/RESOLVED_to_RESOLVED
+=== RUN   TestTransitionTableBySystem/RESOLVED_to_ESCALATED
+=== RUN   TestTransitionTableBySystem/ESCALATED_to_OPEN
+=== RUN   TestTransitionTableBySystem/ESCALATED_to_ASSIGNED
+=== RUN   TestTransitionTableBySystem/ESCALATED_to_IN_PROGRESS
+=== RUN   TestTransitionTableBySystem/ESCALATED_to_RESOLVED
+=== RUN   TestTransitionTableBySystem/ESCALATED_to_ESCALATED
+--- PASS: TestTransitionTableBySystem (0.00s)
+    --- PASS: TestTransitionTableBySystem/OPEN_to_OPEN (0.00s)
+    --- PASS: TestTransitionTableBySystem/OPEN_to_ASSIGNED (0.00s)
+    --- PASS: TestTransitionTableBySystem/OPEN_to_IN_PROGRESS (0.00s)
+    --- PASS: TestTransitionTableBySystem/OPEN_to_RESOLVED (0.00s)
+    --- PASS: TestTransitionTableBySystem/OPEN_to_ESCALATED (0.00s)
+    --- PASS: TestTransitionTableBySystem/ASSIGNED_to_OPEN (0.00s)
+    --- PASS: TestTransitionTableBySystem/ASSIGNED_to_ASSIGNED (0.00s)
+    --- PASS: TestTransitionTableBySystem/ASSIGNED_to_IN_PROGRESS (0.00s)
+    --- PASS: TestTransitionTableBySystem/ASSIGNED_to_RESOLVED (0.00s)
+    --- PASS: TestTransitionTableBySystem/ASSIGNED_to_ESCALATED (0.00s)
+    --- PASS: TestTransitionTableBySystem/IN_PROGRESS_to_OPEN (0.00s)
+    --- PASS: TestTransitionTableBySystem/IN_PROGRESS_to_ASSIGNED (0.00s)
+    --- PASS: TestTransitionTableBySystem/IN_PROGRESS_to_IN_PROGRESS (0.00s)
+    --- PASS: TestTransitionTableBySystem/IN_PROGRESS_to_RESOLVED (0.00s)
+    --- PASS: TestTransitionTableBySystem/IN_PROGRESS_to_ESCALATED (0.00s)
+    --- PASS: TestTransitionTableBySystem/RESOLVED_to_OPEN (0.00s)
+    --- PASS: TestTransitionTableBySystem/RESOLVED_to_ASSIGNED (0.00s)
+    --- PASS: TestTransitionTableBySystem/RESOLVED_to_IN_PROGRESS (0.00s)
+    --- PASS: TestTransitionTableBySystem/RESOLVED_to_RESOLVED (0.00s)
+    --- PASS: TestTransitionTableBySystem/RESOLVED_to_ESCALATED (0.00s)
+    --- PASS: TestTransitionTableBySystem/ESCALATED_to_OPEN (0.00s)
+    --- PASS: TestTransitionTableBySystem/ESCALATED_to_ASSIGNED (0.00s)
+    --- PASS: TestTransitionTableBySystem/ESCALATED_to_IN_PROGRESS (0.00s)
+    --- PASS: TestTransitionTableBySystem/ESCALATED_to_RESOLVED (0.00s)
+    --- PASS: TestTransitionTableBySystem/ESCALATED_to_ESCALATED (0.00s)
+=== RUN   TestCompensationOnlyToPrevious
+--- PASS: TestCompensationOnlyToPrevious (0.00s)
+=== RUN   TestInvalidStatusValues
+--- PASS: TestInvalidStatusValues (0.00s)
+=== RUN   TestFullLifecyclePath
+--- PASS: TestFullLifecyclePath (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/tests/spec	0.370s
