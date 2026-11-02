@@ -68,4 +68,4 @@ Only `GET /health` and one forwarded route (`GET /categories` or `POST /reports`
 
 ## Sprint 2 slice
 
-SCRUM-38 adds the JWT check (identity `ValidateToken`), the rate limit, `pkg/resilience` on every client and these routes: `GET /health`, `POST /auth/register`, `POST /auth/login`, `GET /me`, `GET /categories`, `GET /categories/{category}/locations`, `POST /reports` and `GET /reports/{reportId}`. Role checks use the table above through a stand-in until authorization `CheckPermission` is merged. See `services/api-gateway/README.md`.
+SCRUM-38 adds the JWT check (identity `ValidateToken`), the rate limit, `pkg/resilience` on every client and these routes: `GET /health`, `POST /auth/register`, `POST /auth/login`, `GET /me`, `GET /categories`, `GET /categories/{category}/locations`, `POST /reports` and `GET /reports/{reportId}`. Role checks call authorization `CheckPermission` (SCRUM-14) for every signed-in route. See `services/api-gateway/README.md`.

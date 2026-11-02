@@ -20,7 +20,6 @@ import (
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
 	locationtaxonomyv1 "github.com/jurwaCST/Jurwa/proto/gen/location-taxonomy/v1"
 	reportsubmissionv1 "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1"
-	"github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/staticauthz"
 	"github.com/jurwaCST/Jurwa/services/api-gateway/application"
 	"github.com/jurwaCST/Jurwa/services/api-gateway/domain"
 )
@@ -90,6 +89,17 @@ func (f *fakeReports) GetReport(_ context.Context, id string) (*commonv1.Report,
 	return &commonv1.Report{Id: id, ReporterId: "u-student", Category: commonv1.Category_HOSTEL}, nil
 }
 
+// fakeAuthz is the role table for the routes under test: only students submit,
+// any signed-in role lists and reads (ownership is checked by the router).
+type fakeAuthz struct{}
+
+func (fakeAuthz) CheckPermission(_ context.Context, role, action, _ string) (bool, error) {
+	if action == domain.ActionReportSubmit {
+		return role == domain.RoleStudent, nil
+	}
+	return true, nil
+}
+
 // ---- helpers ----
 
 type env struct {
@@ -105,7 +115,7 @@ func newEnv() *env {
 	now := time.Date(2026, 11, 2, 9, 0, 0, 0, time.UTC)
 	e := &env{cats: &fakeCategories{}, locs: &fakeLocations{}, reports: &fakeReports{}, ident: &fakeIdentity{}, clock: &now}
 	e.h = NewRouter(Deps{
-		Auth:       application.NewAuth(e.ident, staticauthz.New()),
+		Auth:       application.NewAuth(e.ident, fakeAuthz{}),
 		Identity:   e.ident,
 		Categories: e.cats,
 		Locations:  e.locs,
@@ -294,4 +304,27 @@ func TestUnavailableHidesAddress(t *testing.T) {
 	rec := e.do("GET", "/reports/r1", "head-token", "")
 	assert.Equal(t, http.StatusServiceUnavailable, rec.Code)
 	assert.NotContains(t, rec.Body.String(), "127.0.0.1")
+}
+
+type downAuthz struct{}
+
+func (downAuthz) CheckPermission(context.Context, string, string, string) (bool, error) {
+	return false, status.Error(codes.Unavailable, "authorization down")
+}
+
+// Fail closed: when authorization cannot answer, the request is refused.
+func TestAuthorizationDownRefusesRequest(t *testing.T) {
+	e := newEnv()
+	e.h = NewRouter(Deps{
+		Auth:       application.NewAuth(e.ident, downAuthz{}),
+		Identity:   e.ident,
+		Categories: e.cats,
+		Locations:  e.locs,
+		Reports:    e.reports,
+		Limiter:    domain.NewLimiter(20, func() time.Time { return *e.clock }),
+	})
+	rec := e.do("POST", "/reports", "student-token", `{"category":"HOSTEL","location":{"building":"B"},"description":"x"}`)
+	assert.Equal(t, http.StatusServiceUnavailable, rec.Code)
+	assert.Nil(t, e.reports.submitted, "the report service is never reached")
+	assert.Equal(t, 0, e.cats.calls)
 }

@@ -1,0 +1,42 @@
+# api-gateway with the real authorization service (SCRUM-14) instead of the stand-in role table.
+# Running: identity 9016, authorization 9017, category-taxonomy 9009, report-submission 9001, api-gateway 8080.
+# A student registered and logged in through the gateway; the token is used as $TOKEN and not saved here.
+
+## 1. authorization running: the student is allowed
+$ curl -i http://localhost:8080/categories -H "Authorization: Bearer $TOKEN"
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"categories":[{"category":"HOSTEL", "name":"Hostel", "description":"Rooms, bathrooms, water and electricity in the hostels", "sortOrder":1, "active":true, "headPosition":"DSA"}, {"category":"ACADEMIC_BLOCK", "name":"Academic Block", "description":"Classrooms, labs and equipment in the academic blocks", "sortOrder":2, "active":true, "headPosition":"DAA"}, {"category":"OTHERS", "name":"Others", "description":"Campus-wide issues such as Wi-Fi, roads and grounds", "sortOrder":3, "active":true, "headPosition":"SSO"}]}
+
+
+$ curl -i -X POST http://localhost:8080/reports -H "Authorization: Bearer $TOKEN" -d '{"category":"HOSTEL","location":{"building":"Hostel B"},"description":"Light not working"}'
+HTTP/1.1 201 Created
+Content-Type: application/json
+
+{"report":{"id":"ac3f1bfc-a61f-494e-a584-946af82a5466", "reporterId":"4766e18f-684e-489e-9f31-71d3face6b3e", "category":"HOSTEL", "location":{"building":"Hostel B"}, "description":"Light not working", "status":"OPEN", "createdAt":"2026-11-02T13:02:33.148948Z"}}
+
+
+## 2. authorization stopped: the gateway refuses the request (fail closed), it does not let it through
+$ curl -i http://localhost:8080/categories -H "Authorization: Bearer $TOKEN"
+HTTP/1.1 503 Service Unavailable
+Content-Type: application/json
+
+{"error":"service temporarily unavailable, try again"}
+
+
+$ curl -i -X POST http://localhost:8080/reports -H "Authorization: Bearer $TOKEN" -d '{"category":"HOSTEL","location":{"building":"Hostel B"},"description":"Light not working"}'
+HTTP/1.1 503 Service Unavailable
+Content-Type: application/json
+
+{"error":"service temporarily unavailable, try again"}
+
+
+## 3. public routes do not need authorization
+$ curl -i http://localhost:8080/health
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"status":"ok"}
+
+
