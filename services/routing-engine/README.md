@@ -19,7 +19,7 @@ The service is stateless (database-schema.md, row 7), so it has no repository an
 | `adapters/out/directoryclient` | `ports.HolderLookup` | gRPC client for department-directory `GetStaff` |
 | `adapters/out/logpublisher` | `ports.EventPublisher` | Writes `report.routed` as a JSON log line. Redis Streams replaces it in Sprint 3 |
 
-Tests use fakes for all three ports. The timeout, retry and circuit breaker from `pkg/resilience` wrap the clients (SCRUM-91).
+Tests use fakes for all three ports. Both gRPC connections use `pkg/resilience` (SCRUM-91): a 2 second timeout per attempt, up to 3 attempts for Unavailable or DeadlineExceeded, and a circuit breaker per downstream service that opens after 5 failures in a row for 10 seconds.
 
 ## RPCs
 

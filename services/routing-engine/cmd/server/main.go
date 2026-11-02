@@ -15,6 +15,7 @@ import (
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/jurwaCST/Jurwa/pkg/resilience"
 	departmentdirectoryv1 "github.com/jurwaCST/Jurwa/proto/gen/department-directory/v1"
 	routingenginev1 "github.com/jurwaCST/Jurwa/proto/gen/routing-engine/v1"
 	routingrulesv1 "github.com/jurwaCST/Jurwa/proto/gen/routing-rules/v1"
@@ -108,6 +109,10 @@ func envOr(key, fallback string) string {
 
 // dial creates a client connection. gRPC connects lazily, so a service that is
 // not running yet makes calls fail with Unavailable instead of stopping the server.
+// Every call gets a timeout, retries and its own circuit breaker (pkg/resilience).
 func dial(addr string) (*grpc.ClientConn, error) {
-	return grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	return grpc.NewClient(addr,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithChainUnaryInterceptor(resilience.UnaryClientInterceptor(resilience.DefaultConfig())),
+	)
 }

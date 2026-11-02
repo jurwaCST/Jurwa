@@ -1,0 +1,14 @@
+# github.com/jurwaCST/Jurwa/pkg/resilience [github.com/jurwaCST/Jurwa/pkg/resilience.test]
+pkg/resilience/resilience_test.go:40:9: undefined: WithTimeout
+pkg/resilience/resilience_test.go:48:9: undefined: WithTimeout
+pkg/resilience/resilience_test.go:55:8: undefined: WithTimeout
+pkg/resilience/resilience_test.go:76:9: undefined: Retry
+pkg/resilience/resilience_test.go:87:7: undefined: Retry
+pkg/resilience/resilience_test.go:94:7: undefined: Retry
+pkg/resilience/resilience_test.go:111:9: undefined: Retry
+pkg/resilience/resilience_test.go:133:25: undefined: Breaker
+pkg/resilience/resilience_test.go:138:14: undefined: Breaker
+pkg/resilience/resilience_test.go:227:20: undefined: Config
+pkg/resilience/resilience_test.go:111:9: too many errors
+FAIL	github.com/jurwaCST/Jurwa/pkg/resilience [build failed]
+FAIL
