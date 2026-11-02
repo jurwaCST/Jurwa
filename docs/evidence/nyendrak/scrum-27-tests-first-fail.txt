@@ -1,0 +1,14 @@
+# github.com/jurwaCST/Jurwa/functions/sla-escalation-checker/checker [github.com/jurwaCST/Jurwa/functions/sla-escalation-checker/checker.test]
+functions\sla-escalation-checker\checker\checker_test.go:18:14: undefined: Lapsed
+functions\sla-escalation-checker\checker\checker_test.go:24:64: undefined: Lapsed
+functions\sla-escalation-checker\checker\checker_test.go:48:54: undefined: ErrNotEscalatable
+functions\sla-escalation-checker\checker\checker_test.go:58:30: undefined: Lapsed
+functions\sla-escalation-checker\checker\checker_test.go:59:16: undefined: Lapsed
+functions\sla-escalation-checker\checker\checker_test.go:61:21: undefined: Lapsed
+functions\sla-escalation-checker\checker\checker_test.go:69:14: undefined: New
+functions\sla-escalation-checker\checker\checker_test.go:71:18: undefined: Result
+functions\sla-escalation-checker\checker\checker_test.go:77:37: undefined: Lapsed
+functions\sla-escalation-checker\checker\checker_test.go:145:70: undefined: Lapsed
+functions\sla-escalation-checker\checker\checker_test.go:77:37: too many errors
+FAIL	github.com/jurwaCST/Jurwa/functions/sla-escalation-checker/checker [build failed]
+FAIL

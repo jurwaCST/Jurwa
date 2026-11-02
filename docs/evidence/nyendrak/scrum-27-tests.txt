@@ -1,0 +1,18 @@
+--- PASS: TestHandler_ReturnsCounts (0.00s)
+--- PASS: TestHandler_SlaTrackingDown (0.00s)
+--- PASS: TestHandler_BadRequests (0.00s)
+--- PASS: TestEnvOr (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/functions/sla-escalation-checker	0.584s	coverage: 25.3% of statements
+--- PASS: TestRun_NothingDue (0.00s)
+--- PASS: TestRun_EscalatesEachLapsedReport (0.00s)
+--- PASS: TestRun_FetchesBatchesUntilAShortOne (0.00s)
+--- PASS: TestRun_StopsAfterMaxBatches (0.01s)
+--- PASS: TestRun_SlaTrackingDown (0.00s)
+--- PASS: TestRun_SlaTrackingFailsOnSecondBatch (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/functions/sla-escalation-checker/checker	2.954s	coverage: 100.0% of statements
+--- PASS: TestSlaTracking_LapseDue (0.01s)
+--- PASS: TestStatusLifecycle_Escalate (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/functions/sla-escalation-checker/clients	0.457s	coverage: 100.0% of statements
