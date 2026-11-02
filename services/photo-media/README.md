@@ -1,55 +1,39 @@
 # photo-media
 
-> Created from `services/_template`. Replace every TODO below, and delete this note.
-
-## Start a new service (template users)
-
-From the repo root, with your service name and port from the table below:
-
-```bash
-make new-service NAME=routing-rules PORT=9006
-```
-
-| Port | Service | Port | Service |
-|---|---|---|---|
-| 9001 | report-submission | 9011 | status-lifecycle |
-| 9002 | photo-media | 9012 | sla-tracking |
-| 9003 | report-history | 9013 | sla-policy |
-| 9004 | location-taxonomy | 9014 | reassignment |
-| 9005 | internal-notes | 9015 | audit-log |
-| 9006 | routing-rules | 9016 | identity |
-| 9007 | routing-engine | 9017 | authorization |
-| 9008 | department-directory | 9018 | notification |
-| 9009 | category-taxonomy | 9019 | feedback |
-| 9010 | api-gateway (gRPC; HTTP is 8080) | 9020 | analytics |
-
-This copies `services/_template` to `services/<name>` and fills in the name and port. Then:
-
-1. Run `make proto` so your generated code in `proto/gen/<name>/v1/` is up to date.
-2. Write domain tests first in `domain/`, then the domain code.
-3. Add ports (interfaces) in `ports/`, adapters in `adapters/out/`, gRPC handlers in `adapters/in/grpc/`.
-4. Register your gRPC service in `cmd/server/main.go` (see the TODO there).
-5. Run `make test`, `make lint` and `make run SERVICE=<name>`.
-
-Layout:
-
-```
-cmd/server/main.go     starts the gRPC server (health check, reflection, JSON logs, graceful shutdown)
-domain/                business rules, plain Go, no framework imports
-application/           use cases
-ports/                 interfaces the core depends on
-adapters/in/grpc/      gRPC handlers
-adapters/out/          database, Redis and other adapters
-Dockerfile             multi-stage image, built from the repo root
-```
+Owner: Sonam Choki. gRPC port 9002. Contract: `proto/photo-media/v1/photo-media.proto`.
 
 ## What it does
 
-TODO: one or two sentences on what this service owns and what it never does.
+Stores the optional photo of a report. The student uploads the photo first and gets a `photo_id`, then sends that id with `SubmitReport`. It never stores reports and never decides who may see a photo; api-gateway checks that.
 
 ## RPCs
 
-TODO: list the RPCs from `proto/photo-media/v1/`, one line each.
+| RPC | Does | Errors |
+|---|---|---|
+| `UploadPhoto` | Checks and stores one photo, returns its `photo_id` | `INVALID_ARGUMENT` for a wrong type, empty or too large file, or a missing uploader |
+| `GetPhoto` | Returns the bytes, content type, size and uploader of one photo | `INVALID_ARGUMENT` when the id is not a UUID, `NOT_FOUND` when it is unknown |
+
+Rules (in `domain/photo.go`, tested in `domain/photo_test.go`):
+
+| Rule | Detail |
+|---|---|
+| Content type | `image/jpeg` or `image/png` only (case and spaces ignored) |
+| File bytes | Must start with the signature of the stated type: JPEG `FF D8 FF`, PNG `89 50 4E 47`. A GIF renamed to `.png` is rejected |
+| Size | 1 byte to 5 MB (5 242 880 bytes). 0 bytes and 5 MB plus 1 byte are rejected |
+| Uploader | Required UUID (api-gateway sets it from the JWT) |
+
+The server starts with `grpc.MaxRecvMsgSize(6 MB)`, because gRPC accepts only 4 MB by default. api-gateway must allow the same size.
+
+## Layout
+
+```
+domain/photo.go                  Photo, the upload rules and errors
+application/service.go           UploadPhoto and GetPhoto use cases
+ports/ports.go                   PhotoRepository interface
+adapters/in/grpc/handler.go      gRPC handler: protobuf <-> domain, errors -> gRPC codes
+adapters/out/memory/             in-memory repository
+cmd/server/main.go               wires everything and starts the server
+```
 
 ## Configuration
 
@@ -58,15 +42,27 @@ TODO: list the RPCs from `proto/photo-media/v1/`, one line each.
 | `PORT` | `9002` | gRPC port |
 | `SERVICE_NAME` | `photo-media` | Name written in every log line |
 
-TODO: add `DATABASE_URL` and others when the service uses them. Never hard-code passwords.
+Storage is in memory in Sprint 2, so photos are lost on restart. Sprint 3 adds a MongoDB GridFS adapter (bucket `photos`, `docs/design/database-schema.md`).
 
 ## Run
 
 ```bash
 make run SERVICE=photo-media
-grpcurl -plaintext localhost:9002 grpc.health.v1.Health/Check
-grpcurl -plaintext localhost:9002 list
 ```
+
+In a second terminal (grpcurl sends `bytes` fields as base64; `/9j/4AAQ` is the start of a JPEG):
+
+```bash
+grpcurl -plaintext localhost:9002 grpc.health.v1.Health/Check
+
+grpcurl -plaintext -d '{"uploader_id":"1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d","content_type":"image/jpeg","data":"/9j/4AAQ","file_name":"tap.jpg"}' \
+  localhost:9002 jurwa.photomedia.v1.PhotoMediaService/UploadPhoto
+
+grpcurl -plaintext -d '{"photo_id":"<id from the upload>"}' \
+  localhost:9002 jurwa.photomedia.v1.PhotoMediaService/GetPhoto
+```
+
+Expected: health `SERVING`; UploadPhoto returns a `photoId`; GetPhoto returns the same bytes. A GIF (`"content_type":"image/gif"`) returns `InvalidArgument`.
 
 Docker:
 
@@ -79,4 +75,7 @@ docker run --rm -p 9002:9002 jurwa/photo-media
 
 ```bash
 make test
+go test ./services/photo-media/... -cover
 ```
+
+Coverage: 100% on `domain`, `application` and both adapters. Evidence: `docs/evidence/sonam-choki/scrum-28-tests.txt` and `scrum-28-grpcurl.txt`.

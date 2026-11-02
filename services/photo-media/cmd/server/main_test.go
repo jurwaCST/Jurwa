@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/jurwaCST/Jurwa/services/photo-media/domain"
 )
 
 func TestEnvOr(t *testing.T) {
@@ -22,4 +24,8 @@ func TestEnvOr(t *testing.T) {
 			assert.Equal(t, tt.want, envOr("JURWA_TEST_VAR", tt.fallback))
 		})
 	}
+}
+
+func TestMaxRecvMsgFitsLargestPhoto(t *testing.T) {
+	assert.Greater(t, maxRecvMsgBytes, domain.MaxPhotoBytes)
 }

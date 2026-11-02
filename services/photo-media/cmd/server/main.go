@@ -8,11 +8,18 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
+	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
+
+	photomediav1 "github.com/jurwaCST/Jurwa/proto/gen/photo-media/v1"
+	grpcadapter "github.com/jurwaCST/Jurwa/services/photo-media/adapters/in/grpc"
+	"github.com/jurwaCST/Jurwa/services/photo-media/adapters/out/memory"
+	"github.com/jurwaCST/Jurwa/services/photo-media/application"
 )
 
 // Defaults used when the environment variables are not set.
@@ -21,6 +28,10 @@ const (
 	defaultServiceName = "photo-media"
 	defaultPort        = "9002"
 )
+
+// maxRecvMsgBytes lets one request carry a 5 MB photo plus the other fields.
+// gRPC accepts only 4 MB by default (see proto/photo-media/v1/photo-media.proto).
+const maxRecvMsgBytes = 6 << 20
 
 func main() {
 	serviceName := envOr("SERVICE_NAME", defaultServiceName)
@@ -35,14 +46,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	srv := grpc.NewServer()
+	srv := grpc.NewServer(grpc.MaxRecvMsgSize(maxRecvMsgBytes))
 
 	// Standard gRPC health service (grpc.health.v1), used by grpcurl and Kubernetes probes.
 	hs := health.NewServer()
 	healthpb.RegisterHealthServer(srv, hs)
 
-	// TODO: register your service here, for example:
-	// routingrulesv1.RegisterRoutingRulesServiceServer(srv, grpcadapter.NewHandler(app))
+	// In-memory store for Sprint 2; the MongoDB GridFS adapter replaces it in Sprint 3.
+	app := application.NewService(memory.NewRepository(), uuid.NewString, time.Now)
+	photomediav1.RegisterPhotoMediaServiceServer(srv, grpcadapter.NewHandler(app))
 
 	// Reflection lets grpcurl list and call methods without the .proto files.
 	reflection.Register(srv)
