@@ -170,7 +170,9 @@ func TestApplyOlderEntryDoesNotMoveSummaryBack(t *testing.T) {
 }
 
 func TestSortTimelineOldestFirst(t *testing.T) {
-	at := func(h int) Entry { return Entry{Summary: string(rune('a' + h)), OccurredAt: t0.Add(time.Duration(h) * time.Hour)} }
+	at := func(h int) Entry {
+		return Entry{Summary: string(rune('a' + h)), OccurredAt: t0.Add(time.Duration(h) * time.Hour)}
+	}
 	entries := []Entry{at(2), at(0), at(3), at(1)}
 
 	SortTimeline(entries)

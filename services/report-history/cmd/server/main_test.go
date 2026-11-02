@@ -1,9 +1,16 @@
 package main
 
 import (
+	"context"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/jurwaCST/Jurwa/services/report-history/adapters/out/memory"
+	"github.com/jurwaCST/Jurwa/services/report-history/application"
+	"github.com/jurwaCST/Jurwa/services/report-history/domain"
 )
 
 func TestEnvOr(t *testing.T) {
@@ -22,4 +29,23 @@ func TestEnvOr(t *testing.T) {
 			assert.Equal(t, tt.want, envOr("JURWA_TEST_VAR", tt.fallback))
 		})
 	}
+}
+
+func TestSeedSample(t *testing.T) {
+	ctx := context.Background()
+	app := application.NewService(memory.NewRepository(), uuid.NewString)
+
+	require.NoError(t, seedSample(ctx, app))
+
+	reports, _, err := app.ListReportsByReporter(ctx, sampleStudentID, 0, "")
+	require.NoError(t, err)
+	require.Len(t, reports, 2)
+	assert.Equal(t, sampleReport2, reports[0].ReportID, "newest first")
+	assert.Equal(t, domain.StatusInProgress, reports[1].Status)
+
+	timeline, err := app.GetReportTimeline(ctx, sampleReport1)
+	require.NoError(t, err)
+	assert.Len(t, timeline, 3)
+
+	assert.Error(t, seedSample(ctx, app), "seeding twice is rejected")
 }

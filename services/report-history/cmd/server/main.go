@@ -9,10 +9,16 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
+
+	reporthistoryv1 "github.com/jurwaCST/Jurwa/proto/gen/report-history/v1"
+	grpcadapter "github.com/jurwaCST/Jurwa/services/report-history/adapters/in/grpc"
+	"github.com/jurwaCST/Jurwa/services/report-history/adapters/out/memory"
+	"github.com/jurwaCST/Jurwa/services/report-history/application"
 )
 
 // Defaults used when the environment variables are not set.
@@ -41,8 +47,17 @@ func main() {
 	hs := health.NewServer()
 	healthpb.RegisterHealthServer(srv, hs)
 
-	// TODO: register your service here, for example:
-	// routingrulesv1.RegisterRoutingRulesServiceServer(srv, grpcadapter.NewHandler(app))
+	// In-memory store for Sprint 2; the PostgreSQL adapter and the Redis Streams
+	// consumers that call Record replace it in Sprint 3.
+	app := application.NewService(memory.NewRepository(), uuid.NewString)
+	if os.Getenv("SEED_SAMPLE") == "true" {
+		if err := seedSample(context.Background(), app); err != nil {
+			slog.Error("cannot load sample data", "error", err)
+			os.Exit(1)
+		}
+		slog.Info("sample data loaded", "reporter_id", sampleStudentID)
+	}
+	reporthistoryv1.RegisterReportHistoryServiceServer(srv, grpcadapter.NewHandler(app))
 
 	// Reflection lets grpcurl list and call methods without the .proto files.
 	reflection.Register(srv)
