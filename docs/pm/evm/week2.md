@@ -58,7 +58,7 @@ Not counted (not Done, no planned hours yet, carry over to Sprint 3): SCRUM-89 e
 ## 3. Reading
 
 - **Cost (CPI 1.05).** The team used 129 h for work planned at 135 h, so the estimates were close this sprint. That is much closer to 1 than Sprint 1 (1.44), mostly because three of the four members entered their planned hours before starting. The biggest overruns were SCRUM-90 routing-engine (9 h for 6 h) and SCRUM-40 containerization (7 h for 5 h). Both are shared work that other cards depended on.
-- **Schedule (SPI 1.45).** All 27 estimated cards are Done. SPI is high again because the baseline gives each sprint 93.3 h, while the team plans about 135 h per sprint. So SPI mostly shows the baseline is too low, not that the team is far ahead. Revising the PV (A3) is now overdue.
+- **Schedule (SPI 1.45).** All 26 estimated cards are Done. SPI is high again because the baseline gives each sprint 93.3 h, while the team plans about 135 h per sprint. So SPI mostly shows the baseline is too low, not that the team is far ahead. Revising the PV (A3) is now overdue.
 - **Carry-overs.** The four open cards are Nyendrak's. They wait on shared pieces that have no owner yet (the Redis Streams event bus, and the React app in `web/`), not on late work.
 - **Cumulative.** After two sprints, EV is 273 h of the 280 h remaining-work baseline, but Sprint 3 still holds deployment, integration and end-to-end testing, the UI and the final presentation. This confirms the baseline under-counts the work (open question 1 in `schedule-evm.md`: BAC 280 h or 360 h).
 
