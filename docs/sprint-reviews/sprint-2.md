@@ -1,7 +1,7 @@
 # Sprint 2 review and retrospective
 
-Sprint 2: 28 October to 2 November 2026. Scrum Master: Gayley Choden.
-Sources: Jira project SCRUM (read on 2 November 2026, 23:00), merged pull requests on `main`, and each member's status and retro.
+Sprint 2: 28 October to 3 November 2026. Scrum Master: Gayley Choden.
+Sources: Jira project SCRUM (read again on 4 November 2026, after all hours were logged), merged pull requests on `main`, and each member's status and retro.
 
 ## 1. Sprint goal
 
@@ -39,7 +39,8 @@ Build the other 16 services and the two serverless functions as thin slices: bui
 | | SCRUM-33 feedback | #47 |
 | | SCRUM-31 analytics | #54 |
 | | SCRUM-97 digest-dispatcher function | #55 |
-| | SCRUM-80 quality plan: test doubles match the code | #60 |
+
+Also merged during Sprint 2: the quality plan update for SCRUM-80 (#60, Gayley). SCRUM-80 is a Sprint 1 card, so it is not in the 26 cards or the hours below.
 
 ## 3. Carried over to Sprint 3
 
@@ -58,11 +59,11 @@ None of the four has an original estimate yet.
 |---|---|---|---|
 | Gayley Choden | 5 | 27 h | 28 h |
 | Nyendrak Yoezer Zangmo | 6 | 33 h | 28 h |
-| Sonam Choki | 7 | 36 h | 33 h (reported) |
-| Sonam Zangmo | 8 | 39 h | 40 h (reported) |
+| Sonam Choki | 7 | 36 h | 33 h |
+| Sonam Zangmo | 8 | 39 h | 40 h |
 | **Team** | **26** | **135 h** | **129 h** |
 
-- Estimates and Gayley's and Nyendrak's hours are read from Jira. Sonam Choki's and Sonam Zangmo's hours are their own per-card totals, sent to the Scrum Master on 2 November; on that date they were not yet logged as work in Jira.
+- All estimates and hours are read from Jira. Sonam Choki's and Sonam Zangmo's hours were logged after the sprint ended and match the per-card totals they sent on 2 November.
 - First reading: EV 135 h (estimates of the 26 Done cards), AC 129 h, so CPI = 135 / 129 = 1.05 (about on budget). The Sprint 2 EVM log (Nyendrak) gives the final figures.
 - Estimates were added at the end of the sprint again, so the indexes look better than they really are (risk R8, issue I4).
 
@@ -87,7 +88,7 @@ No review meeting was held; each member sent a written status. Highlights:
 ### What did not go well
 
 - **Work landed on the last day.** Most PRs merged on 2 November, and three were stacked (SCRUM-90, 91, 38) so they had to merge in order (Zangmo, Gayley).
-- **Estimates and hours came late again.** Estimates were entered at the end of the sprint; the time-tracking field was missing from Task cards until it was added; two members' hours were not logged in Jira by the end of the sprint (Nyendrak, Choki, Gayley).
+- **Estimates and hours came late again.** Estimates were entered at the end of the sprint; the time-tracking field was missing from Task cards until it was added; two members' hours were not logged in Jira by the end of the sprint (since entered) (Nyendrak, Choki, Gayley).
 - **Shared pieces had no owner.** Nobody owned `web/` or the event bus, which blocks the report form, the PWA and the Saga (Nyendrak).
 - **Cards sat In Progress without being started** (Nyendrak).
 - **Review rules slipped.** One PR (#49) was merged before approval (Choki).
@@ -99,8 +100,8 @@ No review meeting was held; each member sent a written status. Highlights:
 | # | Action | Owner |
 |---|---|---|
 | A1 | Every card gets an original estimate at planning, before it moves to In Progress | Everyone; Gayley checks |
-| A2 | Log hours in Jira every day, with "Log work", not only the estimate. Choki and Zangmo enter their Sprint 2 hours in Jira too | Everyone |
-| A3 | Shared pieces get an owner and a card at planning: `web/` is SCRUM-118 (Gayley). **The event bus (Redis Streams) still needs an owner and a card** | Gayley at planning |
+| A2 | Log hours in Jira every day, with "Log work", not only the estimate, so no hours are entered after the sprint | Everyone |
+| A3 | Shared pieces get an owner and a card at planning: `web/` is SCRUM-118 (Nyendrak). **The event bus (Redis Streams) still needs an owner and a card** | Gayley at planning |
 | A4 | Open a PR as soon as a card is done; avoid stacked PRs; no card waits for the last day | Everyone |
 | A5 | Merge only after the green Approved | Everyone |
 | A6 | Check `api-routes.md` and the authorization policy before writing a role rule | Everyone |
