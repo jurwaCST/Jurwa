@@ -101,7 +101,7 @@ No review meeting was held; each member sent a written status. Highlights:
 |---|---|---|
 | A1 | Every card gets an original estimate at planning, before it moves to In Progress | Everyone; Gayley checks |
 | A2 | Log hours in Jira every day, with "Log work", not only the estimate, so no hours are entered after the sprint | Everyone |
-| A3 | Shared pieces get an owner and a card at planning: `web/` is SCRUM-118 (Nyendrak). **The event bus (Redis Streams) still needs an owner and a card** | Gayley at planning |
+| A3 | Shared pieces get an owner and a card at planning: `web/` is SCRUM-118 (Gayley). **The event bus (Redis Streams) still needs an owner and a card** | Gayley at planning |
 | A4 | Open a PR as soon as a card is done; avoid stacked PRs; no card waits for the last day | Everyone |
 | A5 | Merge only after the green Approved | Everyone |
 | A6 | Check `api-routes.md` and the authorization policy before writing a role rule | Everyone |
