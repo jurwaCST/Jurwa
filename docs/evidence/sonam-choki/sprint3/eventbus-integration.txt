@@ -1,0 +1,63 @@
+# 1. Real Redis started by testcontainers
+$ go test -tags=integration ./pkg/eventbus/... -run TestRedisBus$ -v -count=1
+=== RUN   TestRedisBus
+2026/11/06 11:16:12 github.com/testcontainers/testcontainers-go - Connected to docker: 
+  Server Version: 29.9.2
+  API Version: 1.51
+  Operating System: Docker Desktop
+  Total Memory: 7934 MB
+  Labels:
+  Testcontainers for Go Version: v0.40.0
+  Resolved Docker Host: unix:///var/run/docker.sock
+  Resolved Docker Socket Path: /var/run/docker.sock
+  Test SessionID: ee7003575ebe3793620d3ead03a0439e937f50f2e7708e59e63446ac7bdfee41
+  Test ProcessID: 520951a7-3c3c-4afa-83ce-13f711cf3f0e
+2026/11/06 11:16:12 No image auth found for https://index.docker.io/v1/. Setting empty credentials for the image: redis:7-alpine. This is expected for public images. Details: credentials not found in native keychain
+2026/11/06 11:16:26 No image auth found for https://index.docker.io/v1/. Setting empty credentials for the image: testcontainers/ryuk:0.13.0. This is expected for public images. Details: credentials not found in native keychain
+2026/11/06 11:16:34 Shell not found in container
+    redis_integration_test.go:31: redis: redis://localhost:55001
+=== RUN   TestRedisBus/publish_then_subscribe_delivers_the_same_message
+=== RUN   TestRedisBus/two_consumer_groups_each_get_every_message
+=== RUN   TestRedisBus/one_group_with_two_consumers_shares_the_messages
+=== RUN   TestRedisBus/failing_handler_is_tried_3_times_then_the_message_goes_to_the_dead_stream
+=== RUN   TestRedisBus/handler_that_fails_then_succeeds_is_not_dead-lettered
+=== RUN   TestRedisBus/same_event_id_twice_is_passed_to_the_handler_twice
+=== RUN   TestRedisBus/subscribe_returns_when_the_context_is_cancelled
+=== RUN   TestRedisBus/publish_of_a_nil_message_is_an_error
+2026/11/06 11:16:37 🐳 Stopping container: 3028150ef41b
+2026/11/06 11:16:37 🐳 Terminating container: 3028150ef41b
+--- PASS: TestRedisBus (25.46s)
+    --- PASS: TestRedisBus/publish_then_subscribe_delivers_the_same_message (0.00s)
+    --- PASS: TestRedisBus/two_consumer_groups_each_get_every_message (0.49s)
+    --- PASS: TestRedisBus/one_group_with_two_consumers_shares_the_messages (0.62s)
+    --- PASS: TestRedisBus/failing_handler_is_tried_3_times_then_the_message_goes_to_the_dead_stream (0.52s)
+    --- PASS: TestRedisBus/handler_that_fails_then_succeeds_is_not_dead-lettered (0.52s)
+    --- PASS: TestRedisBus/same_event_id_twice_is_passed_to_the_handler_twice (0.21s)
+    --- PASS: TestRedisBus/subscribe_returns_when_the_context_is_cancelled (0.31s)
+    --- PASS: TestRedisBus/publish_of_a_nil_message_is_an_error (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/pkg/eventbus	26.027s
+
+# 2. Redis from dev/docker-compose.yml (password from dev/.env, hidden)
+$ REDIS_TEST_URL=redis://:***@localhost:6379/0 go test -tags=integration ./pkg/eventbus/... -run TestRedisBus$ -v -count=1
+=== RUN   TestRedisBus
+    redis_integration_test.go:31: redis: redis://***@localhost:6379/0
+=== RUN   TestRedisBus/publish_then_subscribe_delivers_the_same_message
+=== RUN   TestRedisBus/two_consumer_groups_each_get_every_message
+=== RUN   TestRedisBus/one_group_with_two_consumers_shares_the_messages
+=== RUN   TestRedisBus/failing_handler_is_tried_3_times_then_the_message_goes_to_the_dead_stream
+=== RUN   TestRedisBus/handler_that_fails_then_succeeds_is_not_dead-lettered
+=== RUN   TestRedisBus/same_event_id_twice_is_passed_to_the_handler_twice
+=== RUN   TestRedisBus/subscribe_returns_when_the_context_is_cancelled
+=== RUN   TestRedisBus/publish_of_a_nil_message_is_an_error
+--- PASS: TestRedisBus (2.30s)
+    --- PASS: TestRedisBus/publish_then_subscribe_delivers_the_same_message (0.01s)
+    --- PASS: TestRedisBus/two_consumer_groups_each_get_every_message (0.43s)
+    --- PASS: TestRedisBus/one_group_with_two_consumers_shares_the_messages (0.51s)
+    --- PASS: TestRedisBus/failing_handler_is_tried_3_times_then_the_message_goes_to_the_dead_stream (0.31s)
+    --- PASS: TestRedisBus/handler_that_fails_then_succeeds_is_not_dead-lettered (0.52s)
+    --- PASS: TestRedisBus/same_event_id_twice_is_passed_to_the_handler_twice (0.21s)
+    --- PASS: TestRedisBus/subscribe_returns_when_the_context_is_cancelled (0.31s)
+    --- PASS: TestRedisBus/publish_of_a_nil_message_is_an_error (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/pkg/eventbus	2.664s
