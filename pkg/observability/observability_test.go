@@ -122,6 +122,31 @@ func TestUnaryWritesOneJSONLogLine(t *testing.T) {
 	assert.Contains(t, line, "duration_ms")
 }
 
+// Kubernetes probes call the health check every few seconds: count them, but
+// do not fill the logs with them.
+func TestUnaryCountsHealthChecksWithoutALogLine(t *testing.T) {
+	var buf bytes.Buffer
+	o := newTest(t, &buf)
+	health := &grpc.UnaryServerInfo{FullMethod: "/grpc.health.v1.Health/Check"}
+
+	_, _ = o.Unary()(context.Background(), "req", health, okHandler)
+
+	assert.Equal(t, 1.0, testutil.ToFloat64(o.requests.WithLabelValues("identity", health.FullMethod, "OK")))
+	assert.Empty(t, buf.String(), "no log line for a health check")
+}
+
+func TestUnaryLogsAFailedHealthCheck(t *testing.T) {
+	var buf bytes.Buffer
+	o := newTest(t, &buf)
+	health := &grpc.UnaryServerInfo{FullMethod: "/grpc.health.v1.Health/Check"}
+
+	_, _ = o.Unary()(context.Background(), "req", health, func(ctx context.Context, req any) (any, error) {
+		return nil, status.Error(codes.NotFound, "unknown service")
+	})
+
+	assert.Len(t, logLines(t, &buf), 1, "a failing health check is worth a line")
+}
+
 func TestUnaryCreatesACorrelationIDWhenMissing(t *testing.T) {
 	var buf bytes.Buffer
 	o := newTest(t, &buf)
