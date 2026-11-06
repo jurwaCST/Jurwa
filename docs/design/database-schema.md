@@ -124,7 +124,7 @@ Seeded with the DSA, DAA and SSO positions and the 6 academic departments on htt
 
 | Table | Columns (type) | Required | PK | Indexes and checks |
 |---|---|---|---|---|
-| categories | code TEXT, name TEXT, description TEXT, sort_order INTEGER, is_active BOOLEAN, updated_at | all | code | seeded: HOSTEL, ACADEMIC_BLOCK, OTHERS |
+| categories | code TEXT, name TEXT, description TEXT, sort_order INTEGER, is_active BOOLEAN, head_position TEXT, updated_at | all | code | seeded: HOSTEL (DSA), ACADEMIC_BLOCK (DAA), OTHERS (SSO) |
 
 ### location-taxonomy (`location-taxonomy.sql`)
 

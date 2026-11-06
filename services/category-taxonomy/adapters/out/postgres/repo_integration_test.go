@@ -72,3 +72,26 @@ func TestDataSurvivesARestart(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, before, after)
 }
+
+// A database created from the Sprint 2 design file (no head_position column)
+// is upgraded by Migrate and gets the Category Heads.
+func TestMigrateUpgradesTheOldTable(t *testing.T) {
+	ctx := context.Background()
+	url := startDB(t)
+	pool, err := pgxpool.New(ctx, url)
+	require.NoError(t, err)
+	t.Cleanup(pool.Close)
+	_, err = pool.Exec(ctx, `
+		CREATE TABLE categories (
+			code TEXT PRIMARY KEY, name TEXT NOT NULL, description TEXT NOT NULL DEFAULT '',
+			sort_order INTEGER NOT NULL DEFAULT 0, is_active BOOLEAN NOT NULL DEFAULT TRUE,
+			updated_at TIMESTAMPTZ NOT NULL DEFAULT now());`)
+	require.NoError(t, err)
+
+	repo := New(pool)
+	require.NoError(t, repo.Migrate(ctx))
+	all, err := repo.List(ctx)
+	require.NoError(t, err)
+	require.Len(t, all, 3)
+	assert.Equal(t, "DSA", all[0].HeadPosition)
+}
