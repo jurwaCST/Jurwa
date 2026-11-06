@@ -51,7 +51,9 @@ Plus `grpc.health.v1.Health/Check` and server reflection.
 | `application/` | Use cases: `Send`, `List` |
 | `ports/` | `NotificationRepository` and `Sender` interfaces |
 | `adapters/in/grpc/` | gRPC handler, maps errors to gRPC codes |
-| `adapters/out/memory/` | In-memory outbox (a database in Sprint 3) |
+| `adapters/out/memory/` | In-memory outbox, used when `DATABASE_URL` is not set |
+| `adapters/out/postgres/` | PostgreSQL outbox, used when `DATABASE_URL` is set |
+| `adapters/out/repotest/` | Checks both must pass |
 | `adapters/out/logsender/` | `Sender` that writes a JSON log line (the body is not logged) |
 
 ## Configuration
@@ -60,6 +62,9 @@ Plus `grpc.health.v1.Health/Check` and server reflection.
 |---|---|---|
 | `PORT` | `9018` | gRPC port |
 | `SERVICE_NAME` | `notification` | Name written in every log line |
+| `DATABASE_URL` | none | For example `postgres://jurwa:<password>@localhost:5432/notification?sslmode=disable`. Unset: in memory, lost on restart. A wrong URL stops the service instead of falling back. The password comes from the environment (a Kubernetes Secret), never from the repository |
+
+Storage: with `DATABASE_URL` the service uses PostgreSQL (database `notification`, table `notifications`). On start it runs `docs/design/schema/notification.sql` (embedded as `adapters/out/postgres/schema.sql`, a test keeps the two equal), which creates the table if needed. Both stores pass the same checks (`adapters/out/repotest`).
 
 ## Run (PowerShell)
 
@@ -87,3 +92,11 @@ docker run --rm -p 9018:9018 jurwa/notification
 ```powershell
 go test ./services/notification/... -cover
 ```
+
+Integration tests on a real PostgreSQL 16 (Docker Desktop must be running):
+
+```powershell
+go test -tags=integration ./services/notification/adapters/out/postgres/... -v
+```
+
+Evidence: `docs/evidence/gayley/sprint3/db-adapters-3b-integration.txt` and `db-adapters-3b-live.txt`.

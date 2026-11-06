@@ -17,7 +17,6 @@ import (
 	notificationv1 "github.com/jurwaCST/Jurwa/proto/gen/notification/v1"
 	grpcadapter "github.com/jurwaCST/Jurwa/services/notification/adapters/in/grpc"
 	"github.com/jurwaCST/Jurwa/services/notification/adapters/out/logsender"
-	"github.com/jurwaCST/Jurwa/services/notification/adapters/out/memory"
 	"github.com/jurwaCST/Jurwa/services/notification/application"
 )
 
@@ -47,8 +46,14 @@ func main() {
 	hs := health.NewServer()
 	healthpb.RegisterHealthServer(srv, hs)
 
-	// In-memory outbox and a log sender for now; a database in Sprint 3.
-	app := application.NewService(memory.New(), logsender.New(logger))
+	// PostgreSQL when DATABASE_URL is set, otherwise in memory (lost on restart).
+	repo, closeRepo, err := openRepo(os.Getenv("DATABASE_URL"))
+	if err != nil {
+		slog.Error("cannot open the database", "error", err)
+		os.Exit(1)
+	}
+	defer closeRepo()
+	app := application.NewService(repo, logsender.New(logger))
 	notificationv1.RegisterNotificationServiceServer(srv, grpcadapter.NewHandler(app))
 
 	// Reflection lets grpcurl list and call methods without the .proto files.

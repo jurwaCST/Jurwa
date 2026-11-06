@@ -7,7 +7,7 @@ import (
 )
 
 // NotificationRepository is the outbox of notifications.
-// In-memory for now; a database in Sprint 3.
+// adapters/out/memory, or adapters/out/postgres when DATABASE_URL is set.
 type NotificationRepository interface {
 	Save(ctx context.Context, n domain.Notification) error
 	// ListByRecipient returns one user's SENT notifications, newest first,

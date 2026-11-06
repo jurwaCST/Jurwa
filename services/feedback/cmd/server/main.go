@@ -19,7 +19,6 @@ import (
 	feedbackv1 "github.com/jurwaCST/Jurwa/proto/gen/feedback/v1"
 	statuslifecyclev1 "github.com/jurwaCST/Jurwa/proto/gen/status-lifecycle/v1"
 	grpcadapter "github.com/jurwaCST/Jurwa/services/feedback/adapters/in/grpc"
-	"github.com/jurwaCST/Jurwa/services/feedback/adapters/out/memory"
 	"github.com/jurwaCST/Jurwa/services/feedback/adapters/out/statusclient"
 	"github.com/jurwaCST/Jurwa/services/feedback/application"
 )
@@ -51,7 +50,6 @@ func main() {
 	healthpb.RegisterHealthServer(srv, hs)
 
 	// feedback asks status-lifecycle whether a report is RESOLVED.
-	// In-memory store for now; a database in Sprint 3.
 	statusConn, err := dial(envOr("STATUS_LIFECYCLE_ADDR", statusclient.DefaultAddr))
 	if err != nil {
 		slog.Error("cannot create status-lifecycle client", "error", err)
@@ -59,8 +57,15 @@ func main() {
 	}
 	defer statusConn.Close()
 
+	// PostgreSQL when DATABASE_URL is set, otherwise in memory (lost on restart).
+	repo, closeRepo, err := openRepo(os.Getenv("DATABASE_URL"))
+	if err != nil {
+		slog.Error("cannot open the database", "error", err)
+		os.Exit(1)
+	}
+	defer closeRepo()
 	app := application.NewService(
-		memory.New(),
+		repo,
 		statusclient.New(statuslifecyclev1.NewStatusLifecycleServiceClient(statusConn)),
 	)
 	feedbackv1.RegisterFeedbackServiceServer(srv, grpcadapter.NewHandler(app))

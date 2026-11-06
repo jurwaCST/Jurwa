@@ -160,7 +160,7 @@ No rows are seeded because the SLA windows are not decided yet (see section 8).
 
 | Table | Columns (type) | Required | PK | Indexes and checks |
 |---|---|---|---|---|
-| notifications | id UUID, recipient_user_id UUID, channel TEXT, event_type TEXT, report_id UUID, subject TEXT, body TEXT, delivery_status TEXT, created_at, sent_at, read_at | all except report_id, sent_at, read_at | id | channel in EMAIL, IN_APP; delivery_status in PENDING, SENT, FAILED; index (recipient_user_id, created_at); index on pending rows |
+| notifications | id UUID, recipient_user_id UUID, channel TEXT, event_type TEXT, report_id UUID, subject TEXT, body TEXT, delivery_status TEXT, created_at, sent_at, read_at, saved_seq BIGINT | all except report_id, sent_at, read_at | id | channel in EMAIL, IN_APP; delivery_status in PENDING, SENT, FAILED; index (recipient_user_id, created_at); index on pending rows; saved_seq is an identity column that keeps the save order (SCRUM-127) |
 
 ### feedback (`feedback.sql`)
 
@@ -172,9 +172,10 @@ No rows are seeded because the SLA windows are not decided yet (see section 8).
 
 | Table | Columns (type) | Required | PK | Indexes and checks |
 |---|---|---|---|---|
-| report_facts | report_id UUID, category_code TEXT, building TEXT, status TEXT, was_escalated BOOLEAN, created_at, assigned_at, resolved_at, updated_at | all except assigned_at, resolved_at | report_id | index (category_code, status); index on created_at; index on escalated reports |
+| report_facts | report_id TEXT, category_code TEXT, building TEXT (default ''), status TEXT, was_escalated BOOLEAN, created_at, assigned_at, resolved_at, updated_at | all except assigned_at, resolved_at | report_id | category in HOSTEL, ACADEMIC_BLOCK, OTHERS; index (category_code, status); index on created_at; index on escalated reports |
+| processed_events | event_id TEXT, applied_at TIMESTAMPTZ | all | event_id | ids of events already applied, so a repeat is counted once |
 
-Built from events only. Analytics never calls other services' databases.
+Built from events only. Analytics never calls other services' databases. Changed in SCRUM-127: report_id is TEXT because it is copied from the events as they come, building defaults to '' because the events do not carry it yet, and processed_events was added.
 
 ### report-history (`report-history.sql`)
 
