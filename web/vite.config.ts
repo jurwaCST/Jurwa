@@ -7,9 +7,10 @@ export default defineConfig({
   server: {
     // The api-gateway does not send CORS headers yet. With VITE_API_URL=/api the
     // dev server forwards /api/... to the gateway, so the browser sees one origin.
+    // GATEWAY_URL changes the target, for example when port 8080 is taken.
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: process.env.GATEWAY_URL || 'http://localhost:8080',
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
