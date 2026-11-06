@@ -11,7 +11,7 @@ Holds user accounts, checks passwords and issues JSON Web Tokens (JWTs). Users s
 - Tokens are signed with HS256 using `JWT_SECRET` and expire after `JWT_TTL` (15 minutes by default).
 - A wrong email and a wrong password give the same error, so callers cannot tell which accounts exist.
 
-Sprint 1 stores users in memory, so they are lost when the server stops. PostgreSQL replaces this in Sprint 2.
+Storage: when `DATABASE_URL` is set, users are kept in PostgreSQL (`adapters/out/postgres`, database `identity`, table `users`, which also holds each user's roles). On start the service runs `docs/design/schema/identity.sql` (embedded as `adapters/out/postgres/schema.sql`, a test keeps the two equal), which creates the table if needed. Without `DATABASE_URL` users are kept in memory and lost when the server stops. Both adapters pass the same checks (`adapters/out/repotest`).
 
 ## RPCs
 
@@ -31,7 +31,9 @@ Plus the standard `grpc.health.v1.Health` service.
 domain/                 User, email and password rules, bcrypt, JWT signing and checking
 application/            Register, Login, ValidateToken use cases
 ports/                  UserRepository interface
-adapters/out/memory/    in-memory UserRepository (Sprint 1)
+adapters/out/memory/    in-memory UserRepository, used when DATABASE_URL is not set
+adapters/out/postgres/  PostgreSQL UserRepository, used when DATABASE_URL is set
+adapters/out/repotest/  checks both repositories must pass
 adapters/in/grpc/       gRPC handler, maps domain errors to gRPC codes
 cmd/server/             starts the server and wires everything together
 ```
@@ -44,6 +46,7 @@ cmd/server/             starts the server and wires everything together
 | `SERVICE_NAME` | `identity` | Name written in every log line |
 | `JWT_SECRET` | none, required | Signing secret, at least 32 bytes. The server will not start without it. Never commit it; in Kubernetes it comes from a Secret |
 | `JWT_TTL` | `15m` | Token lifetime as a Go duration, for example `15m` or `1h` |
+| `DATABASE_URL` | none | For example `postgres://jurwa:<password>@localhost:5432/identity?sslmode=disable`. Unset: users in memory. A wrong URL stops the service instead of falling back. Never commit the password; in Kubernetes it comes from a Secret |
 
 ## Run
 
@@ -78,4 +81,10 @@ make test
 
 Table-driven tests cover: duplicate email, invalid email, short and long password, blank name, wrong password, unknown email, correct login returns a token, expired token, tampered payload, tampered signature, token signed with another secret, `alg: none` token, and the gRPC error codes. Coverage: domain 94.5%, application 87.5%, gRPC adapter 92.0%.
 
-Evidence of a real run: `docs/evidence/gayley/identity-grpcurl.txt`.
+Integration tests on a real PostgreSQL 16 (Docker Desktop must be running):
+
+```bash
+go test -tags=integration ./services/identity/adapters/out/postgres/... -v
+```
+
+Evidence of a real run: `docs/evidence/gayley/identity-grpcurl.txt`. PostgreSQL: `docs/evidence/gayley/sprint3/db-adapters-integration.txt` and `db-adapters-live.txt`.

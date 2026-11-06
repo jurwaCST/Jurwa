@@ -16,7 +16,6 @@ import (
 
 	authorizationv1 "github.com/jurwaCST/Jurwa/proto/gen/authorization/v1"
 	grpcadapter "github.com/jurwaCST/Jurwa/services/authorization/adapters/in/grpc"
-	"github.com/jurwaCST/Jurwa/services/authorization/adapters/out/memory"
 	"github.com/jurwaCST/Jurwa/services/authorization/application"
 )
 
@@ -46,8 +45,14 @@ func main() {
 	hs := health.NewServer()
 	healthpb.RegisterHealthServer(srv, hs)
 
-	// In-memory role table for now; a database in Sprint 3.
-	app := application.NewService(memory.New())
+	// PostgreSQL when DATABASE_URL is set, otherwise the built-in default table.
+	repo, closeRepo, err := openRepo(os.Getenv("DATABASE_URL"))
+	if err != nil {
+		slog.Error("cannot open the database", "error", err)
+		os.Exit(1)
+	}
+	defer closeRepo()
+	app := application.NewService(repo)
 	authorizationv1.RegisterAuthorizationServiceServer(srv, grpcadapter.NewHandler(app))
 
 	// Reflection lets grpcurl list and call methods without the .proto files.

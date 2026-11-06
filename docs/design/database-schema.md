@@ -32,8 +32,8 @@ Card: SCRUM-75. Author: Nyendrak Yoezer Zangmo. Sources: project proposal (secti
 | 13 | sla-policy | Nyendrak | PostgreSQL | `sla_policy` | One window per category |
 | 14 | reassignment | Nyendrak | PostgreSQL | `reassignment` | Assignment history, one current row per report |
 | 15 | audit-log | Nyendrak | MongoDB | `audit_log` | Append-only events with varied details |
-| 16 | identity | Gayley Choden | PostgreSQL | `identity` | Accounts and password hashes |
-| 17 | authorization | Gayley Choden | PostgreSQL | `authorization_db` | Roles per user |
+| 16 | identity | Gayley Choden | PostgreSQL | `identity` | Accounts, password hashes and each user's roles |
+| 17 | authorization | Gayley Choden | PostgreSQL | `authorization_db` | Permission table: which roles may do each action |
 | 18 | notification | Gayley Choden | PostgreSQL | `notification` | Outbox of messages and their delivery state |
 | 19 | feedback | Gayley Choden | PostgreSQL | `feedback` | One rating per report |
 | 20 | analytics | Gayley Choden | PostgreSQL | `analytics` | Read model for dashboard counts |
@@ -92,16 +92,18 @@ The SQL in `docs/design/schema/<service>.sql` is the exact definition. Owners co
 
 | Table | Columns (type) | Required | PK | Indexes and checks |
 |---|---|---|---|---|
-| users | id UUID, email TEXT, full_name TEXT, password_hash TEXT, is_active BOOLEAN, created_at, updated_at TIMESTAMPTZ | all | id | unique on `lower(email)`; email contains `@` |
+| users | id UUID, email TEXT, full_name TEXT, password_hash TEXT, roles TEXT[], is_active BOOLEAN, created_at, updated_at TIMESTAMPTZ | all | id | unique on `lower(email)`; email contains `@`; at least one role, default `{STUDENT}` |
 
-Passwords are stored only as a bcrypt hash (NFR-05).
+Passwords are stored only as a bcrypt hash (NFR-05). Roles are stored here because identity puts them in the token (SCRUM-127).
 
 ### authorization (`authorization.sql`)
 
 | Table | Columns (type) | Required | PK | Indexes and checks |
 |---|---|---|---|---|
 | roles | code TEXT, description TEXT | all | code | seeded: STUDENT, CATEGORY_HEAD, STAFF, SYSTEM_ADMIN, PRESIDENT |
-| user_roles | user_id UUID, role_code TEXT, granted_by UUID, granted_at TIMESTAMPTZ | all except granted_by | (user_id, role_code) | index on role_code; role_code references roles |
+| role_permissions | action TEXT, role_code TEXT, granted_at TIMESTAMPTZ | all | (action, role_code) | role_code references roles; seeded with the default table from `docs/design/api-routes.md` |
+
+Changed in SCRUM-127: the service answers "may this role do this action?", so it stores the permission table. `user_roles` was never used and was replaced; a user's roles are in identity.
 
 ### routing-rules (`routing-rules.sql`)
 

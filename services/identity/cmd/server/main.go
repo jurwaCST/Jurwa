@@ -19,7 +19,6 @@ import (
 
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
 	grpcadapter "github.com/jurwaCST/Jurwa/services/identity/adapters/in/grpc"
-	"github.com/jurwaCST/Jurwa/services/identity/adapters/out/memory"
 	"github.com/jurwaCST/Jurwa/services/identity/application"
 	"github.com/jurwaCST/Jurwa/services/identity/domain"
 )
@@ -45,8 +44,14 @@ func main() {
 		slog.Error("bad token config", "error", err)
 		os.Exit(1)
 	}
-	// In-memory store for Sprint 1; PostgreSQL replaces it in Sprint 2.
-	app := application.NewService(memory.NewUsers(), tokens)
+	// PostgreSQL when DATABASE_URL is set, otherwise in memory (lost on restart).
+	users, closeUsers, err := openRepo(os.Getenv("DATABASE_URL"))
+	if err != nil {
+		slog.Error("cannot open the database", "error", err)
+		os.Exit(1)
+	}
+	defer closeUsers()
+	app := application.NewService(users, tokens)
 
 	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
