@@ -57,9 +57,9 @@ With this set, 3 runs out of 3 passed. The CI runner is Linux and does not need 
 
 `.github/workflows/integration.yml` runs on every pull request and on every push to `main`, on `ubuntu-latest` (Docker is installed there). Steps: check out, set up Go from `go.mod`, `go vet -tags=integration ./...` (the normal `go vet` skips tagged files), then `make test-integration`. The job stops after 20 minutes.
 
-Time locally: about 1 minute for the whole run with the images already downloaded. Time in CI: see the evidence below.
+Time locally: about 45 seconds for the whole run with the images already downloaded. Time in CI: 1m 51s in total (the job itself 1m 47s), first run on pull request #75, 6 November 2026, images not cached.
 
-Evidence: `docs/evidence/gayley/sprint3/integration-all.txt` and the screenshot of the green workflow beside it.
+Evidence: `docs/evidence/gayley/sprint3/integration-all.txt` (local run) and `docs/evidence/gayley/sprint3/integration-ci.png` (the green workflow on #75).
 
 ## When a test fails in CI
 
