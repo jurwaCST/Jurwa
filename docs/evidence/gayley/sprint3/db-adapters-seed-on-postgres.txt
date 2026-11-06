@@ -1,0 +1,23 @@
+SCRUM-127 after merging main (SCRUM-126 demo seed): identity with DATABASE_URL and SEED_DEMO_USERS=true, started twice on one postgres:16-alpine.
+Run on 2026-11-06. JWT_SECRET was random; the password shown is the local test one only.
+
+--- start 1
+{"time":"2026-11-06T15:37:09.5230118+06:00","level":"INFO","msg":"storage: postgres","service":"identity"}
+{"time":"2026-11-06T15:37:09.8210219+06:00","level":"WARN","msg":"demo users seeded, for the demo only","service":"identity","created":6}
+{"time":"2026-11-06T15:37:09.8210219+06:00","level":"INFO","msg":"server started","service":"identity","port":"19016"}
+--- start 2 (restart, same database)
+{"time":"2026-11-06T15:37:15.0446686+06:00","level":"INFO","msg":"storage: postgres","service":"identity"}
+{"time":"2026-11-06T15:37:15.0490148+06:00","level":"INFO","msg":"server started","service":"identity","port":"19016"}
+
+--- select email, roles from users order by email (from the first attempt)
+admin.demo@jurwa.example|{SYSTEM_ADMIN}
+daa.demo@jurwa.example|{CATEGORY_HEAD}
+dsa.demo@jurwa.example|{CATEGORY_HEAD}
+president.demo@jurwa.example|{PRESIDENT}
+sso.demo@jurwa.example|{CATEGORY_HEAD}
+staff.demo@jurwa.example|{STAFF}
+
+--- select count(*) from users after start 2
+6
+
+go test ./... : 126 ok, 0 FAIL. go test -tags=integration -p 1 ./services/identity/... : all ok.
