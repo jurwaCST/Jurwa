@@ -12,7 +12,7 @@ Holds the three report categories shown on the PWA form, in a fixed order, with 
 
 A System Administrator can change the display name and help text (`UpsertCategory`). The category codes, their order and their Category Head never change, and none of the three can be removed, because routing-rules and the report form depend on them. Who holds each head position is kept in department-directory, not here.
 
-Sprint 2 keeps the categories in memory (`adapters/out/memory`), so a rename is lost on restart. The PostgreSQL adapter from `docs/design/schema/category-taxonomy.sql` comes in Sprint 3.
+Storage: when `DATABASE_URL` is set the categories are kept in PostgreSQL (`adapters/out/postgres`, database `category_taxonomy`). On start the service runs the table design from `docs/design/schema/category-taxonomy.sql` (embedded as `adapters/out/postgres/schema.sql`, a test keeps the two equal), which creates the table if needed, adds the `head_position` column to an older table, and seeds the three categories once. Without `DATABASE_URL` it keeps them in memory (`adapters/out/memory`), and a rename is lost on restart. Both adapters pass the same checks (`adapters/out/repotest`).
 
 ## RPCs
 
@@ -33,7 +33,13 @@ Contract: `proto/category-taxonomy/v1/category-taxonomy.proto`, service `jurwa.c
 | `PORT` | `9009` | gRPC port |
 | `SERVICE_NAME` | `category-taxonomy` | Name written in every log line |
 
-`DATABASE_URL` is added with the PostgreSQL adapter in Sprint 3.
+`DATABASE_URL` (for example `postgres://jurwa:<password>@localhost:5432/category_taxonomy?sslmode=disable`): use PostgreSQL. Unset: keep the categories in memory. A wrong URL stops the service instead of falling back to memory. The password comes from the environment (a Kubernetes Secret), never from the repository.
+
+Integration tests on a real PostgreSQL 16 (Docker Desktop must be running):
+
+```bash
+go test -tags=integration ./services/category-taxonomy/adapters/out/postgres/... -v
+```
 
 ## Run
 

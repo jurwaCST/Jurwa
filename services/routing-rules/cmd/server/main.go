@@ -8,6 +8,9 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -17,8 +20,10 @@ import (
 	routingrulesv1 "github.com/jurwaCST/Jurwa/proto/gen/routing-rules/v1"
 	grpcadapter "github.com/jurwaCST/Jurwa/services/routing-rules/adapters/in/grpc"
 	"github.com/jurwaCST/Jurwa/services/routing-rules/adapters/out/memory"
+	"github.com/jurwaCST/Jurwa/services/routing-rules/adapters/out/postgres"
 	"github.com/jurwaCST/Jurwa/services/routing-rules/application"
 	"github.com/jurwaCST/Jurwa/services/routing-rules/domain"
+	"github.com/jurwaCST/Jurwa/services/routing-rules/ports"
 )
 
 // Defaults used when the environment variables are not set.
@@ -47,9 +52,14 @@ func main() {
 	hs := health.NewServer()
 	healthpb.RegisterHealthServer(srv, hs)
 
-	// Sprint 1 keeps rules in memory, seeded with the three agreed rules.
-	// The PostgreSQL adapter (DATABASE_URL) replaces it in Sprint 2.
-	repo := memory.NewRepository(domain.DefaultRules())
+	// PostgreSQL when DATABASE_URL is set, otherwise in memory (seeded with the
+	// defaults, lost on restart). Unit tests and "make run" need no database.
+	repo, closeRepo, err := openRepo(os.Getenv("DATABASE_URL"))
+	if err != nil {
+		slog.Error("cannot open the database", "error", err)
+		os.Exit(1)
+	}
+	defer closeRepo()
 	routingrulesv1.RegisterRoutingRulesServiceServer(srv, grpcadapter.NewHandler(application.NewService(repo)))
 
 	// Reflection lets grpcurl list and call methods without the .proto files.
@@ -82,4 +92,26 @@ func envOr(key, fallback string) string {
 		return v
 	}
 	return fallback
+}
+
+// openRepo returns the PostgreSQL repository when url is set (creating the
+// table and seeding it if needed), otherwise the in-memory one.
+func openRepo(url string) (ports.RuleRepository, func(), error) {
+	if url == "" {
+		slog.Info("storage: in memory (DATABASE_URL not set)")
+		return memory.NewRepository(domain.DefaultRules()), func() {}, nil
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	pool, err := pgxpool.New(ctx, url)
+	if err != nil {
+		return nil, nil, err
+	}
+	repo := postgres.New(pool)
+	if err := repo.Migrate(ctx); err != nil {
+		pool.Close()
+		return nil, nil, err
+	}
+	slog.Info("storage: postgres")
+	return repo, pool.Close, nil
 }

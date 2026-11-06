@@ -8,7 +8,7 @@ It never reads the description (routing uses only category and location, FR-11) 
 
 Matching: a rule for the exact building beats the category rule (building `""`). Among equally specific rules the lowest priority number wins (default 100). Inactive rules are ignored.
 
-Sprint 1 keeps the rules in memory (`adapters/out/memory`), so changes made with `UpsertRule` are lost on restart. The PostgreSQL adapter from `docs/design/schema/routing-rules.sql` comes in Sprint 2.
+Storage: when `DATABASE_URL` is set the rules are kept in PostgreSQL (`adapters/out/postgres`, database `routing_rules`). On start the service runs the table design from `docs/design/schema/routing-rules.sql` (embedded as `adapters/out/postgres/schema.sql`, a test keeps the two equal), which creates the table if needed and seeds the three default rules once. Without `DATABASE_URL` it keeps them in memory (`adapters/out/memory`), and changes are lost on restart. Both adapters pass the same checks (`adapters/out/repotest`).
 
 ## RPCs
 
@@ -27,7 +27,13 @@ Contract: `proto/routing-rules/v1/routing-rules.proto`, service `jurwa.routingru
 | `PORT` | `9006` | gRPC port |
 | `SERVICE_NAME` | `routing-rules` | Name written in every log line |
 
-`DATABASE_URL` is added with the PostgreSQL adapter in Sprint 2.
+`DATABASE_URL` (for example `postgres://jurwa:<password>@localhost:5432/routing_rules?sslmode=disable`): use PostgreSQL. Unset: keep the rules in memory. A wrong URL stops the service instead of falling back to memory. The password comes from the environment (a Kubernetes Secret), never from the repository.
+
+Integration tests on a real PostgreSQL 16 (Docker Desktop must be running):
+
+```bash
+go test -tags=integration ./services/routing-rules/adapters/out/postgres/... -v
+```
 
 ## Run
 

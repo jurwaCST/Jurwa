@@ -1,0 +1,50 @@
+# category-taxonomy with PostgreSQL 16 (Docker), DATABASE_URL=postgres://jurwa:<password>@localhost:55432/category_taxonomy
+
+## Integration tests (testcontainers)
+$ go test -tags=integration ./services/category-taxonomy/adapters/out/postgres/... -v
+=== RUN   TestRepositoryContract
+=== RUN   TestRepositoryContract/seeded_with_the_three_default_categories_in_order
+=== RUN   TestRepositoryContract/save_replaces_a_category
+=== RUN   TestRepositoryContract/save_of_an_unknown_category_is_not_found_and_adds_nothing
+--- PASS: TestRepositoryContract (1.58s)
+    --- PASS: TestRepositoryContract/seeded_with_the_three_default_categories_in_order (0.02s)
+    --- PASS: TestRepositoryContract/save_replaces_a_category (0.01s)
+    --- PASS: TestRepositoryContract/save_of_an_unknown_category_is_not_found_and_adds_nothing (0.01s)
+=== RUN   TestDataSurvivesARestart
+--- PASS: TestDataSurvivesARestart (1.05s)
+=== RUN   TestMigrateUpgradesTheOldTable
+--- PASS: TestMigrateUpgradesTheOldTable (1.17s)
+=== RUN   TestSchemaMatchesTheDesignFile
+--- PASS: TestSchemaMatchesTheDesignFile (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/category-taxonomy/adapters/out/postgres	4.132s
+
+## Restart check
+### first start
+"msg":"storage: postgres"
+$ grpcurl -plaintext -d '{"category":"HOSTEL","display_name":"Hostels","actor_role":"SYSTEM_ADMIN"}' localhost:9009 jurwa.categorytaxonomy.v1.CategoryTaxonomyService/UpsertCategory
+{
+  "category": {
+    "category": "HOSTEL",
+    "name": "Hostels",
+    "description": "Rooms, bathrooms, water and electricity in the hostels",
+    "sortOrder": 1,
+    "active": true,
+    "headPosition": "DSA"
+  }
+}
+
+### service stopped and started again
+$ grpcurl -plaintext -d '{"category":"HOSTEL"}' localhost:9009 jurwa.categorytaxonomy.v1.CategoryTaxonomyService/GetCategory
+{
+  "category": {
+    "category": "HOSTEL",
+    "name": "Hostels",
+    "description": "Rooms, bathrooms, water and electricity in the hostels",
+    "sortOrder": 1,
+    "active": true,
+    "headPosition": "DSA"
+  }
+}
+
+# The rename made before the restart is still there: data is in PostgreSQL.

@@ -21,10 +21,10 @@ routing-engine calls `GetStaff` to find who holds the Category Head position of 
 | `CIVIL` | Civil & Environmental Engineering | yes |
 | `CT` | Computing Technologies | yes |
 | `EEE` | Electrical & Electronics Engineering | yes |
-| `MECH` | Mechanical Engineering | none listed (only a Programme Leader) |
+| `MECH` | Mechanical Engineering | none listed: the Programme Leader acts as HoD |
 | `SH` | Science & Humanities | yes |
 
-The proposal mentions 5 departmental HoDs, and https://cst.edu.bt/staff-directory/ lists exactly 5. Mechanical Engineering has none listed. Its HoD position is still seeded so the DAA can reassign Mechanical reports once the System Administrator assigns a holder. Staff names are not stored here: holders are user ids from identity.
+The proposal mentions 5 departmental HoDs, and https://cst.edu.bt/staff-directory/ lists exactly 5. Mechanical Engineering has none listed, so its Programme Leader acts as HoD: the position keeps the code `HOD_MECH` (reassignment works the same way) and its title is "Head of Department, Mechanical Engineering (Programme Leader, acting)". Staff names are not stored here: holders are user ids from identity, assigned by the System Administrator.
 
 **Demo holders:** identity has no seeded users yet, so DSA, DAA and SSO are given fixed demo user ids (`00000000-0000-4000-8000-00000000000{1,2,3}`) to let a report be routed end to end. Every other position has no holder. Real holders are entered by the System Administrator in Sprint 3.
 

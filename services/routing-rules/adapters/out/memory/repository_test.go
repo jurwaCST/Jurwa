@@ -7,7 +7,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/jurwaCST/Jurwa/services/routing-rules/adapters/out/repotest"
 	"github.com/jurwaCST/Jurwa/services/routing-rules/domain"
+	"github.com/jurwaCST/Jurwa/services/routing-rules/ports"
 )
 
 func TestRepository(t *testing.T) {
@@ -43,4 +45,8 @@ func TestRepository(t *testing.T) {
 	everything, err := repo.List(ctx, true)
 	require.NoError(t, err)
 	assert.Len(t, everything, 4)
+}
+
+func TestRepositoryContract(t *testing.T) {
+	repotest.Run(t, func(*testing.T) ports.RuleRepository { return NewRepository(domain.DefaultRules()) })
 }

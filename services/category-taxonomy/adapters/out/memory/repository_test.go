@@ -7,7 +7,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/jurwaCST/Jurwa/services/category-taxonomy/adapters/out/repotest"
 	"github.com/jurwaCST/Jurwa/services/category-taxonomy/domain"
+	"github.com/jurwaCST/Jurwa/services/category-taxonomy/ports"
 )
 
 func TestRepository(t *testing.T) {
@@ -32,4 +34,8 @@ func TestRepository(t *testing.T) {
 	all, err = repo.List(ctx)
 	require.NoError(t, err)
 	assert.Len(t, all, 3)
+}
+
+func TestRepositoryContract(t *testing.T) {
+	repotest.Run(t, func(*testing.T) ports.CategoryRepository { return NewRepository(domain.DefaultCategories()) })
 }

@@ -1,0 +1,16 @@
+$ go vet -tags=integration ./services/routing-rules/adapters/out/postgres/ ./services/category-taxonomy/adapters/out/postgres/
+# github.com/jurwaCST/Jurwa/services/routing-rules/adapters/out/postgres
+# [github.com/jurwaCST/Jurwa/services/routing-rules/adapters/out/postgres]
+vet: services/routing-rules/adapters/out/postgres/repo_integration_test.go:37:41: undefined: Repository
+# github.com/jurwaCST/Jurwa/services/category-taxonomy/adapters/out/postgres
+# [github.com/jurwaCST/Jurwa/services/category-taxonomy/adapters/out/postgres]
+vet: services/category-taxonomy/adapters/out/postgres/repo_integration_test.go:37:41: undefined: Repository
+
+$ go test ./services/routing-rules/adapters/out/postgres/ ./services/category-taxonomy/adapters/out/postgres/
+# github.com/jurwaCST/Jurwa/services/routing-rules/adapters/out/postgres [github.com/jurwaCST/Jurwa/services/routing-rules/adapters/out/postgres.test]
+services/routing-rules/adapters/out/postgres/schema_test.go:16:34: undefined: schemaSQL
+FAIL	github.com/jurwaCST/Jurwa/services/routing-rules/adapters/out/postgres [build failed]
+# github.com/jurwaCST/Jurwa/services/category-taxonomy/adapters/out/postgres [github.com/jurwaCST/Jurwa/services/category-taxonomy/adapters/out/postgres.test]
+services/category-taxonomy/adapters/out/postgres/schema_test.go:16:34: undefined: schemaSQL
+FAIL	github.com/jurwaCST/Jurwa/services/category-taxonomy/adapters/out/postgres [build failed]
+FAIL
