@@ -24,7 +24,7 @@ Start the gateway and the services it calls first (identity, authorization, cate
 | `VITE_API_URL` | `web/.env.local` (copy `.env.example`) | `http://localhost:8080` |
 | `GATEWAY_URL` | environment, for the dev proxy only | `http://localhost:8080` |
 
-The gateway sends no CORS headers yet, so a browser on port 5173 cannot call port 8080 directly. Use the dev proxy: put `VITE_API_URL=/api` in `web/.env.local`, and the dev server forwards `/api/...` to the gateway. If port 8080 is taken on your laptop, run the gateway with `HTTP_PORT=8081` and start the app with `GATEWAY_URL=http://localhost:8081 npm run dev`.
+The gateway sends no CORS headers yet, so a browser on port 5173 cannot call port 8080 directly. Use the dev proxy: put `VITE_API_URL=/api` in `web/.env.local`, and the dev server forwards `/api/...` to the gateway. Put it in the file, not on the command line: Git Bash turns `VITE_API_URL=/api` into `C:/Program Files/Git/api`, and every call then fails with "Cannot reach the server". If port 8080 is taken on your laptop, run the gateway with `HTTP_PORT=8081` and start the app with `GATEWAY_URL=http://localhost:8081 npm run dev`.
 
 There are no seeded accounts yet. Register one with `POST /auth/register` (a new account is a Student):
 
