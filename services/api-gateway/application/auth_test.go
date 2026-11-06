@@ -58,3 +58,15 @@ func TestAuthorize(t *testing.T) {
 	errDown := errors.New("authorization down")
 	assert.ErrorIs(t, NewAuth(fakeIdentity{}, fakeAuthz{err: errDown}).Authorize(ctx, p, "report.read", "report"), errDown)
 }
+
+func TestAuthorizeAsReturnsTheAllowedRole(t *testing.T) {
+	ctx := context.Background()
+	p := domain.Principal{UserID: "u1", Roles: []string{"STUDENT", "STAFF"}}
+
+	role, err := NewAuth(fakeIdentity{}, fakeAuthz{role: "STAFF", action: "report.notes.add"}).AuthorizeAs(ctx, p, "report.notes.add", "r")
+	require.NoError(t, err)
+	assert.Equal(t, "STAFF", role)
+
+	_, err = NewAuth(fakeIdentity{}, fakeAuthz{role: "SYSTEM_ADMIN", action: "report.notes.add"}).AuthorizeAs(ctx, p, "report.notes.add", "r")
+	assert.ErrorIs(t, err, domain.ErrForbidden)
+}

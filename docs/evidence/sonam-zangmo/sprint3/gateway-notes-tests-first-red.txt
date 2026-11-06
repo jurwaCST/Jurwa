@@ -1,0 +1,18 @@
+# github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients [github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients.test]
+services/api-gateway/adapters/out/grpcclients/notes_test.go:36:7: undefined: Notes
+# github.com/jurwaCST/Jurwa/services/api-gateway/application [github.com/jurwaCST/Jurwa/services/api-gateway/application.test]
+services/api-gateway/application/auth_test.go:66:93: NewAuth(fakeIdentity{}, fakeAuthz{…}).AuthorizeAs undefined (type *Auth has no field or method AuthorizeAs)
+services/api-gateway/application/auth_test.go:70:96: NewAuth(fakeIdentity{}, fakeAuthz{…}).AuthorizeAs undefined (type *Auth has no field or method AuthorizeAs)
+# github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http [github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http.test]
+services/api-gateway/adapters/in/http/router_test.go:103:14: undefined: domain.ActionReportNoteAdd
+services/api-gateway/adapters/in/http/router_test.go:105:14: undefined: domain.ActionReportNoteRead
+services/api-gateway/adapters/in/http/router_test.go:152:3: unknown field Notes in struct literal of type Deps
+FAIL	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http [build failed]
+?   	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient	0.847s
+FAIL	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients [build failed]
+FAIL	github.com/jurwaCST/Jurwa/services/api-gateway/application [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/cmd/server	1.624s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/domain	2.113s
+?   	github.com/jurwaCST/Jurwa/services/api-gateway/ports	[no test files]
+FAIL

@@ -27,6 +27,9 @@ const (
 	ActionLocationList = "location.list"
 	ActionReportSubmit = "report.submit"
 	ActionReportRead   = "report.read"
+
+	ActionReportNoteAdd  = "report.notes.add"
+	ActionReportNoteRead = "report.notes.read"
 )
 
 // Principal is the signed-in user, taken from a validated JWT.

@@ -19,6 +19,7 @@ import (
 
 	commonv1 "github.com/jurwaCST/Jurwa/proto/gen/common/v1"
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
+	internalnotesv1 "github.com/jurwaCST/Jurwa/proto/gen/internal-notes/v1"
 	reportsubmissionv1 "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1"
 	"github.com/jurwaCST/Jurwa/services/api-gateway/application"
 	"github.com/jurwaCST/Jurwa/services/api-gateway/domain"
@@ -35,6 +36,7 @@ type Deps struct {
 	Categories ports.Categories
 	Locations  ports.Locations
 	Reports    ports.Reports
+	Notes      ports.Notes
 	Limiter    *domain.Limiter
 }
 
@@ -56,13 +58,18 @@ func NewRouter(d Deps) http.Handler {
 	mux.Handle("GET /categories/{category}/locations", r.protected(domain.ActionLocationList, r.listLocations))
 	mux.Handle("POST /reports", r.protected(domain.ActionReportSubmit, r.submitReport))
 	mux.Handle("GET /reports/{reportId}", r.protected(domain.ActionReportRead, r.getReport))
+	mux.Handle("POST /reports/{reportId}/notes", r.protected(domain.ActionReportNoteAdd, r.addNote))
+	mux.Handle("GET /reports/{reportId}/notes", r.protected(domain.ActionReportNoteRead, r.listNotes))
 
 	return r.rateLimit(mux)
 }
 
 // ---- middleware ----
 
-type principalKey struct{}
+type (
+	principalKey struct{}
+	roleKey      struct{} // the role that authorization allowed for this route
+)
 
 // protected checks the JWT with identity and the role with the authorizer
 // before calling next. The principal is put in the request context.
@@ -73,12 +80,20 @@ func (r router) protected(action string, next http.HandlerFunc) http.Handler {
 			writeError(w, err)
 			return
 		}
-		if err := r.Auth.Authorize(req.Context(), p, action, req.URL.Path); err != nil {
+		role, err := r.Auth.AuthorizeAs(req.Context(), p, action, req.URL.Path)
+		if err != nil {
 			writeError(w, err)
 			return
 		}
-		next(w, req.WithContext(context.WithValue(req.Context(), principalKey{}, p)))
+		ctx := context.WithValue(req.Context(), principalKey{}, p)
+		next(w, req.WithContext(context.WithValue(ctx, roleKey{}, role)))
 	})
+}
+
+// actingRole is the caller's role that was allowed for the route.
+func actingRole(req *http.Request) string {
+	role, _ := req.Context().Value(roleKey{}).(string)
+	return role
 }
 
 func principal(req *http.Request) domain.Principal {
@@ -166,6 +181,22 @@ func (r router) getReport(w http.ResponseWriter, req *http.Request) {
 		err = domain.ErrForbidden
 	}
 	reply(w, http.StatusOK, report, err)
+}
+
+func (r router) addNote(w http.ResponseWriter, req *http.Request) {
+	in := &internalnotesv1.AddNoteRequest{}
+	if !readJSON(w, req, in) {
+		return
+	}
+	in.ReportId = req.PathValue("reportId") // from the path, never the body
+	in.AuthorId = principal(req).UserID     // from the JWT, never the body (rule 2)
+	resp, err := r.Notes.AddNote(req.Context(), actingRole(req), in)
+	reply(w, http.StatusCreated, resp, err)
+}
+
+func (r router) listNotes(w http.ResponseWriter, req *http.Request) {
+	resp, err := r.Notes.ListNotes(req.Context(), actingRole(req), req.PathValue("reportId"))
+	reply(w, http.StatusOK, resp, err)
 }
 
 // ---- JSON and errors ----

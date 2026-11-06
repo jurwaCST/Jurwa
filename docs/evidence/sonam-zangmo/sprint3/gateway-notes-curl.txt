@@ -1,0 +1,80 @@
+# SCRUM-117 notes routes. Running: identity 9016, authorization 9017, report-submission 9001, internal-notes 9005, api-gateway 8080.
+# A student registered, logged in (token used as $TOKEN, not saved) and submitted report 7ff3ccb7-160e-4d18-b89c-26385bb913bc.
+
+## 1. No token: 401
+$ curl -i -X POST http://localhost:8080/reports/7ff3ccb7-160e-4d18-b89c-26385bb913bc/notes -d '{"body":"Plumber booked"}'
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+
+{"error":"missing bearer token"}
+
+
+$ curl -i http://localhost:8080/reports/7ff3ccb7-160e-4d18-b89c-26385bb913bc/notes
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+
+{"error":"missing bearer token"}
+
+
+## 2. Student: 403 on both (authorization CheckPermission says no, internal-notes is never called)
+$ curl -i -X POST http://localhost:8080/reports/7ff3ccb7-160e-4d18-b89c-26385bb913bc/notes -H "Authorization: Bearer $TOKEN" -d '{"body":"Plumber booked"}'
+HTTP/1.1 403 Forbidden
+Content-Type: application/json
+
+{"error":"not allowed"}
+
+
+$ curl -i http://localhost:8080/reports/7ff3ccb7-160e-4d18-b89c-26385bb913bc/notes -H "Authorization: Bearer $TOKEN"
+HTTP/1.1 403 Forbidden
+Content-Type: application/json
+
+{"error":"not allowed"}
+
+
+## 3. Staff and System Admin through the gateway
+# identity can only create STUDENT accounts (Register always gives STUDENT), so a Staff or
+# System Admin login cannot be shown here yet. Those rules are covered by the unit tests:
+--- PASS: TestNotesNeedAToken (0.00s)
+--- PASS: TestNotesRoles (0.00s)
+    --- PASS: TestNotesRoles/head-token (0.00s)
+    --- PASS: TestNotesRoles/staff-token (0.00s)
+    --- PASS: TestNotesRoles/admin-token (0.00s)
+    --- PASS: TestNotesRoles/student-token (0.00s)
+--- PASS: TestAddNoteSetsAuthorAndRoleFromTheJWT (0.00s)
+--- PASS: TestListNotesSendsTheRole (0.00s)
+--- PASS: TestAddNoteBadInput (0.00s)
+--- PASS: TestNotesSendTheRoleThatWasAllowed (0.00s)
+
+## 4. What the gateway sends, called on internal-notes directly with the same metadata (x-user-role)
+$ grpcurl -plaintext -H 'x-user-role: STAFF' -d '{"report_id":"7ff3ccb7-160e-4d18-b89c-26385bb913bc","author_id":"<staff user id>","body":"Plumber booked for Monday"}' localhost:9005 jurwa.internalnotes.v1.InternalNotesService/AddNote
+{
+  "note": {
+    "id": "2911b97b-e4ba-4fcb-a703-d3c2d24de2f0",
+    "reportId": "7ff3ccb7-160e-4d18-b89c-26385bb913bc",
+    "authorId": "00000000-0000-4000-8000-000000000001",
+    "body": "Plumber booked for Monday",
+    "createdAt": "2026-11-06T04:52:23.209471Z"
+  }
+}
+
+
+$ grpcurl -plaintext -H 'x-user-role: SYSTEM_ADMIN' -d '{"report_id":"7ff3ccb7-160e-4d18-b89c-26385bb913bc","author_id":"...","body":"x"}' localhost:9005 .../AddNote
+ERROR:
+  Code: PermissionDenied
+  Message: permission denied: only staff and category heads may add internal notes
+
+
+$ grpcurl -plaintext -H 'x-user-role: SYSTEM_ADMIN' -d '{"report_id":"7ff3ccb7-160e-4d18-b89c-26385bb913bc"}' localhost:9005 .../ListNotes
+{
+  "notes": [
+    {
+      "id": "2911b97b-e4ba-4fcb-a703-d3c2d24de2f0",
+      "reportId": "7ff3ccb7-160e-4d18-b89c-26385bb913bc",
+      "authorId": "00000000-0000-4000-8000-000000000001",
+      "body": "Plumber booked for Monday",
+      "createdAt": "2026-11-06T04:52:23.209471Z"
+    }
+  ]
+}
+
+
