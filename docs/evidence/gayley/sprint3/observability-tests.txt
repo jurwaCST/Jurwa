@@ -16,6 +16,10 @@ SCRUM-105 pkg/observability tests, 2026-11-06, Windows 11, Go go1.27.0.
     --- PASS: TestUnaryCountsAHandlerErrorWithItsCode/plain_Go_error_is_Unknown (0.00s)
 === RUN   TestUnaryWritesOneJSONLogLine
 --- PASS: TestUnaryWritesOneJSONLogLine (0.00s)
+=== RUN   TestUnaryCountsHealthChecksWithoutALogLine
+--- PASS: TestUnaryCountsHealthChecksWithoutALogLine (0.00s)
+=== RUN   TestUnaryLogsAFailedHealthCheck
+--- PASS: TestUnaryLogsAFailedHealthCheck (0.00s)
 === RUN   TestUnaryCreatesACorrelationIDWhenMissing
 --- PASS: TestUnaryCreatesACorrelationIDWhenMissing (0.00s)
 === RUN   TestUnaryGivesTheHandlerTheIncomingCorrelationID
@@ -27,7 +31,7 @@ SCRUM-105 pkg/observability tests, 2026-11-06, Windows 11, Go go1.27.0.
 === RUN   TestMetricsServerIsOffWithoutAnAddress
 --- PASS: TestMetricsServerIsOffWithoutAnAddress (0.00s)
 === RUN   TestMetricsServerServesTheCounters
---- PASS: TestMetricsServerServesTheCounters (0.01s)
+--- PASS: TestMetricsServerServesTheCounters (0.00s)
 === RUN   TestMetricsServerFailsOnABadAddress
 --- PASS: TestMetricsServerFailsOnABadAddress (0.00s)
 === RUN   TestInitReadsMetricsAddrFromTheEnvironment
@@ -38,4 +42,4 @@ SCRUM-105 pkg/observability tests, 2026-11-06, Windows 11, Go go1.27.0.
 --- PASS: TestTwoObsDoNotShareCounters (0.00s)
 PASS
 coverage: 98.8% of statements
-ok  	github.com/jurwaCST/Jurwa/pkg/observability	2.459s	coverage: 98.8% of statements
+ok  	github.com/jurwaCST/Jurwa/pkg/observability	2.574s	coverage: 98.8% of statements

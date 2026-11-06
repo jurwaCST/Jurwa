@@ -17,6 +17,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -25,6 +26,9 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 )
+
+// healthPrefix is the standard gRPC health service that Kubernetes probes call.
+const healthPrefix = "/grpc.health.v1.Health/"
 
 // Config is what New needs. Init fills it from the environment.
 type Config struct {
@@ -137,6 +141,8 @@ func (o *Obs) Unary() grpc.UnaryServerInterceptor {
 		level := slog.LevelInfo
 		if err != nil {
 			level = slog.LevelWarn
+		} else if strings.HasPrefix(info.FullMethod, healthPrefix) {
+			return resp, err // probes run every few seconds, a passing one needs no line
 		}
 		o.logger.LogAttrs(ctx, level, "grpc request",
 			slog.String("method", info.FullMethod),
