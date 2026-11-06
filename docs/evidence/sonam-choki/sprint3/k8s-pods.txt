@@ -1,0 +1,148 @@
+# SCRUM-123 Kubernetes manifests: evidence (2026-11-06 11:43)
+
+$ bash scripts/push-local-registry.sh
+OK      audit-log
+OK      authorization
+OK      category-taxonomy
+OK      department-directory
+OK      feedback
+OK      identity
+OK      internal-notes
+OK      location-taxonomy
+OK      notification
+OK      photo-media
+OK      reassignment
+OK      report-history
+OK      report-submission
+OK      routing-engine
+OK      routing-rules
+OK      sla-policy
+OK      sla-tracking
+OK      status-lifecycle
+Pushed 20 image(s), 0 failed.
+
+
+$ kubectl get nodes
+NAME                 STATUS   ROLES           AGE     VERSION
+k3d-jurwa-agent-0    Ready    <none>          9m6s    v1.35.5+k3s1
+k3d-jurwa-agent-1    Ready    <none>          9m7s    v1.35.5+k3s1
+k3d-jurwa-server-0   Ready    control-plane   9m15s   v1.35.5+k3s1
+
+$ kubectl -n jurwa get pods
+NAME                                    READY   STATUS    RESTARTS   AGE
+analytics-5d6b849f85-t27mw              1/1     Running   0          33s
+api-gateway-99dcfd9fb-p8cjd             1/1     Running   0          33s
+audit-log-dd9d9559b-h7v9d               1/1     Running   0          33s
+authorization-788d45b9f7-7jgb7          1/1     Running   0          33s
+category-taxonomy-7968f58d6f-442kd      1/1     Running   0          33s
+department-directory-67947976b6-mt88g   1/1     Running   0          33s
+feedback-76584849c-6v84k                1/1     Running   0          33s
+identity-647d8fdf69-ddqw2               1/1     Running   0          33s
+internal-notes-665ddf6f6f-v9b96         1/1     Running   0          33s
+location-taxonomy-5b9cb8b9f6-64sx2      1/1     Running   0          33s
+mongo-0                                 1/1     Running   0          8m12s
+notification-b7c79bb67-mshx7            1/1     Running   0          32s
+photo-media-6f9bd6d759-pdxsb            1/1     Running   0          32s
+postgres-0                              1/1     Running   0          8m12s
+reassignment-dc78dcc46-dxfnh            1/1     Running   0          32s
+redis-0                                 1/1     Running   0          8m12s
+report-history-6579f94dd5-p2wn8         1/1     Running   0          31s
+report-submission-76c7b497c5-qwvnt      1/1     Running   0          31s
+routing-engine-9f6d95ccb-qnj2b          1/1     Running   0          31s
+routing-rules-84bd8f8cb5-2z8nv          1/1     Running   0          31s
+sla-policy-6b94d8dddf-j8b78             1/1     Running   0          31s
+sla-tracking-55f47c687b-nl8k7           1/1     Running   0          31s
+status-lifecycle-5f4fcf86d4-dpvv7       1/1     Running   0          31s
+
+$ kubectl -n jurwa get svc
+NAME                   TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)             AGE
+analytics              ClusterIP   10.43.148.24    <none>        9020/TCP            34s
+api-gateway            ClusterIP   10.43.61.76     <none>        9010/TCP,8080/TCP   34s
+audit-log              ClusterIP   10.43.107.210   <none>        9015/TCP            34s
+authorization          ClusterIP   10.43.33.59     <none>        9017/TCP            34s
+category-taxonomy      ClusterIP   10.43.228.47    <none>        9009/TCP            34s
+department-directory   ClusterIP   10.43.239.85    <none>        9008/TCP            34s
+feedback               ClusterIP   10.43.23.188    <none>        9019/TCP            34s
+identity               ClusterIP   10.43.97.166    <none>        9016/TCP            34s
+internal-notes         ClusterIP   10.43.176.154   <none>        9005/TCP            34s
+location-taxonomy      ClusterIP   10.43.158.77    <none>        9004/TCP            34s
+mongo                  ClusterIP   None            <none>        27017/TCP           8m13s
+notification           ClusterIP   10.43.224.33    <none>        9018/TCP            34s
+photo-media            ClusterIP   10.43.128.135   <none>        9002/TCP            34s
+postgres               ClusterIP   None            <none>        5432/TCP            8m13s
+reassignment           ClusterIP   10.43.186.227   <none>        9014/TCP            33s
+redis                  ClusterIP   None            <none>        6379/TCP            8m13s
+report-history         ClusterIP   10.43.195.248   <none>        9003/TCP            33s
+report-submission      ClusterIP   10.43.153.44    <none>        9001/TCP            33s
+routing-engine         ClusterIP   10.43.164.67    <none>        9007/TCP            33s
+routing-rules          ClusterIP   10.43.224.111   <none>        9006/TCP            33s
+sla-policy             ClusterIP   10.43.80.122    <none>        9013/TCP            33s
+sla-tracking           ClusterIP   10.43.161.243   <none>        9012/TCP            33s
+status-lifecycle       ClusterIP   10.43.184.16    <none>        9011/TCP            33s
+
+$ kubectl -n jurwa get pvc
+NAME              STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+data-mongo-0      Bound    pvc-601bfa17-a8ee-4747-a34b-920813597e73   1Gi        RWO            local-path     <unset>                 8m12s
+data-postgres-0   Bound    pvc-30acb01d-69c2-4b79-a612-6b89bfa67089   1Gi        RWO            local-path     <unset>                 8m12s
+data-redis-0      Bound    pvc-aea33441-a1c4-4076-9f03-6d3db08d3998   1Gi        RWO            local-path     <unset>                 8m12s
+
+# The 13 PostgreSQL databases (created by deploy/k8s/data/create-databases.sql)
+$ kubectl -n jurwa exec postgres-0 -- psql -U $POSTGRES_USER -d jurwa -Atc "select datname ..."
+analytics
+authorization_db
+category_taxonomy
+department_directory
+feedback
+identity
+jurwa
+location_taxonomy
+notification
+reassignment
+report_history
+routing_rules
+sla_policy
+status_lifecycle
+
+$ kubectl -n jurwa port-forward svc/api-gateway 8080:8080 &
+$ curl -i http://localhost:8080/categories
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+Date: Fri, 06 Nov 2026 05:43:40 GMT
+Content-Length: 33
+
+{"error":"missing bearer token"}
+
+
+# Generator is safe to re-run
+$ bash scripts/gen-k8s-manifests.sh && git status --short deploy/k8s/services
+Generated manifests for 20 services in deploy/k8s/services/
+(no changes)
+
+# Full path through the cluster: gateway -> identity, authorization, category-taxonomy, report-submission
+$ curl -i http://localhost:8080/health
+HTTP/1.1 200 OK
+Content-Type: application/json
+Date: Fri, 06 Nov 2026 05:43:57 GMT
+Content-Length: 15
+
+{"status":"ok"}
+
+$ curl -i -X POST http://localhost:8080/auth/register -d '{"email":"k8s.student@rub.edu.bt","fullName":"K8s Student","password":"secret123"}'
+HTTP/1.1 201 Created
+Content-Type: application/json
+Date: Fri, 06 Nov 2026 05:43:58 GMT
+Content-Length: 196
+
+{"user":{"id":"2e55300e-648b-43da-b8a2-12102be8b20b", "email":"k8s.student@rub.edu.bt", "fullName":"K8s Student", "roles":["STUDENT"], "active":true, "createdAt":"2026-11-06T05:43:58.039588302Z"}}
+
+$ curl -X POST http://localhost:8080/auth/login -d '{"email":"k8s.student@rub.edu.bt","password":"secret123"}'
+(reply has accessToken, 289 characters, not shown)
+
+$ curl -i http://localhost:8080/categories -H "Authorization: Bearer $TOKEN"
+HTTP/1.1 200 OK
+Content-Type: application/json
+Date: Fri, 06 Nov 2026 05:43:58 GMT
+Content-Length: 519
+
+{"categories":[{"category":"HOSTEL", "name":"Hostel", "description":"Rooms, bathrooms, water and electricity in the hostels", "sortOrder":1, "active":true, "headPosition":"DSA"}, {"category":"ACADEMIC_BLOCK", "name":"Academic Block", "description":"Classrooms, labs and equipment in the academic blocks", "sortOrder":2, "active":true, "headPosition":"DAA"}, {"category":"OTHERS", "name":"Others", "description":"Campus-wide issues such as Wi-Fi, roads and grounds", "sortOrder":3, "active":true, "headPosition":"SSO"}]}
+

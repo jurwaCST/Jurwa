@@ -1,0 +1,28 @@
+# Everything Jurwa runs in the cluster:  kubectl apply -k deploy/k8s
+# Create the Secret first:               bash scripts/create-secrets.sh
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - base/namespace.yaml
+  - data
+  - services/analytics
+  - services/api-gateway
+  - services/audit-log
+  - services/authorization
+  - services/category-taxonomy
+  - services/department-directory
+  - services/feedback
+  - services/identity
+  - services/internal-notes
+  - services/location-taxonomy
+  - services/notification
+  - services/photo-media
+  - services/reassignment
+  - services/report-history
+  - services/report-submission
+  - services/routing-engine
+  - services/routing-rules
+  - services/sla-policy
+  - services/sla-tracking
+  - services/status-lifecycle
