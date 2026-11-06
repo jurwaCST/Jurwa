@@ -1,0 +1,193 @@
+SCRUM-106: make test-integration on branch SCRUM-106-testcontainers-ci (main at 88df3be), Windows 11, Docker Desktop, 2026-11-06.
+Result: 120 packages ok, 0 FAIL. Integration packages on main: category-taxonomy postgres, routing-rules postgres, pkg/eventbus (Redis).
+
+go test -tags=integration ./... -count=1
+ok  	github.com/jurwaCST/Jurwa/functions/digest-dispatcher	3.827s
+ok  	github.com/jurwaCST/Jurwa/functions/digest-dispatcher/clients	3.734s
+ok  	github.com/jurwaCST/Jurwa/functions/digest-dispatcher/dispatcher	5.259s
+ok  	github.com/jurwaCST/Jurwa/functions/sla-escalation-checker	3.819s
+ok  	github.com/jurwaCST/Jurwa/functions/sla-escalation-checker/checker	5.368s
+ok  	github.com/jurwaCST/Jurwa/functions/sla-escalation-checker/clients	3.582s
+ok  	github.com/jurwaCST/Jurwa/pkg/eventbus	15.864s
+ok  	github.com/jurwaCST/Jurwa/pkg/resilience	3.130s
+?   	github.com/jurwaCST/Jurwa/pkg/resilience/mocks	[no test files]
+?   	github.com/jurwaCST/Jurwa/proto/gen/analytics/v1	[no test files]
+?   	github.com/jurwaCST/Jurwa/proto/gen/audit-log/v1	[no test files]
+?   	github.com/jurwaCST/Jurwa/proto/gen/authorization/v1	[no test files]
+?   	github.com/jurwaCST/Jurwa/proto/gen/category-taxonomy/v1	[no test files]
+?   	github.com/jurwaCST/Jurwa/proto/gen/common/v1	[no test files]
+?   	github.com/jurwaCST/Jurwa/proto/gen/department-directory/v1	[no test files]
+?   	github.com/jurwaCST/Jurwa/proto/gen/events/v1	[no test files]
+?   	github.com/jurwaCST/Jurwa/proto/gen/feedback/v1	[no test files]
+?   	github.com/jurwaCST/Jurwa/proto/gen/identity/v1	[no test files]
+?   	github.com/jurwaCST/Jurwa/proto/gen/internal-notes/v1	[no test files]
+?   	github.com/jurwaCST/Jurwa/proto/gen/location-taxonomy/v1	[no test files]
+?   	github.com/jurwaCST/Jurwa/proto/gen/notification/v1	[no test files]
+?   	github.com/jurwaCST/Jurwa/proto/gen/photo-media/v1	[no test files]
+?   	github.com/jurwaCST/Jurwa/proto/gen/reassignment/v1	[no test files]
+?   	github.com/jurwaCST/Jurwa/proto/gen/report-history/v1	[no test files]
+?   	github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1	[no test files]
+?   	github.com/jurwaCST/Jurwa/proto/gen/routing-engine/v1	[no test files]
+?   	github.com/jurwaCST/Jurwa/proto/gen/routing-rules/v1	[no test files]
+?   	github.com/jurwaCST/Jurwa/proto/gen/sla-policy/v1	[no test files]
+?   	github.com/jurwaCST/Jurwa/proto/gen/sla-tracking/v1	[no test files]
+?   	github.com/jurwaCST/Jurwa/proto/gen/status-lifecycle/v1	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/analytics/adapters/in/grpc	3.139s
+?   	github.com/jurwaCST/Jurwa/services/analytics/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/analytics/adapters/out/memory	3.844s
+ok  	github.com/jurwaCST/Jurwa/services/analytics/application	3.770s
+ok  	github.com/jurwaCST/Jurwa/services/analytics/cmd/server	2.789s
+ok  	github.com/jurwaCST/Jurwa/services/analytics/domain	3.716s
+?   	github.com/jurwaCST/Jurwa/services/analytics/ports	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http	3.077s
+?   	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient	2.973s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients	4.598s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/application	2.802s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/cmd/server	2.852s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/domain	2.580s
+?   	github.com/jurwaCST/Jurwa/services/api-gateway/ports	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/audit-log/adapters/in/grpc	2.691s
+?   	github.com/jurwaCST/Jurwa/services/audit-log/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/audit-log/adapters/out/memory	2.659s
+ok  	github.com/jurwaCST/Jurwa/services/audit-log/application	2.564s
+ok  	github.com/jurwaCST/Jurwa/services/audit-log/cmd/server	2.568s
+ok  	github.com/jurwaCST/Jurwa/services/audit-log/domain	2.548s
+?   	github.com/jurwaCST/Jurwa/services/audit-log/ports	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/authorization/adapters/in/grpc	2.728s
+?   	github.com/jurwaCST/Jurwa/services/authorization/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/authorization/adapters/out/memory	3.237s
+ok  	github.com/jurwaCST/Jurwa/services/authorization/application	3.458s
+ok  	github.com/jurwaCST/Jurwa/services/authorization/cmd/server	2.670s
+ok  	github.com/jurwaCST/Jurwa/services/authorization/domain	3.389s
+?   	github.com/jurwaCST/Jurwa/services/authorization/ports	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/category-taxonomy/adapters/in/grpc	2.778s
+?   	github.com/jurwaCST/Jurwa/services/category-taxonomy/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/category-taxonomy/adapters/out/memory	3.344s
+ok  	github.com/jurwaCST/Jurwa/services/category-taxonomy/adapters/out/postgres	14.283s
+?   	github.com/jurwaCST/Jurwa/services/category-taxonomy/adapters/out/repotest	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/category-taxonomy/application	2.930s
+ok  	github.com/jurwaCST/Jurwa/services/category-taxonomy/cmd/server	3.216s
+ok  	github.com/jurwaCST/Jurwa/services/category-taxonomy/domain	3.998s
+?   	github.com/jurwaCST/Jurwa/services/category-taxonomy/ports	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/department-directory/adapters/in/grpc	2.238s
+?   	github.com/jurwaCST/Jurwa/services/department-directory/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/department-directory/adapters/out/memory	3.170s
+ok  	github.com/jurwaCST/Jurwa/services/department-directory/application	3.150s
+ok  	github.com/jurwaCST/Jurwa/services/department-directory/cmd/server	2.834s
+ok  	github.com/jurwaCST/Jurwa/services/department-directory/domain	4.963s
+?   	github.com/jurwaCST/Jurwa/services/department-directory/ports	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/feedback/adapters/in/grpc	3.028s
+?   	github.com/jurwaCST/Jurwa/services/feedback/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/feedback/adapters/out/memory	4.411s
+ok  	github.com/jurwaCST/Jurwa/services/feedback/adapters/out/statusclient	2.542s
+ok  	github.com/jurwaCST/Jurwa/services/feedback/application	3.662s
+ok  	github.com/jurwaCST/Jurwa/services/feedback/cmd/server	2.830s
+ok  	github.com/jurwaCST/Jurwa/services/feedback/domain	3.721s
+?   	github.com/jurwaCST/Jurwa/services/feedback/ports	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/identity/adapters/in/grpc	3.626s
+?   	github.com/jurwaCST/Jurwa/services/identity/adapters/out/memory	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/identity/application	7.571s
+ok  	github.com/jurwaCST/Jurwa/services/identity/cmd/server	3.403s
+ok  	github.com/jurwaCST/Jurwa/services/identity/domain	3.800s
+?   	github.com/jurwaCST/Jurwa/services/identity/ports	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/internal-notes/adapters/in/grpc	3.628s
+?   	github.com/jurwaCST/Jurwa/services/internal-notes/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/internal-notes/adapters/out/memory	2.463s
+ok  	github.com/jurwaCST/Jurwa/services/internal-notes/application	3.500s
+ok  	github.com/jurwaCST/Jurwa/services/internal-notes/cmd/server	2.511s
+ok  	github.com/jurwaCST/Jurwa/services/internal-notes/domain	2.638s
+?   	github.com/jurwaCST/Jurwa/services/internal-notes/ports	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/location-taxonomy/adapters/in/grpc	2.263s
+?   	github.com/jurwaCST/Jurwa/services/location-taxonomy/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/location-taxonomy/adapters/out/memory	3.432s
+ok  	github.com/jurwaCST/Jurwa/services/location-taxonomy/application	3.861s
+ok  	github.com/jurwaCST/Jurwa/services/location-taxonomy/cmd/server	3.056s
+ok  	github.com/jurwaCST/Jurwa/services/location-taxonomy/domain	3.559s
+?   	github.com/jurwaCST/Jurwa/services/location-taxonomy/ports	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/in/grpc	2.472s
+?   	github.com/jurwaCST/Jurwa/services/notification/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/out/logsender	4.018s
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/out/memory	3.357s
+ok  	github.com/jurwaCST/Jurwa/services/notification/application	3.114s
+ok  	github.com/jurwaCST/Jurwa/services/notification/cmd/server	2.730s
+ok  	github.com/jurwaCST/Jurwa/services/notification/domain	4.752s
+?   	github.com/jurwaCST/Jurwa/services/notification/ports	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/photo-media/adapters/in/grpc	2.684s
+?   	github.com/jurwaCST/Jurwa/services/photo-media/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/photo-media/adapters/out/memory	3.657s
+ok  	github.com/jurwaCST/Jurwa/services/photo-media/application	3.488s
+ok  	github.com/jurwaCST/Jurwa/services/photo-media/cmd/server	2.596s
+ok  	github.com/jurwaCST/Jurwa/services/photo-media/domain	3.557s
+?   	github.com/jurwaCST/Jurwa/services/photo-media/ports	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/adapters/in/grpc	2.989s
+?   	github.com/jurwaCST/Jurwa/services/reassignment/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/adapters/out/logpublisher	4.657s
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/adapters/out/memory	4.120s
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/application	4.276s
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/cmd/server	5.116s
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/domain	4.146s
+?   	github.com/jurwaCST/Jurwa/services/reassignment/ports	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/report-history/adapters/in/grpc	3.294s
+?   	github.com/jurwaCST/Jurwa/services/report-history/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/report-history/adapters/out/memory	4.319s
+ok  	github.com/jurwaCST/Jurwa/services/report-history/application	4.361s
+ok  	github.com/jurwaCST/Jurwa/services/report-history/cmd/server	3.081s
+ok  	github.com/jurwaCST/Jurwa/services/report-history/domain	4.275s
+?   	github.com/jurwaCST/Jurwa/services/report-history/ports	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/adapters/in/grpc	3.043s
+?   	github.com/jurwaCST/Jurwa/services/report-submission/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/memory	4.238s
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/uuid	4.192s
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/application	4.253s
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/cmd/server	2.909s
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/domain	5.889s
+?   	github.com/jurwaCST/Jurwa/services/report-submission/ports	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/adapters/in/grpc	3.593s
+?   	github.com/jurwaCST/Jurwa/services/routing-engine/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/adapters/out/directoryclient	3.541s
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/adapters/out/logpublisher	4.682s
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/adapters/out/rulesclient	2.791s
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/application	4.053s
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/cmd/server	3.128s
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/domain	4.035s
+?   	github.com/jurwaCST/Jurwa/services/routing-engine/ports	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/routing-rules/adapters/in/grpc	3.485s
+?   	github.com/jurwaCST/Jurwa/services/routing-rules/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/routing-rules/adapters/out/memory	4.344s
+ok  	github.com/jurwaCST/Jurwa/services/routing-rules/adapters/out/postgres	9.803s
+?   	github.com/jurwaCST/Jurwa/services/routing-rules/adapters/out/repotest	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/routing-rules/application	4.616s
+ok  	github.com/jurwaCST/Jurwa/services/routing-rules/cmd/server	4.218s
+ok  	github.com/jurwaCST/Jurwa/services/routing-rules/domain	3.412s
+?   	github.com/jurwaCST/Jurwa/services/routing-rules/ports	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/sla-policy/adapters/in/grpc	2.628s
+?   	github.com/jurwaCST/Jurwa/services/sla-policy/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/sla-policy/adapters/out/memory	3.633s
+ok  	github.com/jurwaCST/Jurwa/services/sla-policy/application	3.517s
+ok  	github.com/jurwaCST/Jurwa/services/sla-policy/cmd/server	2.444s
+ok  	github.com/jurwaCST/Jurwa/services/sla-policy/domain	4.588s
+?   	github.com/jurwaCST/Jurwa/services/sla-policy/ports	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/in/grpc	2.729s
+?   	github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/out/logpublisher	3.641s
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/out/memory	4.041s
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/out/slapolicy	3.151s
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/application	3.887s
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/cmd/server	3.017s
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/domain	3.842s
+?   	github.com/jurwaCST/Jurwa/services/sla-tracking/ports	[no test files]
+?   	github.com/jurwaCST/Jurwa/services/sla-tracking/ports/mocks	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/adapters/in/grpc	3.006s
+?   	github.com/jurwaCST/Jurwa/services/status-lifecycle/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/adapters/out/logpublisher	2.918s
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/adapters/out/memory	2.857s
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/application	2.678s
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/cmd/server	2.309s
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/domain	3.136s
+?   	github.com/jurwaCST/Jurwa/services/status-lifecycle/ports	[no test files]
+ok  	github.com/jurwaCST/Jurwa/tests/spec	3.067s
+
+real	0m43.778s
+user	0m0.031s
+sys	0m0.015s
