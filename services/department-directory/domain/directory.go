@@ -61,8 +61,8 @@ func (p Position) Validate() error {
 // DefaultDepartments are the 6 academic departments of CST, named as on
 // https://cst.edu.bt/department/. Each gets one HoD position. On 2 November 2026
 // the staff directory (https://cst.edu.bt/staff-directory/) listed an HoD for
-// every department except Mechanical Engineering, so HOD_MECH stays vacant until
-// the System Administrator assigns a holder.
+// every department except Mechanical Engineering, so the Mechanical Programme
+// Leader acts as HoD (actingHoD). The System Administrator assigns the holder.
 func DefaultDepartments() []Department {
 	return []Department{
 		{Code: "ARCH", Name: "Architecture"},
@@ -73,6 +73,10 @@ func DefaultDepartments() []Department {
 		{Code: "SH", Name: "Science & Humanities"},
 	}
 }
+
+// actingHoD marks departments with no HoD, whose Programme Leader acts as HoD.
+// The position code stays HOD_<dept>, so reassignment works the same way.
+var actingHoD = map[string]bool{"MECH": true}
 
 // DefaultPositions are the Category Heads (decision 2), one HoD per department
 // and the Hostel reassignment targets named in the proposal. Nobody holds them yet.
@@ -89,7 +93,11 @@ func DefaultPositions() []Position {
 		{Code: "CHIEF_COUNCILLOR", Title: "Chief Councillor", Kind: KindCouncillor},
 	}
 	for _, d := range DefaultDepartments() {
-		ps = append(ps, Position{Code: "HOD_" + d.Code, Title: "Head of Department, " + d.Name, Kind: KindHoD, DepartmentCode: d.Code})
+		title := "Head of Department, " + d.Name
+		if actingHoD[d.Code] {
+			title += " (Programme Leader, acting)"
+		}
+		ps = append(ps, Position{Code: "HOD_" + d.Code, Title: title, Kind: KindHoD, DepartmentCode: d.Code})
 	}
 	for i := range ps {
 		ps[i].Active = true
