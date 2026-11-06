@@ -1,0 +1,93 @@
+# routing-rules with PostgreSQL 16 (Docker), DATABASE_URL=postgres://jurwa:<password>@localhost:55432/routing_rules
+
+## Integration tests (testcontainers)
+$ go test -tags=integration ./services/routing-rules/adapters/out/postgres/... -v
+=== RUN   TestRepositoryContract
+=== RUN   TestRepositoryContract/seeded_with_the_three_default_rules
+=== RUN   TestRepositoryContract/list_is_ordered_by_category_then_building
+=== RUN   TestRepositoryContract/upsert_of_the_same_category_and_building_keeps_the_id
+=== RUN   TestRepositoryContract/a_new_building_rule_gets_a_new_id_and_inactive_rules_are_hidden
+=== RUN   TestRepositoryContract/other_categories_are_not_returned
+--- PASS: TestRepositoryContract (2.48s)
+    --- PASS: TestRepositoryContract/seeded_with_the_three_default_rules (0.03s)
+    --- PASS: TestRepositoryContract/list_is_ordered_by_category_then_building (0.01s)
+    --- PASS: TestRepositoryContract/upsert_of_the_same_category_and_building_keeps_the_id (0.01s)
+    --- PASS: TestRepositoryContract/a_new_building_rule_gets_a_new_id_and_inactive_rules_are_hidden (0.01s)
+    --- PASS: TestRepositoryContract/other_categories_are_not_returned (0.01s)
+=== RUN   TestDataSurvivesARestart
+--- PASS: TestDataSurvivesARestart (1.34s)
+=== RUN   TestSchemaMatchesTheDesignFile
+--- PASS: TestSchemaMatchesTheDesignFile (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/routing-rules/adapters/out/postgres	4.161s
+
+## Restart check
+### first start
+"msg":"storage: postgres"
+$ grpcurl -plaintext -d '{"rule":{"category":"HOSTEL","building":"Hostel B","target_position":"SSO","active":true}}' localhost:9006 jurwa.routingrules.v1.RoutingRulesService/UpsertRule
+{
+  "rule": {
+    "id": "7d136503-c957-434e-ab3c-0e48d7d322d6",
+    "category": "HOSTEL",
+    "building": "Hostel B",
+    "targetPosition": "SSO",
+    "priority": 100,
+    "active": true,
+    "updatedAt": "..."
+  }
+}
+
+### service stopped and started again
+$ grpcurl -plaintext -d '{"category":"HOSTEL","location":{"building":"Hostel B"}}' localhost:9006 jurwa.routingrules.v1.RoutingRulesService/GetRule
+{
+  "rule": {
+    "id": "7d136503-c957-434e-ab3c-0e48d7d322d6",
+    "category": "HOSTEL",
+    "building": "Hostel B",
+    "targetPosition": "SSO",
+    "priority": 100,
+    "active": true,
+    "updatedAt": "2026-11-06T05:25:11.946645Z"
+  }
+}
+
+$ grpcurl -plaintext localhost:9006 jurwa.routingrules.v1.RoutingRulesService/ListRules
+{
+  "rules": [
+    {
+      "id": "a762951b-53ef-42ce-8981-4ba3ded7b8f2",
+      "category": "ACADEMIC_BLOCK",
+      "targetPosition": "DAA",
+      "priority": 100,
+      "active": true,
+      "updatedAt": "2026-11-06T05:25:11.605230Z"
+    },
+    {
+      "id": "2e618618-f790-4d8c-b67a-57924d65a16d",
+      "category": "HOSTEL",
+      "targetPosition": "DSA",
+      "priority": 100,
+      "active": true,
+      "updatedAt": "2026-11-06T05:25:11.605230Z"
+    },
+    {
+      "id": "7d136503-c957-434e-ab3c-0e48d7d322d6",
+      "category": "HOSTEL",
+      "building": "Hostel B",
+      "targetPosition": "SSO",
+      "priority": 100,
+      "active": true,
+      "updatedAt": "2026-11-06T05:25:11.946645Z"
+    },
+    {
+      "id": "a2fa4b12-20ce-40a7-ac0b-e0b97d52bc68",
+      "category": "OTHERS",
+      "targetPosition": "SSO",
+      "priority": 100,
+      "active": true,
+      "updatedAt": "2026-11-06T05:25:11.605230Z"
+    }
+  ]
+}
+
+# The Hostel B rule added before the restart is still there: data is in PostgreSQL.
