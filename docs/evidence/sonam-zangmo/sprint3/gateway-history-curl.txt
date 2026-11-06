@@ -1,0 +1,63 @@
+# SCRUM-119 report-history routes. Running: identity 9016, authorization 9017, report-submission 9001, report-history 9003, api-gateway 8080.
+# student1 ($T1) submitted report 7cbe05a4-2004-4ac5-a1e4-240b5b43d03e; student2 ($T2) is another student. Tokens are not saved.
+
+## 1. No token: 401
+$ curl -i http://localhost:8080/me/reports
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+
+{"error":"missing bearer token"}
+
+
+## 2. Student lists their own reports: 200 (reporter id from the JWT; ?reporterId is ignored)
+$ curl -i 'http://localhost:8080/me/reports?reporterId=someone-else&pageSize=10' -H "Authorization: Bearer $T1"
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"reports":[], "nextPageToken":""}
+
+
+# The list is empty: report-history is filled from events:report.submitted, and the event bus
+# (SCRUM-122, Choki) is not merged yet. The gateway call itself works, and an empty list is sent as [].
+
+## 3. Bad paging: 400, report-history is not called
+$ curl -i 'http://localhost:8080/me/reports?pageSize=abc' -H "Authorization: Bearer $T1"
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{"error":"pageSize must be a number"}
+
+
+## 4. Timeline of another student's report: 403 (owner checked with report-submission)
+$ curl -i http://localhost:8080/reports/7cbe05a4-2004-4ac5-a1e4-240b5b43d03e/timeline -H "Authorization: Bearer $T2"
+HTTP/1.1 403 Forbidden
+Content-Type: application/json
+
+{"error":"not allowed"}
+
+
+## 5. Timeline of own report: ownership passes, report-history has no entry yet (no events): 404
+$ curl -i http://localhost:8080/reports/7cbe05a4-2004-4ac5-a1e4-240b5b43d03e/timeline -H "Authorization: Bearer $T1"
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+
+{"error":"report not found"}
+
+
+## 6. Unknown report: 404
+$ curl -i http://localhost:8080/reports/00000000-0000-4000-8000-0000000000ff/timeline -H "Authorization: Bearer $T1"
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+
+{"error":"report not found"}
+
+
+## 7. Role rules covered by unit tests (Category Head, Staff, System Admin cannot log in until identity seeds demo users)
+--- PASS: TestHistoryRoutesNeedAToken (0.00s)
+--- PASS: TestMyReportsUsesTheIDFromTheJWT (0.00s)
+--- PASS: TestMyReportsDefaultsAndBadPaging (0.00s)
+--- PASS: TestMyReportsIsForStudentsOnly (0.00s)
+--- PASS: TestTimelineOwnership (0.00s)
+--- PASS: TestTimelineUnknownReport (0.00s)
+--- PASS: TestEmptyListsAreSentAsEmptyArrays (0.00s)
+--- PASS: TestReportJSONFieldsAreAlwaysPresent (0.00s)

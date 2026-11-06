@@ -26,6 +26,7 @@ import (
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
 	internalnotesv1 "github.com/jurwaCST/Jurwa/proto/gen/internal-notes/v1"
 	locationtaxonomyv1 "github.com/jurwaCST/Jurwa/proto/gen/location-taxonomy/v1"
+	reporthistoryv1 "github.com/jurwaCST/Jurwa/proto/gen/report-history/v1"
 	reportsubmissionv1 "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1"
 	httpadapter "github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http"
 	"github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient"
@@ -66,6 +67,7 @@ func main() {
 		"location-taxonomy": envOr("LOCATION_TAXONOMY_ADDR", "localhost:9004"),
 		"report-submission": envOr("REPORT_SUBMISSION_ADDR", "localhost:9001"),
 		"internal-notes":    envOr("INTERNAL_NOTES_ADDR", "localhost:9005"),
+		"report-history":    envOr("REPORT_HISTORY_ADDR", "localhost:9003"),
 	} {
 		conn, err := dial(addr)
 		if err != nil {
@@ -84,6 +86,7 @@ func main() {
 		Locations:  grpcclients.Locations{C: locationtaxonomyv1.NewLocationTaxonomyServiceClient(conns["location-taxonomy"])},
 		Reports:    grpcclients.Reports{C: reportsubmissionv1.NewReportSubmissionServiceClient(conns["report-submission"])},
 		Notes:      grpcclients.Notes{C: internalnotesv1.NewInternalNotesServiceClient(conns["internal-notes"])},
+		History:    grpcclients.History{C: reporthistoryv1.NewReportHistoryServiceClient(conns["report-history"])},
 		Limiter:    domain.NewLimiter(rateLimit, time.Now),
 	})
 	httpSrv := &http.Server{

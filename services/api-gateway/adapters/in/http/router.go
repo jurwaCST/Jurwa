@@ -11,6 +11,7 @@ import (
 	"log/slog"
 	"net"
 	"net/http"
+	"strconv"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -37,6 +38,7 @@ type Deps struct {
 	Locations  ports.Locations
 	Reports    ports.Reports
 	Notes      ports.Notes
+	History    ports.History
 	Limiter    *domain.Limiter
 }
 
@@ -60,6 +62,8 @@ func NewRouter(d Deps) http.Handler {
 	mux.Handle("GET /reports/{reportId}", r.protected(domain.ActionReportRead, r.getReport))
 	mux.Handle("POST /reports/{reportId}/notes", r.protected(domain.ActionReportNoteAdd, r.addNote))
 	mux.Handle("GET /reports/{reportId}/notes", r.protected(domain.ActionReportNoteRead, r.listNotes))
+	mux.Handle("GET /me/reports", r.protected(domain.ActionReportListOwn, r.myReports))
+	mux.Handle("GET /reports/{reportId}/timeline", r.protected(domain.ActionReportTimelineRead, r.timeline))
 
 	return r.rateLimit(mux)
 }
@@ -199,13 +203,49 @@ func (r router) listNotes(w http.ResponseWriter, req *http.Request) {
 	reply(w, http.StatusOK, resp, err)
 }
 
+func (r router) myReports(w http.ResponseWriter, req *http.Request) {
+	var pageSize int64
+	if v := req.URL.Query().Get("pageSize"); v != "" {
+		n, err := strconv.ParseInt(v, 10, 32)
+		if err != nil {
+			writeJSONError(w, http.StatusBadRequest, "pageSize must be a number")
+			return
+		}
+		pageSize = n
+	}
+	// The reporter is always the signed-in student, never a query parameter (rule 2).
+	resp, err := r.History.ListReportsByReporter(req.Context(), principal(req).UserID, int32(pageSize), req.URL.Query().Get("pageToken"))
+	reply(w, http.StatusOK, resp, err)
+}
+
+// timeline applies "Student (own)": the timeline has no reporter, so for a
+// student the owner is looked up in report-submission first, the same check
+// as GET /reports/{reportId}.
+func (r router) timeline(w http.ResponseWriter, req *http.Request) {
+	reportID := req.PathValue("reportId")
+	if actingRole(req) == domain.RoleStudent {
+		report, err := r.Reports.GetReport(req.Context(), reportID)
+		if err == nil && !domain.CanReadReport(principal(req), report.GetReporterId()) {
+			err = domain.ErrForbidden
+		}
+		if err != nil {
+			writeError(w, err)
+			return
+		}
+	}
+	resp, err := r.History.GetReportTimeline(req.Context(), reportID)
+	reply(w, http.StatusOK, resp, err)
+}
+
 // ---- JSON and errors ----
 
 var (
 	// Strict: an unknown field or enum value (for example "category":"NOPE") is a 400,
 	// not silently dropped.
 	unmarshal = protojson.UnmarshalOptions{}
-	marshal   = protojson.MarshalOptions{}
+	// Every field is sent, so the PWA can rely on it: an empty list is [] and
+	// an empty text is "". Optional fields that are not set (photoId) stay out.
+	marshal = protojson.MarshalOptions{EmitUnpopulated: true}
 )
 
 // readJSON decodes the body into m. On bad JSON it writes 400 and returns false.

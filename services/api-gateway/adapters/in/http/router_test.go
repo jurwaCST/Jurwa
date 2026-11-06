@@ -19,8 +19,8 @@ import (
 	commonv1 "github.com/jurwaCST/Jurwa/proto/gen/common/v1"
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
 	internalnotesv1 "github.com/jurwaCST/Jurwa/proto/gen/internal-notes/v1"
-	reporthistoryv1 "github.com/jurwaCST/Jurwa/proto/gen/report-history/v1"
 	locationtaxonomyv1 "github.com/jurwaCST/Jurwa/proto/gen/location-taxonomy/v1"
+	reporthistoryv1 "github.com/jurwaCST/Jurwa/proto/gen/report-history/v1"
 	reportsubmissionv1 "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1"
 	"github.com/jurwaCST/Jurwa/services/api-gateway/application"
 	"github.com/jurwaCST/Jurwa/services/api-gateway/domain"
@@ -140,10 +140,14 @@ type fakeHistory struct {
 	pageToken string
 	timeline  string
 	err       error
+	empty     bool
 }
 
 func (f *fakeHistory) ListReportsByReporter(_ context.Context, reporterID string, pageSize int32, pageToken string) (*reporthistoryv1.ListReportsByReporterResponse, error) {
 	f.reporter, f.pageSize, f.pageToken = reporterID, pageSize, pageToken
+	if f.empty {
+		return &reporthistoryv1.ListReportsByReporterResponse{}, nil
+	}
 	return &reporthistoryv1.ListReportsByReporterResponse{Reports: []*reporthistoryv1.ReportSummary{{ReportId: "r1", ReporterId: reporterID}}, NextPageToken: "next"}, nil
 }
 
@@ -517,4 +521,24 @@ func TestTimelineUnknownReport(t *testing.T) {
 	e = newEnv()
 	e.history.err = status.Error(codes.NotFound, "report not found")
 	assert.Equal(t, http.StatusNotFound, e.do("GET", "/reports/r9/timeline", "head-token", "").Code, "staff roles: report-history says not found")
+}
+
+// A student with no reports gets an empty list, not a missing field, so the
+// PWA can always loop over "reports".
+func TestEmptyListsAreSentAsEmptyArrays(t *testing.T) {
+	e := newEnv()
+	e.history.empty = true
+	rec := e.do("GET", "/me/reports", "student-token", "")
+	require.Equal(t, http.StatusOK, rec.Code)
+	assert.JSONEq(t, `{"reports":[],"nextPageToken":""}`, rec.Body.String())
+}
+
+// Plain fields are always sent; an optional field that is not set (photoId)
+// stays out instead of being sent as null.
+func TestReportJSONFieldsAreAlwaysPresent(t *testing.T) {
+	rec := newEnv().do("GET", "/reports/r1", "head-token", "")
+	require.Equal(t, http.StatusOK, rec.Code)
+	body := decode(t, rec)
+	assert.Contains(t, body, "description", "empty text is sent as \"\"")
+	assert.NotContains(t, body, "photoId", "a report without a photo has no photoId")
 }

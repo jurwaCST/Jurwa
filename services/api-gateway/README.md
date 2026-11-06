@@ -29,6 +29,8 @@ Every gRPC client goes through `pkg/resilience` (2 s timeout, up to 3 attempts f
 | `GET /reports/{reportId}` | report-submission GetReport | Student (own), Category Head, Staff, System Administrator |
 | `POST /reports/{reportId}/notes` | internal-notes AddNote (returns 201) | Category Head, Staff |
 | `GET /reports/{reportId}/notes` | internal-notes ListNotes | Category Head, Staff, System Administrator |
+| `GET /me/reports` | report-history ListReportsByReporter (`?pageSize=` 1 to 100, `?pageToken=`) | Student; the reporter id comes from the JWT |
+| `GET /reports/{reportId}/timeline` | report-history GetReportTimeline | Student (own, checked with report-submission), Category Head, Staff, System Administrator |
 
 The other routes in `api-routes.md` are added as their services are merged.
 
@@ -63,6 +65,7 @@ Error bodies are `{"error": "<message>"}`.
 | `REPORT_SUBMISSION_ADDR` | `localhost:9001` | report-submission |
 | `AUTHORIZATION_ADDR` | `localhost:9017` | authorization |
 | `INTERNAL_NOTES_ADDR` | `localhost:9005` | internal-notes |
+| `REPORT_HISTORY_ADDR` | `localhost:9003` | report-history |
 
 ## Run
 
@@ -74,6 +77,7 @@ make run SERVICE=authorization
 make run SERVICE=category-taxonomy
 make run SERVICE=report-submission
 make run SERVICE=internal-notes
+make run SERVICE=report-history
 make run SERVICE=api-gateway
 ```
 
