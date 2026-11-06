@@ -1,0 +1,27 @@
+# SCRUM-126 tests first: go test ./services/identity/... before the code exists, 2026-11-06 11:26
+# github.com/jurwaCST/Jurwa/services/identity/application [github.com/jurwaCST/Jurwa/services/identity/application.test]
+services\identity\application\seed_test.go:27:22: svc.SeedDemoUsers undefined (type *Service has no field or method SeedDemoUsers)
+services\identity\application\seed_test.go:54:16: undefined: DemoUsers
+services\identity\application\seed_test.go:61:16: svc.SeedDemoUsers undefined (type *Service has no field or method SeedDemoUsers)
+services\identity\application\seed_test.go:63:22: svc.SeedDemoUsers undefined (type *Service has no field or method SeedDemoUsers)
+services\identity\application\seed_test.go:78:53: undefined: ErrDemoPasswordMissing
+services\identity\application\seed_test.go:79:54: undefined: ErrDemoPasswordMissing
+services\identity\application\seed_test.go:86:24: svc.SeedDemoUsers undefined (type *Service has no field or method SeedDemoUsers)
+services\identity\application\seed_test.go:102:15: svc.SeedDemoUsers undefined (type *Service has no field or method SeedDemoUsers)
+services\identity\application\seed_test.go:103:25: undefined: ErrDemoEmailTaken
+services\identity\application\seed_test.go:109:16: svc.SeedDemoUsers undefined (type *Service has no field or method SeedDemoUsers)
+services\identity\application\seed_test.go:109:16: too many errors
+ok  	github.com/jurwaCST/Jurwa/services/identity/adapters/in/grpc	(cached)
+?   	github.com/jurwaCST/Jurwa/services/identity/adapters/out/memory	[no test files]
+FAIL	github.com/jurwaCST/Jurwa/services/identity/application [build failed]
+# github.com/jurwaCST/Jurwa/services/identity/domain [github.com/jurwaCST/Jurwa/services/identity/domain.test]
+services\identity\domain\user_test.go:129:12: undefined: NewUserWithRole
+services\identity\domain\user_test.go:136:11: undefined: NewUserWithRole
+services\identity\domain\user_test.go:137:25: undefined: ErrInvalidRole
+services\identity\domain\user_test.go:138:11: undefined: NewUserWithRole
+# github.com/jurwaCST/Jurwa/services/identity/cmd/server [github.com/jurwaCST/Jurwa/services/identity/cmd/server.test]
+services\identity\cmd\server\seed_test.go:40:20: undefined: seedFromEnv
+FAIL	github.com/jurwaCST/Jurwa/services/identity/cmd/server [build failed]
+FAIL	github.com/jurwaCST/Jurwa/services/identity/domain [build failed]
+?   	github.com/jurwaCST/Jurwa/services/identity/ports	[no test files]
+FAIL

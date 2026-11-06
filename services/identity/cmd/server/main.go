@@ -48,6 +48,16 @@ func main() {
 	// In-memory store for Sprint 1; PostgreSQL replaces it in Sprint 2.
 	app := application.NewService(memory.NewUsers(), tokens)
 
+	// Demo accounts for the roles that cannot register (SEED_DEMO_USERS=true).
+	created, err := seedFromEnv(context.Background(), app, os.Getenv)
+	if err != nil {
+		slog.Error("cannot seed demo users", "error", err)
+		os.Exit(1)
+	}
+	if created > 0 {
+		slog.Warn("demo users seeded, for the demo only", "created", created)
+	}
+
 	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		slog.Error("cannot listen", "port", port, "error", err)
