@@ -1,0 +1,50 @@
+$ go test ./pkg/eventbus/... -cover -v -count=1
+=== RUN   TestMemoryBus
+=== RUN   TestMemoryBus/publish_then_subscribe_delivers_the_same_message
+=== RUN   TestMemoryBus/two_consumer_groups_each_get_every_message
+=== RUN   TestMemoryBus/one_group_with_two_consumers_shares_the_messages
+=== RUN   TestMemoryBus/failing_handler_is_tried_3_times_then_the_message_goes_to_the_dead_stream
+=== RUN   TestMemoryBus/handler_that_fails_then_succeeds_is_not_dead-lettered
+=== RUN   TestMemoryBus/same_event_id_twice_is_passed_to_the_handler_twice
+=== RUN   TestMemoryBus/subscribe_returns_when_the_context_is_cancelled
+=== RUN   TestMemoryBus/publish_of_a_nil_message_is_an_error
+--- PASS: TestMemoryBus (0.53s)
+    --- PASS: TestMemoryBus/publish_then_subscribe_delivers_the_same_message (0.00s)
+    --- PASS: TestMemoryBus/two_consumer_groups_each_get_every_message (0.02s)
+    --- PASS: TestMemoryBus/one_group_with_two_consumers_shares_the_messages (0.20s)
+    --- PASS: TestMemoryBus/failing_handler_is_tried_3_times_then_the_message_goes_to_the_dead_stream (0.00s)
+    --- PASS: TestMemoryBus/handler_that_fails_then_succeeds_is_not_dead-lettered (0.20s)
+    --- PASS: TestMemoryBus/same_event_id_twice_is_passed_to_the_handler_twice (0.00s)
+    --- PASS: TestMemoryBus/subscribe_returns_when_the_context_is_cancelled (0.10s)
+    --- PASS: TestMemoryBus/publish_of_a_nil_message_is_an_error (0.00s)
+=== RUN   TestRedisBusOnMiniredis
+=== RUN   TestRedisBusOnMiniredis/publish_then_subscribe_delivers_the_same_message
+=== RUN   TestRedisBusOnMiniredis/two_consumer_groups_each_get_every_message
+=== RUN   TestRedisBusOnMiniredis/one_group_with_two_consumers_shares_the_messages
+=== RUN   TestRedisBusOnMiniredis/failing_handler_is_tried_3_times_then_the_message_goes_to_the_dead_stream
+=== RUN   TestRedisBusOnMiniredis/handler_that_fails_then_succeeds_is_not_dead-lettered
+=== RUN   TestRedisBusOnMiniredis/same_event_id_twice_is_passed_to_the_handler_twice
+=== RUN   TestRedisBusOnMiniredis/subscribe_returns_when_the_context_is_cancelled
+=== RUN   TestRedisBusOnMiniredis/publish_of_a_nil_message_is_an_error
+--- PASS: TestRedisBusOnMiniredis (0.88s)
+    --- PASS: TestRedisBusOnMiniredis/publish_then_subscribe_delivers_the_same_message (0.00s)
+    --- PASS: TestRedisBusOnMiniredis/two_consumer_groups_each_get_every_message (0.10s)
+    --- PASS: TestRedisBusOnMiniredis/one_group_with_two_consumers_shares_the_messages (0.31s)
+    --- PASS: TestRedisBusOnMiniredis/failing_handler_is_tried_3_times_then_the_message_goes_to_the_dead_stream (0.11s)
+    --- PASS: TestRedisBusOnMiniredis/handler_that_fails_then_succeeds_is_not_dead-lettered (0.21s)
+    --- PASS: TestRedisBusOnMiniredis/same_event_id_twice_is_passed_to_the_handler_twice (0.05s)
+    --- PASS: TestRedisBusOnMiniredis/subscribe_returns_when_the_context_is_cancelled (0.10s)
+    --- PASS: TestRedisBusOnMiniredis/publish_of_a_nil_message_is_an_error (0.00s)
+=== RUN   TestNewRedisRejectsBadURL
+--- PASS: TestNewRedisRejectsBadURL (0.00s)
+=== RUN   TestRedisSubscribeFailsWhenRedisIsDown
+redis: 2026/11/06 11:16:48 pool.go:422: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:53251: connect: connection refused
+redis: 2026/11/06 11:16:49 pool.go:422: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:53251: connect: connection refused
+redis: 2026/11/06 11:16:49 pool.go:422: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:53251: connect: connection refused
+redis: 2026/11/06 11:16:50 pool.go:422: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:53251: connect: connection refused
+--- PASS: TestRedisSubscribeFailsWhenRedisIsDown (2.09s)
+=== RUN   TestRedisEntryWithoutPayloadGoesToDeadStream
+--- PASS: TestRedisEntryWithoutPayloadGoesToDeadStream (0.05s)
+PASS
+coverage: 94.1% of statements
+ok  	github.com/jurwaCST/Jurwa/pkg/eventbus	4.084s	coverage: 94.1% of statements
