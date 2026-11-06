@@ -1,0 +1,17 @@
+SCRUM-105 tests first: pkg/observability has only the tests, so it does not build yet (red). 2026-11-06.
+Library: github.com/prometheus/client_golang v1.23.2 (v1.25 needs Go 1.26, the repo and the Dockerfiles use Go 1.25).
+
+# github.com/jurwaCST/Jurwa/pkg/observability [github.com/jurwaCST/Jurwa/pkg/observability.test]
+pkg\observability\observability_test.go:27:48: undefined: Obs
+pkg\observability\observability_test.go:29:12: undefined: New
+pkg\observability\observability_test.go:29:16: undefined: Config
+pkg\observability\observability_test.go:53:12: undefined: New
+pkg\observability\observability_test.go:53:16: undefined: Config
+pkg\observability\observability_test.go:131:10: undefined: CorrelationID
+pkg\observability\observability_test.go:149:10: undefined: CorrelationID
+pkg\observability\observability_test.go:157:22: undefined: CorrelationID
+pkg\observability\observability_test.go:180:12: undefined: New
+pkg\observability\observability_test.go:229:35: undefined: Obs
+pkg\observability\observability_test.go:180:12: too many errors
+FAIL	github.com/jurwaCST/Jurwa/pkg/observability [build failed]
+FAIL
