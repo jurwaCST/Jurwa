@@ -18,8 +18,10 @@ import (
 	reportsubmissionv1 "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1"
 	grpcadapter "github.com/jurwaCST/Jurwa/services/report-submission/adapters/in/grpc"
 	"github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/memory"
+	"github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/mongo"
 	"github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/uuid"
 	"github.com/jurwaCST/Jurwa/services/report-submission/application"
+	"github.com/jurwaCST/Jurwa/services/report-submission/ports"
 )
 
 // Defaults used when the environment variables are not set.
@@ -27,6 +29,7 @@ import (
 const (
 	defaultServiceName = "report-submission"
 	defaultPort        = "9001"
+	defaultMongoDB     = "report_submission"
 )
 
 func main() {
@@ -48,8 +51,14 @@ func main() {
 	hs := health.NewServer()
 	healthpb.RegisterHealthServer(srv, hs)
 
-	// In-memory storage for Sprint 1; the MongoDB adapter replaces it in Sprint 2.
-	app := application.NewService(memory.NewRepository(), uuid.Generator{}, time.Now)
+	repo, closeRepo, err := newRepository(context.Background())
+	if err != nil {
+		slog.Error("cannot open storage", "error", err)
+		os.Exit(1)
+	}
+	defer closeRepo()
+
+	app := application.NewService(repo, uuid.Generator{}, time.Now)
 	reportsubmissionv1.RegisterReportSubmissionServiceServer(srv, grpcadapter.NewHandler(app))
 
 	// Reflection lets grpcurl list and call methods without the .proto files.
@@ -74,6 +83,27 @@ func main() {
 		os.Exit(1)
 	}
 	slog.Info("server stopped")
+}
+
+// newRepository uses MongoDB when MONGO_URL is set, otherwise memory (data is
+// lost on restart). The database name comes from MONGO_DB.
+func newRepository(ctx context.Context) (ports.ReportRepository, func(), error) {
+	url := os.Getenv("MONGO_URL")
+	if url == "" {
+		slog.Info("storage: memory (MONGO_URL not set)")
+		return memory.NewRepository(), func() {}, nil
+	}
+	database := envOr("MONGO_DB", defaultMongoDB)
+	repo, err := mongo.Connect(ctx, url, database)
+	if err != nil {
+		return nil, nil, err
+	}
+	if err := repo.EnsureIndexes(ctx); err != nil {
+		_ = repo.Close(ctx)
+		return nil, nil, err
+	}
+	slog.Info("storage: mongodb", "database", database)
+	return repo, func() { _ = repo.Close(context.Background()) }, nil
 }
 
 // envOr returns the environment variable key, or fallback when it is empty.
