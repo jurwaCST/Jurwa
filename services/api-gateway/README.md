@@ -9,12 +9,13 @@ For every request it:
 1. **Rate limits**: at most 20 requests a second per client IP (in-memory token bucket, `RATE_LIMIT_PER_SECOND`). The 21st gets `429` with `Retry-After: 1`. Redis counters replace this in Sprint 3 so several gateway pods share one limit.
 2. **Checks the JWT** on every route except `/health`, `/auth/register` and `/auth/login`: `Authorization: Bearer <token>` is sent to identity `ValidateToken`. A missing or invalid token is `401`.
 3. **Checks the role** for the route's action with authorization `CheckPermission` (Gayley's service, `AUTHORIZATION_ADDR`). A denial is `403`. If authorization cannot be reached the request is refused with `503`, never let through. A student may read only their own report (checked in the gateway, which has the report).
+   For internal-notes, whose messages have no role field, the gateway sends the allowed role as the gRPC metadata `x-user-role` (for example `STAFF`), and `author_id` from the JWT. The body of `POST .../notes` is `{"body": "..."}`; the report id comes from the path.
 4. **Forwards** the call. User ids such as `reporter_id` come from the JWT, never from the body. Bodies are decoded strictly: bad JSON, an unknown field or an unknown enum value is `400`.
 5. **Maps gRPC errors to HTTP**, and never passes internal error text to the browser.
 
 Every gRPC client goes through `pkg/resilience` (2 s timeout, up to 3 attempts for Unavailable or DeadlineExceeded, one circuit breaker per service).
 
-## Routes in Sprint 2
+## Routes
 
 | Method and path | Service, RPC | Roles |
 |---|---|---|
@@ -26,6 +27,8 @@ Every gRPC client goes through `pkg/resilience` (2 s timeout, up to 3 attempts f
 | `GET /categories/{category}/locations` | location-taxonomy ListLocations | any signed-in user |
 | `POST /reports` | report-submission SubmitReport (returns 201) | Student |
 | `GET /reports/{reportId}` | report-submission GetReport | Student (own), Category Head, Staff, System Administrator |
+| `POST /reports/{reportId}/notes` | internal-notes AddNote (returns 201) | Category Head, Staff |
+| `GET /reports/{reportId}/notes` | internal-notes ListNotes | Category Head, Staff, System Administrator |
 
 The other routes in `api-routes.md` are added as their services are merged.
 
@@ -59,6 +62,7 @@ Error bodies are `{"error": "<message>"}`.
 | `LOCATION_TAXONOMY_ADDR` | `localhost:9004` | location-taxonomy |
 | `REPORT_SUBMISSION_ADDR` | `localhost:9001` | report-submission |
 | `AUTHORIZATION_ADDR` | `localhost:9017` | authorization |
+| `INTERNAL_NOTES_ADDR` | `localhost:9005` | internal-notes |
 
 ## Run
 
@@ -69,6 +73,7 @@ JWT_SECRET=<any long random string> make run SERVICE=identity
 make run SERVICE=authorization
 make run SERVICE=category-taxonomy
 make run SERVICE=report-submission
+make run SERVICE=internal-notes
 make run SERVICE=api-gateway
 ```
 

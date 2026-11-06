@@ -1,0 +1,8 @@
+# SCRUM-118 tests first: cd web && npm test (before the code exists), 2026-11-06 10:58
+ FAIL  src/App.test.tsx [ src/App.test.tsx ]
+Error: Failed to resolve import "./api/client" from "src/App.test.tsx". Does the file exist?
+ FAIL  src/api/client.test.ts [ src/api/client.test.ts ]
+Error: Failed to resolve import "./client" from "src/api/client.test.ts". Does the file exist?
+  2  |  import { api, ApiError, setToken } from "./client";
+ Test Files  2 failed (2)
+      Tests  no tests

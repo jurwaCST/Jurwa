@@ -9,6 +9,7 @@ import (
 	categorytaxonomyv1 "github.com/jurwaCST/Jurwa/proto/gen/category-taxonomy/v1"
 	commonv1 "github.com/jurwaCST/Jurwa/proto/gen/common/v1"
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
+	internalnotesv1 "github.com/jurwaCST/Jurwa/proto/gen/internal-notes/v1"
 	locationtaxonomyv1 "github.com/jurwaCST/Jurwa/proto/gen/location-taxonomy/v1"
 	reportsubmissionv1 "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1"
 )
@@ -40,4 +41,11 @@ type Locations interface {
 type Reports interface {
 	SubmitReport(ctx context.Context, in *reportsubmissionv1.SubmitReportRequest) (*reportsubmissionv1.SubmitReportResponse, error)
 	GetReport(ctx context.Context, reportID string) (*commonv1.Report, error)
+}
+
+// Notes is internal-notes (Choki). role is the caller's role, sent as the gRPC
+// metadata x-user-role because the messages have no role field.
+type Notes interface {
+	AddNote(ctx context.Context, role string, in *internalnotesv1.AddNoteRequest) (*internalnotesv1.AddNoteResponse, error)
+	ListNotes(ctx context.Context, role, reportID string) (*internalnotesv1.ListNotesResponse, error)
 }

@@ -18,6 +18,7 @@ import (
 	categorytaxonomyv1 "github.com/jurwaCST/Jurwa/proto/gen/category-taxonomy/v1"
 	commonv1 "github.com/jurwaCST/Jurwa/proto/gen/common/v1"
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
+	internalnotesv1 "github.com/jurwaCST/Jurwa/proto/gen/internal-notes/v1"
 	locationtaxonomyv1 "github.com/jurwaCST/Jurwa/proto/gen/location-taxonomy/v1"
 	reportsubmissionv1 "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1"
 	"github.com/jurwaCST/Jurwa/services/api-gateway/application"
@@ -32,6 +33,8 @@ type fakeIdentity struct{ loginErr error }
 var users = map[string]*identityv1.User{
 	"student-token": {Id: "u-student", Email: "s@rub.edu.bt", Roles: []commonv1.Role{commonv1.Role_STUDENT}},
 	"head-token":    {Id: "u-head", Email: "h@rub.edu.bt", Roles: []commonv1.Role{commonv1.Role_CATEGORY_HEAD}},
+	"staff-token":   {Id: "u-staff", Email: "st@rub.edu.bt", Roles: []commonv1.Role{commonv1.Role_STAFF}},
+	"admin-token":   {Id: "u-admin", Email: "a@rub.edu.bt", Roles: []commonv1.Role{commonv1.Role_SYSTEM_ADMIN}},
 }
 
 func (f *fakeIdentity) Register(_ context.Context, in *identityv1.RegisterRequest) (*identityv1.RegisterResponse, error) {
@@ -94,10 +97,35 @@ func (f *fakeReports) GetReport(_ context.Context, id string) (*commonv1.Report,
 type fakeAuthz struct{}
 
 func (fakeAuthz) CheckPermission(_ context.Context, role, action, _ string) (bool, error) {
-	if action == domain.ActionReportSubmit {
+	switch action {
+	case domain.ActionReportSubmit:
 		return role == domain.RoleStudent, nil
+	case domain.ActionReportNoteAdd: // same rule as the authorization policy
+		return role == domain.RoleCategoryHead || role == domain.RoleStaff, nil
+	case domain.ActionReportNoteRead:
+		return role == domain.RoleCategoryHead || role == domain.RoleStaff || role == domain.RoleSystemAdmin, nil
 	}
 	return true, nil
+}
+
+// fakeNotes records what the gateway sends to internal-notes.
+type fakeNotes struct {
+	role    string
+	added   *internalnotesv1.AddNoteRequest
+	listFor string
+}
+
+func (f *fakeNotes) AddNote(_ context.Context, role string, in *internalnotesv1.AddNoteRequest) (*internalnotesv1.AddNoteResponse, error) {
+	f.role, f.added = role, in
+	if strings.TrimSpace(in.GetBody()) == "" {
+		return nil, status.Error(codes.InvalidArgument, "invalid note: body is required")
+	}
+	return &internalnotesv1.AddNoteResponse{Note: &internalnotesv1.Note{Id: "n1", ReportId: in.GetReportId(), AuthorId: in.GetAuthorId(), Body: in.GetBody()}}, nil
+}
+
+func (f *fakeNotes) ListNotes(_ context.Context, role, reportID string) (*internalnotesv1.ListNotesResponse, error) {
+	f.role, f.listFor = role, reportID
+	return &internalnotesv1.ListNotesResponse{Notes: []*internalnotesv1.Note{{Id: "n1", ReportId: reportID, Body: "Plumber booked"}}}, nil
 }
 
 // ---- helpers ----
@@ -108,18 +136,20 @@ type env struct {
 	locs    *fakeLocations
 	reports *fakeReports
 	ident   *fakeIdentity
+	notes   *fakeNotes
 	clock   *time.Time
 }
 
 func newEnv() *env {
 	now := time.Date(2026, 11, 2, 9, 0, 0, 0, time.UTC)
-	e := &env{cats: &fakeCategories{}, locs: &fakeLocations{}, reports: &fakeReports{}, ident: &fakeIdentity{}, clock: &now}
+	e := &env{cats: &fakeCategories{}, locs: &fakeLocations{}, reports: &fakeReports{}, ident: &fakeIdentity{}, notes: &fakeNotes{}, clock: &now}
 	e.h = NewRouter(Deps{
 		Auth:       application.NewAuth(e.ident, fakeAuthz{}),
 		Identity:   e.ident,
 		Categories: e.cats,
 		Locations:  e.locs,
 		Reports:    e.reports,
+		Notes:      e.notes,
 		Limiter:    domain.NewLimiter(20, func() time.Time { return *e.clock }),
 	})
 	return e
@@ -327,4 +357,70 @@ func TestAuthorizationDownRefusesRequest(t *testing.T) {
 	assert.Equal(t, http.StatusServiceUnavailable, rec.Code)
 	assert.Nil(t, e.reports.submitted, "the report service is never reached")
 	assert.Equal(t, 0, e.cats.calls)
+}
+
+// ---- internal-notes routes (SCRUM-117) ----
+
+const notesPath = "/reports/6f1c2a7e-3b4d-4c5e-8f90-1a2b3c4d5e6f/notes"
+
+func TestNotesNeedAToken(t *testing.T) {
+	e := newEnv()
+	assert.Equal(t, http.StatusUnauthorized, e.do("POST", notesPath, "", `{"body":"x"}`).Code)
+	assert.Equal(t, http.StatusUnauthorized, e.do("GET", notesPath, "", "").Code)
+	assert.Nil(t, e.notes.added)
+}
+
+func TestNotesRoles(t *testing.T) {
+	tests := []struct {
+		token    string
+		wantAdd  int
+		wantList int
+	}{
+		{token: "head-token", wantAdd: http.StatusCreated, wantList: http.StatusOK},
+		{token: "staff-token", wantAdd: http.StatusCreated, wantList: http.StatusOK},
+		{token: "admin-token", wantAdd: http.StatusForbidden, wantList: http.StatusOK},
+		{token: "student-token", wantAdd: http.StatusForbidden, wantList: http.StatusForbidden},
+	}
+	for _, tt := range tests {
+		t.Run(tt.token, func(t *testing.T) {
+			e := newEnv()
+			assert.Equal(t, tt.wantAdd, e.do("POST", notesPath, tt.token, `{"body":"Plumber booked for Monday"}`).Code)
+			assert.Equal(t, tt.wantList, e.do("GET", notesPath, tt.token, "").Code)
+		})
+	}
+}
+
+func TestAddNoteSetsAuthorAndRoleFromTheJWT(t *testing.T) {
+	e := newEnv()
+	rec := e.do("POST", notesPath, "staff-token", `{"body":"Plumber booked","authorId":"someone-else","reportId":"other"}`)
+	require.Equal(t, http.StatusCreated, rec.Code, rec.Body.String())
+	assert.Equal(t, "u-staff", e.notes.added.GetAuthorId(), "author id comes from the JWT, never the body")
+	assert.Equal(t, "6f1c2a7e-3b4d-4c5e-8f90-1a2b3c4d5e6f", e.notes.added.GetReportId(), "report id comes from the path")
+	assert.Equal(t, "STAFF", e.notes.role, "sent to internal-notes as x-user-role")
+	assert.Equal(t, "Plumber booked", decode(t, rec)["note"].(map[string]any)["body"])
+}
+
+func TestListNotesSendsTheRole(t *testing.T) {
+	e := newEnv()
+	rec := e.do("GET", notesPath, "admin-token", "")
+	require.Equal(t, http.StatusOK, rec.Code)
+	assert.Equal(t, "SYSTEM_ADMIN", e.notes.role)
+	assert.Equal(t, "6f1c2a7e-3b4d-4c5e-8f90-1a2b3c4d5e6f", e.notes.listFor)
+	assert.Len(t, decode(t, rec)["notes"], 1)
+}
+
+func TestAddNoteBadInput(t *testing.T) {
+	e := newEnv()
+	assert.Equal(t, http.StatusBadRequest, e.do("POST", notesPath, "staff-token", `{"body":`).Code, "bad JSON")
+	assert.Nil(t, e.notes.added, "bad JSON never reaches internal-notes")
+	assert.Equal(t, http.StatusBadRequest, e.do("POST", notesPath, "staff-token", `{"body":"  "}`).Code, "empty note (InvalidArgument from internal-notes)")
+}
+
+// A user with two roles: the role sent is the one authorization allowed.
+func TestNotesSendTheRoleThatWasAllowed(t *testing.T) {
+	users["student-staff-token"] = &identityv1.User{Id: "u-two", Roles: []commonv1.Role{commonv1.Role_STUDENT, commonv1.Role_STAFF}}
+	defer delete(users, "student-staff-token")
+	e := newEnv()
+	require.Equal(t, http.StatusCreated, e.do("POST", notesPath, "student-staff-token", `{"body":"x"}`).Code)
+	assert.Equal(t, "STAFF", e.notes.role)
 }

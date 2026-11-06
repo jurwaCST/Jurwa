@@ -40,14 +40,21 @@ func (a *Auth) Authenticate(ctx context.Context, header string) (domain.Principa
 // Authorize returns nil when any of p's roles may do action on resource,
 // otherwise domain.ErrForbidden.
 func (a *Auth) Authorize(ctx context.Context, p domain.Principal, action, resource string) error {
+	_, err := a.AuthorizeAs(ctx, p, action, resource)
+	return err
+}
+
+// AuthorizeAs is Authorize that also returns the first of p's roles that was
+// allowed. Services that read the caller's role (x-user-role) get this one.
+func (a *Auth) AuthorizeAs(ctx context.Context, p domain.Principal, action, resource string) (string, error) {
 	for _, role := range p.Roles {
 		ok, err := a.authz.CheckPermission(ctx, role, action, resource)
 		if err != nil {
-			return err
+			return "", err
 		}
 		if ok {
-			return nil
+			return role, nil
 		}
 	}
-	return fmt.Errorf("%w: %s on %s", domain.ErrForbidden, action, resource)
+	return "", fmt.Errorf("%w: %s on %s", domain.ErrForbidden, action, resource)
 }
