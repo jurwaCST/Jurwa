@@ -19,6 +19,7 @@ import (
 	commonv1 "github.com/jurwaCST/Jurwa/proto/gen/common/v1"
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
 	internalnotesv1 "github.com/jurwaCST/Jurwa/proto/gen/internal-notes/v1"
+	reporthistoryv1 "github.com/jurwaCST/Jurwa/proto/gen/report-history/v1"
 	locationtaxonomyv1 "github.com/jurwaCST/Jurwa/proto/gen/location-taxonomy/v1"
 	reportsubmissionv1 "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1"
 	"github.com/jurwaCST/Jurwa/services/api-gateway/application"
@@ -104,6 +105,10 @@ func (fakeAuthz) CheckPermission(_ context.Context, role, action, _ string) (boo
 		return role == domain.RoleCategoryHead || role == domain.RoleStaff, nil
 	case domain.ActionReportNoteRead:
 		return role == domain.RoleCategoryHead || role == domain.RoleStaff || role == domain.RoleSystemAdmin, nil
+	case domain.ActionReportListOwn:
+		return role == domain.RoleStudent, nil
+	case domain.ActionReportTimelineRead:
+		return role != "PRESIDENT", nil
 	}
 	return true, nil
 }
@@ -128,6 +133,28 @@ func (f *fakeNotes) ListNotes(_ context.Context, role, reportID string) (*intern
 	return &internalnotesv1.ListNotesResponse{Notes: []*internalnotesv1.Note{{Id: "n1", ReportId: reportID, Body: "Plumber booked"}}}, nil
 }
 
+// fakeHistory records what the gateway sends to report-history.
+type fakeHistory struct {
+	reporter  string
+	pageSize  int32
+	pageToken string
+	timeline  string
+	err       error
+}
+
+func (f *fakeHistory) ListReportsByReporter(_ context.Context, reporterID string, pageSize int32, pageToken string) (*reporthistoryv1.ListReportsByReporterResponse, error) {
+	f.reporter, f.pageSize, f.pageToken = reporterID, pageSize, pageToken
+	return &reporthistoryv1.ListReportsByReporterResponse{Reports: []*reporthistoryv1.ReportSummary{{ReportId: "r1", ReporterId: reporterID}}, NextPageToken: "next"}, nil
+}
+
+func (f *fakeHistory) GetReportTimeline(_ context.Context, reportID string) (*reporthistoryv1.GetReportTimelineResponse, error) {
+	f.timeline = reportID
+	if f.err != nil {
+		return nil, f.err
+	}
+	return &reporthistoryv1.GetReportTimelineResponse{Entries: []*reporthistoryv1.TimelineEntry{{Id: "e1", EventType: "report.submitted", Summary: "Report submitted"}}}, nil
+}
+
 // ---- helpers ----
 
 type env struct {
@@ -137,12 +164,13 @@ type env struct {
 	reports *fakeReports
 	ident   *fakeIdentity
 	notes   *fakeNotes
+	history *fakeHistory
 	clock   *time.Time
 }
 
 func newEnv() *env {
 	now := time.Date(2026, 11, 2, 9, 0, 0, 0, time.UTC)
-	e := &env{cats: &fakeCategories{}, locs: &fakeLocations{}, reports: &fakeReports{}, ident: &fakeIdentity{}, notes: &fakeNotes{}, clock: &now}
+	e := &env{cats: &fakeCategories{}, locs: &fakeLocations{}, reports: &fakeReports{}, ident: &fakeIdentity{}, notes: &fakeNotes{}, history: &fakeHistory{}, clock: &now}
 	e.h = NewRouter(Deps{
 		Auth:       application.NewAuth(e.ident, fakeAuthz{}),
 		Identity:   e.ident,
@@ -150,6 +178,7 @@ func newEnv() *env {
 		Locations:  e.locs,
 		Reports:    e.reports,
 		Notes:      e.notes,
+		History:    e.history,
 		Limiter:    domain.NewLimiter(20, func() time.Time { return *e.clock }),
 	})
 	return e
@@ -423,4 +452,69 @@ func TestNotesSendTheRoleThatWasAllowed(t *testing.T) {
 	e := newEnv()
 	require.Equal(t, http.StatusCreated, e.do("POST", notesPath, "student-staff-token", `{"body":"x"}`).Code)
 	assert.Equal(t, "STAFF", e.notes.role)
+}
+
+// ---- report-history routes (SCRUM-119) ----
+
+func TestHistoryRoutesNeedAToken(t *testing.T) {
+	e := newEnv()
+	assert.Equal(t, http.StatusUnauthorized, e.do("GET", "/me/reports", "", "").Code)
+	assert.Equal(t, http.StatusUnauthorized, e.do("GET", "/reports/r1/timeline", "", "").Code)
+	assert.Empty(t, e.history.reporter)
+}
+
+func TestMyReportsUsesTheIDFromTheJWT(t *testing.T) {
+	e := newEnv()
+	rec := e.do("GET", "/me/reports?reporterId=u-other&pageSize=5&pageToken=abc", "student-token", "")
+	require.Equal(t, http.StatusOK, rec.Code, rec.Body.String())
+	assert.Equal(t, "u-student", e.history.reporter, "the reporter id comes from the JWT, never the request")
+	assert.Equal(t, int32(5), e.history.pageSize)
+	assert.Equal(t, "abc", e.history.pageToken)
+	assert.Equal(t, "next", decode(t, rec)["nextPageToken"])
+}
+
+func TestMyReportsDefaultsAndBadPaging(t *testing.T) {
+	e := newEnv()
+	require.Equal(t, http.StatusOK, e.do("GET", "/me/reports", "student-token", "").Code)
+	assert.Equal(t, int32(0), e.history.pageSize, "0 means the service default (20)")
+
+	e = newEnv()
+	assert.Equal(t, http.StatusBadRequest, e.do("GET", "/me/reports?pageSize=abc", "student-token", "").Code)
+	assert.Empty(t, e.history.reporter, "bad paging never reaches report-history")
+}
+
+func TestMyReportsIsForStudentsOnly(t *testing.T) {
+	e := newEnv()
+	assert.Equal(t, http.StatusForbidden, e.do("GET", "/me/reports", "head-token", "").Code)
+	assert.Empty(t, e.history.reporter)
+}
+
+func TestTimelineOwnership(t *testing.T) {
+	// fakeReports says report r1 belongs to u-student.
+	e := newEnv()
+	require.Equal(t, http.StatusOK, e.do("GET", "/reports/r1/timeline", "student-token", "").Code, "own report")
+	assert.Equal(t, "r1", e.history.timeline)
+
+	e = newEnv()
+	assert.Equal(t, http.StatusOK, e.do("GET", "/reports/r1/timeline", "head-token", "").Code, "Category Head reads any report")
+	e = newEnv()
+	assert.Equal(t, http.StatusOK, e.do("GET", "/reports/r1/timeline", "staff-token", "").Code)
+	e = newEnv()
+	assert.Equal(t, http.StatusOK, e.do("GET", "/reports/r1/timeline", "admin-token", "").Code)
+
+	users["other-student"] = &identityv1.User{Id: "u-other", Roles: []commonv1.Role{commonv1.Role_STUDENT}}
+	defer delete(users, "other-student")
+	e = newEnv()
+	assert.Equal(t, http.StatusForbidden, e.do("GET", "/reports/r1/timeline", "other-student", "").Code, "another student's report")
+	assert.Empty(t, e.history.timeline, "the timeline is never fetched")
+}
+
+func TestTimelineUnknownReport(t *testing.T) {
+	e := newEnv()
+	e.reports.getErr = status.Error(codes.NotFound, "report not found")
+	assert.Equal(t, http.StatusNotFound, e.do("GET", "/reports/r9/timeline", "student-token", "").Code, "student: owner lookup says not found")
+
+	e = newEnv()
+	e.history.err = status.Error(codes.NotFound, "report not found")
+	assert.Equal(t, http.StatusNotFound, e.do("GET", "/reports/r9/timeline", "head-token", "").Code, "staff roles: report-history says not found")
 }
