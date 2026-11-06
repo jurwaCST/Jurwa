@@ -15,8 +15,11 @@ import (
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/jurwaCST/Jurwa/pkg/eventbus"
 	reportsubmissionv1 "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1"
 	grpcadapter "github.com/jurwaCST/Jurwa/services/report-submission/adapters/in/grpc"
+	"github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/eventpublisher"
+	"github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/logpublisher"
 	"github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/memory"
 	"github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/mongo"
 	"github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/uuid"
@@ -58,7 +61,14 @@ func main() {
 	}
 	defer closeRepo()
 
-	app := application.NewService(repo, uuid.Generator{}, time.Now)
+	pub, closePub, err := newPublisher(context.Background(), logger)
+	if err != nil {
+		slog.Error("cannot open event bus", "error", err)
+		os.Exit(1)
+	}
+	defer closePub()
+
+	app := application.NewService(repo, uuid.Generator{}, pub, time.Now)
 	reportsubmissionv1.RegisterReportSubmissionServiceServer(srv, grpcadapter.NewHandler(app))
 
 	// Reflection lets grpcurl list and call methods without the .proto files.
@@ -104,6 +114,28 @@ func newRepository(ctx context.Context) (ports.ReportRepository, func(), error) 
 	}
 	slog.Info("storage: mongodb", "database", database)
 	return repo, func() { _ = repo.Close(context.Background()) }, nil
+}
+
+// newPublisher sends events on Redis Streams when REDIS_URL is set, otherwise
+// it only logs them.
+func newPublisher(ctx context.Context, logger *slog.Logger) (ports.EventPublisher, func(), error) {
+	url := os.Getenv("REDIS_URL")
+	if url == "" {
+		slog.Info("events: log only (REDIS_URL not set)")
+		return logpublisher.New(logger), func() {}, nil
+	}
+	bus, err := eventbus.NewRedis(url)
+	if err != nil {
+		return nil, nil, err
+	}
+	pingCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	if err := bus.Ping(pingCtx); err != nil {
+		_ = bus.Close()
+		return nil, nil, err
+	}
+	slog.Info("events: redis streams", "stream", eventbus.StreamReportSubmitted)
+	return eventpublisher.New(bus, uuid.Generator{}.NewID, time.Now), func() { _ = bus.Close() }, nil
 }
 
 // envOr returns the environment variable key, or fallback when it is empty.

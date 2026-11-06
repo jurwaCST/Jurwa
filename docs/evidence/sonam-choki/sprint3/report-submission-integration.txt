@@ -91,3 +91,44 @@ $ grpcurl -plaintext -d '{"report_id":"132175f1-0ddf-4ced-a428-f4eb97ab8a90"}' l
 }
 
 # The report survived the restart: it was read from MongoDB, not memory.
+
+## 4. Report submitted through the cluster: stored in MongoDB and published on Redis Streams
+# In the cluster: report through api-gateway -> report-submission -> MongoDB + Redis Streams
+
+$ kubectl -n jurwa logs deploy/report-submission   (start-up lines)
+{"time":"2026-11-06T05:55:08.544113918Z","level":"INFO","msg":"storage: mongodb","service":"report-submission","database":"report_submission"}
+{"time":"2026-11-06T05:55:08.545022418Z","level":"INFO","msg":"events: redis streams","service":"report-submission","stream":"events:report.submitted"}
+
+$ curl -i -X POST http://localhost:8080/reports -H "Authorization: Bearer $TOKEN" -d '{"category":"HOSTEL","location":{"building":"Hostel B","wing":"East"},"description":"Tap leaking in bathroom 2 (cluster check)"}'
+HTTP/1.1 201 Created
+Content-Type: application/json
+Date: Fri, 06 Nov 2026 05:55:31 GMT
+Content-Length: 303
+
+{"report":{"id":"ace11ee9-9108-4112-be78-f83245c49ccc", "reporterId":"2e55300e-648b-43da-b8a2-12102be8b20b", "category":"HOSTEL", "location":{"building":"Hostel B", "wing":"East"}, "description":"Tap leaking in bathroom 2 (cluster check)", "status":"OPEN", "createdAt":"2026-11-06T05:55:31.706021804Z"}}
+
+$ kubectl -n jurwa exec mongo-0 -- mongosh report_submission --eval 'db.reports.findOne({_id: "ace11ee9-9108-4112-be78-f83245c49ccc"})'   (user and password from the Secret)
+{
+  _id: 'ace11ee9-9108-4112-be78-f83245c49ccc',
+  reporter_id: '2e55300e-648b-43da-b8a2-12102be8b20b',
+  category: 'HOSTEL',
+  location: {
+    building: 'Hostel B',
+    wing: 'East'
+  },
+  description: 'Tap leaking in bathroom 2 (cluster check)',
+  status: 'OPEN',
+  created_at: ISODate('2026-11-06T05:55:31.706Z')
+}
+
+$ kubectl -n jurwa exec redis-0 -- redis-cli XLEN events:report.submitted
+1
+
+$ kubectl -n jurwa exec redis-0 -- redis-cli XREVRANGE events:report.submitted + - COUNT 1   (payload is protobuf bytes)
+1793944531709-0
+payload
+
+m
+$851b147d-1bb2-4665-a9de-e7f39dfe11d9report-submission"$ace11ee9-9108-4112-be78-f83245c49ccc
+$ace11ee9-9108-4112-be78-f83245c49ccc$2e55300e-648b-43da-b8a2-12102be8b20b"
+Hostel BEast*)Tap leaking in bathroom 2 (cluster check)8B
