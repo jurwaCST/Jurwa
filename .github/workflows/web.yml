@@ -1,0 +1,46 @@
+name: Web
+
+on:
+  pull_request:
+    paths:
+      - 'web/**'
+      - '.github/workflows/web.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'web/**'
+      - '.github/workflows/web.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  web:
+    name: Web tests and build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          # Vitest 5 and jsdom 31 need Node 22.22 or newer, so not Node 20.
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install (from package-lock.json)
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Type check and build
+        run: npm run build

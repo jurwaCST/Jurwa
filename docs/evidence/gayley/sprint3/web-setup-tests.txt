@@ -1,0 +1,49 @@
+# SCRUM-118 web tests and build, 2026-11-06 11:02, Node v26.10.0
+
+$ cd web && npm ci && npm run lint && npm test -- --reporter=verbose && npm run build
+
+ RUN  v5.1.0 C:/Users/Acer/Desktop/Jurwa/web
+ ✓ src/api/client.test.ts > base URL > defaults to the gateway on localhost:8080 4ms
+ ✓ src/api/client.test.ts > base URL > uses VITE_API_URL when it is set, without a double slash 1ms
+ ✓ src/api/client.test.ts > token > sends no Authorization header before setToken 1ms
+ ✓ src/api/client.test.ts > token > sends Authorization: Bearer <token> after setToken 1ms
+ ✓ src/api/client.test.ts > token > stops sending it after setToken(null) 0ms
+ ✓ src/api/client.test.ts > methods > get returns the parsed JSON body 0ms
+ ✓ src/api/client.test.ts > methods > post sends the body as JSON 0ms
+ ✓ src/api/client.test.ts > methods > put sends the body as JSON 0ms
+ ✓ src/api/client.test.ts > methods > upload sends the file as multipart form data under the given field 1ms
+ ✓ src/api/client.test.ts > methods > returns undefined for 204 No Content 1ms
+ ✓ src/api/client.test.ts > errors > turns a 401 into an ApiError with status 401 0ms
+ ✓ src/api/client.test.ts > errors > uses the "error" field of a JSON error body as the message 1ms
+ ✓ src/api/client.test.ts > errors > falls back to a generic message when the body is not JSON 0ms
+ ✓ src/api/client.test.ts > errors > turns a network failure into an ApiError with status 0 0ms
+ ✓ src/App.test.tsx > routes > home shows the app name and a sign in link 51ms
+ ✓ src/App.test.tsx > routes > an unknown route shows a not found page 4ms
+ ✓ src/App.test.tsx > routes > /login shows the login form 9ms
+ ✓ src/App.test.tsx > role guards > sends a visitor who is not signed in to /login 6ms
+ ✓ src/App.test.tsx > role guards > shows the report form placeholder to a student 3ms
+ ✓ src/App.test.tsx > role guards > refuses the report form to staff with a 403 page 3ms
+ ✓ src/App.test.tsx > role guards > /staff is open to CATEGORY_HEAD 3ms
+ ✓ src/App.test.tsx > role guards > /staff is open to STAFF 3ms
+ ✓ src/App.test.tsx > role guards > /admin is open to SYSTEM_ADMIN 2ms
+ ✓ src/App.test.tsx > role guards > /president is open to PRESIDENT 2ms
+ ✓ src/App.test.tsx > role guards > /staff is refused to STUDENT 2ms
+ ✓ src/App.test.tsx > role guards > /admin is refused to CATEGORY_HEAD 2ms
+ ✓ src/App.test.tsx > role guards > /president is refused to SYSTEM_ADMIN 3ms
+ ✓ src/App.test.tsx > role guards > treats an expired session as signed out 6ms
+ ✓ src/App.test.tsx > login > signs in through the gateway and shows the links for the role 463ms
+ ✓ src/App.test.tsx > login > shows the gateway error when the password is wrong 377ms
+ ✓ src/App.test.tsx > login > signing out goes back to the signed-out home page 64ms
+ Test Files  2 passed (2)
+      Tests  31 passed (31)
+   Start at  11:02:30
+   Duration  2.72s (environment 56%, tests 26%, setup 12%, import 4%, transform 1%, worker 1%)
+vite v8.3.6 building client environment for production...
+transforming...
+✓ 36 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.45 kB │ gzip:  0.29 kB
+dist/assets/index-Dn2MDKpA.css    1.32 kB │ gzip:  0.63 kB
+dist/assets/index-CFHhGKvH.js   264.38 kB │ gzip: 83.93 kB
+✓ built in 170ms

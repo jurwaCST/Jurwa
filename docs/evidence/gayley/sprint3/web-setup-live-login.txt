@@ -1,0 +1,27 @@
+# SCRUM-118 live check: web dev server proxy (/api) to the real api-gateway, 2026-11-06 11:02
+# Running: identity, authorization, category-taxonomy, api-gateway (HTTP_PORT=8081, port 8080 was taken on this laptop)
+# Dev server: GATEWAY_URL=http://localhost:8081 VITE_API_URL=/api npx vite --port 5173
+
+$ curl http://localhost:5173/   (the app page)
+    <title>Jurwa</title>
+    <div id="root"></div>
+
+$ curl http://localhost:5173/api/health
+{"status":"ok"}
+
+$ curl -X POST http://localhost:5173/api/auth/login  (account registered earlier, token hidden)
+{"accessToken":"<JWT hidden>","expiresAt":"2026-11-06T05:17:52.188802Z","user":{"id":"fc4f0850-a6f9-4c76-bb5e-c6ac2eac2a59","email":"pema.test@cst.edu.bt","fullName":"Pema Test","roles":["STUDENT"],"active":true,"createdAt":"2026-11-06T05:01:27.752762400Z"}}
+
+$ curl http://localhost:5173/api/me -H "Authorization: Bearer <JWT>"
+{"id":"fc4f0850-a6f9-4c76-bb5e-c6ac2eac2a59","email":"pema.test@cst.edu.bt","fullName":"Pema Test","roles":["STUDENT"],"active":true,"createdAt":"2026-11-06T05:01:27.752762400Z"}
+
+$ curl http://localhost:5173/api/categories -H "Authorization: Bearer <JWT>"
+{"categories":[{"category":"HOSTEL","name":"Hostel","description":"Rooms, bathrooms, water and electricity in the hostels","sortOrder":1,"active":true,"headPosition":"DSA"},{"category":"ACADEMIC_BLOCK","name":"Academic Block","description":"Classrooms, labs and equipment in the academic blocks","sor ...
+
+$ curl -i http://localhost:5173/api/me   (no token)
+HTTP/1.1 401 Unauthorized
+{"error":"missing bearer token"}
+
+$ curl -X POST http://localhost:5173/api/auth/login  (wrong password)
+{"error":"wrong email or password"}
+ HTTP 401
