@@ -188,9 +188,11 @@ func subscribe(t *testing.T, bus Bus, stream, group, consumer string, h eventbus
 	})
 }
 
-// streamName gives each test its own stream, so tests on one Redis do not mix.
+// streamName gives each test its own stream, so tests and repeated runs on one
+// Redis do not mix.
 func streamName(t *testing.T) string {
-	return "test:" + strings.NewReplacer(" ", "-", "/", ".").Replace(t.Name())
+	name := strings.NewReplacer(" ", "-", "/", ".").Replace(t.Name())
+	return fmt.Sprintf("test:%s:%d", name, time.Now().UnixNano())
 }
 
 func statusChanged(eventID, reportID string) *eventsv1.StatusChanged {
