@@ -7,7 +7,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/jurwaCST/Jurwa/services/authorization/adapters/out/repotest"
 	"github.com/jurwaCST/Jurwa/services/authorization/domain"
+	"github.com/jurwaCST/Jurwa/services/authorization/ports"
 )
 
 func TestNewLoadsTheDefaultPolicy(t *testing.T) {
@@ -21,4 +23,8 @@ func TestWithPolicyLoadsTheGivenPolicy(t *testing.T) {
 	p, err := WithPolicy(custom).Load(context.Background())
 	require.NoError(t, err)
 	assert.Equal(t, []string{domain.ActionMeRead}, p.Actions())
+}
+
+func TestRepositoryContract(t *testing.T) {
+	repotest.Run(t, func(*testing.T) ports.PolicyRepository { return New() })
 }

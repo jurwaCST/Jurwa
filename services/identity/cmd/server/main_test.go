@@ -43,3 +43,16 @@ func TestNewTokenIssuer(t *testing.T) {
 		})
 	}
 }
+
+func TestOpenRepoWithoutDatabaseURLUsesMemory(t *testing.T) {
+	repo, closeRepo, err := openRepo("")
+	assert.NoError(t, err)
+	assert.NotNil(t, repo)
+	closeRepo()
+}
+
+// A wrong DATABASE_URL stops the service instead of silently using memory.
+func TestOpenRepoWithABadURLFails(t *testing.T) {
+	_, _, err := openRepo("not a database url")
+	assert.Error(t, err)
+}
