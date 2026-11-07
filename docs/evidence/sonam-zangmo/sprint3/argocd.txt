@@ -1,0 +1,74 @@
+# SCRUM-102 Argo CD live run, 2026-11-08 00:08 to 00:15 (Bhutan time).
+# Laptop: MacBook, Apple M3, 8 GB RAM; Docker Desktop given 6 GB. One-node k3d cluster (deploy/argocd/README.md, step 1), Argo CD v3.5.6 (dex, notifications and applicationset scaled to 0).
+# Repo access: fine-grained token, Contents read-only on jurwaCST/Jurwa only, typed into deploy/argocd/add-repo-credentials.sh; it is only in the Secret argocd/jurwa-repo, not here.
+# The Application was applied with targetRevision SCRUM-102-argocd for this test, because deploy/argocd/demo is not on main yet. After the merge it points at main (the file says main).
+# The 4 restarts are the services starting before PostgreSQL and MongoDB were ready; they then stayed up.
+
+$ kubectl -n argocd get pods
+NAME                                  READY   STATUS    RESTARTS   AGE
+argocd-application-controller-0       1/1     Running   0          21m
+argocd-redis-7f849fd769-4jbmj         1/1     Running   0          21m
+argocd-repo-server-58c976b9df-zs7n6   1/1     Running   0          21m
+argocd-server-947dccccf-fh7g2         1/1     Running   0          21m
+
+$ kubectl -n argocd get application jurwa-demo
+NAME         REPO                                    PATH                 REVISION                                   SYNC     HEALTH
+jurwa-demo   https://github.com/jurwaCST/Jurwa.git   deploy/argocd/demo   4c9f18a6f43a2ccfca8917aa2ccaa76420a3dc5e   Synced   Healthy
+
+$ kubectl -n jurwa get pods
+NAME                                 READY   STATUS    RESTARTS       AGE
+api-gateway-99dcfd9fb-h5p42          1/1     Running   0              2m27s
+authorization-788d45b9f7-jzln9       1/1     Running   4 (105s ago)   2m27s
+category-taxonomy-7968f58d6f-vwt8v   1/1     Running   4 (110s ago)   2m27s
+identity-647d8fdf69-f5ll9            1/1     Running   4 (108s ago)   2m27s
+mongo-0                              1/1     Running   0              2m27s
+postgres-0                           1/1     Running   0              2m27s
+redis-0                              1/1     Running   0              2m27s
+report-submission-76c7b497c5-vf6q4   1/1     Running   4 (68s ago)    2m27s
+
+$ kubectl -n jurwa logs deploy/identity | grep storage
+{"time":"2026-11-07T18:10:06.042124298Z","level":"INFO","msg":"storage: postgres","service":"identity"}
+
+$ curl POST /auth/register through the gateway in the cluster (port-forward 18080)
+{"user":{"id":"00b03512-bf86-4fb7-80a0-d39db101d90c", "email":"karma.argocd@rub.edu.bt", "fullName":"Karma", "roles":["STUDENT"], "active":true, "createdAt":"2026-11-07T18:11:09.947334883Z"}} HTTP 201
+
+$ curl POST /auth/login: 200, token hidden
+HTTP 200
+
+$ curl GET /categories
+{"categories":[{"category":"HOSTEL", "name":"Hostel", "description":"Rooms, bathrooms, water and electricity in the hostels", "sortOrder":1, "active":true, "headPosition":"DSA"}, {"category":"ACADEMIC
+
+$ curl POST /reports
+{"report":{"id":"07abbd27-98e5-499d-8c4a-a0e98e8fad1e", "reporterId":"00b03512-bf86-4fb7-80a0-d39db101d90c", "category":"HOSTEL", "location":{"building":"Hostel B", "wing":"", "area":""}, "description":"Tap leaking", "st
+
+$ Self-heal: kubectl -n jurwa scale deploy/api-gateway --replicas=0 (a change by hand, not in Git), at 00:11:18
+deployment.apps/api-gateway scaled
+spec.replicas back to 1 after 2 s, at 00:11:20
+Waiting for deployment "api-gateway" rollout to finish: 0 of 1 updated replicas are available...
+deployment "api-gateway" successfully rolled out
+
+$ kubectl -n argocd get application jurwa-demo
+NAME         SYNC STATUS   HEALTH STATUS
+jurwa-demo   Synced        Progressing
+
+$ Argo CD history of jurwa-demo (operation of the last sync)
+successfully synced (all tasks run)  phase=Succeeded  revision=4c9f18a6f43a2ccfca8917aa2ccaa76420a3dc5e
+
+$ Memory on the laptop cluster (one node, Docker Desktop 6 GB)
+k3d-jurwa-serverlb 30.07MiB / 5.784GiB
+k3d-jurwa-server-0 2.337GiB / 5.784GiB
+
+$ Git change: pushed commit e98775b (label app.kubernetes.io/part-of=jurwa on the demo set) at 00:11:38; no kubectl apply, waiting for Argo CD's own poll
+Argo CD synced revision e98775b at 00:14:37, 172 s after the check started
+
+$ kubectl -n jurwa get deploy -L app.kubernetes.io/part-of
+NAME                READY   UP-TO-DATE   AVAILABLE   AGE     PART-OF
+api-gateway         1/1     1            1           5m55s   jurwa
+authorization       1/1     1            1           5m55s   jurwa
+category-taxonomy   1/1     1            1           5m55s   jurwa
+identity            1/1     1            1           5m55s   jurwa
+report-submission   1/1     1            1           5m55s   jurwa
+
+$ kubectl -n argocd get application jurwa-demo
+NAME         REVISION                                   SYNC     HEALTH
+jurwa-demo   e98775bfe1478380c37a049304708dfce1a975ff   Synced   Healthy

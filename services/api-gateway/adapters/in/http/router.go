@@ -80,6 +80,7 @@ func NewRouter(d Deps) http.Handler {
 	mux.Handle("GET /reports/{reportId}", r.protected(domain.ActionReportRead, r.getReport))
 	mux.Handle("POST /reports/{reportId}/notes", r.protected(domain.ActionReportNoteAdd, r.addNote))
 	mux.Handle("GET /reports/{reportId}/notes", r.protected(domain.ActionReportNoteRead, r.listNotes))
+	mux.Handle("GET /me/assigned-reports", r.protected(domain.ActionReportListAssigned, r.assignedReports))
 	mux.Handle("GET /me/reports", r.protected(domain.ActionReportListOwn, r.myReports))
 	mux.Handle("POST /reports/{reportId}/status", r.protected(domain.ActionReportStatusChange, r.changeStatus))
 	mux.Handle("GET /reports/{reportId}/status", r.protected(domain.ActionReportStatusRead, r.getStatus))
@@ -228,18 +229,39 @@ func (r router) listNotes(w http.ResponseWriter, req *http.Request) {
 }
 
 func (r router) myReports(w http.ResponseWriter, req *http.Request) {
-	var pageSize int64
-	if v := req.URL.Query().Get("pageSize"); v != "" {
-		n, err := strconv.ParseInt(v, 10, 32)
-		if err != nil {
-			writeJSONError(w, http.StatusBadRequest, "pageSize must be a number")
-			return
-		}
-		pageSize = n
+	pageSize, ok := readPageSize(w, req)
+	if !ok {
+		return
 	}
 	// The reporter is always the signed-in student, never a query parameter (rule 2).
-	resp, err := r.History.ListReportsByReporter(req.Context(), principal(req).UserID, int32(pageSize), req.URL.Query().Get("pageToken"))
+	resp, err := r.History.ListReportsByReporter(req.Context(), principal(req).UserID, pageSize, req.URL.Query().Get("pageToken"))
 	reply(w, http.StatusOK, resp, err)
+}
+
+// assignedReports is the Category Head and staff "assigned to me" list.
+func (r router) assignedReports(w http.ResponseWriter, req *http.Request) {
+	pageSize, ok := readPageSize(w, req)
+	if !ok {
+		return
+	}
+	// The assignee is always the signed-in user, never a query parameter (rule 2).
+	resp, err := r.History.ListReportsByAssignee(req.Context(), principal(req).UserID, pageSize, req.URL.Query().Get("pageToken"))
+	reply(w, http.StatusOK, resp, err)
+}
+
+// readPageSize reads the optional ?pageSize= (0 when absent: the service
+// default). A value that is not a number writes 400 and returns false.
+func readPageSize(w http.ResponseWriter, req *http.Request) (int32, bool) {
+	v := req.URL.Query().Get("pageSize")
+	if v == "" {
+		return 0, true
+	}
+	n, err := strconv.ParseInt(v, 10, 32)
+	if err != nil {
+		writeJSONError(w, http.StatusBadRequest, "pageSize must be a number")
+		return 0, false
+	}
+	return int32(n), true
 }
 
 // timeline applies "Student (own)": the timeline has no reporter, so for a

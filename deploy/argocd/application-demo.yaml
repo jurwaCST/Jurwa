@@ -1,0 +1,22 @@
+# Argo CD Application for the low-memory demo set (deploy/argocd/demo).
+#   kubectl apply -f deploy/argocd/application-demo.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: jurwa-demo
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/jurwaCST/Jurwa.git
+    targetRevision: main
+    path: deploy/argocd/demo
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: jurwa
+  syncPolicy:
+    automated:
+      prune: true     # a resource removed from Git is removed from the cluster
+      selfHeal: true  # a change made by hand in the cluster is put back to what Git says
+    syncOptions:
+      - CreateNamespace=true

@@ -19,6 +19,14 @@ func (h History) ListReportsByReporter(ctx context.Context, reporterID string, p
 	})
 }
 
+func (h History) ListReportsByAssignee(ctx context.Context, assigneeID string, pageSize int32, pageToken string) (*reporthistoryv1.ListReportsByAssigneeResponse, error) {
+	return h.C.ListReportsByAssignee(ctx, &reporthistoryv1.ListReportsByAssigneeRequest{
+		AssigneeId: assigneeID,
+		PageSize:   pageSize,
+		PageToken:  pageToken,
+	})
+}
+
 func (h History) GetReportTimeline(ctx context.Context, reportID string) (*reporthistoryv1.GetReportTimelineResponse, error) {
 	return h.C.GetReportTimeline(ctx, &reporthistoryv1.GetReportTimelineRequest{ReportId: reportID})
 }

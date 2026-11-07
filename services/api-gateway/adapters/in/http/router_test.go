@@ -115,6 +115,8 @@ func (fakeAuthz) CheckPermission(_ context.Context, role, action, _ string) (boo
 		return role == domain.RoleCategoryHead || role == domain.RoleStaff, nil
 	case domain.ActionReportStatusRead:
 		return role != "PRESIDENT", nil
+	case domain.ActionReportListAssigned:
+		return role == domain.RoleCategoryHead || role == domain.RoleStaff, nil
 	case domain.ActionDashboardRead: // same rule as the authorization policy
 		return role == domain.RoleSystemAdmin || role == "PRESIDENT", nil
 	}
@@ -143,6 +145,7 @@ func (f *fakeNotes) ListNotes(_ context.Context, role, reportID string) (*intern
 
 // fakeHistory records what the gateway sends to report-history.
 type fakeHistory struct {
+	assignee  string
 	reporter  string
 	pageSize  int32
 	pageToken string
