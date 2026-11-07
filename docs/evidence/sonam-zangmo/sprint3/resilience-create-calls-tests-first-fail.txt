@@ -1,0 +1,15 @@
+# SCRUM-132 tests first: go test ./pkg/resilience/ before the code exists, 2026-11-08 00:39
+# github.com/jurwaCST/Jurwa/pkg/resilience [github.com/jurwaCST/Jurwa/pkg/resilience.test]
+pkg/resilience/create_calls_test.go:27:6: cfg.NoRetryAfterTimeout undefined (type Config has no field or method NoRetryAfterTimeout)
+pkg/resilience/create_calls_test.go:37:6: cfg.NoRetryAfterTimeout undefined (type Config has no field or method NoRetryAfterTimeout)
+pkg/resilience/create_calls_test.go:46:6: cfg.NoRetryAfterTimeout undefined (type Config has no field or method NoRetryAfterTimeout)
+pkg/resilience/create_calls_test.go:65:22: cfg.NoRetryAfterTimeout undefined (type Config has no field or method NoRetryAfterTimeout)
+pkg/resilience/create_calls_test.go:67:20: cfg.NoRetryAfterTimeout undefined (type Config has no field or method NoRetryAfterTimeout)
+pkg/resilience/create_calls_test.go:71:17: undefined: RetryableUnavailableOnly
+pkg/resilience/create_calls_test.go:72:18: undefined: RetryableUnavailableOnly
+pkg/resilience/create_calls_test.go:73:18: undefined: RetryableUnavailableOnly
+pkg/resilience/create_calls_test.go:74:18: undefined: RetryableUnavailableOnly
+pkg/resilience/create_calls_test.go:79:40: undefined: RetryableUnavailableOnly
+pkg/resilience/create_calls_test.go:79:40: too many errors
+FAIL	github.com/jurwaCST/Jurwa/pkg/resilience [build failed]
+FAIL
