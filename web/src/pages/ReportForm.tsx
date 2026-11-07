@@ -236,7 +236,7 @@ export default function ReportForm() {
           <p role="status" className="report-done-text">
             Report sent. Your report number is <code className="report-number">{sentId}</code>.
           </p>
-          <p className="muted">The right Category Head has received it. You can follow it under your reports.</p>
+          <p className="muted">It goes to the Category Head for this category. Keep the number to ask about it later.</p>
           <div className="report-actions">
             <button type="button" onClick={startAgain}>
               Report another issue
