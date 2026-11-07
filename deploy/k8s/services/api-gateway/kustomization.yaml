@@ -22,3 +22,7 @@ configMapGenerator:
       - LOCATION_TAXONOMY_ADDR=location-taxonomy:9004
       - REPORT_SUBMISSION_ADDR=report-submission:9001
       - INTERNAL_NOTES_ADDR=internal-notes:9005
+      - REPORT_HISTORY_ADDR=report-history:9003
+      - PHOTO_MEDIA_ADDR=photo-media:9002
+      - STATUS_LIFECYCLE_ADDR=status-lifecycle:9011
+      - ANALYTICS_ADDR=analytics:9020
