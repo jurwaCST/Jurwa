@@ -14,12 +14,16 @@ Keeps a read model of reports for the PWA: one summary per report (for "My repor
 | `ListReportsByAssignee` | One page of the reports currently assigned to one person (Category Head or staff), newest first, with `next_page_token`. The assignee comes from `report.routed` and `report.reassigned` entries | `INVALID_ARGUMENT` for a missing or malformed assignee id, page size outside 1 to 100, or a bad page token |
 | `GetReportTimeline` | Every timeline entry of one report, oldest first | `INVALID_ARGUMENT` when the id is not a UUID, `NOT_FOUND` when the report is unknown |
 
-Two application methods fill the store. They have no RPC, because only events call them:
+The store is filled from the event bus by `adapters/in/events` (consumer group `report-history`), not by an RPC:
 
-| Method | Called by (Sprint 3) | Does |
+| Stream | Application method | Does |
 |---|---|---|
-| `RecordSubmitted` | `events:report.submitted` consumer | Creates the summary (status `OPEN`) and the first timeline entry |
-| `Record` | `events:status.changed`, `events:report.reassigned`, `events:escalation.compensated` consumers | Adds one timeline entry and updates the summary |
+| `events:report.submitted` | `RecordSubmitted` | Creates the summary (status `OPEN`) and the first timeline entry |
+| `events:report.routed` | `RecordEvent` | Entry "Routed to <position>", assignee = `category_head_id` |
+| `events:status.changed` | `RecordEvent` | Entry "Status changed to <status>", summary status |
+| `events:report.reassigned` | `RecordEvent` | Entry "Reassigned: <reason>", assignee = `to_user_id` |
+
+Each timeline entry's id is the event's `meta.event_id`, so an event delivered twice is recorded once. An event that arrives before its `report.submitted` (another stream) waits up to 5 seconds for it, then fails and is retried by the bus (after 3 attempts it goes to `<stream>.dead`). `events:escalation.compensated` is not read yet.
 
 Rules (in `domain/history.go`, tested in `domain/history_test.go`):
 
@@ -38,6 +42,7 @@ domain/history.go                Summary, Entry, statuses, ordering, paging and 
 application/service.go           RecordSubmitted, Record, ListReportsByReporter, ListReportsByAssignee, GetReportTimeline
 ports/ports.go                   HistoryRepository interface
 adapters/in/grpc/handler.go      gRPC handler: protobuf <-> domain, errors -> gRPC codes
+adapters/in/events/consumer.go   event bus consumer: four streams -> RecordSubmitted / RecordEvent
 adapters/out/memory/             in-memory repository
 cmd/server/main.go               wires everything and starts the server
 cmd/server/sample.go             optional sample data for local demos
@@ -49,9 +54,10 @@ cmd/server/sample.go             optional sample data for local demos
 |---|---|---|
 | `PORT` | `9003` | gRPC port |
 | `SERVICE_NAME` | `report-history` | Name written in every log line |
+| `REDIS_URL` | unset | For example `redis://:PASSWORD@localhost:6379/0`. Set: the four streams are read. Not set: no events are read (use `SEED_SAMPLE` for data) |
 | `SEED_SAMPLE` | unset | `true` loads two sample reports of student `1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d`, routed to the DSA `4e5f6071-8293-4d0e-9f2a-3b4c5d6e7f80` and the SSO `5f607182-93a4-4e1f-8a3b-4c5d6e7f8091`. Local demos only |
 
-Storage is in memory in Sprint 2. Sprint 3 adds a PostgreSQL adapter (`DATABASE_URL`, `docs/design/schema/report-history.sql`) and the Redis Streams consumers.
+Storage is in memory. Because of that, on every start the service rewinds its consumer group on the four streams (`eventbus.Redis.Rewind`) and reads all events again, so its lists are rebuilt after a restart; repeated events are ignored by their id. This needs one replica. A PostgreSQL adapter (`DATABASE_URL`, `docs/design/schema/report-history.sql`) would keep the data and make the rewind unnecessary.
 
 ## Run
 

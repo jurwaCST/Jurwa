@@ -39,6 +39,7 @@ Who publishes and who reads: `docs/design/database-schema.md` section 6.
 - A handler that returns an error is tried `MaxAttempts` (3) times. Then the message goes to `<stream>.dead` (fields `payload`, `error`, `group`, `source_id`) and is acked.
 - A message can arrive more than once (for example after a crash). **Handlers must ignore a repeated `meta.event_id`.**
 - `Subscribe` blocks. Run it in a goroutine; it returns `nil` when the context is cancelled.
+- `(*Redis).Rewind(ctx, stream, group)` makes the group read the stream again from the first entry next time it subscribes. For a service that keeps its data in memory and rebuilds it on start (report-history). One consumer only.
 
 ## Environment
 
