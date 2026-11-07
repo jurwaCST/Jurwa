@@ -1,0 +1,11 @@
+# Needs cert-manager in the cluster first: bash scripts/install-cert-manager.sh
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: jurwa
+
+resources:
+  - cluster-issuer.yaml
+  - certificate.yaml
+  - middleware.yaml
+  - tls-store.yaml
+  - ingress.yaml
