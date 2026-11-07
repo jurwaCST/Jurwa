@@ -1,7 +1,7 @@
 # Sprint 1 review and retrospective
 
 Sprint 1: 22 to 27 October 2026. Scrum Master: Gayley Choden.
-Sources: Jira project SCRUM, merged pull requests on `main`, the EVM log (`docs/pm/evm/week1.md`) and each member's retro.
+Sources: Jira project SCRUM (hours read again on 6 November 2026), merged pull requests on `main`, the EVM log (`docs/pm/evm/week1.md`) and each member's retro.
 
 ## 1. Sprint goal
 
@@ -26,7 +26,7 @@ Charter, requirements, plans, wireframes, service template, gRPC contracts, k3d 
 | Nyendrak Yoezer Zangmo | SCRUM-75 database schema | #14 |
 | | SCRUM-79 schedule and EVM baseline | #15 |
 | | SCRUM-19 status-lifecycle thin slice | #25 |
-| | SCRUM-82 first EVM log | #26 |
+| | SCRUM-82 first EVM log (not counted in the totals, see section 3) | #26 |
 | Gayley Choden | SCRUM-71 learning spike | #2 |
 | | SCRUM-80 quality management plan | #3 |
 | | SCRUM-81 communications plan | #4 |
@@ -41,8 +41,22 @@ Evidence for each member is in `docs/evidence/<name>/`.
 |---|---|---|
 | SCRUM-90 routing-engine | Sonam Zangmo | Stretch card, started but not finished |
 | SCRUM-38 api-gateway | Sonam Zangmo | Stretch card, not started |
+| SCRUM-82 weekly EVM log | Nyendrak Yoezer Zangmo | Runs every sprint: the Sprint 1 log merged (#26), the card stayed open for the next logs |
 
-## 4. EVM (from `docs/pm/evm/week1.md`)
+## 4. Hours
+
+| Member | Cards Done | Planned hours (EVM log) | Hours logged (Jira) |
+|---|---|---|---|
+| Sonam Choki | 6 | 51 h | 34 h |
+| Sonam Zangmo | 4 | 29 h | 23 h |
+| Nyendrak Yoezer Zangmo | 3 | 22 h | 16 h |
+| Gayley Choden | 5 | 36 h | 23 h |
+| **Team** | **18** | **138 h** | **96 h** |
+
+- Hours logged are read from Jira on 6 November and match the EVM log. SCRUM-38 and SCRUM-90 are not counted here: their hours belong to Sprint 2, where they were finished.
+- On 6 November Jira shows no original estimate on most Sprint 1 cards, so the planned hours above come from the EVM log (`docs/pm/evm/week1.md`), not from Jira.
+
+## 5. EVM (from `docs/pm/evm/week1.md`)
 
 | PV | EV | AC | CPI | SPI |
 |---|---|---|---|---|
@@ -50,7 +64,7 @@ Evidence for each member is in `docs/evidence/<name>/`.
 
 Both indexes are above 1, but treat them as optimistic. Estimates were entered at the end of the sprint, and the Sprint 1 cards add up to 138 h against a baseline of 93.3 h, so the per-sprint PV needs revising.
 
-## 5. Sprint review
+## 6. Sprint review
 
 Demo: each owner runs their thin slice and calls it with grpcurl.
 
@@ -61,7 +75,7 @@ Demo: each owner runs their thin slice and calls it with grpcurl.
 | routing-rules | Sonam Zangmo | GetRule |
 | status-lifecycle | Nyendrak Yoezer Zangmo | Valid and invalid status changes |
 
-## 6. Retrospective
+## 7. Retrospective
 
 ### What went well
 
