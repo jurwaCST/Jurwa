@@ -72,3 +72,7 @@ $ grpcurl -plaintext -d '{"assignee_id":"00000000-0000-4000-8000-000000000001"}'
       "reportId": "ace11ee9-9108-4112-be78-f83245c49ccc",
       "status": "OPEN",
       "currentAssigneeId": "00000000-0000-4000-8000-000000000001",
+
+## Out-of-order events (found by a flaky test, fixed test-first in 0b7f656)
+$ go test -race ./services/report-history/adapters/in/events/ -run TestTheFourStreamsBuildTheReadModel -count=50
+FAIL
