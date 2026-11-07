@@ -76,3 +76,12 @@ $ grpcurl -plaintext -d '{"assignee_id":"00000000-0000-4000-8000-000000000001"}'
 ## Out-of-order events (found by a flaky test, fixed test-first in 0b7f656)
 $ go test -race ./services/report-history/adapters/in/events/ -run TestTheFourStreamsBuildTheReadModel -count=50
 FAIL
+The first fix alone was not enough (the 50 runs above still failed): two consumers also overwrote each other's summary (lost update). Test first in 972826a, fixed with a write lock in the application:
+$ go test -race ./services/report-history/application/ -run TestConcurrentEventsForOneReportAreAllApplied -count=5   (200 concurrent pairs each)
+ok  	github.com/jurwaCST/Jurwa/services/report-history/application	1.402s
+$ go test -race ./services/report-history/adapters/in/events/ -run TestTheFourStreamsBuildTheReadModel -count=100
+ok  	github.com/jurwaCST/Jurwa/services/report-history/adapters/in/events	5.515s
+
+## After the fix, report-history restarted again: the lists are rebuilt from the streams
+$ curl -k https://jurwa.localtest.me/api/me/reports -H "Authorization: Bearer $TOKEN"
+{"reports":[{"reportId":"105760b4-51ed-420e-a246-6c455ef7ffd9", "reporterId":"1857bbd7-54fd-4993-b75a-69914784276e", "category":"HOSTEL", "location":{"building":"Hostel B", "wing":"East", "area":""}, "status":"OPEN", "currentAssigneeId":"00000000-0000-4000-8000-000000000001", "createdAt":"2026-11-07T17:39:45.935078255Z", "updatedAt":"2026-11-07T17:39:45.941718380Z"}], "nextPageToken":""}
