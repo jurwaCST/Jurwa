@@ -1,0 +1,41 @@
+SCRUM-127 tests first: run before any adapter code exists. Expected to fail (build failed).
+Date: 2026-11-06 12:57
+$ go test ./services/identity/... ./services/authorization/...
+ok  	github.com/jurwaCST/Jurwa/services/identity/adapters/in/grpc	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/identity/adapters/out/memory	(cached)
+# github.com/jurwaCST/Jurwa/services/authorization/adapters/out/repotest
+services\authorization\adapters\out\repotest\contract.go:44:32: want.Roles undefined (type domain.Policy has no field or method Roles)
+services\authorization\adapters\out\repotest\contract.go:44:51: got.Roles undefined (type domain.Policy has no field or method Roles)
+# github.com/jurwaCST/Jurwa/services/identity/adapters/out/postgres [github.com/jurwaCST/Jurwa/services/identity/adapters/out/postgres.test]
+services\identity\adapters\out\postgres\schema_test.go:16:34: undefined: schemaSQL
+# github.com/jurwaCST/Jurwa/services/authorization/domain [github.com/jurwaCST/Jurwa/services/authorization/domain.test]
+services\authorization\domain\policy_test.go:199:14: undefined: ParseRole
+services\authorization\domain\policy_test.go:204:12: undefined: ParseRole
+services\authorization\domain\policy_test.go:211:44: p.Roles undefined (type Policy has no field or method Roles)
+services\authorization\domain\policy_test.go:212:20: p.Roles undefined (type Policy has no field or method Roles)
+services\authorization\domain\policy_test.go:214:13: p.Roles undefined (type Policy has no field or method Roles)
+services\authorization\domain\policy_test.go:216:31: p.Roles undefined (type Policy has no field or method Roles)
+# github.com/jurwaCST/Jurwa/services/authorization/adapters/out/postgres [github.com/jurwaCST/Jurwa/services/authorization/adapters/out/postgres.test]
+services\authorization\adapters\out\postgres\schema_test.go:16:34: undefined: schemaSQL
+FAIL	github.com/jurwaCST/Jurwa/services/identity/adapters/out/postgres [build failed]
+?   	github.com/jurwaCST/Jurwa/services/identity/adapters/out/repotest	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/identity/application	(cached)
+# github.com/jurwaCST/Jurwa/services/authorization/cmd/server [github.com/jurwaCST/Jurwa/services/authorization/cmd/server.test]
+services\authorization\cmd\server\main_test.go:28:26: undefined: openRepo
+services\authorization\cmd\server\main_test.go:36:15: undefined: openRepo
+# github.com/jurwaCST/Jurwa/services/identity/cmd/server [github.com/jurwaCST/Jurwa/services/identity/cmd/server.test]
+services\identity\cmd\server\main_test.go:48:26: undefined: openRepo
+services\identity\cmd\server\main_test.go:56:15: undefined: openRepo
+FAIL	github.com/jurwaCST/Jurwa/services/identity/cmd/server [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/identity/domain	(cached)
+?   	github.com/jurwaCST/Jurwa/services/identity/ports	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/authorization/adapters/in/grpc	(cached)
+?   	github.com/jurwaCST/Jurwa/services/authorization/adapters/out	[no test files]
+FAIL	github.com/jurwaCST/Jurwa/services/authorization/adapters/out/memory [build failed]
+FAIL	github.com/jurwaCST/Jurwa/services/authorization/adapters/out/postgres [build failed]
+FAIL	github.com/jurwaCST/Jurwa/services/authorization/adapters/out/repotest [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/authorization/application	(cached)
+FAIL	github.com/jurwaCST/Jurwa/services/authorization/cmd/server [build failed]
+FAIL	github.com/jurwaCST/Jurwa/services/authorization/domain [build failed]
+?   	github.com/jurwaCST/Jurwa/services/authorization/ports	[no test files]
+FAIL

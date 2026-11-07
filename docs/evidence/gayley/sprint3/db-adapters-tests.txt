@@ -1,0 +1,25 @@
+SCRUM-127 unit tests after the adapter code (no database needed). Integration tests: db-adapters-integration.txt.
+Date: 2026-11-06 13:04
+$ go test ./services/identity/... ./services/authorization/... -cover -count=1
+ok  	github.com/jurwaCST/Jurwa/services/identity/adapters/in/grpc	5.081s	coverage: 92.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/identity/adapters/out/memory	2.447s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/identity/adapters/out/postgres	2.560s	coverage: 0.0% of statements
+	github.com/jurwaCST/Jurwa/services/identity/adapters/out/repotest		coverage: 0.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/identity/application	3.285s	coverage: 87.5% of statements
+ok  	github.com/jurwaCST/Jurwa/services/identity/cmd/server	3.117s	coverage: 13.2% of statements
+ok  	github.com/jurwaCST/Jurwa/services/identity/domain	2.043s	coverage: 94.5% of statements
+ok  	github.com/jurwaCST/Jurwa/services/authorization/adapters/in/grpc	2.477s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/authorization/adapters/out/memory	1.537s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/authorization/adapters/out/postgres	1.641s	coverage: 0.0% of statements
+	github.com/jurwaCST/Jurwa/services/authorization/adapters/out/repotest		coverage: 0.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/authorization/application	1.482s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/authorization/cmd/server	2.911s	coverage: 10.7% of statements
+ok  	github.com/jurwaCST/Jurwa/services/authorization/domain	1.552s	coverage: 100.0% of statements
+
+$ make test   (whole repo)
+123 packages ok, 0 FAIL
+
+PostgreSQL adapters are covered by the integration tests (Docker):
+$ go test -tags=integration -p 1 -count=1 -cover ./services/identity/adapters/out/postgres/... ./services/authorization/adapters/out/postgres/...
+ok  	github.com/jurwaCST/Jurwa/services/identity/adapters/out/postgres	10.163s	coverage: 90.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/authorization/adapters/out/postgres	7.562s	coverage: 78.3% of statements

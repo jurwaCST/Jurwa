@@ -7,7 +7,8 @@ import (
 )
 
 // PolicyRepository loads the permission table.
-// In-memory for now (the default table); a database in Sprint 3.
+// adapters/out/memory holds the default table; adapters/out/postgres reads it
+// from the database when DATABASE_URL is set.
 type PolicyRepository interface {
 	Load(ctx context.Context) (domain.Policy, error)
 }

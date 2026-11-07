@@ -9,7 +9,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/jurwaCST/Jurwa/services/notification/adapters/out/repotest"
 	"github.com/jurwaCST/Jurwa/services/notification/domain"
+	"github.com/jurwaCST/Jurwa/services/notification/ports"
 )
 
 const (
@@ -121,4 +123,8 @@ func TestSaveReplacesSameID(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, list, 1)
 	assert.Equal(t, domain.Sent, list[0].Status)
+}
+
+func TestContract(t *testing.T) {
+	repotest.Run(t, func(*testing.T) ports.NotificationRepository { return New() })
 }

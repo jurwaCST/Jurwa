@@ -17,7 +17,6 @@ import (
 
 	analyticsv1 "github.com/jurwaCST/Jurwa/proto/gen/analytics/v1"
 	grpcadapter "github.com/jurwaCST/Jurwa/services/analytics/adapters/in/grpc"
-	"github.com/jurwaCST/Jurwa/services/analytics/adapters/out/memory"
 	"github.com/jurwaCST/Jurwa/services/analytics/application"
 	"github.com/jurwaCST/Jurwa/services/analytics/domain"
 )
@@ -48,9 +47,15 @@ func main() {
 	hs := health.NewServer()
 	healthpb.RegisterHealthServer(srv, hs)
 
-	// Built from events only. In-memory for now; the Redis Streams consumer
-	// that calls app.Record and a database come in Sprint 3.
-	app := application.NewService(memory.New())
+	// Built from events only. PostgreSQL when DATABASE_URL is set, otherwise in
+	// memory (lost on restart).
+	repo, closeRepo, err := openRepo(os.Getenv("DATABASE_URL"))
+	if err != nil {
+		slog.Error("cannot open the database", "error", err)
+		os.Exit(1)
+	}
+	defer closeRepo()
+	app := application.NewService(repo)
 	if os.Getenv("SEED_DEMO_DATA") == "true" {
 		n := seed(app, demoEvents(time.Now().UTC()))
 		slog.Info("demo data loaded", "events", n)

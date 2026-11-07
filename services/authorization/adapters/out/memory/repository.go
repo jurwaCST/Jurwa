@@ -1,5 +1,5 @@
 // Package memory is an in-memory PolicyRepository that holds one fixed
-// permission table. A database replaces it in Sprint 3.
+// permission table. Used when DATABASE_URL is not set.
 package memory
 
 import (

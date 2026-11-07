@@ -1,5 +1,5 @@
 // Package memory is an in-memory NotificationRepository. Data is lost on
-// restart. A database replaces it in Sprint 3.
+// restart. Used when DATABASE_URL is not set.
 package memory
 
 import (
