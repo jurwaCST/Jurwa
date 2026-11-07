@@ -1,0 +1,32 @@
+# SCRUM-136 go test -race -v ./services/api-gateway/... (assigned-reports tests), 2026-11-07 23:33
+=== RUN   TestAssignedReportsNeedAToken
+--- PASS: TestAssignedReportsNeedAToken (0.00s)
+=== RUN   TestAssignedReportsUseTheIDFromTheJWT
+--- PASS: TestAssignedReportsUseTheIDFromTheJWT (0.00s)
+=== RUN   TestAssignedReportsRoles
+--- PASS: TestAssignedReportsRoles (0.00s)
+=== RUN   TestAssignedReportsPaging
+--- PASS: TestAssignedReportsPaging (0.00s)
+=== RUN   TestAssignedReportsEmptyList
+--- PASS: TestAssignedReportsEmptyList (0.00s)
+=== RUN   TestMyReportsUsesTheIDFromTheJWT
+--- PASS: TestMyReportsUsesTheIDFromTheJWT (0.00s)
+=== RUN   TestMyReportsDefaultsAndBadPaging
+--- PASS: TestMyReportsDefaultsAndBadPaging (0.00s)
+=== RUN   TestMyReportsIsForStudentsOnly
+--- PASS: TestMyReportsIsForStudentsOnly (0.00s)
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http	4.534s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient	5.247s
+=== RUN   TestHistoryListReportsByAssignee
+--- PASS: TestHistoryListReportsByAssignee (0.00s)
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients	2.757s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/application	4.632s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/cmd/server	3.339s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/domain	2.037s
+
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http	2.449s	coverage: 97.5% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient	1.211s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients	0.669s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/application	3.578s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/cmd/server	2.994s	coverage: 8.8% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/domain	1.779s	coverage: 97.0% of statements

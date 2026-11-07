@@ -30,6 +30,7 @@ Every gRPC client goes through `pkg/resilience` (2 s timeout, up to 3 attempts f
 | `POST /reports/{reportId}/notes` | internal-notes AddNote (returns 201) | Category Head, Staff |
 | `GET /reports/{reportId}/notes` | internal-notes ListNotes | Category Head, Staff, System Administrator |
 | `GET /me/reports` | report-history ListReportsByReporter (`?pageSize=` 1 to 100, `?pageToken=`) | Student; the reporter id comes from the JWT |
+| `GET /me/assigned-reports` | report-history ListReportsByAssignee (`?pageSize=` 1 to 100, `?pageToken=`) | Category Head, Staff; the assignee id comes from the JWT |
 | `GET /reports/{reportId}/timeline` | report-history GetReportTimeline | Student (own, checked with report-submission), Category Head, Staff, System Administrator |
 | `POST /reports/{reportId}/status` | status-lifecycle ChangeStatus (body `{"toStatus": "IN_PROGRESS", "expectedVersion": 1, "reason": "..."}`) | Category Head, Staff; the actor id comes from the JWT |
 | `GET /reports/{reportId}/status` | status-lifecycle GetStatus | Student (own, checked with report-submission), Category Head, Staff, System Administrator |
@@ -42,7 +43,7 @@ The other routes in `api-routes.md` are added as their services are merged.
 
 ## Status changes
 
-The report id comes from the path and the actor id from the JWT; both are ignored in the body. The actor is never empty, because an empty actor means the system, which is the only one allowed to set `ESCALATED`. status-lifecycle checks the flow (OPEN, ASSIGNED, IN_PROGRESS, RESOLVED): a change the flow does not allow is 422, and a stale `expectedVersion` (someone changed it first) is 409. `api-routes.md` says "Staff (assignee)": the gateway checks the role only for now, because no service knows the assignee yet; the assignee check follows when report-history has it (SCRUM-131).
+The report id comes from the path and the actor id from the JWT; both are ignored in the body. The actor is never empty, because an empty actor means the system, which is the only one allowed to set `ESCALATED`. status-lifecycle checks the flow (OPEN, ASSIGNED, IN_PROGRESS, RESOLVED): a change the flow does not allow is 422, and a stale `expectedVersion` (someone changed it first) is 409. `api-routes.md` says "Staff (assignee)": the gateway checks the role only for now, because report-history only now learns the assignee (from report.routed and report.reassigned); the assignee check can follow.
 
 ## Dashboard
 

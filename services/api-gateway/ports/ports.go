@@ -57,6 +57,7 @@ type Notes interface {
 // History is report-history (Choki): the "My reports" list and report timelines.
 type History interface {
 	ListReportsByReporter(ctx context.Context, reporterID string, pageSize int32, pageToken string) (*reporthistoryv1.ListReportsByReporterResponse, error)
+	ListReportsByAssignee(ctx context.Context, assigneeID string, pageSize int32, pageToken string) (*reporthistoryv1.ListReportsByAssigneeResponse, error)
 	GetReportTimeline(ctx context.Context, reportID string) (*reporthistoryv1.GetReportTimelineResponse, error)
 }
 
