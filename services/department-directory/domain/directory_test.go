@@ -148,3 +148,16 @@ func TestWithDemoHolders(t *testing.T) {
 	require.NoError(t, err)
 	assert.Empty(t, plain.HolderUserID, "the default list is not changed")
 }
+
+// Mechanical has no HoD on the staff directory, so its Programme Leader acts as
+// HoD. The code stays HOD_MECH, so reassignment does not change.
+func TestMechanicalProgrammeLeaderActsAsHoD(t *testing.T) {
+	p, err := FindHoD(DefaultDepartments(), DefaultPositions(), "MECH")
+	require.NoError(t, err)
+	assert.Equal(t, "HOD_MECH", p.Code)
+	assert.Equal(t, "Head of Department, Mechanical Engineering (Programme Leader, acting)", p.Title)
+
+	ct, err := FindHoD(DefaultDepartments(), DefaultPositions(), "CT")
+	require.NoError(t, err)
+	assert.Equal(t, "Head of Department, Computing Technologies", ct.Title, "other departments keep the normal title")
+}

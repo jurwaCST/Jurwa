@@ -32,8 +32,8 @@ Card: SCRUM-75. Author: Nyendrak Yoezer Zangmo. Sources: project proposal (secti
 | 13 | sla-policy | Nyendrak | PostgreSQL | `sla_policy` | One window per category |
 | 14 | reassignment | Nyendrak | PostgreSQL | `reassignment` | Assignment history, one current row per report |
 | 15 | audit-log | Nyendrak | MongoDB | `audit_log` | Append-only events with varied details |
-| 16 | identity | Gayley Choden | PostgreSQL | `identity` | Accounts and password hashes |
-| 17 | authorization | Gayley Choden | PostgreSQL | `authorization_db` | Roles per user |
+| 16 | identity | Gayley Choden | PostgreSQL | `identity` | Accounts, password hashes and each user's roles |
+| 17 | authorization | Gayley Choden | PostgreSQL | `authorization_db` | Permission table: which roles may do each action |
 | 18 | notification | Gayley Choden | PostgreSQL | `notification` | Outbox of messages and their delivery state |
 | 19 | feedback | Gayley Choden | PostgreSQL | `feedback` | One rating per report |
 | 20 | analytics | Gayley Choden | PostgreSQL | `analytics` | Read model for dashboard counts |
@@ -92,16 +92,18 @@ The SQL in `docs/design/schema/<service>.sql` is the exact definition. Owners co
 
 | Table | Columns (type) | Required | PK | Indexes and checks |
 |---|---|---|---|---|
-| users | id UUID, email TEXT, full_name TEXT, password_hash TEXT, is_active BOOLEAN, created_at, updated_at TIMESTAMPTZ | all | id | unique on `lower(email)`; email contains `@` |
+| users | id UUID, email TEXT, full_name TEXT, password_hash TEXT, roles TEXT[], is_active BOOLEAN, created_at, updated_at TIMESTAMPTZ | all | id | unique on `lower(email)`; email contains `@`; at least one role, default `{STUDENT}` |
 
-Passwords are stored only as a bcrypt hash (NFR-05).
+Passwords are stored only as a bcrypt hash (NFR-05). Roles are stored here because identity puts them in the token (SCRUM-127).
 
 ### authorization (`authorization.sql`)
 
 | Table | Columns (type) | Required | PK | Indexes and checks |
 |---|---|---|---|---|
 | roles | code TEXT, description TEXT | all | code | seeded: STUDENT, CATEGORY_HEAD, STAFF, SYSTEM_ADMIN, PRESIDENT |
-| user_roles | user_id UUID, role_code TEXT, granted_by UUID, granted_at TIMESTAMPTZ | all except granted_by | (user_id, role_code) | index on role_code; role_code references roles |
+| role_permissions | action TEXT, role_code TEXT, granted_at TIMESTAMPTZ | all | (action, role_code) | role_code references roles; seeded with the default table from `docs/design/api-routes.md` |
+
+Changed in SCRUM-127: the service answers "may this role do this action?", so it stores the permission table. `user_roles` was never used and was replaced; a user's roles are in identity.
 
 ### routing-rules (`routing-rules.sql`)
 
@@ -118,13 +120,13 @@ Seeded with the three agreed rules: HOSTEL to DSA, ACADEMIC_BLOCK to DAA, OTHERS
 | departments | code TEXT, name TEXT, created_at | all | code | none |
 | positions | code TEXT, title TEXT, kind TEXT, department_code TEXT, holder_user_id UUID, is_active BOOLEAN, updated_at | code, title, kind | code | kind in CATEGORY_HEAD, HOD, COUNCILLOR, STAFF; index on holder_user_id and active kind |
 
-Seeded with the DSA, DAA and SSO positions and the 6 academic departments on https://cst.edu.bt/department/, each with one HoD position: Architecture (`ARCH`), Civil & Environmental Engineering (`CIVIL`), Computing Technologies (`CT`), Electrical & Electronics Engineering (`EEE`), Mechanical Engineering (`MECH`) and Science & Humanities (`SH`). The staff directory lists 5 HoDs (none for Mechanical), so `HOD_MECH` starts vacant. Position holders are entered by the System Administrator.
+Seeded with the DSA, DAA and SSO positions and the 6 academic departments on https://cst.edu.bt/department/, each with one HoD position: Architecture (`ARCH`), Civil & Environmental Engineering (`CIVIL`), Computing Technologies (`CT`), Electrical & Electronics Engineering (`EEE`), Mechanical Engineering (`MECH`) and Science & Humanities (`SH`). The staff directory lists 5 HoDs (none for Mechanical), so the Mechanical Programme Leader acts as HoD: `HOD_MECH` keeps its code and its title says "(Programme Leader, acting)". Position holders are entered by the System Administrator.
 
 ### category-taxonomy (`category-taxonomy.sql`)
 
 | Table | Columns (type) | Required | PK | Indexes and checks |
 |---|---|---|---|---|
-| categories | code TEXT, name TEXT, description TEXT, sort_order INTEGER, is_active BOOLEAN, updated_at | all | code | seeded: HOSTEL, ACADEMIC_BLOCK, OTHERS |
+| categories | code TEXT, name TEXT, description TEXT, sort_order INTEGER, is_active BOOLEAN, head_position TEXT, updated_at | all | code | seeded: HOSTEL (DSA), ACADEMIC_BLOCK (DAA), OTHERS (SSO) |
 
 ### location-taxonomy (`location-taxonomy.sql`)
 
@@ -158,7 +160,7 @@ No rows are seeded because the SLA windows are not decided yet (see section 8).
 
 | Table | Columns (type) | Required | PK | Indexes and checks |
 |---|---|---|---|---|
-| notifications | id UUID, recipient_user_id UUID, channel TEXT, event_type TEXT, report_id UUID, subject TEXT, body TEXT, delivery_status TEXT, created_at, sent_at, read_at | all except report_id, sent_at, read_at | id | channel in EMAIL, IN_APP; delivery_status in PENDING, SENT, FAILED; index (recipient_user_id, created_at); index on pending rows |
+| notifications | id UUID, recipient_user_id UUID, channel TEXT, event_type TEXT, report_id UUID, subject TEXT, body TEXT, delivery_status TEXT, created_at, sent_at, read_at, saved_seq BIGINT | all except report_id, sent_at, read_at | id | channel in EMAIL, IN_APP; delivery_status in PENDING, SENT, FAILED; index (recipient_user_id, created_at); index on pending rows; saved_seq is an identity column that keeps the save order (SCRUM-127) |
 
 ### feedback (`feedback.sql`)
 
@@ -170,9 +172,10 @@ No rows are seeded because the SLA windows are not decided yet (see section 8).
 
 | Table | Columns (type) | Required | PK | Indexes and checks |
 |---|---|---|---|---|
-| report_facts | report_id UUID, category_code TEXT, building TEXT, status TEXT, was_escalated BOOLEAN, created_at, assigned_at, resolved_at, updated_at | all except assigned_at, resolved_at | report_id | index (category_code, status); index on created_at; index on escalated reports |
+| report_facts | report_id TEXT, category_code TEXT, building TEXT (default ''), status TEXT, was_escalated BOOLEAN, created_at, assigned_at, resolved_at, updated_at | all except assigned_at, resolved_at | report_id | category in HOSTEL, ACADEMIC_BLOCK, OTHERS; index (category_code, status); index on created_at; index on escalated reports |
+| processed_events | event_id TEXT, applied_at TIMESTAMPTZ | all | event_id | ids of events already applied, so a repeat is counted once |
 
-Built from events only. Analytics never calls other services' databases.
+Built from events only. Analytics never calls other services' databases. Changed in SCRUM-127: report_id is TEXT because it is copied from the events as they come, building defaults to '' because the events do not carry it yet, and processed_events was added.
 
 ### report-history (`report-history.sql`)
 

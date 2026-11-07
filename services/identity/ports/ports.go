@@ -8,8 +8,8 @@ import (
 	"github.com/jurwaCST/Jurwa/services/identity/domain"
 )
 
-// UserRepository stores user accounts. Sprint 1 uses an in-memory adapter;
-// PostgreSQL comes in Sprint 2.
+// UserRepository stores user accounts: adapters/out/memory, or
+// adapters/out/postgres when DATABASE_URL is set.
 type UserRepository interface {
 	// Create saves a new user. Returns domain.ErrEmailTaken if the email exists.
 	Create(ctx context.Context, u domain.User) error

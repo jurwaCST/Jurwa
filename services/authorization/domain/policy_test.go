@@ -193,3 +193,25 @@ func TestRoleString(t *testing.T) {
 		assert.Equal(t, tt.want, tt.role.String())
 	}
 }
+
+func TestParseRole(t *testing.T) {
+	for _, r := range []Role{S, CH, SF, AD, PR} {
+		got, ok := ParseRole(r.String())
+		assert.True(t, ok, r.String())
+		assert.Equal(t, r, got)
+	}
+	for _, name := range []string{"", "ROLE_UNSPECIFIED", "student", "DEAN"} {
+		_, ok := ParseRole(name)
+		assert.False(t, ok, "%q is not a role", name)
+	}
+}
+
+func TestPolicyRoles(t *testing.T) {
+	p := DefaultPolicy()
+	assert.ElementsMatch(t, []Role{AD, PR}, p.Roles(ActionDashboardRead))
+	assert.Empty(t, p.Roles("no.such.action"))
+
+	roles := p.Roles(ActionReportSubmit)
+	roles[0] = PR
+	assert.Equal(t, []Role{S}, p.Roles(ActionReportSubmit), "changing the returned slice must not change the policy")
+}

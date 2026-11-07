@@ -1,0 +1,31 @@
+SCRUM-105 live check in Kubernetes, 2026-11-06 (local k3d cluster "spike", namespace jurwa).
+Applied: kubectl apply -k deploy/observability, plus identity and authorization built from this branch with METRICS_ADDR=:9100 and the scrape annotations (test manifests, not in the repo).
+Traffic: 2.5 minutes of grpcurl calls: identity Login as president.demo (right password), every third loop a wrong password, authorization CheckPermission PRESIDENT dashboard.read.
+
+NAME                             READY   STATUS    RESTARTS   AGE
+authorization-5db9d585bc-lscnp   1/1     Running   0          4m12s
+grafana-6dbd4d4589-nlrhk         1/1     Running   0          4m13s
+identity-fb585954f-sf5tk         1/1     Running   0          4m13s
+prometheus-5647b94f44-74lg9      1/1     Running   0          4m13s
+
+Prometheus queries (the same as the dashboard panels):
+$ up{job="jurwa-pods"}
+  {'__name__': 'up', 'app': 'identity', 'instance': '10.42.0.28:9100', 'job': 'jurwa-pods', 'pod': 'identity-fb585954f-sf5tk'} 1
+  {'__name__': 'up', 'app': 'authorization', 'instance': '10.42.0.29:9100', 'job': 'jurwa-pods', 'pod': 'authorization-5db9d585bc-lscnp'} 1
+$ sum by (service, code) (grpc_requests_total{method!~"/grpc.health.v1.Health/.*"})
+  {'code': 'OK', 'service': 'authorization'} 224
+  {'code': 'OK', 'service': 'identity'} 224
+  {'code': 'Unauthenticated', 'service': 'identity'} 75
+$ sum by (service) (rate(grpc_requests_total{method!~"/grpc.health.v1.Health/.*"}[1m]))
+  {'service': 'authorization'} 1.2889748205435918
+  {'service': 'identity'} 1.4000622249877772
+$ sum by (service) (rate(grpc_requests_total{code!="OK", method!~"/grpc.health.v1.Health/.*"}[1m]))
+  {'service': 'identity'} 0.35557135872705453
+$ histogram_quantile(0.95, sum by (service, le) (rate(grpc_request_duration_seconds_bucket{method!~"/grpc.health.v1.Health/.*"}[5m])))
+  {'service': 'identity'} 0.09654822335025381
+  {'service': 'authorization'} 0.00475
+
+--- last identity log lines
+{"time":"2026-11-06T11:04:05.622428455Z","level":"WARN","msg":"grpc request","service":"identity","method":"/jurwa.identity.v1.IdentityService/Login","code":"Unauthenticated","duration_ms":73.002,"correlation_id":"763347f5-7fdd-461c-9128-440d42b05adb"}
+{"time":"2026-11-06T11:04:06.220609914Z","level":"INFO","msg":"user logged in","service":"identity","user_id":"00000000-0000-4000-8000-000000000030"}
+{"time":"2026-11-06T11:04:06.220645558Z","level":"INFO","msg":"grpc request","service":"identity","method":"/jurwa.identity.v1.IdentityService/Login","code":"OK","duration_ms":48.38,"correlation_id":"dc0da236-8ed6-4841-819c-c77b476185d6"}

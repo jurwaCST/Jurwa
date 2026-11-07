@@ -14,9 +14,9 @@ import (
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/jurwaCST/Jurwa/pkg/observability"
 	authorizationv1 "github.com/jurwaCST/Jurwa/proto/gen/authorization/v1"
 	grpcadapter "github.com/jurwaCST/Jurwa/services/authorization/adapters/in/grpc"
-	"github.com/jurwaCST/Jurwa/services/authorization/adapters/out/memory"
 	"github.com/jurwaCST/Jurwa/services/authorization/application"
 )
 
@@ -31,7 +31,13 @@ func main() {
 	serviceName := envOr("SERVICE_NAME", defaultServiceName)
 	port := envOr("PORT", defaultPort)
 
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil)).With("service", serviceName)
+	// Metrics on METRICS_ADDR (off when empty) and one JSON log line per request.
+	obs, err := observability.Init(serviceName)
+	if err != nil {
+		slog.Error("cannot start observability", "error", err)
+		os.Exit(1)
+	}
+	logger := obs.Logger()
 	slog.SetDefault(logger)
 
 	lis, err := net.Listen("tcp", ":"+port)
@@ -40,14 +46,20 @@ func main() {
 		os.Exit(1)
 	}
 
-	srv := grpc.NewServer()
+	srv := grpc.NewServer(grpc.ChainUnaryInterceptor(obs.Unary()))
 
 	// Standard gRPC health service (grpc.health.v1), used by grpcurl and Kubernetes probes.
 	hs := health.NewServer()
 	healthpb.RegisterHealthServer(srv, hs)
 
-	// In-memory role table for now; a database in Sprint 3.
-	app := application.NewService(memory.New())
+	// PostgreSQL when DATABASE_URL is set, otherwise the built-in default table.
+	repo, closeRepo, err := openRepo(os.Getenv("DATABASE_URL"))
+	if err != nil {
+		slog.Error("cannot open the database", "error", err)
+		os.Exit(1)
+	}
+	defer closeRepo()
+	app := application.NewService(repo)
 	authorizationv1.RegisterAuthorizationServiceServer(srv, grpcadapter.NewHandler(app))
 
 	// Reflection lets grpcurl list and call methods without the .proto files.

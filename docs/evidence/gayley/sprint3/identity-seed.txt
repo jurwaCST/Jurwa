@@ -1,0 +1,56 @@
+# SCRUM-126 live check, 2026-11-06 11:27. JWT_SECRET is a local throwaway value. The demo password is hidden below as <SEED_DEMO_PASSWORD>.
+
+## 1. With the seed: SEED_DEMO_USERS=true SEED_DEMO_PASSWORD=<SEED_DEMO_PASSWORD> make run SERVICE=identity
+server log:
+{"time":"2026-11-06T11:27:28.794444+06:00","level":"WARN","msg":"demo users seeded, for the demo only","service":"identity","created":6}
+{"time":"2026-11-06T11:27:28.7964467+06:00","level":"INFO","msg":"server started","service":"identity","port":"9016"}
+
+$ grpcurl -plaintext -d '{"email":"dsa.demo@jurwa.example","password":"<SEED_DEMO_PASSWORD>"}' localhost:9016 jurwa.identity.v1.IdentityService/Login
+{
+  "accessToken": "<JWT hidden>",
+  "expiresAt": "2026-11-06T05:42:35.408072500Z",
+  "user": {
+    "id": "00000000-0000-4000-8000-000000000001",
+    "email": "dsa.demo@jurwa.example",
+    "fullName": "DSA (demo)",
+    "roles": [
+      "CATEGORY_HEAD"
+    ],
+    "active": true,
+    "createdAt": "2026-11-06T05:27:28.495089300Z"
+  }
+}
+token claims: sub=00000000-0000-4000-8000-000000000001 roles=['CATEGORY_HEAD']
+
+daa.demo@jurwa.example: 00000000-0000-4000-8000-000000000002 ['CATEGORY_HEAD']
+
+sso.demo@jurwa.example: 00000000-0000-4000-8000-000000000003 ['CATEGORY_HEAD']
+
+staff.demo@jurwa.example: 00000000-0000-4000-8000-000000000010 ['STAFF']
+
+admin.demo@jurwa.example: 00000000-0000-4000-8000-000000000020 ['SYSTEM_ADMIN']
+
+president.demo@jurwa.example: 00000000-0000-4000-8000-000000000030 ['PRESIDENT']
+
+$ Login as dsa.demo with a wrong password
+ERROR:
+  Code: Unauthenticated
+  Message: wrong email or password
+
+$ Register a new account (always STUDENT)
+    "roles": [
+      "STUDENT"
+    ],
+    "active": true,
+
+## 2. Without the flag: make run SERVICE=identity
+server log:
+{"time":"2026-11-06T11:27:44.008468+06:00","level":"INFO","msg":"server started","service":"identity","port":"9016"}
+
+$ the same DSA login
+ERROR:
+  Code: Unauthenticated
+  Message: wrong email or password
+
+## 3. Flag on, no password: SEED_DEMO_USERS=true go run ./services/identity/cmd/server  (the server exits)
+{"time":"2026-11-06T11:27:48.7904151+06:00","level":"ERROR","msg":"cannot seed demo users","service":"identity","error":"SEED_DEMO_PASSWORD: demo password is required"}

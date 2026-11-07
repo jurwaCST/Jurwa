@@ -112,51 +112,50 @@ func NewProjection() *Projection {
 // nothing, when the event is a repeat or cannot be used (for example an
 // unknown status). It never panics on bad events.
 func (p *Projection) Apply(e Event) bool {
-	if e.ID == "" || e.ReportID == "" || p.seen[e.ID] {
+	if p.seen[e.ID] {
 		return false
 	}
-	applied := false
+	current, exists := p.reports[e.ReportID]
+	next, ok := Next(current, exists, e)
+	if !ok {
+		return false
+	}
+	p.reports[e.ReportID] = next
+	p.seen[e.ID] = true
+	return true
+}
+
+// Next returns the report after event e. current is the stored report and
+// exists says whether there is one. ok is false, and the report must not
+// change, when the event cannot be used. Repeats are not checked here: the
+// store keeps the seen event ids. Both the in-memory and the PostgreSQL store
+// use this, so they follow the same rules.
+func Next(current Report, exists bool, e Event) (Report, bool) {
+	if e.ID == "" || e.ReportID == "" {
+		return Report{}, false
+	}
 	switch e.Type {
 	case ReportSubmitted:
-		applied = p.applySubmitted(e)
+		if exists || !e.Category.valid() {
+			return Report{}, false
+		}
+		return Report{ID: e.ReportID, Category: e.Category, Status: Open, CreatedAt: e.OccurredAt}, true
 	case StatusChanged:
-		applied = p.applyStatusChanged(e)
+		if !exists || !e.ToStatus.valid() {
+			return Report{}, false
+		}
+		r := current
+		r.Status = e.ToStatus
+		r.ResolvedAt = time.Time{}
+		if e.ToStatus == Resolved {
+			r.ResolvedAt = e.OccurredAt
+		}
+		if e.ToStatus == Escalated {
+			r.WasEscalated = true
+		}
+		return r, true
 	}
-	if applied {
-		p.seen[e.ID] = true
-	}
-	return applied
-}
-
-func (p *Projection) applySubmitted(e Event) bool {
-	if !e.Category.valid() {
-		return false
-	}
-	if _, exists := p.reports[e.ReportID]; exists {
-		return false
-	}
-	p.reports[e.ReportID] = Report{ID: e.ReportID, Category: e.Category, Status: Open, CreatedAt: e.OccurredAt}
-	return true
-}
-
-func (p *Projection) applyStatusChanged(e Event) bool {
-	if !e.ToStatus.valid() {
-		return false
-	}
-	r, exists := p.reports[e.ReportID]
-	if !exists {
-		return false
-	}
-	r.Status = e.ToStatus
-	r.ResolvedAt = time.Time{}
-	if e.ToStatus == Resolved {
-		r.ResolvedAt = e.OccurredAt
-	}
-	if e.ToStatus == Escalated {
-		r.WasEscalated = true
-	}
-	p.reports[e.ReportID] = r
-	return true
+	return Report{}, false
 }
 
 // Reports returns a copy of every report, sorted by id.

@@ -124,3 +124,17 @@ func TestCheckPassword(t *testing.T) {
 		})
 	}
 }
+
+func TestNewUserWithRole(t *testing.T) {
+	u, err := NewUserWithRole("id-1", " DSA.Demo@Jurwa.Example ", "DSA (demo)", "secret123", RoleCategoryHead, fixedNow)
+	require.NoError(t, err)
+	assert.Equal(t, "dsa.demo@jurwa.example", u.Email)
+	assert.Equal(t, []Role{RoleCategoryHead}, u.Roles)
+	assert.True(t, u.Active)
+	assert.NoError(t, u.CheckPassword("secret123"))
+
+	_, err = NewUserWithRole("id-2", "x@jurwa.example", "X", "secret123", Role("ROOT"), fixedNow)
+	assert.ErrorIs(t, err, ErrInvalidRole)
+	_, err = NewUserWithRole("id-3", "x@jurwa.example", "X", "short", RoleStaff, fixedNow)
+	assert.ErrorIs(t, err, ErrPasswordTooShort)
+}

@@ -45,7 +45,9 @@ Plus `grpc.health.v1.Health/Check` and server reflection.
 | `application/` | Use cases: `Record`, `Summary`, `Breakdown` |
 | `ports/` | `ProjectionStore` interface |
 | `adapters/in/grpc/` | gRPC handler, maps errors to gRPC codes |
-| `adapters/out/memory/` | In-memory store (a database in Sprint 3) |
+| `adapters/out/memory/` | In-memory store, used when `DATABASE_URL` is not set |
+| `adapters/out/postgres/` | PostgreSQL store, used when `DATABASE_URL` is set |
+| `adapters/out/repotest/` | Checks both must pass |
 
 ## Configuration
 
@@ -54,6 +56,9 @@ Plus `grpc.health.v1.Health/Check` and server reflection.
 | `PORT` | `9020` | gRPC port |
 | `SERVICE_NAME` | `analytics` | Name written in every log line |
 | `SEED_DEMO_DATA` | empty | `true` loads the demo events at start-up. Sprint 2 demos only |
+| `DATABASE_URL` | none | For example `postgres://jurwa:<password>@localhost:5432/analytics?sslmode=disable`. Unset: in memory, lost on restart. A wrong URL stops the service instead of falling back. The password comes from the environment (a Kubernetes Secret), never from the repository |
+
+Storage: with `DATABASE_URL` the service uses PostgreSQL (database `analytics`, table `report_facts` and `processed_events`). On start it runs `docs/design/schema/analytics.sql` (embedded as `adapters/out/postgres/schema.sql`, a test keeps the two equal), which creates the tables if needed. The ids of applied events are kept, so a repeated event, or the demo seed after a restart, is never counted twice. Both stores pass the same checks (`adapters/out/repotest`).
 
 ## Run (PowerShell)
 
@@ -83,3 +88,11 @@ docker run --rm -p 9020:9020 -e SEED_DEMO_DATA=true jurwa/analytics
 ```powershell
 go test ./services/analytics/... -cover
 ```
+
+Integration tests on a real PostgreSQL 16 (Docker Desktop must be running):
+
+```powershell
+go test -tags=integration ./services/analytics/adapters/out/postgres/... -v
+```
+
+Evidence: `docs/evidence/gayley/sprint3/db-adapters-3b-integration.txt` and `db-adapters-3b-live.txt`.

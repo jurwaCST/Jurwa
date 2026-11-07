@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS notifications (
     created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
     sent_at           TIMESTAMPTZ,
     read_at           TIMESTAMPTZ,
+    saved_seq         BIGINT      GENERATED ALWAYS AS IDENTITY, -- save order, breaks ties on created_at
     CONSTRAINT notifications_channel_chk CHECK (channel IN ('EMAIL', 'IN_APP')),
     CONSTRAINT notifications_status_chk  CHECK (delivery_status IN ('PENDING', 'SENT', 'FAILED'))
 );
