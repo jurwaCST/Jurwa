@@ -1,0 +1,50 @@
+# SCRUM-120 go test -race -v ./services/api-gateway/... (photo tests), 2026-11-07 22:03
+=== RUN   TestPhotoRoutesNeedAToken
+--- PASS: TestPhotoRoutesNeedAToken (0.00s)
+=== RUN   TestUploadPhotoSendsTheFileAndTheUploaderFromTheJWT
+--- PASS: TestUploadPhotoSendsTheFileAndTheUploaderFromTheJWT (0.00s)
+=== RUN   TestUploadPhotoPassesTheTypeThrough
+--- PASS: TestUploadPhotoPassesTheTypeThrough (0.00s)
+=== RUN   TestUploadPhotoOnlyStudents
+--- PASS: TestUploadPhotoOnlyStudents (0.00s)
+=== RUN   TestUploadPhotoSizes
+=== RUN   TestUploadPhotoSizes/exactly_5_MB
+=== RUN   TestUploadPhotoSizes/5_MB_+_1_byte:_photo-media_refuses
+=== RUN   TestUploadPhotoSizes/5.5_MB:_photo-media_refuses
+=== RUN   TestUploadPhotoSizes/6_MB_+_1_byte:_the_gateway_refuses
+=== RUN   TestUploadPhotoSizes/10_MB:_the_gateway_refuses
+--- PASS: TestUploadPhotoSizes (5.62s)
+    --- PASS: TestUploadPhotoSizes/exactly_5_MB (0.30s)
+    --- PASS: TestUploadPhotoSizes/5_MB_+_1_byte:_photo-media_refuses (0.58s)
+    --- PASS: TestUploadPhotoSizes/5.5_MB:_photo-media_refuses (1.29s)
+    --- PASS: TestUploadPhotoSizes/6_MB_+_1_byte:_the_gateway_refuses (1.21s)
+    --- PASS: TestUploadPhotoSizes/10_MB:_the_gateway_refuses (2.22s)
+=== RUN   TestUploadPhotoBadForm
+--- PASS: TestUploadPhotoBadForm (0.00s)
+=== RUN   TestGetPhotoReturnsTheImage
+--- PASS: TestGetPhotoReturnsTheImage (0.00s)
+=== RUN   TestGetPhotoOwnership
+--- PASS: TestGetPhotoOwnership (0.00s)
+=== RUN   TestGetPhotoErrors
+--- PASS: TestGetPhotoErrors (0.00s)
+=== RUN   TestGetPhotoUnexpectedTypeIsNotServedAsIs
+--- PASS: TestGetPhotoUnexpectedTypeIsNotServedAsIs (0.00s)
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http	11.609s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient	3.195s
+=== RUN   TestPhotosSendsTheRequest
+--- PASS: TestPhotosSendsTheRequest (0.06s)
+=== RUN   TestPhotoMessageLimitsAllowAFiveMBPhoto
+--- PASS: TestPhotoMessageLimitsAllowAFiveMBPhoto (1.84s)
+=== RUN   TestPhotoMessageLimitsStopAnythingOverSixMB
+--- PASS: TestPhotoMessageLimitsStopAnythingOverSixMB (0.64s)
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients	11.050s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/application	7.270s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/cmd/server	10.919s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/domain	11.346s
+
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http	6.296s	coverage: 97.2% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient	2.052s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients	4.302s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/application	3.069s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/cmd/server	7.031s	coverage: 8.8% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/domain	8.250s	coverage: 97.0% of statements

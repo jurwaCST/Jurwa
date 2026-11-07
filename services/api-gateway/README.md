@@ -31,8 +31,24 @@ Every gRPC client goes through `pkg/resilience` (2 s timeout, up to 3 attempts f
 | `GET /reports/{reportId}/notes` | internal-notes ListNotes | Category Head, Staff, System Administrator |
 | `GET /me/reports` | report-history ListReportsByReporter (`?pageSize=` 1 to 100, `?pageToken=`) | Student; the reporter id comes from the JWT |
 | `GET /reports/{reportId}/timeline` | report-history GetReportTimeline | Student (own, checked with report-submission), Category Head, Staff, System Administrator |
+| `POST /photos` | photo-media UploadPhoto (returns 201 `{"photoId": "..."}`) | Student; the uploader id comes from the JWT |
+| `GET /photos/{photoId}` | photo-media GetPhoto (returns the raw image) | Student (own), Category Head, Staff, System Administrator |
 
 The other routes in `api-routes.md` are added as their services are merged.
+
+## Photos
+
+`POST /photos` takes `multipart/form-data` with the file in the field `photo`. The gateway passes the part's `Content-Type` and file name to photo-media as they are and does no type check: photo-media checks the real bytes (JPG or PNG, at most 5 MB) and its errors come back as 400. Other form fields are ignored, including any uploader id. The PWA then sends the `photoId` with `POST /reports`.
+
+| Photo size | Who refuses it | Response |
+|---|---|---|
+| up to 5 MB | nobody | 201 `{"photoId": "..."}` |
+| over 5 MB, body up to 6 MB | photo-media | 400 `{"error": "invalid photo: photo is larger than 5 MB"}` |
+| body over 6 MB | the gateway, before calling photo-media | 400, the same message |
+
+Only `POST /photos` gets the 6 MB body limit; every other route keeps 64 KB. The photo-media gRPC connection allows 6 MB messages in both directions (the grpc-go default for a received message is 4 MB, which would block `GET /photos` for larger photos); photo-media's server accepts 6 MB too.
+
+`GET /photos/{photoId}` sends the image bytes with `Content-Type: image/jpeg` or `image/png` (anything else is sent as `application/octet-stream`), `X-Content-Type-Options: nosniff` and `Cache-Control: private, no-store`. The route needs the JWT, so the PWA fetches it with the `Authorization` header and shows it from a blob URL (`URL.createObjectURL`). A student can only fetch their own photos.
 
 ## Errors
 
@@ -66,6 +82,7 @@ Error bodies are `{"error": "<message>"}`.
 | `AUTHORIZATION_ADDR` | `localhost:9017` | authorization |
 | `INTERNAL_NOTES_ADDR` | `localhost:9005` | internal-notes |
 | `REPORT_HISTORY_ADDR` | `localhost:9003` | report-history |
+| `PHOTO_MEDIA_ADDR` | `localhost:9002` | photo-media |
 
 ## Run
 
@@ -78,6 +95,7 @@ make run SERVICE=category-taxonomy
 make run SERVICE=report-submission
 make run SERVICE=internal-notes
 make run SERVICE=report-history
+make run SERVICE=photo-media
 make run SERVICE=api-gateway
 ```
 

@@ -1,0 +1,22 @@
+# SCRUM-120 tests first: go test ./services/api-gateway/... before the code exists, 2026-11-07 21:59
+# github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients [github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients.test]
+services/api-gateway/adapters/out/grpcclients/photos_test.go:39:80: undefined: Photos
+services/api-gateway/adapters/out/grpcclients/photos_test.go:42:42: undefined: MaxPhotoMessageBytes
+services/api-gateway/adapters/out/grpcclients/photos_test.go:54:9: undefined: Photos
+services/api-gateway/adapters/out/grpcclients/photos_test.go:59:32: undefined: PhotoMessageLimits
+services/api-gateway/adapters/out/grpcclients/photos_test.go:77:59: undefined: PhotoMessageLimits
+services/api-gateway/adapters/out/grpcclients/photos_test.go:91:43: undefined: PhotoMessageLimits
+services/api-gateway/adapters/out/grpcclients/photos_test.go:92:100: undefined: MaxPhotoMessageBytes
+# github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http [github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http.test]
+services/api-gateway/adapters/in/http/router_test.go:110:47: undefined: domain.ActionPhotoRead
+services/api-gateway/adapters/in/http/router_test.go:112:14: undefined: domain.ActionPhotoUpload
+services/api-gateway/adapters/in/http/router_test.go:189:3: unknown field Photos in struct literal of type Deps
+FAIL	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http [build failed]
+?   	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient	(cached)
+FAIL	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/application	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/cmd/server	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/domain	(cached)
+?   	github.com/jurwaCST/Jurwa/services/api-gateway/ports	[no test files]
+FAIL

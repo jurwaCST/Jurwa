@@ -33,6 +33,9 @@ const (
 
 	ActionReportListOwn      = "report.list_own"
 	ActionReportTimelineRead = "report.timeline.read"
+
+	ActionPhotoUpload = "photo.upload"
+	ActionPhotoRead   = "photo.read"
 )
 
 // Principal is the signed-in user, taken from a validated JWT.
