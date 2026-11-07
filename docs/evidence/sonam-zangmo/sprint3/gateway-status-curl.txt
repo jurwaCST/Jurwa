@@ -1,0 +1,78 @@
+# SCRUM-128 live check, 2026-11-07 22:44. Local binaries: identity (SEED_DEMO_USERS=true; the demo password and JWT_SECRET are throwaway values, not shown), authorization, report-submission, status-lifecycle, api-gateway on :8080. Tokens are never printed.
+# Demo ids: dsa.demo 00000000-0000-4000-8000-000000000001, staff.demo 00000000-0000-4000-8000-000000000010.
+
+$ POST /reports as student Dawa (to get a real report id)
+HTTP 201
+report id: 30f27da5-8c00-4497-bd8b-135f06faffbb
+
+# status-lifecycle is now started with SEED_REPORT_IDS=30f27da5-8c00-4497-bd8b-135f06faffbb (it does not consume report.submitted yet), so the report starts OPEN.
+
+$ GET /reports/<id>/status as Dawa (owner)
+{"status":{"reportId":"30f27da5-8c00-4497-bd8b-135f06faffbb","status":"OPEN","previousStatus":"STATUS_UNSPECIFIED","version":1,"updatedAt":"2026-11-07T16:43:58.754468Z"}}
+HTTP 200
+
+$ POST status ASSIGNED as dsa.demo, with a forged reportId and an empty actorId in the body (updatedBy shows the DSA id from the JWT)
+{"status":{"reportId":"30f27da5-8c00-4497-bd8b-135f06faffbb","status":"ASSIGNED","previousStatus":"OPEN","version":2,"updatedBy":"00000000-0000-4000-8000-000000000001","updatedAt":"2026-11-07T16:44:12.425135Z"}}
+HTTP 200
+
+$ POST status IN_PROGRESS as staff.demo with a stale expectedVersion 1 (DSA already moved it to version 2)
+{"error":"version conflict"}
+
+HTTP 409
+
+$ POST status IN_PROGRESS as staff.demo with expectedVersion 2 (current)
+{"status":{"reportId":"30f27da5-8c00-4497-bd8b-135f06faffbb","status":"IN_PROGRESS","previousStatus":"ASSIGNED","version":3,"updatedBy":"00000000-0000-4000-8000-000000000010","updatedAt":"2026-11-07T16:44:12.440417Z"}}
+HTTP 200
+
+$ POST status ESCALATED as dsa.demo (only the system may escalate)
+{"error":"invalid status transition: IN_PROGRESS to ESCALATED"}
+
+HTTP 422
+
+$ POST status OPEN as dsa.demo (going back is not in the flow)
+{"error":"invalid status transition: IN_PROGRESS to OPEN"}
+
+HTTP 422
+
+$ POST status RESOLVED as Dawa (student)
+{"error":"not allowed"}
+
+HTTP 403
+
+$ POST status RESOLVED as admin.demo (System Administrator)
+{"error":"not allowed"}
+
+HTTP 403
+
+$ POST status with an unknown value DONE
+{"error":"invalid JSON body"}
+
+HTTP 400
+
+$ POST status with no toStatus
+{"error":"toStatus is required"}
+
+HTTP 400
+
+$ POST status RESOLVED as staff.demo
+{"status":{"reportId":"30f27da5-8c00-4497-bd8b-135f06faffbb","status":"RESOLVED","previousStatus":"IN_PROGRESS","version":4,"updatedBy":"00000000-0000-4000-8000-000000000010","updatedAt":"2026-11-07T16:44:12.489017Z"}}
+HTTP 200
+
+$ GET /reports/<id>/status as Tshering (another student)
+{"error":"not allowed"}
+
+HTTP 403
+
+$ GET /reports/<id>/status as admin.demo
+{"status":{"reportId":"30f27da5-8c00-4497-bd8b-135f06faffbb","status":"RESOLVED","previousStatus":"IN_PROGRESS","version":4,"updatedBy":"00000000-0000-4000-8000-000000000010","updatedAt":"2026-11-07T16:44:12.489017Z"}}
+HTTP 200
+
+$ GET /reports/<unknown id>/status as dsa.demo
+{"error":"report not found"}
+
+HTTP 404
+
+$ POST status with no token
+{"error":"missing bearer token"}
+
+HTTP 401

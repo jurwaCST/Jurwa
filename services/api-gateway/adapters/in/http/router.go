@@ -24,6 +24,7 @@ import (
 	internalnotesv1 "github.com/jurwaCST/Jurwa/proto/gen/internal-notes/v1"
 	photomediav1 "github.com/jurwaCST/Jurwa/proto/gen/photo-media/v1"
 	reportsubmissionv1 "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1"
+	statuslifecyclev1 "github.com/jurwaCST/Jurwa/proto/gen/status-lifecycle/v1"
 	"github.com/jurwaCST/Jurwa/services/api-gateway/application"
 	"github.com/jurwaCST/Jurwa/services/api-gateway/domain"
 	"github.com/jurwaCST/Jurwa/services/api-gateway/ports"
@@ -51,6 +52,7 @@ type Deps struct {
 	Notes      ports.Notes
 	History    ports.History
 	Photos     ports.Photos
+	Status     ports.Status
 	Limiter    *domain.Limiter
 }
 
@@ -75,6 +77,8 @@ func NewRouter(d Deps) http.Handler {
 	mux.Handle("POST /reports/{reportId}/notes", r.protected(domain.ActionReportNoteAdd, r.addNote))
 	mux.Handle("GET /reports/{reportId}/notes", r.protected(domain.ActionReportNoteRead, r.listNotes))
 	mux.Handle("GET /me/reports", r.protected(domain.ActionReportListOwn, r.myReports))
+	mux.Handle("POST /reports/{reportId}/status", r.protected(domain.ActionReportStatusChange, r.changeStatus))
+	mux.Handle("GET /reports/{reportId}/status", r.protected(domain.ActionReportStatusRead, r.getStatus))
 	mux.Handle("POST /photos", r.protected(domain.ActionPhotoUpload, r.uploadPhoto))
 	mux.Handle("GET /photos/{photoId}", r.protected(domain.ActionPhotoRead, r.getPhoto))
 	mux.Handle("GET /reports/{reportId}/timeline", r.protected(domain.ActionReportTimelineRead, r.timeline))
@@ -237,17 +241,59 @@ func (r router) myReports(w http.ResponseWriter, req *http.Request) {
 // as GET /reports/{reportId}.
 func (r router) timeline(w http.ResponseWriter, req *http.Request) {
 	reportID := req.PathValue("reportId")
-	if actingRole(req) == domain.RoleStudent {
-		report, err := r.Reports.GetReport(req.Context(), reportID)
-		if err == nil && !domain.CanReadReport(principal(req), report.GetReporterId()) {
-			err = domain.ErrForbidden
-		}
-		if err != nil {
-			writeError(w, err)
-			return
-		}
+	if err := r.checkOwnReport(req, reportID); err != nil {
+		writeError(w, err)
+		return
 	}
 	resp, err := r.History.GetReportTimeline(req.Context(), reportID)
+	reply(w, http.StatusOK, resp, err)
+}
+
+// checkOwnReport applies "Student (own)" for routes whose answer has no
+// reporter: when the allowed role is Student, the report must be theirs
+// (ErrForbidden otherwise, or report-submission's NOT_FOUND). Other roles pass.
+func (r router) checkOwnReport(req *http.Request, reportID string) error {
+	if actingRole(req) != domain.RoleStudent {
+		return nil
+	}
+	report, err := r.Reports.GetReport(req.Context(), reportID)
+	if err != nil {
+		return err
+	}
+	if !domain.CanReadReport(principal(req), report.GetReporterId()) {
+		return domain.ErrForbidden
+	}
+	return nil
+}
+
+// changeStatus sends the new status to status-lifecycle, which checks the flow
+// (FAILED_PRECONDITION, 422) and the version (ABORTED, 409).
+func (r router) changeStatus(w http.ResponseWriter, req *http.Request) {
+	in := &statuslifecyclev1.ChangeStatusRequest{}
+	if !readJSON(w, req, in) {
+		return
+	}
+	if in.GetToStatus() == commonv1.Status_STATUS_UNSPECIFIED {
+		writeJSONError(w, http.StatusBadRequest, "toStatus is required")
+		return
+	}
+	in.ReportId = req.PathValue("reportId") // from the path, never the body
+	// From the JWT, never the body (rule 2). It is never empty here, because an
+	// empty actor means the system, which may set ESCALATED.
+	in.ActorId = principal(req).UserID
+	resp, err := r.Status.ChangeStatus(req.Context(), in)
+	reply(w, http.StatusOK, resp, err)
+}
+
+// getStatus applies "Student (own)" like timeline: a student's ownership is
+// checked with report-submission first.
+func (r router) getStatus(w http.ResponseWriter, req *http.Request) {
+	reportID := req.PathValue("reportId")
+	if err := r.checkOwnReport(req, reportID); err != nil {
+		writeError(w, err)
+		return
+	}
+	resp, err := r.Status.GetStatus(req.Context(), reportID)
 	reply(w, http.StatusOK, resp, err)
 }
 
