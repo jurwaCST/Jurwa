@@ -12,3 +12,9 @@ resources:
   - ../../k8s/services/authorization
   - ../../k8s/services/category-taxonomy
   - ../../k8s/services/report-submission
+
+# Marks everything Argo CD manages for the demo (metadata only, selectors unchanged).
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: jurwa
+    includeSelectors: false
