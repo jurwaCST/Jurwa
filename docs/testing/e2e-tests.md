@@ -82,7 +82,7 @@ Cypress writes a video to `web/cypress/videos/` and, when a test fails, a screen
 
 ## Not in CI
 
-CI would need the whole stack (gateway, six services, the web dev server) in the runner, which is too heavy for this sprint. The run is shown locally instead: `docs/evidence/gayley/sprint3/cypress-run.txt` (8 of 8 passing, 7 Nov 2026) and `cypress-run.mp4`.
+CI would need the whole stack (gateway, eight services, the web dev server) in the runner, which is too heavy for this sprint. The run is shown locally instead: `docs/evidence/gayley/sprint3/cypress-run.txt` (8 of 8 passing, 7 Nov 2026) and `cypress-run.mp4`.
 
 ## Known gaps
 
