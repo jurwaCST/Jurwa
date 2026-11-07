@@ -1,0 +1,19 @@
+> make docker-build SERVICE=status-lifecycle
+#16 DONE 0.1s
+#17 naming to docker.io/jurwa/status-lifecycle:latest 0.0s done
+#17 DONE 1.9s
+
+> make docker-build SERVICE=sla-tracking
+#16 DONE 0.1s
+#17 naming to docker.io/jurwa/sla-tracking:latest done
+#17 DONE 1.5s
+
+> make docker-build SERVICE=reassignment
+#15 DONE 0.1s
+#16 naming to docker.io/jurwa/reassignment:latest done
+#16 DONE 1.5s
+
+> docker images (jurwa/status-lifecycle, sla-tracking, reassignment)
+jurwa/reassignment:latest  3 seconds ago  28.8MB
+jurwa/sla-tracking:latest  7 minutes ago  28.9MB
+jurwa/status-lifecycle:latest  12 minutes ago  28.8MB
