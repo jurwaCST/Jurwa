@@ -1,0 +1,23 @@
+# Argo CD Application for everything in deploy/k8s (all 20 services, the data
+# stores and the ingress). Needs about 16 GB of RAM; see deploy/argocd/README.md.
+#   kubectl apply -f deploy/argocd/application.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: jurwa
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/jurwaCST/Jurwa.git
+    targetRevision: main
+    path: deploy/k8s
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: jurwa
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

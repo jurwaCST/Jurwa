@@ -1,0 +1,14 @@
+# The low-memory demo set for Argo CD on an 8 GB laptop (SCRUM-102): the data
+# stores, the gateway and the four services sign-up, sign-in, categories and
+# report submission need. The full set is deploy/k8s (application.yaml).
+# The namespace comes from CreateNamespace=true in application-demo.yaml.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../k8s/data
+  - ../../k8s/services/api-gateway
+  - ../../k8s/services/identity
+  - ../../k8s/services/authorization
+  - ../../k8s/services/category-taxonomy
+  - ../../k8s/services/report-submission
