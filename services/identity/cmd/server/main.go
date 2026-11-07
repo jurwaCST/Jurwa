@@ -17,6 +17,7 @@ import (
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/jurwaCST/Jurwa/pkg/observability"
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
 	grpcadapter "github.com/jurwaCST/Jurwa/services/identity/adapters/in/grpc"
 	"github.com/jurwaCST/Jurwa/services/identity/application"
@@ -36,7 +37,13 @@ func main() {
 	serviceName := envOr("SERVICE_NAME", defaultServiceName)
 	port := envOr("PORT", defaultPort)
 
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil)).With("service", serviceName)
+	// Metrics on METRICS_ADDR (off when empty) and one JSON log line per request.
+	obs, err := observability.Init(serviceName)
+	if err != nil {
+		slog.Error("cannot start observability", "error", err)
+		os.Exit(1)
+	}
+	logger := obs.Logger()
 	slog.SetDefault(logger)
 
 	tokens, err := newTokenIssuer(os.Getenv("JWT_SECRET"), envOr("JWT_TTL", defaultJWTTTL))
@@ -69,7 +76,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	srv := grpc.NewServer()
+	srv := grpc.NewServer(grpc.ChainUnaryInterceptor(obs.Unary()))
 
 	// Standard gRPC health service (grpc.health.v1), used by grpcurl and Kubernetes probes.
 	hs := health.NewServer()
