@@ -4,7 +4,9 @@ Card: SCRUM-84 (work package 1.8, epic SCRUM-70). Owner: Sonam Zangmo. Presentat
 
 The demo shows the full life of one report, in the order a real report lives it, and proves each success criterion of the charter (section 10) on screen. It runs on Sonam Choki's 16 GB laptop with everything from `deploy/k8s`, deployed by Argo CD (`deploy/argocd/application.yaml`). Sonam Zangmo's 8 GB laptop with the small demo set (`deploy/argocd/application-demo.yaml`) is the second machine.
 
-## 1. Outline (15 minutes)
+## 1. Outline
+
+The time limit for the presentation is not given yet. This outline assumes 15 minutes as a working draft; section 1b shows what to keep when the slot is shorter.
 
 | # | Time | Step | Presenter (proposed) | Shows | Charter criterion |
 |---|---|---|---|---|---|
@@ -20,6 +22,18 @@ The demo shows the full life of one report, in the order a real report lives it,
 | 10 | 1:00 | Project | Sonam Zangmo | EVM chart, risks closed, what we would do next | "Within budget, weekly EVM" |
 
 Presenters are a proposal: each person shows what they built. Change it at the first rehearsal.
+
+## 1b. If the slot is shorter
+
+Steps are kept in this order, so the demo can be cut from the bottom without losing the story.
+
+| Slot | Keep | Drop or move to one closing slide |
+|---|---|---|
+| 15 min or more | All 10 steps | Nothing |
+| 10 min | 1, 3, 4, 5, 6, 2 | 7, 8, 9, 10 become one slide with the numbers (coverage, p95, EVM) |
+| 5 min | 3, 4, 5, 6 (the report from submit to escalation), with one sentence on Argo CD | Everything else on the closing slide |
+
+Steps 3 to 6 are the core: they prove routing and escalation, two of the charter's success criteria, live.
 
 ## 2. Script
 
