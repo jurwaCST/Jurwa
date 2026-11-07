@@ -11,6 +11,7 @@ import (
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
 	internalnotesv1 "github.com/jurwaCST/Jurwa/proto/gen/internal-notes/v1"
 	locationtaxonomyv1 "github.com/jurwaCST/Jurwa/proto/gen/location-taxonomy/v1"
+	photomediav1 "github.com/jurwaCST/Jurwa/proto/gen/photo-media/v1"
 	reporthistoryv1 "github.com/jurwaCST/Jurwa/proto/gen/report-history/v1"
 	reportsubmissionv1 "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1"
 )
@@ -55,4 +56,10 @@ type Notes interface {
 type History interface {
 	ListReportsByReporter(ctx context.Context, reporterID string, pageSize int32, pageToken string) (*reporthistoryv1.ListReportsByReporterResponse, error)
 	GetReportTimeline(ctx context.Context, reportID string) (*reporthistoryv1.GetReportTimelineResponse, error)
+}
+
+// Photos is photo-media (Choki): the photo a student attaches to a report.
+type Photos interface {
+	UploadPhoto(ctx context.Context, in *photomediav1.UploadPhotoRequest) (*photomediav1.UploadPhotoResponse, error)
+	GetPhoto(ctx context.Context, photoID string) (*photomediav1.GetPhotoResponse, error)
 }

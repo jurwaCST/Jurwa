@@ -9,6 +9,7 @@ import (
 	"errors"
 	"io"
 	"log/slog"
+	"mime/multipart"
 	"net"
 	"net/http"
 	"strconv"
@@ -21,14 +22,24 @@ import (
 	commonv1 "github.com/jurwaCST/Jurwa/proto/gen/common/v1"
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
 	internalnotesv1 "github.com/jurwaCST/Jurwa/proto/gen/internal-notes/v1"
+	photomediav1 "github.com/jurwaCST/Jurwa/proto/gen/photo-media/v1"
 	reportsubmissionv1 "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1"
 	"github.com/jurwaCST/Jurwa/services/api-gateway/application"
 	"github.com/jurwaCST/Jurwa/services/api-gateway/domain"
 	"github.com/jurwaCST/Jurwa/services/api-gateway/ports"
 )
 
-// maxBodyBytes bounds a JSON body. Photos go to photo-media, not through here.
+// maxBodyBytes bounds a JSON body.
 const maxBodyBytes = 64 << 10
+
+// maxPhotoBodyBytes bounds POST /photos only: a 5 MB photo plus the multipart
+// headers. photo-media gives the exact error for a photo between 5 and 6 MB;
+// anything bigger is refused here, with the same message (errPhotoTooLarge).
+const maxPhotoBodyBytes = 6 << 20
+
+// errPhotoTooLarge is photo-media's own message for a photo over 5 MB, so the
+// PWA gets one message whichever side refuses the upload.
+const errPhotoTooLarge = "invalid photo: photo is larger than 5 MB"
 
 // Deps are the ports and helpers the routes use.
 type Deps struct {
@@ -39,6 +50,7 @@ type Deps struct {
 	Reports    ports.Reports
 	Notes      ports.Notes
 	History    ports.History
+	Photos     ports.Photos
 	Limiter    *domain.Limiter
 }
 
@@ -63,6 +75,8 @@ func NewRouter(d Deps) http.Handler {
 	mux.Handle("POST /reports/{reportId}/notes", r.protected(domain.ActionReportNoteAdd, r.addNote))
 	mux.Handle("GET /reports/{reportId}/notes", r.protected(domain.ActionReportNoteRead, r.listNotes))
 	mux.Handle("GET /me/reports", r.protected(domain.ActionReportListOwn, r.myReports))
+	mux.Handle("POST /photos", r.protected(domain.ActionPhotoUpload, r.uploadPhoto))
+	mux.Handle("GET /photos/{photoId}", r.protected(domain.ActionPhotoRead, r.getPhoto))
 	mux.Handle("GET /reports/{reportId}/timeline", r.protected(domain.ActionReportTimelineRead, r.timeline))
 
 	return r.rateLimit(mux)
@@ -235,6 +249,79 @@ func (r router) timeline(w http.ResponseWriter, req *http.Request) {
 	}
 	resp, err := r.History.GetReportTimeline(req.Context(), reportID)
 	reply(w, http.StatusOK, resp, err)
+}
+
+// uploadPhoto reads the multipart field "photo" and sends it to photo-media.
+// The gateway does no type check: photo-media checks the real bytes.
+func (r router) uploadPhoto(w http.ResponseWriter, req *http.Request) {
+	req.Body = http.MaxBytesReader(w, req.Body, maxPhotoBodyBytes)
+	mr, err := req.MultipartReader()
+	if err != nil {
+		writeJSONError(w, http.StatusBadRequest, `invalid photo: send multipart/form-data with the file in the field "photo"`)
+		return
+	}
+	in, err := readPhotoPart(mr)
+	if err != nil {
+		var tooBig *http.MaxBytesError
+		if errors.As(err, &tooBig) {
+			writeJSONError(w, http.StatusBadRequest, errPhotoTooLarge)
+			return
+		}
+		writeJSONError(w, http.StatusBadRequest, `invalid photo: send multipart/form-data with the file in the field "photo"`)
+		return
+	}
+	in.UploaderId = principal(req).UserID // from the JWT, never the form (rule 2)
+	resp, err := r.Photos.UploadPhoto(req.Context(), in)
+	reply(w, http.StatusCreated, resp, err)
+}
+
+// readPhotoPart returns the first part named "photo". Other fields are skipped.
+func readPhotoPart(mr *multipart.Reader) (*photomediav1.UploadPhotoRequest, error) {
+	for {
+		part, err := mr.NextPart()
+		if err != nil {
+			return nil, err // io.EOF: no photo field
+		}
+		if part.FormName() != "photo" {
+			if _, err := io.Copy(io.Discard, part); err != nil {
+				return nil, err
+			}
+			continue
+		}
+		data, err := io.ReadAll(part)
+		if err != nil {
+			return nil, err
+		}
+		return &photomediav1.UploadPhotoRequest{
+			ContentType: part.Header.Get("Content-Type"),
+			FileName:    part.FileName(),
+			Data:        data,
+		}, nil
+	}
+}
+
+// imageTypes are the only types sent with their own Content-Type.
+var imageTypes = map[string]bool{"image/jpeg": true, "image/png": true}
+
+// getPhoto sends the raw image, so the PWA can show it from a blob URL.
+func (r router) getPhoto(w http.ResponseWriter, req *http.Request) {
+	photo, err := r.Photos.GetPhoto(req.Context(), req.PathValue("photoId"))
+	if err == nil && !domain.CanReadReport(principal(req), photo.GetUploaderId()) {
+		err = domain.ErrForbidden
+	}
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	ct := photo.GetContentType()
+	if !imageTypes[ct] {
+		ct = "application/octet-stream" // never let a browser run it
+	}
+	w.Header().Set("Content-Type", ct)
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	w.Header().Set("Cache-Control", "private, no-store")
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write(photo.GetData())
 }
 
 // ---- JSON and errors ----

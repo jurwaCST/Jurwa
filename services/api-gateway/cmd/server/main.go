@@ -26,6 +26,7 @@ import (
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
 	internalnotesv1 "github.com/jurwaCST/Jurwa/proto/gen/internal-notes/v1"
 	locationtaxonomyv1 "github.com/jurwaCST/Jurwa/proto/gen/location-taxonomy/v1"
+	photomediav1 "github.com/jurwaCST/Jurwa/proto/gen/photo-media/v1"
 	reporthistoryv1 "github.com/jurwaCST/Jurwa/proto/gen/report-history/v1"
 	reportsubmissionv1 "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1"
 	httpadapter "github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http"
@@ -68,8 +69,13 @@ func main() {
 		"report-submission": envOr("REPORT_SUBMISSION_ADDR", "localhost:9001"),
 		"internal-notes":    envOr("INTERNAL_NOTES_ADDR", "localhost:9005"),
 		"report-history":    envOr("REPORT_HISTORY_ADDR", "localhost:9003"),
+		"photo-media":       envOr("PHOTO_MEDIA_ADDR", "localhost:9002"),
 	} {
-		conn, err := dial(addr)
+		var extra []grpc.DialOption
+		if name == "photo-media" {
+			extra = append(extra, grpcclients.PhotoMessageLimits()) // 6 MB, not the 4 MB default
+		}
+		conn, err := dial(addr, extra...)
 		if err != nil {
 			slog.Error("cannot create client", "service", name, "addr", addr, "error", err)
 			os.Exit(1)
@@ -87,6 +93,7 @@ func main() {
 		Reports:    grpcclients.Reports{C: reportsubmissionv1.NewReportSubmissionServiceClient(conns["report-submission"])},
 		Notes:      grpcclients.Notes{C: internalnotesv1.NewInternalNotesServiceClient(conns["internal-notes"])},
 		History:    grpcclients.History{C: reporthistoryv1.NewReportHistoryServiceClient(conns["report-history"])},
+		Photos:     grpcclients.Photos{C: photomediav1.NewPhotoMediaServiceClient(conns["photo-media"])},
 		Limiter:    domain.NewLimiter(rateLimit, time.Now),
 	})
 	httpSrv := &http.Server{
@@ -145,11 +152,12 @@ func main() {
 }
 
 // dial creates a lazy client connection wrapped with pkg/resilience.
-func dial(addr string) (*grpc.ClientConn, error) {
-	return grpc.NewClient(addr,
+func dial(addr string, extra ...grpc.DialOption) (*grpc.ClientConn, error) {
+	opts := append([]grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithChainUnaryInterceptor(resilience.UnaryClientInterceptor(resilience.DefaultConfig())),
-	)
+	}, extra...)
+	return grpc.NewClient(addr, opts...)
 }
 
 // envOr returns the environment variable key, or fallback when it is empty.
