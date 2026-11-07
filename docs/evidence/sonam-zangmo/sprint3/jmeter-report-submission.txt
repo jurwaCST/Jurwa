@@ -1,0 +1,44 @@
+# SCRUM-109 JMeter load test of POST /reports through the api-gateway, 2026-11-07
+# Apache JMeter 5.6.3 (non-GUI), tests/load/report-submission.jmx run by tests/load/run.sh.
+# Laptop: Apple silicon, 8 cores, macOS. Local binaries: identity, authorization, report-submission (in-memory store), api-gateway on :8080.
+# Target (proposed to the team for NFR-02): 50 users at the same time for 2 minutes, p95 under 500 ms, under 1% errors.
+# Tokens are never saved: run.sh deletes tokens.csv after the run.
+
+## Run 1: the agreed load (50 users, 120 s, ramp-up 10 s, each user 1 report a second)
+# Gateway started with RATE_LIMIT_PER_SECOND=1000, because all 50 users come from one laptop IP; on campus each student has their own IP.
+# Before the run, run.sh registered and logged in 50 students one at a time (not timed).
+POST /reports
+  requests 5617, errors 0 (0.00%), throughput 47.3/s
+  ms: average 61.7, median 3, p90 85, p95 252, p99 843, max 3957
+  HTTP codes: {'201': 5617}
+
+Target (p95 < 500 ms and errors < 1.0%): p95 252 ms, errors 0.00% -> MET
+
+## Run 2: the rate limit (gateway default RATE_LIMIT_PER_SECOND=20; 5 users, 15 s, each user 10 reports a second = about 50 a second from one IP)
+POST /reports
+  requests 716, errors 408 (56.98%), throughput 49.2/s
+  ms: average 4.0, median 2, p90 7, p95 8, p99 23, max 232
+  HTTP codes: {'201': 308, '429': 408}
+
+Target (p95 < 500 ms and errors < 1.0%): p95 8 ms, errors 56.98% -> not the goal of this run: the 429s are the rate limit working
+# 308 accepted in 15 s = about 20 a second, the configured limit; the rest got 429 Too Many Requests with Retry-After: 1.
+
+## Finding from the first attempt (not counted): sign-up inside the timed run
+# The first plan had each of the 50 users register and log in during the 10 s ramp-up, while the laptop was also building Docker images (load average about 49 on 8 cores).
+POST /auth/register
+  requests 50, errors 38 (76.00%), throughput 5.7/s
+  ms: average 939.9, median 52, p90 2148, p95 3239, p99 4406, max 4444
+  HTTP codes: {'201': 12, '409': 1, '503': 37}
+POST /auth/login
+  requests 50, errors 50 (100.00%), throughput 6.0/s
+  ms: average 445.2, median 9, p90 2168, p95 2182, p99 2205, max 2208
+  HTTP codes: {'503': 50}
+POST /reports
+  requests 5629, errors 5629 (100.00%), throughput 48.6/s
+  ms: average 45.8, median 5, p90 108, p95 217, p99 698, max 1632
+  HTTP codes: {'401': 5249, '503': 380}
+
+# What happened: bcrypt sign-ups on a busy CPU took over the gateway's 2 s per-attempt timeout (pkg/resilience), the identity circuit breaker opened, so logins got 503 and reports got 401 (no token).
+# The one 409 shows a second problem: a Register that timed out at the gateway had in fact succeeded in identity, and the retry then found the email taken.
+# Change made: sign-up and login now happen before the timed part (run.sh), so the test measures report submission only, as NFR-02 asks.
+# Follow-up: pkg/resilience retries DeadlineExceeded for every RPC. Calls that create something (Register, SubmitReport, UploadPhoto) are not safe to retry after a timeout: a retry can fail with 409 or create a duplicate. Proposed card: retry those only on Unavailable.
