@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/health"
@@ -19,10 +20,12 @@ import (
 	slapolicyv1 "github.com/jurwaCST/Jurwa/proto/gen/sla-policy/v1"
 	slatrackingv1 "github.com/jurwaCST/Jurwa/proto/gen/sla-tracking/v1"
 	grpcadapter "github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/in/grpc"
+	"github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/out/eventpublisher"
 	"github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/out/logpublisher"
 	"github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/out/memory"
 	"github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/out/slapolicy"
 	"github.com/jurwaCST/Jurwa/services/sla-tracking/application"
+	"github.com/jurwaCST/Jurwa/services/sla-tracking/ports"
 )
 
 // Defaults used when the environment variables are not set.
@@ -40,6 +43,10 @@ func main() {
 
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil)).With("service", serviceName)
 	slog.SetDefault(logger)
+
+	// Stop cleanly on Ctrl+C (SIGINT) or when Kubernetes stops the pod (SIGTERM).
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
 
 	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
@@ -62,11 +69,23 @@ func main() {
 	}
 	defer policyConn.Close()
 
-	// In-memory timers and a log publisher for now; Redis and Redis Streams later.
+	// In-memory timers. sla.lapsed goes to Redis Streams when REDIS_URL is set
+	// (it starts the escalation Saga), otherwise it is only logged.
+	var pub ports.EventPublisher = logpublisher.New(logger)
+	bus, err := eventBus(ctx)
+	if err != nil {
+		slog.Error("cannot connect to the event bus", "error", err)
+		os.Exit(1)
+	}
+	if bus != nil {
+		defer bus.Close()
+		pub = eventpublisher.New(bus, uuid.NewString, time.Now)
+		slog.Info("event bus connected")
+	}
 	app := application.NewService(
 		memory.New(),
 		slapolicy.New(slapolicyv1.NewSlaPolicyServiceClient(policyConn)),
-		logpublisher.New(logger),
+		pub,
 		time.Now,
 	)
 	slatrackingv1.RegisterSlaTrackingServiceServer(srv, grpcadapter.NewHandler(app))
@@ -75,10 +94,6 @@ func main() {
 	reflection.Register(srv)
 
 	hs.SetServingStatus("", healthpb.HealthCheckResponse_SERVING)
-
-	// Stop cleanly on Ctrl+C (SIGINT) or when Kubernetes stops the pod (SIGTERM).
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer stop()
 
 	go func() {
 		<-ctx.Done()

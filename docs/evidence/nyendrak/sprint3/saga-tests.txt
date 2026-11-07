@@ -1,0 +1,39 @@
+> go test ./tests/saga/... -v -count=1
+--- PASS: TestSaga_LapseEscalatesReportAndHandsItUp (0.01s)
+--- PASS: TestSaga_ResolvedReport_EscalationIsUndone (0.01s)
+--- PASS: TestSaga_StatusStepFails_PreviousAssigneeIsBack (0.01s)
+--- PASS: TestSaga_RepeatedEvent_EscalatesOnce (0.01s)
+--- PASS: TestSaga_OneCorrelationIDThroughTheRun (0.01s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/tests/saga	4.733s
+
+> go test ./tests/saga/... -count=100 (flakiness check)
+ok  	github.com/jurwaCST/Jurwa/tests/saga	7.549s
+
+> go test ./tests/saga/... ./services/reassignment/... ./services/status-lifecycle/... ./services/sla-tracking/... -cover
+ok  	github.com/jurwaCST/Jurwa/tests/saga	8.116s	coverage: [no statements]
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/adapters/in/events	7.389s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/adapters/in/grpc	2.809s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/adapters/out/eventpublisher	6.036s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/adapters/out/logpublisher	3.426s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/adapters/out/memory	3.452s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/application	3.509s	coverage: 99.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/cmd/server	2.851s	coverage: 12.8% of statements
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/domain	3.424s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/adapters/in/events	4.740s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/adapters/in/grpc	3.243s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/adapters/out/eventpublisher	5.517s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/adapters/out/logpublisher	3.614s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/adapters/out/memory	2.554s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/application	2.411s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/cmd/server	2.054s	coverage: 9.7% of statements
+ok  	github.com/jurwaCST/Jurwa/services/status-lifecycle/domain	2.319s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/in/grpc	1.911s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/out/eventpublisher	2.561s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/out/logpublisher	1.579s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/out/memory	1.468s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/out/slapolicy	3.281s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/application	3.644s	coverage: 98.2% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/cmd/server	3.174s	coverage: 2.7% of statements
+ok  	github.com/jurwaCST/Jurwa/services/sla-tracking/domain	3.020s	coverage: 100.0% of statements
+	github.com/jurwaCST/Jurwa/services/sla-tracking/ports/mocks		coverage: 0.0% of statements

@@ -27,9 +27,11 @@ type ReportReassigned struct {
 	ReportID     string
 	FromUserID   string
 	ToUserID     string
-	ActorID      string
+	ActorID      string // "" when the system acted (escalation, compensation)
 	Reason       string
 	AssignedAt   time.Time
+	// CorrelationID ties the event to one escalation Saga run. "" outside a Saga.
+	CorrelationID string
 }
 
 // EventPublisher sends events to the event bus (Redis Streams later).

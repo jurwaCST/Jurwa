@@ -19,6 +19,7 @@ type Service struct {
 	pub   ports.EventPublisher
 	now   func() time.Time
 	newID func() string
+	saga  sagaMemory // Saga events already handled (saga.go)
 }
 
 // NewService wires the use cases. now is time.Now and newID is uuid.NewString outside tests.

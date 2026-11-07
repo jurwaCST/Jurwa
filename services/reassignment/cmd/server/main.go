@@ -19,10 +19,13 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	reassignmentv1 "github.com/jurwaCST/Jurwa/proto/gen/reassignment/v1"
+	"github.com/jurwaCST/Jurwa/services/reassignment/adapters/in/events"
 	grpcadapter "github.com/jurwaCST/Jurwa/services/reassignment/adapters/in/grpc"
+	"github.com/jurwaCST/Jurwa/services/reassignment/adapters/out/eventpublisher"
 	"github.com/jurwaCST/Jurwa/services/reassignment/adapters/out/logpublisher"
 	"github.com/jurwaCST/Jurwa/services/reassignment/adapters/out/memory"
 	"github.com/jurwaCST/Jurwa/services/reassignment/application"
+	"github.com/jurwaCST/Jurwa/services/reassignment/ports"
 )
 
 // Defaults used when the environment variables are not set.
@@ -39,6 +42,10 @@ func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil)).With("service", serviceName)
 	slog.SetDefault(logger)
 
+	// Stop cleanly on Ctrl+C (SIGINT) or when Kubernetes stops the pod (SIGTERM).
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
 	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		slog.Error("cannot listen", "port", port, "error", err)
@@ -51,19 +58,30 @@ func main() {
 	hs := health.NewServer()
 	healthpb.RegisterHealthServer(srv, hs)
 
-	// In-memory store and a log publisher for now; PostgreSQL and Redis Streams later.
-	app := application.NewService(memory.New(), logpublisher.New(logger), time.Now, uuid.NewString)
+	// In-memory store, and Redis Streams when REDIS_URL is set (otherwise events are only logged).
+	var pub ports.EventPublisher = logpublisher.New(logger)
+	bus, err := eventBus(ctx)
+	if err != nil {
+		slog.Error("cannot connect to the event bus", "error", err)
+		os.Exit(1)
+	}
+	if bus != nil {
+		defer bus.Close()
+		pub = eventpublisher.New(bus, uuid.NewString, time.Now)
+	}
+	app := application.NewService(memory.New(), pub, time.Now, uuid.NewString)
 	seedAssignments(app, os.Getenv("SEED_ASSIGNMENTS"))
+	if bus != nil {
+		// Escalation Saga: sla.lapsed escalates, escalation.compensated undoes it.
+		events.Start(ctx, bus, consumerName(serviceName), app)
+		slog.Info("event bus connected", "group", events.Group)
+	}
 	reassignmentv1.RegisterReassignmentServiceServer(srv, grpcadapter.NewHandler(app))
 
 	// Reflection lets grpcurl list and call methods without the .proto files.
 	reflection.Register(srv)
 
 	hs.SetServingStatus("", healthpb.HealthCheckResponse_SERVING)
-
-	// Stop cleanly on Ctrl+C (SIGINT) or when Kubernetes stops the pod (SIGTERM).
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer stop()
 
 	go func() {
 		<-ctx.Done()

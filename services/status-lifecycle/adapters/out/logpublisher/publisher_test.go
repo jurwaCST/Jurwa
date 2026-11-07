@@ -24,3 +24,15 @@ func TestPublishStatusChanged_WritesJSONLine(t *testing.T) {
 	assert.Contains(t, buf.String(), `"event":"status.changed"`)
 	assert.Contains(t, buf.String(), `"to_status":"ASSIGNED"`)
 }
+
+func TestPublishEscalationCompensated_WritesJSONLine(t *testing.T) {
+	var buf bytes.Buffer
+	p := New(slog.New(slog.NewJSONHandler(&buf, nil)))
+
+	err := p.PublishEscalationCompensated(context.Background(), ports.EscalationCompensated{
+		ReportID: "r1", FailedStep: "status-lifecycle.set-escalated", UndoneStep: "reassignment.escalate",
+	})
+	require.NoError(t, err)
+	assert.Contains(t, buf.String(), `"event":"escalation.compensated"`)
+	assert.Contains(t, buf.String(), `"undone_step":"reassignment.escalate"`)
+}

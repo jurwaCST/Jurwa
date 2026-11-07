@@ -45,7 +45,9 @@ var t0 = time.Date(2026, 11, 7, 9, 0, 0, 0, time.UTC)
 // onePolicy gives every category a 1 hour SLA window.
 type onePolicy struct{}
 
-func (onePolicy) Window(context.Context, stdomain.Category) (time.Duration, error) { return time.Hour, nil }
+func (onePolicy) Window(context.Context, stdomain.Category) (time.Duration, error) {
+	return time.Hour, nil
+}
 
 // seen is one event read back from the bus.
 type seen struct {
@@ -116,6 +118,28 @@ func (w *world) recorded() []seen {
 	defer w.mu.Unlock()
 	out := append([]seen(nil), w.events...)
 	sort.SliceStable(out, func(i, j int) bool { return out[i].at.Before(out[j].at) })
+	return out
+}
+
+// run returns the events of the Saga run started by the sla.lapsed event for
+// reportID: the events that carry its correlation_id. Setup events are left out.
+func (w *world) run(reportID string) []seen {
+	all := w.recorded()
+	correlation := ""
+	for _, e := range all {
+		if l, ok := e.msg.(*eventsv1.SlaLapsed); ok && l.GetReportId() == reportID {
+			correlation = e.correlation
+		}
+	}
+	if correlation == "" {
+		return nil
+	}
+	var out []seen
+	for _, e := range all {
+		if e.correlation == correlation {
+			out = append(out, e)
+		}
+	}
 	return out
 }
 
@@ -190,11 +214,22 @@ func TestSaga_LapseEscalatesReportAndHandsItUp(t *testing.T) {
 	assert.Equal(t, "DSA", cur.AssigneePositionCode)
 	assert.Empty(t, cur.AssignedBy, "the system acted")
 
-	assert.Eventually(t, func() bool { return len(w.recorded()) == 3 }, wait, tick)
-	ev := w.recorded()
-	assert.Equal(t, eventbus.StreamSlaLapsed, ev[0].stream, "the lapse comes first")
-	streams := []string{ev[1].stream, ev[2].stream}
-	assert.ElementsMatch(t, []string{eventbus.StreamReportReassigned, eventbus.StreamStatusChanged}, streams)
+	assert.Eventually(t, func() bool { return len(w.run(id)) == 3 }, wait, tick)
+	ev := w.run(id)
+	var lapsedAt time.Time
+	streams := []string{}
+	for _, e := range ev {
+		streams = append(streams, e.stream)
+		if e.stream == eventbus.StreamSlaLapsed {
+			lapsedAt = e.at
+		}
+	}
+	assert.ElementsMatch(t, []string{eventbus.StreamSlaLapsed, eventbus.StreamReportReassigned, eventbus.StreamStatusChanged}, streams)
+	for _, e := range ev {
+		// The two steps react to the lapse, so neither is earlier than it.
+		// (Windows clocks can give equal times, so "not before" rather than "after".)
+		assert.False(t, e.at.Before(lapsedAt), "%s before the lapse", e.stream)
+	}
 	for _, e := range ev {
 		if r, ok := e.msg.(*eventsv1.ReportReassigned); ok {
 			assert.Equal(t, staffID, r.GetFromUserId())
@@ -206,6 +241,27 @@ func TestSaga_LapseEscalatesReportAndHandsItUp(t *testing.T) {
 		}
 	}
 	assert.Zero(t, w.count(eventbus.StreamEscalationCompensated))
+}
+
+// assertUndone checks that no escalation remains and the staff member holds the
+// report again. The steps run in parallel, so two orders are correct:
+// escalate then undo (history ends ESCALATED, COMPENSATED), or the undo arrives
+// first and the late escalation is skipped (no ESCALATED at all).
+func assertUndone(t *testing.T, w *world, id string) {
+	t.Helper()
+	assert.Eventually(t, func() bool {
+		cur := w.current(t, id)
+		return cur.AssigneeUserID == staffID && cur.Kind != redomain.Escalated
+	}, wait, tick)
+	list, err := w.reassign.ListReassignments(context.Background(), redomain.RoleSystemAdmin, id)
+	require.NoError(t, err)
+	kinds := []redomain.Kind{}
+	for _, a := range list {
+		kinds = append(kinds, a.Kind)
+	}
+	escalateThenUndo := []redomain.Kind{redomain.Routed, redomain.Reassigned, redomain.Escalated, redomain.Compensated}
+	undoFirst := []redomain.Kind{redomain.Routed, redomain.Reassigned}
+	assert.True(t, assert.ObjectsAreEqual(escalateThenUndo, kinds) || assert.ObjectsAreEqual(undoFirst, kinds), "history %v", kinds)
 }
 
 // (b) A lapse for a report that was RESOLVED meanwhile: the status step fails,
@@ -220,12 +276,9 @@ func TestSaga_ResolvedReport_EscalationIsUndone(t *testing.T) {
 	}
 	w.lapse(t) // the timer was not stopped (lost event), so it still lapses
 
-	assert.Eventually(t, func() bool { return w.current(t, id).Kind == redomain.Compensated }, wait, tick)
-	cur := w.current(t, id)
-	assert.Equal(t, staffID, cur.AssigneeUserID, "the previous assignee is back")
-	assert.Equal(t, sldomain.Resolved, w.statusOf(t, id).Status, "no escalation remains")
-
 	assert.Eventually(t, func() bool { return w.count(eventbus.StreamEscalationCompensated) == 1 }, wait, tick)
+	assertUndone(t, w, id)
+	assert.Equal(t, sldomain.Resolved, w.statusOf(t, id).Status, "no escalation remains")
 	for _, e := range w.recorded() {
 		if c, ok := e.msg.(*eventsv1.EscalationCompensated); ok {
 			assert.Equal(t, "status-lifecycle.set-escalated", c.GetFailedStep())
@@ -251,14 +304,8 @@ func TestSaga_StatusStepFails_PreviousAssigneeIsBack(t *testing.T) {
 	require.NoError(t, err)
 	w.lapse(t)
 
-	assert.Eventually(t, func() bool { return w.current(t, id).Kind == redomain.Compensated }, wait, tick)
-	assert.Equal(t, staffID, w.current(t, id).AssigneeUserID)
-	list, _ := w.reassign.ListReassignments(ctx, redomain.RoleSystemAdmin, id)
-	kinds := []redomain.Kind{}
-	for _, a := range list {
-		kinds = append(kinds, a.Kind)
-	}
-	assert.Equal(t, []redomain.Kind{redomain.Routed, redomain.Reassigned, redomain.Escalated, redomain.Compensated}, kinds)
+	assert.Eventually(t, func() bool { return w.count(eventbus.StreamEscalationCompensated) == 1 }, wait, tick)
+	assertUndone(t, w, id)
 }
 
 // (d) The same sla.lapsed event delivered twice (same event_id) escalates once.
@@ -298,24 +345,54 @@ func TestSaga_RepeatedEvent_EscalatesOnce(t *testing.T) {
 func TestSaga_OneCorrelationIDThroughTheRun(t *testing.T) {
 	w := newWorld(t)
 	ctx := context.Background()
-	id := w.assignedReport(t)
+	happy := w.assignedReport(t)
+	resolved := w.assignedReport(t)
 	for _, s := range []sldomain.Status{sldomain.InProgress, sldomain.Resolved} {
-		_, err := w.status.ChangeStatus(ctx, slapp.ChangeStatusCommand{ReportID: id, To: s, ActorID: staffID})
+		_, err := w.status.ChangeStatus(ctx, slapp.ChangeStatusCommand{ReportID: resolved, To: s, ActorID: staffID})
 		require.NoError(t, err)
 	}
-	w.lapse(t)
+	w.lapse(t) // both timers lapse in one check
 
-	// lapse, escalate (reassigned), compensated, restore (reassigned)
-	assert.Eventually(t, func() bool { return len(w.recorded()) == 4 }, wait, tick)
-	ev := w.recorded()
-	require.Equal(t, eventbus.StreamSlaLapsed, ev[0].stream)
-	want := ev[0].correlation
-	require.NotEmpty(t, want)
+	// The Saga's own events, found by what they say, not by their correlation_id.
+	sagaEvent := func(e seen) (reportID string, ok bool) {
+		switch m := e.msg.(type) {
+		case *eventsv1.SlaLapsed:
+			return m.GetReportId(), true
+		case *eventsv1.ReportReassigned:
+			return m.GetReportId(), m.ActorId == nil // the system acted
+		case *eventsv1.StatusChanged:
+			return m.GetReportId(), m.GetToStatus().String() == "ESCALATED"
+		case *eventsv1.EscalationCompensated:
+			return m.GetReportId(), true
+		}
+		return "", false
+	}
+	assert.Eventually(t, func() bool {
+		return w.statusOf(t, happy).Status == sldomain.Escalated && w.count(eventbus.StreamEscalationCompensated) == 1 &&
+			w.current(t, resolved).AssigneeUserID == staffID
+	}, wait, tick)
+
+	lapseCorrelation := map[string]string{}
+	for _, e := range w.recorded() {
+		if l, ok := e.msg.(*eventsv1.SlaLapsed); ok {
+			lapseCorrelation[l.GetReportId()] = e.correlation
+		}
+	}
+	require.Len(t, lapseCorrelation, 2)
+	assert.NotEqual(t, lapseCorrelation[happy], lapseCorrelation[resolved], "each lapse starts its own run")
+
 	ids := map[string]bool{}
-	for _, e := range ev {
-		assert.Equal(t, want, e.correlation, e.stream)
-		assert.NotEmpty(t, e.eventID, e.stream)
+	checked := 0
+	for _, e := range w.recorded() {
+		reportID, ok := sagaEvent(e)
+		if !ok {
+			continue
+		}
+		checked++
+		assert.Equal(t, lapseCorrelation[reportID], e.correlation, "%s for %s", e.stream, reportID)
+		assert.NotEmpty(t, e.eventID)
+		assert.False(t, ids[e.eventID], "every event has its own event_id")
 		ids[e.eventID] = true
 	}
-	assert.Len(t, ids, 4, "every event has its own event_id")
+	assert.GreaterOrEqual(t, checked, 5, "2 lapses, escalate and ESCALATED for one, compensated for the other")
 }

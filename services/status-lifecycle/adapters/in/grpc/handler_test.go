@@ -27,6 +27,10 @@ type nopPublisher struct{ err error }
 
 func (p nopPublisher) PublishStatusChanged(context.Context, ports.StatusChanged) error { return p.err }
 
+func (p nopPublisher) PublishEscalationCompensated(context.Context, ports.EscalationCompensated) error {
+	return p.err
+}
+
 func newHandler(t *testing.T, pubErr error) *Handler {
 	t.Helper()
 	app := application.NewService(memory.New(), nopPublisher{err: pubErr}, time.Now)
