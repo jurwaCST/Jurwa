@@ -9,5 +9,5 @@
     "noEmit": true,
     "isolatedModules": true
   },
-  "include": ["**/*.ts", "../cypress.config.ts"]
+  "include": ["**/*.ts", "../cypress.config.mjs"]
 }

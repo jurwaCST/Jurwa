@@ -78,6 +78,7 @@ Cypress writes a video to `web/cypress/videos/` and, when a test fails, a screen
 
 - In the VS Code terminal Cypress may stop with `bad option: --smoke-test`. VS Code sets `ELECTRON_RUN_AS_NODE=1`; run `unset ELECTRON_RUN_AS_NODE` first, or use a normal Git Bash window.
 - If the built-in Electron browser crashes, use another one: `npx cypress run --browser edge` (or `chrome`).
+- Why the config is `cypress.config.mjs` (plain JavaScript) and the tests are compiled with esbuild: with TypeScript 7 and Node 26, Cypress hung after the `allowCypressEnv` warning and printed nothing else. Its default compiler (webpack + ts-loader) needs the TypeScript JS API, which TypeScript 7 no longer has, and its helper process crashed (exit code `0xC0000409`). Its loader for a `.ts` config (tsx) also hung on Node 26. The tests themselves stay TypeScript.
 
 ## Not in CI
 
