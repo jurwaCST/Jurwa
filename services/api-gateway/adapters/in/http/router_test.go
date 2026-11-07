@@ -107,8 +107,10 @@ func (fakeAuthz) CheckPermission(_ context.Context, role, action, _ string) (boo
 		return role == domain.RoleCategoryHead || role == domain.RoleStaff || role == domain.RoleSystemAdmin, nil
 	case domain.ActionReportListOwn:
 		return role == domain.RoleStudent, nil
-	case domain.ActionReportTimelineRead:
+	case domain.ActionReportTimelineRead, domain.ActionPhotoRead:
 		return role != "PRESIDENT", nil
+	case domain.ActionPhotoUpload:
+		return role == domain.RoleStudent, nil
 	}
 	return true, nil
 }
@@ -169,12 +171,13 @@ type env struct {
 	ident   *fakeIdentity
 	notes   *fakeNotes
 	history *fakeHistory
+	photos  *fakePhotos
 	clock   *time.Time
 }
 
 func newEnv() *env {
 	now := time.Date(2026, 11, 2, 9, 0, 0, 0, time.UTC)
-	e := &env{cats: &fakeCategories{}, locs: &fakeLocations{}, reports: &fakeReports{}, ident: &fakeIdentity{}, notes: &fakeNotes{}, history: &fakeHistory{}, clock: &now}
+	e := &env{cats: &fakeCategories{}, locs: &fakeLocations{}, reports: &fakeReports{}, ident: &fakeIdentity{}, notes: &fakeNotes{}, history: &fakeHistory{}, photos: &fakePhotos{}, clock: &now}
 	e.h = NewRouter(Deps{
 		Auth:       application.NewAuth(e.ident, fakeAuthz{}),
 		Identity:   e.ident,
@@ -183,6 +186,7 @@ func newEnv() *env {
 		Reports:    e.reports,
 		Notes:      e.notes,
 		History:    e.history,
+		Photos:     e.photos,
 		Limiter:    domain.NewLimiter(20, func() time.Time { return *e.clock }),
 	})
 	return e
