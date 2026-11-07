@@ -1,0 +1,31 @@
+# api-gateway Sprint 3 routes inside the cluster, after adding the four addresses (2026-11-07 23:24)
+$ kubectl -n jurwa get configmap -l ... (api-gateway-config) | grep _ADDR
+{"ANALYTICS_ADDR":"analytics:9020"
+"AUTHORIZATION_ADDR":"authorization:9017"
+"CATEGORY_TAXONOMY_ADDR":"category-taxonomy:9009"
+"IDENTITY_ADDR":"identity:9016"
+"INTERNAL_NOTES_ADDR":"internal-notes:9005"
+"LOCATION_TAXONOMY_ADDR":"location-taxonomy:9004"
+"PHOTO_MEDIA_ADDR":"photo-media:9002"
+"REPORT_HISTORY_ADDR":"report-history:9003"
+"REPORT_SUBMISSION_ADDR":"report-submission:9001"
+"STATUS_LIFECYCLE_ADDR":"status-lifecycle:9011"}
+
+$ curl -k -i https://jurwa.localtest.me/api/me/reports -H "Authorization: Bearer $TOKEN"
+HTTP/2 200 
+{"reports":[], "nextPageToken":""}
+$ curl -k -i https://jurwa.localtest.me/api/dashboard/summary -H "Authorization: Bearer $TOKEN"
+HTTP/2 403 
+{"error":"not allowed"}
+
+$ curl -k -i https://jurwa.localtest.me/api/photos -H "Authorization: Bearer $TOKEN"
+HTTP/2 405 
+Method Not Allowed
+
+
+403 on /dashboard/summary is the role check (a student may not see the dashboard): the gateway reached authorization. The empty /me/reports list is expected until report-history reads report.submitted (SCRUM-130).
+
+# Generator is safe to re-run
+$ bash scripts/gen-k8s-manifests.sh && git status --short deploy/k8s/services
+Generated manifests for 20 services in deploy/k8s/services/
+ M deploy/k8s/services/api-gateway/kustomization.yaml
