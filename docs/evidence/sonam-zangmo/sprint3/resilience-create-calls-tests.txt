@@ -1,0 +1,41 @@
+# SCRUM-132 go test -race -v ./pkg/resilience/, 2026-11-08 00:40
+=== RUN   TestCreateCallIsNotRetriedAfterATimeout
+--- PASS: TestCreateCallIsNotRetriedAfterATimeout (0.00s)
+=== RUN   TestCreateCallIsStillRetriedWhenTheServiceWasUnreachable
+--- PASS: TestCreateCallIsStillRetriedWhenTheServiceWasUnreachable (0.00s)
+=== RUN   TestReadCallIsStillRetriedAfterATimeout
+--- PASS: TestReadCallIsStillRetriedAfterATimeout (0.00s)
+=== RUN   TestDefaultConfigListsTheCreateCalls
+--- PASS: TestDefaultConfigListsTheCreateCalls (0.00s)
+=== RUN   TestRetryableAfterTimeout
+--- PASS: TestRetryableAfterTimeout (0.00s)
+=== RUN   TestRetryUsesItsOwnRetryableWhenSet
+--- PASS: TestRetryUsesItsOwnRetryableWhenSet (0.00s)
+=== RUN   TestDefaultConfig
+--- PASS: TestDefaultConfig (0.00s)
+ok  	github.com/jurwaCST/Jurwa/pkg/resilience	1.404s
+
+ok  	github.com/jurwaCST/Jurwa/pkg/resilience	3.512s	coverage: 96.6% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http	4.063s	coverage: 97.5% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient	1.373s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients	2.479s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/application	1.905s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/cmd/server	0.661s	coverage: 8.8% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/domain	2.920s	coverage: 97.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/adapters/in/events	4.455s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/adapters/in/grpc	4.121s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/adapters/out/directoryclient	3.954s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/adapters/out/eventpublisher	4.012s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/adapters/out/logpublisher	3.857s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/adapters/out/rulesclient	3.911s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/application	4.004s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/cmd/server	5.697s	coverage: 22.1% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/domain	4.010s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/feedback/adapters/in/grpc	3.868s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/feedback/adapters/out/memory	4.026s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/feedback/adapters/out/postgres	4.350s	coverage: 0.0% of statements
+	github.com/jurwaCST/Jurwa/services/feedback/adapters/out/repotest		coverage: 0.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/feedback/adapters/out/statusclient	4.427s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/feedback/application	4.725s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/feedback/cmd/server	4.170s	coverage: 18.6% of statements
+ok  	github.com/jurwaCST/Jurwa/services/feedback/domain	4.617s	coverage: 100.0% of statements
