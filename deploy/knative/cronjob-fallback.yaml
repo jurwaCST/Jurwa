@@ -1,0 +1,52 @@
+# Fallback for the sla-escalation-checker function (risk R3 in the charter):
+# if Knative is not running, a plain Kubernetes CronJob runs the same image once
+# a minute with RUN_ONCE=true. Each run asks sla-tracking for lapsed timers and
+# sets those reports to ESCALATED. Owner: Nyendrak (SCRUM-104).
+# Apply: kubectl apply -f deploy/knative/cronjob-fallback.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: sla-escalation-checker
+  namespace: jurwa
+  labels:
+    app.kubernetes.io/name: sla-escalation-checker
+    app.kubernetes.io/part-of: jurwa
+spec:
+  schedule: "* * * * *" # every minute
+  # A slow run is never doubled: the next one waits.
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 50
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0 # the next minute is the retry
+      activeDeadlineSeconds: 55
+      ttlSecondsAfterFinished: 600
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: sla-escalation-checker
+            app.kubernetes.io/part-of: jurwa
+        spec:
+          restartPolicy: Never
+          # The function does not call the Kubernetes API.
+          automountServiceAccountToken: false
+          containers:
+            - name: sla-escalation-checker
+              image: jurwa-registry:5050/sla-escalation-checker:latest
+              imagePullPolicy: Always
+              env:
+                - name: RUN_ONCE
+                  value: "true"
+                - name: SLA_TRACKING_ADDR
+                  value: sla-tracking:9012
+                - name: STATUS_LIFECYCLE_ADDR
+                  value: status-lifecycle:9011
+              resources:
+                requests:
+                  cpu: 20m
+                  memory: 32Mi
+                limits:
+                  cpu: 200m
+                  memory: 64Mi

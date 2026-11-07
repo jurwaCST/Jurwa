@@ -1,0 +1,13 @@
+SCRUM-104 run-once mode of sla-escalation-checker, 2026-11-08 01:12 +0600
+
+# sla-tracking not running: the run fails and the exit code is 1
+> RUN_ONCE=true ./sla-escalation-checker
+{"level":"ERROR","msg":"escalation run failed","service":"sla-escalation-checker","error":"sla-tracking ListDueTimers: rpc error: code = Unavailable desc = connection error: desc = \"transport: Error while dialing: dial tcp 127.0.0.1:9012: connectex: No connection could be made because the target machine actively refused it.\""}
+{"lapsed":0,"escalated":0,"skipped":0,"errors":1}
+exit code: 1
+
+# sla-tracking (:9012) and status-lifecycle (:9011) running, nothing due: one check, exit code 0
+> RUN_ONCE=true ./sla-escalation-checker
+{"level":"INFO","msg":"escalation run finished","service":"sla-escalation-checker","lapsed":0,"escalated":0,"skipped":0,"errors":0}
+{"lapsed":0,"escalated":0,"skipped":0,"errors":0}
+exit code: 0
