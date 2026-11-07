@@ -1,0 +1,59 @@
+# Traefik (built into k3d) takes HTTPS on port 443 of the laptop and sends
+# /api to api-gateway. The web app (path /) is added when its Service exists.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jurwa
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.middlewares: jurwa-strip-api@kubernetescrd
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - jurwa.localtest.me
+      secretName: jurwa-tls
+  rules:
+    - host: jurwa.localtest.me
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  name: http
+    # No host: lets a phone on the same Wi-Fi use https://<laptop-ip>/api
+    - http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  name: http
+---
+# Plain HTTP on port 80 only redirects to HTTPS.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jurwa-http-redirect
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: jurwa-redirect-https@kubernetescrd
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: jurwa.localtest.me
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  name: http

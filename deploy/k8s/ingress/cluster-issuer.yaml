@@ -1,0 +1,8 @@
+# Self-signed issuer: cert-manager signs the certificate itself. Browsers show a
+# warning because no public authority signed it (expected for a local demo).
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: jurwa-selfsigned
+spec:
+  selfSigned: {}

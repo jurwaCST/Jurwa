@@ -1,0 +1,74 @@
+# SCRUM-103 Traefik ingress and cert-manager TLS (2026-11-06 12:58)
+
+$ kubectl -n kube-system get pods | grep traefik
+helm-install-traefik-crd-ppvbc            0/1     Completed   0          83m
+helm-install-traefik-t98dm                0/1     Completed   1          83m
+svclb-traefik-af11a017-bpvsv              2/2     Running     0          82m
+svclb-traefik-af11a017-cpg6f              2/2     Running     0          82m
+svclb-traefik-af11a017-mnnn9              2/2     Running     0          82m
+traefik-9bcdbbd9-scnw8                    1/1     Running     0          82m
+
+$ bash scripts/install-cert-manager.sh   (cert-manager v1.21.3)
+NAME                                       READY   STATUS    RESTARTS   AGE
+cert-manager-564c99cc8f-kv2lh              1/1     Running   0          2m13s
+cert-manager-cainjector-85878d4fb8-c7hv2   1/1     Running   0          2m13s
+cert-manager-webhook-574bc9799f-8dq5d      1/1     Running   0          2m13s
+
+$ kubectl apply -k deploy/k8s
+$ kubectl get clusterissuer
+NAME               READY   AGE
+jurwa-selfsigned   True    50s
+
+$ kubectl -n jurwa get certificate
+NAME        READY   SECRET      AGE
+jurwa-tls   True    jurwa-tls   51s
+
+$ kubectl -n jurwa get ingress
+NAME                  CLASS     HOSTS                ADDRESS                            PORTS     AGE
+jurwa                 traefik   jurwa.localtest.me   172.19.0.3,172.19.0.4,172.19.0.5   80, 443   51s
+jurwa-http-redirect   traefik   jurwa.localtest.me   172.19.0.3,172.19.0.4,172.19.0.5   80        51s
+
+$ echo | openssl s_client -connect jurwa.localtest.me:443 -servername jurwa.localtest.me | openssl x509 -noout -subject -issuer -dates -ext subjectAltName
+subject=CN=jurwa.localtest.me
+issuer=CN=jurwa.localtest.me
+notBefore=Nov  6 06:57:22 2026 GMT
+notAfter=Feb  4 06:57:22 2027 GMT
+X509v3 Subject Alternative Name: 
+    DNS:jurwa.localtest.me
+
+$ curl -k -i https://jurwa.localtest.me/api/health
+HTTP/2 200 
+content-type: application/json
+date: Fri, 06 Nov 2026 06:58:13 GMT
+content-length: 15
+
+{"status":"ok"}
+
+$ curl -k -i https://jurwa.localtest.me/api/categories   (no token: the gateway answers, the role check works)
+HTTP/2 401 
+content-type: application/json
+date: Fri, 06 Nov 2026 06:58:13 GMT
+content-length: 33
+
+{"error":"missing bearer token"}
+
+
+$ curl -k -i https://jurwa.localtest.me/api/categories -H "Authorization: Bearer $TOKEN"   (TOKEN from POST /api/auth/login)
+HTTP/2 200 
+content-type: application/json
+date: Fri, 06 Nov 2026 06:58:13 GMT
+content-length: 519
+
+{"categories":[{"category":"HOSTEL", "name":"Hostel", "description":"Rooms, bathrooms, water and electricity in the hostels", "sortOrder":1, "active":true, "headPosition":"DSA"}, {"category":"ACADEMIC_BLOCK", "name":"Academic Block", "description":"Classrooms, labs and equipment in the academic blocks", "sortOrder":2, "active":true, "headPosition":"DAA"}, {"category":"OTHERS", "name":"Others", "description":"Campus-wide issues such as Wi-Fi, roads and grounds", "sortOrder":3, "active":true, "headPosition":"SSO"}]}
+
+$ curl -i http://jurwa.localtest.me/api/health   (plain HTTP is redirected)
+HTTP/1.1 301 Moved Permanently
+Location: https://jurwa.localtest.me/api/health
+Date: Fri, 06 Nov 2026 06:58:13 GMT
+Content-Length: 17
+
+Moved Permanently
+$ curl -k -i https://<laptop-ip>/api/health   (route used by a phone on the same Wi-Fi)
+HTTP/2 200 
+$ echo | openssl s_client -connect <laptop-ip>:443 | openssl x509 -noout -subject
+subject=CN=jurwa.localtest.me
