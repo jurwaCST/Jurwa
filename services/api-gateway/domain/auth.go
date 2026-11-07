@@ -36,6 +36,9 @@ const (
 
 	ActionPhotoUpload = "photo.upload"
 	ActionPhotoRead   = "photo.read"
+
+	ActionReportStatusRead   = "report.status.read"
+	ActionReportStatusChange = "report.status.change"
 )
 
 // Principal is the signed-in user, taken from a validated JWT.

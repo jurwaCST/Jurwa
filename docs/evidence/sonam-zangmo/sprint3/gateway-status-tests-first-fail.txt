@@ -1,0 +1,16 @@
+# SCRUM-128 tests first: go test ./services/api-gateway/... before the code exists, 2026-11-07 22:42
+# github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients [github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients.test]
+services/api-gateway/adapters/out/grpcclients/status_test.go:34:7: undefined: Status
+# github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http [github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http.test]
+services/api-gateway/adapters/in/http/router_test.go:114:14: undefined: domain.ActionReportStatusChange
+services/api-gateway/adapters/in/http/router_test.go:116:14: undefined: domain.ActionReportStatusRead
+services/api-gateway/adapters/in/http/router_test.go:195:3: unknown field Status in struct literal of type Deps
+FAIL	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http [build failed]
+?   	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient	(cached)
+FAIL	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/application	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/cmd/server	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/domain	(cached)
+?   	github.com/jurwaCST/Jurwa/services/api-gateway/ports	[no test files]
+FAIL

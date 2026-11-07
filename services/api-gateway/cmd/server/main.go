@@ -29,6 +29,7 @@ import (
 	photomediav1 "github.com/jurwaCST/Jurwa/proto/gen/photo-media/v1"
 	reporthistoryv1 "github.com/jurwaCST/Jurwa/proto/gen/report-history/v1"
 	reportsubmissionv1 "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1"
+	statuslifecyclev1 "github.com/jurwaCST/Jurwa/proto/gen/status-lifecycle/v1"
 	httpadapter "github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http"
 	"github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient"
 	"github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients"
@@ -70,6 +71,7 @@ func main() {
 		"internal-notes":    envOr("INTERNAL_NOTES_ADDR", "localhost:9005"),
 		"report-history":    envOr("REPORT_HISTORY_ADDR", "localhost:9003"),
 		"photo-media":       envOr("PHOTO_MEDIA_ADDR", "localhost:9002"),
+		"status-lifecycle":  envOr("STATUS_LIFECYCLE_ADDR", "localhost:9011"),
 	} {
 		var extra []grpc.DialOption
 		if name == "photo-media" {
@@ -94,6 +96,7 @@ func main() {
 		Notes:      grpcclients.Notes{C: internalnotesv1.NewInternalNotesServiceClient(conns["internal-notes"])},
 		History:    grpcclients.History{C: reporthistoryv1.NewReportHistoryServiceClient(conns["report-history"])},
 		Photos:     grpcclients.Photos{C: photomediav1.NewPhotoMediaServiceClient(conns["photo-media"])},
+		Status:     grpcclients.Status{C: statuslifecyclev1.NewStatusLifecycleServiceClient(conns["status-lifecycle"])},
 		Limiter:    domain.NewLimiter(rateLimit, time.Now),
 	})
 	httpSrv := &http.Server{

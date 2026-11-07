@@ -14,6 +14,7 @@ import (
 	photomediav1 "github.com/jurwaCST/Jurwa/proto/gen/photo-media/v1"
 	reporthistoryv1 "github.com/jurwaCST/Jurwa/proto/gen/report-history/v1"
 	reportsubmissionv1 "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1"
+	statuslifecyclev1 "github.com/jurwaCST/Jurwa/proto/gen/status-lifecycle/v1"
 )
 
 // Identity is the identity service (Gayley).
@@ -62,4 +63,11 @@ type History interface {
 type Photos interface {
 	UploadPhoto(ctx context.Context, in *photomediav1.UploadPhotoRequest) (*photomediav1.UploadPhotoResponse, error)
 	GetPhoto(ctx context.Context, photoID string) (*photomediav1.GetPhotoResponse, error)
+}
+
+// Status is status-lifecycle (Nyendrak): it owns each report's status and the
+// allowed flow. The gateway only sets the report id and the actor.
+type Status interface {
+	ChangeStatus(ctx context.Context, in *statuslifecyclev1.ChangeStatusRequest) (*statuslifecyclev1.ChangeStatusResponse, error)
+	GetStatus(ctx context.Context, reportID string) (*statuslifecyclev1.GetStatusResponse, error)
 }

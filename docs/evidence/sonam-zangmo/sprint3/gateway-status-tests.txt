@@ -1,0 +1,36 @@
+# SCRUM-128 go test -race -v ./services/api-gateway/... (status tests), 2026-11-07 22:44
+=== RUN   TestStatusRoutesNeedAToken
+--- PASS: TestStatusRoutesNeedAToken (0.00s)
+=== RUN   TestChangeStatusTakesTheReportFromThePathAndTheActorFromTheJWT
+--- PASS: TestChangeStatusTakesTheReportFromThePathAndTheActorFromTheJWT (0.00s)
+=== RUN   TestChangeStatusRoles
+--- PASS: TestChangeStatusRoles (0.00s)
+=== RUN   TestChangeStatusBadInput
+--- PASS: TestChangeStatusBadInput (0.00s)
+=== RUN   TestChangeStatusErrorsFromStatusLifecycle
+=== RUN   TestChangeStatusErrorsFromStatusLifecycle/transition_not_allowed,_for_example_to_ESCALATED_by_a_person
+=== RUN   TestChangeStatusErrorsFromStatusLifecycle/someone_changed_it_first
+=== RUN   TestChangeStatusErrorsFromStatusLifecycle/unknown_report
+--- PASS: TestChangeStatusErrorsFromStatusLifecycle (0.00s)
+    --- PASS: TestChangeStatusErrorsFromStatusLifecycle/transition_not_allowed,_for_example_to_ESCALATED_by_a_person (0.00s)
+    --- PASS: TestChangeStatusErrorsFromStatusLifecycle/someone_changed_it_first (0.00s)
+    --- PASS: TestChangeStatusErrorsFromStatusLifecycle/unknown_report (0.00s)
+=== RUN   TestGetStatusOwnership
+--- PASS: TestGetStatusOwnership (0.00s)
+=== RUN   TestGetStatusUnknownReport
+--- PASS: TestGetStatusUnknownReport (0.00s)
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http	2.677s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient	4.108s
+=== RUN   TestStatus
+--- PASS: TestStatus (0.00s)
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients	1.778s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/application	4.712s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/cmd/server	2.945s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/domain	3.500s
+
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http	3.498s	coverage: 97.5% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient	1.162s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients	1.737s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/application	2.299s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/cmd/server	0.598s	coverage: 8.8% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/domain	2.825s	coverage: 97.0% of statements
