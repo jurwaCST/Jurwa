@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 	"testing"
 	"time"
 
@@ -281,6 +282,84 @@ func TestListReportsByAssigneeErrors(t *testing.T) {
 	assert.ErrorIs(t, err, errDB)
 }
 
+func TestRecordEventUsesTheEventIDAndIgnoresARepeat(t *testing.T) {
+	ctx := context.Background()
+	svc := newTestService()
+	_, err := svc.RecordSubmitted(ctx, submitted(reportA, studentA, t0))
+	require.NoError(t, err)
+	eventID := "0e000000-0000-4000-8000-000000000001"
+
+	require.NoError(t, svc.RecordEvent(ctx, eventID, routedTo(reportA, dsa, t0.Add(time.Minute))))
+	require.NoError(t, svc.RecordEvent(ctx, eventID, routedTo(reportA, dsa, t0.Add(time.Minute))), "a repeated event is not an error")
+
+	timeline, err := svc.GetReportTimeline(ctx, reportA)
+	require.NoError(t, err)
+	require.Len(t, timeline, 2, "submitted and routed, the repeat is ignored")
+	assert.Equal(t, eventID, timeline[1].ID)
+
+	page, _, err := svc.ListReportsByAssignee(ctx, dsa, 0, "")
+	require.NoError(t, err)
+	assert.Len(t, page, 1)
+}
+
+func TestRecordEventErrors(t *testing.T) {
+	ctx := context.Background()
+	svc := newTestService()
+	eventID := "0e000000-0000-4000-8000-000000000002"
+
+	assert.ErrorIs(t, svc.RecordEvent(ctx, eventID, routedTo(reportA, dsa, t0)), domain.ErrReportNotFound)
+	assert.ErrorIs(t, svc.RecordEvent(ctx, "not-a-uuid", routedTo(reportA, dsa, t0)), domain.ErrInvalidEntryID)
+
+	broken := NewService(brokenRepo{Repository: memory.NewRepository(), failOn: "AppendEntry"}, sequentialIDs())
+	_, err := broken.RecordSubmitted(ctx, submitted(reportA, studentA, t0))
+	require.Error(t, err)
+}
+
+func TestRecordSubmittedUsesTheEventIDForTheFirstEntry(t *testing.T) {
+	ctx := context.Background()
+	svc := newTestService()
+	in := submitted(reportA, studentA, t0)
+	in.EventID = "0e000000-0000-4000-8000-000000000003"
+
+	_, err := svc.RecordSubmitted(ctx, in)
+	require.NoError(t, err)
+
+	timeline, err := svc.GetReportTimeline(ctx, reportA)
+	require.NoError(t, err)
+	assert.Equal(t, in.EventID, timeline[0].ID)
+}
+
+// Two consumers (two streams) can record events for the same report at the same
+// moment. Neither change may be lost.
+func TestConcurrentEventsForOneReportAreAllApplied(t *testing.T) {
+	ctx := context.Background()
+	hod := "6071a2b3-c4d5-4e6f-9a0b-1c2d3e4f5a6b"
+	for i := range 200 {
+		svc := newTestService()
+		_, err := svc.RecordSubmitted(ctx, submitted(reportA, studentA, t0))
+		require.NoError(t, err)
+
+		var wg sync.WaitGroup
+		wg.Add(2)
+		go func() {
+			defer wg.Done()
+			assert.NoError(t, svc.RecordEvent(ctx, fmt.Sprintf("0e100000-0000-4000-8000-%012d", i), statusChange(reportA, domain.StatusOpen, domain.StatusAssigned, t0.Add(2*time.Minute))))
+		}()
+		go func() {
+			defer wg.Done()
+			assert.NoError(t, svc.RecordEvent(ctx, fmt.Sprintf("0e200000-0000-4000-8000-%012d", i), domain.EntryInput{
+				ReportID: reportA, EventType: domain.EventReportReassigned, AssigneeID: hod, Summary: "Reassigned", OccurredAt: t0.Add(time.Hour),
+			}))
+		}()
+		wg.Wait()
+
+		page, _, err := svc.ListReportsByReporter(ctx, studentA, 0, "")
+		require.NoError(t, err)
+		require.Equal(t, domain.StatusAssigned, page[0].Status, "run %d: status change lost", i)
+		require.Equal(t, hod, page[0].AssigneeID, "run %d: reassignment lost", i)
+	}
+}
+
 // brokenRepo wraps the memory repository and fails the chosen method.
 type brokenRepo struct {
 	*memory.Repository
@@ -372,9 +451,10 @@ func TestStorageErrorsArePassedOn(t *testing.T) {
 		t.Run(tt.failOn, func(t *testing.T) {
 			ctx := context.Background()
 			mem := memory.NewRepository()
-			_, err := NewService(mem, sequentialIDs()).RecordSubmitted(ctx, submitted(reportA, studentA, t0))
+			ids := sequentialIDs() // one generator, so entry ids stay unique
+			_, err := NewService(mem, ids).RecordSubmitted(ctx, submitted(reportA, studentA, t0))
 			require.NoError(t, err)
-			svc := NewService(brokenRepo{Repository: mem, failOn: tt.failOn}, sequentialIDs())
+			svc := NewService(brokenRepo{Repository: mem, failOn: tt.failOn}, ids)
 
 			err = tt.call(ctx, svc)
 

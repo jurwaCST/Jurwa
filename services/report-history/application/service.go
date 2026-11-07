@@ -2,7 +2,9 @@ package application
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/jurwaCST/Jurwa/services/report-history/domain"
@@ -13,6 +15,11 @@ import (
 type Service struct {
 	repo  ports.HistoryRepository
 	newID func() string
+	// writeMu makes each write (read summary, append entry, write summary) one
+	// step, so two consumers recording events for the same report at the same
+	// time cannot overwrite each other's change. Enough for one instance; a
+	// PostgreSQL adapter would use a transaction instead.
+	writeMu sync.Mutex
 }
 
 // NewService wires the use cases to their port. newID is usually uuid.NewString.
@@ -21,7 +28,9 @@ func NewService(repo ports.HistoryRepository, newID func() string) *Service {
 }
 
 // SubmittedInput is the part of a report.submitted event that report-history keeps.
+// EventID, when set, becomes the id of the first timeline entry.
 type SubmittedInput struct {
+	EventID    string
 	ReportID   string
 	ReporterID string
 	Category   domain.Category
@@ -30,13 +39,19 @@ type SubmittedInput struct {
 }
 
 // RecordSubmitted stores the summary of a new report and the first timeline entry.
-// TODO(Sprint 3): called by the events:report.submitted consumer on Redis Streams.
+// Called by the events:report.submitted consumer (adapters/in/events).
 func (s *Service) RecordSubmitted(ctx context.Context, in SubmittedInput) (domain.Summary, error) {
+	s.writeMu.Lock()
+	defer s.writeMu.Unlock()
 	summary, err := domain.NewSummary(in.ReportID, in.ReporterID, in.Category, in.Location, in.CreatedAt.UTC())
 	if err != nil {
 		return domain.Summary{}, err
 	}
-	entry, err := domain.NewEntry(s.newID(), domain.EntryInput{
+	entryID := in.EventID
+	if entryID == "" {
+		entryID = s.newID()
+	}
+	entry, err := domain.NewEntry(entryID, domain.EntryInput{
 		ReportID:   in.ReportID,
 		EventType:  domain.EventReportSubmitted,
 		ToStatus:   domain.StatusOpen,
@@ -56,12 +71,28 @@ func (s *Service) RecordSubmitted(ctx context.Context, in SubmittedInput) (domai
 	return summary, nil
 }
 
-// Record adds one timeline entry to a known report and updates its summary.
-// TODO(Sprint 3): called by the status.changed, report.reassigned and
-// escalation.compensated consumers on Redis Streams.
+// Record adds one timeline entry with a new id to a known report and updates
+// its summary.
 func (s *Service) Record(ctx context.Context, in domain.EntryInput) (domain.Entry, error) {
+	return s.record(ctx, s.newID(), in)
+}
+
+// RecordEvent adds the timeline entry of one event, using the event id as the
+// entry id. The same event delivered again is ignored (nil). Called by the
+// report.routed, status.changed and report.reassigned consumers.
+func (s *Service) RecordEvent(ctx context.Context, eventID string, in domain.EntryInput) error {
+	_, err := s.record(ctx, eventID, in)
+	if errors.Is(err, domain.ErrEntryExists) {
+		return nil
+	}
+	return err
+}
+
+func (s *Service) record(ctx context.Context, id string, in domain.EntryInput) (domain.Entry, error) {
+	s.writeMu.Lock()
+	defer s.writeMu.Unlock()
 	in.OccurredAt = in.OccurredAt.UTC()
-	entry, err := domain.NewEntry(s.newID(), in)
+	entry, err := domain.NewEntry(id, in)
 	if err != nil {
 		return domain.Entry{}, err
 	}

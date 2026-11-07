@@ -309,3 +309,22 @@ func TestFilterByAssignee(t *testing.T) {
 	assert.Equal(t, []Summary{a}, FilterByAssignee([]Summary{a, b}, headActor))
 	assert.Empty(t, FilterByAssignee([]Summary{b}, headActor))
 }
+
+// Events on different streams can be handled in any order: a status change
+// recorded after a newer reassignment must still set the status.
+func TestApplyStatusAndAssigneeHaveTheirOwnTime(t *testing.T) {
+	s, err := NewSummary(reportA, studentA, CategoryHostel, hostelLoc, t0)
+	require.NoError(t, err)
+
+	reassigned := Entry{ReportID: reportA, EventType: EventReportReassigned, AssigneeID: headActor, Summary: "Reassigned", OccurredAt: t0.Add(time.Hour)}
+	assigned := Entry{ReportID: reportA, EventType: EventStatusChanged, FromStatus: StatusOpen, ToStatus: StatusAssigned, Summary: "Assigned", OccurredAt: t0.Add(2 * time.Minute)}
+	olderRouting := Entry{ReportID: reportA, EventType: EventReportRouted, AssigneeID: studentB, Summary: "Routed", OccurredAt: t0.Add(time.Minute)}
+
+	s = s.Apply(reassigned)
+	s = s.Apply(assigned)
+	s = s.Apply(olderRouting)
+
+	assert.Equal(t, StatusAssigned, s.Status, "the older status change is still applied")
+	assert.Equal(t, headActor, s.AssigneeID, "the older routing does not undo the reassignment")
+	assert.Equal(t, t0.Add(time.Hour), s.UpdatedAt, "updated_at is the newest event")
+}

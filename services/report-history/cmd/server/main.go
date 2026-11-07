@@ -8,14 +8,18 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/google/uuid"
+
+	"github.com/jurwaCST/Jurwa/pkg/eventbus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 
 	reporthistoryv1 "github.com/jurwaCST/Jurwa/proto/gen/report-history/v1"
+	"github.com/jurwaCST/Jurwa/services/report-history/adapters/in/events"
 	grpcadapter "github.com/jurwaCST/Jurwa/services/report-history/adapters/in/grpc"
 	"github.com/jurwaCST/Jurwa/services/report-history/adapters/out/memory"
 	"github.com/jurwaCST/Jurwa/services/report-history/application"
@@ -47,8 +51,8 @@ func main() {
 	hs := health.NewServer()
 	healthpb.RegisterHealthServer(srv, hs)
 
-	// In-memory store for Sprint 2; the PostgreSQL adapter and the Redis Streams
-	// consumers that call Record replace it in Sprint 3.
+	// In-memory store. The data is rebuilt from the event streams on start
+	// (see startConsumers); a PostgreSQL adapter would keep it across restarts.
 	app := application.NewService(memory.NewRepository(), uuid.NewString)
 	if os.Getenv("SEED_SAMPLE") == "true" {
 		if err := seedSample(context.Background(), app); err != nil {
@@ -68,6 +72,11 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
+	if err := startConsumers(ctx, app, serviceName); err != nil {
+		slog.Error("cannot start event consumers", "error", err)
+		os.Exit(1)
+	}
+
 	go func() {
 		<-ctx.Done()
 		slog.Info("shutting down")
@@ -81,6 +90,46 @@ func main() {
 		os.Exit(1)
 	}
 	slog.Info("server stopped")
+}
+
+// startConsumers reads the event streams when REDIS_URL is set. The store is in
+// memory, so every stream is read again from its first event on start
+// (Rewind); events seen before are ignored by their event id.
+func startConsumers(ctx context.Context, app *application.Service, serviceName string) error {
+	url := os.Getenv("REDIS_URL")
+	if url == "" {
+		slog.Info("events: not read (REDIS_URL not set)")
+		return nil
+	}
+	bus, err := eventbus.NewRedis(url)
+	if err != nil {
+		return err
+	}
+	pingCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	if err := bus.Ping(pingCtx); err != nil {
+		_ = bus.Close()
+		return err
+	}
+	for _, stream := range events.Streams() {
+		if err := bus.Rewind(ctx, stream, events.Group); err != nil {
+			_ = bus.Close()
+			return err
+		}
+	}
+	consumer, _ := os.Hostname()
+	if consumer == "" {
+		consumer = serviceName
+	}
+	go func() {
+		defer bus.Close()
+		if err := events.NewConsumer(app).Run(ctx, bus, consumer); err != nil {
+			slog.Error("event consumer stopped", "error", err)
+			os.Exit(1)
+		}
+	}()
+	slog.Info("events: reading", "streams", events.Streams(), "group", events.Group, "consumer", consumer)
+	return nil
 }
 
 // envOr returns the environment variable key, or fallback when it is empty.

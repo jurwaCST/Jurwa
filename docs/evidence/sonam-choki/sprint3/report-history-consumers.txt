@@ -1,0 +1,87 @@
+# SCRUM-130 report-history event consumers (2026-11-07 23:40)
+
+## Unit tests (race detector on)
+$ go test -race ./pkg/eventbus/... ./services/report-history/... -cover
+ok  	github.com/jurwaCST/Jurwa/pkg/eventbus	6.787s	coverage: 94.4% of statements
+ok  	github.com/jurwaCST/Jurwa/services/report-history/adapters/in/events	2.079s	coverage: 92.9% of statements
+ok  	github.com/jurwaCST/Jurwa/services/report-history/adapters/in/grpc	4.149s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/report-history/adapters/out/memory	2.158s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/report-history/application	2.562s	coverage: 98.2% of statements
+ok  	github.com/jurwaCST/Jurwa/services/report-history/cmd/server	3.740s	coverage: 16.2% of statements
+ok  	github.com/jurwaCST/Jurwa/services/report-history/domain	4.754s	coverage: 100.0% of statements
+
+# In the cluster: report-history fills from the event bus
+
+$ kubectl -n jurwa logs deploy/report-history | grep events
+{"time":"2026-11-07T17:39:26.885820969Z","level":"INFO","msg":"events: reading","service":"report-history","streams":["events:report.submitted","events:report.routed","events:status.changed","events:report.reassigned"],"group":"report-history","consumer":"report-history-7458574698-78wgb"}
+
+## 1. The report submitted earlier (before this version) is replayed from the stream on start
+$ curl -k https://jurwa.localtest.me/api/me/reports -H "Authorization: Bearer $TOKEN"
+{"reports":[], "nextPageToken":""}
+
+## 2. A new report: submitted -> routed by routing-engine -> recorded by report-history
+$ curl -k -X POST https://jurwa.localtest.me/api/reports -H "Authorization: Bearer $TOKEN" -d '{"category":"HOSTEL","location":{"building":"Hostel B","wing":"East"},"description":"Shower has no hot water (SCRUM-130 check)"}'
+{"report":{"id":"105760b4-51ed-420e-a246-6c455ef7ffd9", "reporterId":"1857bbd7-54fd-4993-b75a-69914784276e", "category":"HOSTEL", "location":{"building":"Hostel B", "wing":"East", "area":""}, "description":"Shower has no hot water (SCRUM-130 check)", "status":"OPEN", "createdAt":"2026-11-07T17:39:45.935078255Z"}}
+
+$ curl -k https://jurwa.localtest.me/api/me/reports -H "Authorization: Bearer $TOKEN"
+{"reports":[{"reportId":"105760b4-51ed-420e-a246-6c455ef7ffd9", "reporterId":"1857bbd7-54fd-4993-b75a-69914784276e", "category":"HOSTEL", "location":{"building":"Hostel B", "wing":"East", "area":""}, "status":"OPEN", "currentAssigneeId":"00000000-0000-4000-8000-000000000001", "createdAt":"2026-11-07T17:39:45.935078255Z", "updatedAt":"2026-11-07T17:39:45.941718380Z"}], "nextPageToken":""}
+
+$ curl -k https://jurwa.localtest.me/api/reports/105760b4-51ed-420e-a246-6c455ef7ffd9/timeline -H "Authorization: Bearer $TOKEN"
+{"entries":[{"id":"c46c38ef-84c1-45db-b30d-25d40b8708b9", "eventType":"report.submitted", "fromStatus":"STATUS_UNSPECIFIED", "toStatus":"OPEN", "actorId":"1857bbd7-54fd-4993-b75a-69914784276e", "summary":"Report submitted", "occurredAt":"2026-11-07T17:39:45.935078255Z"}, {"id":"f5c824c7-c326-5774-a31b-23126b31b0b5", "eventType":"report.routed", "fromStatus":"STATUS_UNSPECIFIED", "toStatus":"STATUS_UNSPECIFIED", "summary":"Routed to DSA", "occurredAt":"2026-11-07T17:39:45.941718380Z"}]}
+
+$ kubectl -n jurwa exec redis-0 -- redis-cli XINFO GROUPS events:report.routed
+name
+report-history
+consumers
+1
+pending
+0
+last-delivered-id
+1794073185941-0
+entries-read
+2
+lag
+0
+
+
+## 1b. Replay check: the report submitted yesterday by the earlier user id 2e55300e-... (identity keeps users in memory, so the same email got a new id after a restart)
+$ grpcurl -plaintext -d '{"reporter_id":"2e55300e-648b-43da-b8a2-12102be8b20b"}' localhost:19003 jurwa.reporthistory.v1.ReportHistoryService/ListReportsByReporter
+{
+  "reports": [
+    {
+      "reportId": "ace11ee9-9108-4112-be78-f83245c49ccc",
+      "reporterId": "2e55300e-648b-43da-b8a2-12102be8b20b",
+      "category": "HOSTEL",
+      "location": {
+        "building": "Hostel B",
+        "wing": "East"
+      },
+      "status": "OPEN",
+      "currentAssigneeId": "00000000-0000-4000-8000-000000000001",
+      "createdAt": "2026-11-06T05:55:31.706021804Z",
+      "updatedAt": "2026-11-07T17:39:31.934310221Z"
+    }
+  ]
+}
+
+## 3. Reports assigned to the Category Head chosen by routing-engine
+$ grpcurl -plaintext -d '{"assignee_id":"00000000-0000-4000-8000-000000000001"}' localhost:19003 jurwa.reporthistory.v1.ReportHistoryService/ListReportsByAssignee
+      "reportId": "105760b4-51ed-420e-a246-6c455ef7ffd9",
+      "status": "OPEN",
+      "currentAssigneeId": "00000000-0000-4000-8000-000000000001",
+      "reportId": "ace11ee9-9108-4112-be78-f83245c49ccc",
+      "status": "OPEN",
+      "currentAssigneeId": "00000000-0000-4000-8000-000000000001",
+
+## Out-of-order events (found by a flaky test, fixed test-first in 0b7f656)
+$ go test -race ./services/report-history/adapters/in/events/ -run TestTheFourStreamsBuildTheReadModel -count=50
+FAIL
+The first fix alone was not enough (the 50 runs above still failed): two consumers also overwrote each other's summary (lost update). Test first in 972826a, fixed with a write lock in the application:
+$ go test -race ./services/report-history/application/ -run TestConcurrentEventsForOneReportAreAllApplied -count=5   (200 concurrent pairs each)
+ok  	github.com/jurwaCST/Jurwa/services/report-history/application	1.402s
+$ go test -race ./services/report-history/adapters/in/events/ -run TestTheFourStreamsBuildTheReadModel -count=100
+ok  	github.com/jurwaCST/Jurwa/services/report-history/adapters/in/events	5.515s
+
+## After the fix, report-history restarted again: the lists are rebuilt from the streams
+$ curl -k https://jurwa.localtest.me/api/me/reports -H "Authorization: Bearer $TOKEN"
+{"reports":[{"reportId":"105760b4-51ed-420e-a246-6c455ef7ffd9", "reporterId":"1857bbd7-54fd-4993-b75a-69914784276e", "category":"HOSTEL", "location":{"building":"Hostel B", "wing":"East", "area":""}, "status":"OPEN", "currentAssigneeId":"00000000-0000-4000-8000-000000000001", "createdAt":"2026-11-07T17:39:45.935078255Z", "updatedAt":"2026-11-07T17:39:45.941718380Z"}], "nextPageToken":""}

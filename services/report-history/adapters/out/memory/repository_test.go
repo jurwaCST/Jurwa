@@ -64,9 +64,9 @@ func TestListSummariesByReporter(t *testing.T) {
 func TestEntriesKeepAppendOrderPerReport(t *testing.T) {
 	ctx := context.Background()
 	repo := NewRepository()
-	first := domain.Entry{ReportID: reportA, Summary: "first"}
-	second := domain.Entry{ReportID: reportA, Summary: "second"}
-	other := domain.Entry{ReportID: reportB, Summary: "other report"}
+	first := domain.Entry{ID: "0a000000-0000-4000-8000-000000000001", ReportID: reportA, Summary: "first"}
+	second := domain.Entry{ID: "0a000000-0000-4000-8000-000000000002", ReportID: reportA, Summary: "second"}
+	other := domain.Entry{ID: "0a000000-0000-4000-8000-000000000003", ReportID: reportB, Summary: "other report"}
 	for _, e := range []domain.Entry{first, other, second} {
 		require.NoError(t, repo.AppendEntry(ctx, e))
 	}
@@ -97,4 +97,16 @@ func TestListSummariesByAssignee(t *testing.T) {
 	got, err = repo.ListSummariesByAssignee(ctx, studentA)
 	require.NoError(t, err)
 	assert.Empty(t, got)
+}
+
+func TestAppendEntryTwiceWithTheSameIDIsRejected(t *testing.T) {
+	ctx := context.Background()
+	repo := NewRepository()
+	e := domain.Entry{ID: "3d4e5f60-7182-4c9d-8e1f-2a3b4c5d6e7f", ReportID: reportA, EventType: domain.EventStatusChanged, Summary: "x", OccurredAt: t0}
+	require.NoError(t, repo.AppendEntry(ctx, e))
+	assert.ErrorIs(t, repo.AppendEntry(ctx, e), domain.ErrEntryExists)
+
+	got, err := repo.ListEntries(ctx, reportA)
+	require.NoError(t, err)
+	assert.Len(t, got, 1)
 }

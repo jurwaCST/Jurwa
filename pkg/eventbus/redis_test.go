@@ -64,3 +64,35 @@ func TestRedisEntryWithoutPayloadGoesToDeadStream(t *testing.T) {
 	}, 5*time.Second, 20*time.Millisecond)
 	assert.False(t, called, "handler must not get an entry without payload")
 }
+
+func TestRedisRewindReplaysTheStreamToTheGroup(t *testing.T) {
+	server := miniredis.RunT(t)
+	bus, err := eventbus.NewRedis("redis://" + server.Addr() + "/0")
+	require.NoError(t, err)
+	bus.Block = 50 * time.Millisecond
+	ctx := context.Background()
+	stream := streamName(t)
+	require.NoError(t, bus.Publish(ctx, stream, statusChanged("evt-1", "rep-1")))
+	require.NoError(t, bus.Publish(ctx, stream, statusChanged("evt-2", "rep-1")))
+
+	first := newCollector()
+	runCtx, stop := context.WithCancel(ctx)
+	done := make(chan struct{})
+	go func() { defer close(done); _ = bus.Subscribe(runCtx, stream, "history", "c1", first.handle) }()
+	require.Eventually(t, func() bool { return first.count() == 2 }, 5*time.Second, 20*time.Millisecond)
+	stop()
+	<-done
+
+	require.NoError(t, bus.Rewind(ctx, stream, "history"))
+
+	again := newCollector()
+	subscribe(t, bus, stream, "history", "c1", again.handle)
+	require.Eventually(t, func() bool { return again.count() == 2 }, 5*time.Second, 20*time.Millisecond)
+}
+
+func TestRedisRewindOfAnUnknownGroupIsNotAnError(t *testing.T) {
+	server := miniredis.RunT(t)
+	bus, err := eventbus.NewRedis("redis://" + server.Addr() + "/0")
+	require.NoError(t, err)
+	assert.NoError(t, bus.Rewind(context.Background(), "no-such-stream", "history"))
+}
