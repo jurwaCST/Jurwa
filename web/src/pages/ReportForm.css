@@ -1,0 +1,45 @@
+/* Report form (SCRUM-35). One column, large touch targets, for phones first. */
+
+.report-form select,
+.report-form textarea,
+.report-form input[type='file'] {
+  font: inherit;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.report-form textarea {
+  resize: vertical;
+}
+
+.report-form button[type='submit'] {
+  min-height: 2.75rem;
+}
+
+.report-form .counter {
+  margin: -0.5rem 0 0;
+  text-align: right;
+  font-size: 0.875rem;
+}
+
+.photo-preview {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: start;
+}
+
+.photo-preview img {
+  max-width: 100%;
+  max-height: 12rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.report-sent {
+  font-weight: 600;
+}

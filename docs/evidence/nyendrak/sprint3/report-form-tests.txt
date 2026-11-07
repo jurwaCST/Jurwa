@@ -1,0 +1,49 @@
+ ✓ src/api/client.test.ts > base URL > defaults to the gateway on localhost:8080 8ms
+ ✓ src/api/client.test.ts > base URL > uses VITE_API_URL when it is set, without a double slash 1ms
+ ✓ src/api/client.test.ts > token > sends no Authorization header before setToken 1ms
+ ✓ src/api/client.test.ts > token > sends Authorization: Bearer <token> after setToken 2ms
+ ✓ src/api/client.test.ts > token > stops sending it after setToken(null) 1ms
+ ✓ src/api/client.test.ts > methods > get returns the parsed JSON body 1ms
+ ✓ src/api/client.test.ts > methods > post sends the body as JSON 1ms
+ ✓ src/api/client.test.ts > methods > put sends the body as JSON 1ms
+ ✓ src/api/client.test.ts > methods > upload sends the file as multipart form data under the given field 3ms
+ ✓ src/api/client.test.ts > methods > returns undefined for 204 No Content 1ms
+ ✓ src/api/client.test.ts > errors > turns a 401 into an ApiError with status 401 1ms
+ ✓ src/api/client.test.ts > errors > uses the "error" field of a JSON error body as the message 1ms
+ ✓ src/api/client.test.ts > errors > falls back to a generic message when the body is not JSON 0ms
+ ✓ src/api/client.test.ts > errors > turns a network failure into an ApiError with status 0 0ms
+ ✓ src/App.test.tsx > routes > home shows the app name and a sign in link 144ms
+ ✓ src/App.test.tsx > routes > an unknown route shows a not found page 13ms
+ ✓ src/App.test.tsx > routes > /login shows the login form 31ms
+ ✓ src/App.test.tsx > role guards > sends a visitor who is not signed in to /login 21ms
+ ✓ src/App.test.tsx > role guards > shows the report form to a student 26ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-65 category and location dropdowns > shows the active categories from the API in their order 215ms
+ ✓ src/App.test.tsx > role guards > refuses the report form to staff with a 403 page 10ms
+ ✓ src/App.test.tsx > role guards > /staff is open to CATEGORY_HEAD 9ms
+ ✓ src/App.test.tsx > role guards > /staff is open to STAFF 7ms
+ ✓ src/App.test.tsx > role guards > /admin is open to SYSTEM_ADMIN 4ms
+ ✓ src/App.test.tsx > role guards > /president is open to PRESIDENT 3ms
+ ✓ src/App.test.tsx > role guards > /staff is refused to STUDENT 9ms
+ ✓ src/App.test.tsx > role guards > /admin is refused to CATEGORY_HEAD 8ms
+ ✓ src/App.test.tsx > role guards > /president is refused to SYSTEM_ADMIN 6ms
+ ✓ src/App.test.tsx > role guards > treats an expired session as signed out 20ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-65 category and location dropdowns > loads the locations of the chosen category and narrows building, wing and area 212ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-65 category and location dropdowns > has no wing step when the locations have no wing (Others) 142ms
+ ✓ src/App.test.tsx > login > signs in through the gateway and shows the links for the role 441ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-65 category and location dropdowns > needs a category and a full location before sending 472ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-65 category and location dropdowns > shows a message when the categories cannot be loaded 31ms
+ ✓ src/App.test.tsx > login > shows the gateway error when the password is wrong 352ms
+ ✓ src/App.test.tsx > login > signing out goes back to the signed-out home page 49ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-66 description and photo field > shows a live counter and stops at 500 characters 175ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-66 description and photo field > needs a description that is not only spaces 682ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-66 description and photo field > refuses a photo that is not JPG or PNG 62ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-66 description and photo field > refuses a photo over 5 MB and accepts exactly 5 MB 111ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-66 description and photo field > shows a preview and can remove the photo 94ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-67 submit to report-submission > sends the report and shows the report id 533ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-67 submit to report-submission > uploads the photo first and sends its photoId with the report 529ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-67 submit to report-submission > shows the reason for a 400 and keeps the form 452ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-67 submit to report-submission > asks to try again when a service is unavailable or the server cannot be reached 587ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-67 submit to report-submission > does not send the report when the photo upload fails 542ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-67 submit to report-submission > disables the button while sending, so a report is sent only once 607ms
+ Test Files  3 passed (3)
+      Tests  47 passed (47)

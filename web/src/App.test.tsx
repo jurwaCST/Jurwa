@@ -62,10 +62,10 @@ describe('role guards', () => {
     expect(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument()
   })
 
-  it('shows the report form placeholder to a student', () => {
+  it('shows the report form to a student', () => {
     signInAs('STUDENT')
     renderAt('/report/new')
-    expect(screen.getByText('Report form: Nyendrak, SCRUM-35')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Report an issue' })).toBeInTheDocument()
   })
 
   it('refuses the report form to staff with a 403 page', () => {
