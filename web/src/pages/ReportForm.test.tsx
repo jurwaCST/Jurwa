@@ -292,3 +292,53 @@ describe('SCRUM-67 submit to report-submission', () => {
     expect(await screen.findByRole('status')).toHaveTextContent('r-1')
   })
 })
+
+describe('polish: clearer messages and screens', () => {
+  it('asks the student to sign in again when the sign-in has expired while loading', async () => {
+    get.mockRejectedValueOnce(new ApiError(401, 'invalid or expired token'))
+    renderForm()
+    expect(await screen.findByRole('alert')).toHaveTextContent('Your sign-in has expired. Please sign in again.')
+    expect(screen.getByRole('link', { name: 'Sign in again' })).toHaveAttribute('href', '/login')
+  })
+
+  it('asks the student to sign in again when the sign-in expires before sending', async () => {
+    post.mockRejectedValueOnce(new ApiError(401, 'invalid or expired token'))
+    const user = userEvent.setup()
+    renderForm()
+    await fillValid(user)
+    await user.click(screen.getByRole('button', { name: 'Send report' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('Your sign-in has expired. Please sign in again.')
+    expect(screen.getByRole('link', { name: 'Sign in again' })).toBeInTheDocument()
+  })
+
+  it('shows the chosen photo with its name and size', async () => {
+    const user = userEvent.setup()
+    renderForm()
+    await user.upload(await screen.findByLabelText('Photo (optional)'), pngFile('tap.png', 2048))
+    expect(screen.getByText('tap.png, 2 KB')).toBeInTheDocument()
+  })
+
+  it('marks the field that needs attention', async () => {
+    const user = userEvent.setup()
+    renderForm()
+    await screen.findByLabelText('Category')
+    await user.click(screen.getByRole('button', { name: 'Send report' }))
+    const category = screen.getByLabelText('Category')
+    expect(category).toHaveAttribute('aria-invalid', 'true')
+    expect(category).toHaveAccessibleDescription('Choose a category.')
+  })
+
+  it('can start another report from the success screen', async () => {
+    post.mockResolvedValueOnce({ report: { id: 'r-200' } })
+    const user = userEvent.setup()
+    renderForm()
+    await fillValid(user)
+    await user.click(screen.getByRole('button', { name: 'Send report' }))
+    await screen.findByRole('status')
+    expect(screen.getByRole('link', { name: 'Back to home' })).toHaveAttribute('href', '/')
+
+    await user.click(screen.getByRole('button', { name: 'Report another issue' }))
+    expect(screen.getByRole('button', { name: 'Send report' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Description')).toHaveValue('')
+  })
+})
