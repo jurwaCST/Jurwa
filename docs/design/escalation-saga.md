@@ -4,6 +4,22 @@ Card: SCRUM-89. Owner: Nyendrak Yoezer Zangmo. Services: sla-tracking, reassignm
 
 When a report's SLA lapses, it is handed back up to its Category Head and set to ESCALATED. The two changes are made by two services, so this is a **choreographed Saga**: each service reacts to an event, and when a step fails an earlier step is undone by a compensating action. No service calls another for this.
 
+## Before the Saga: how a report gets a status, an assignee and a timer
+
+All from events, with no seed setting (each service reads in its own consumer group):
+
+| Event | Published by | Read by | What happens |
+|---|---|---|---|
+| `report.submitted` | report-submission | status-lifecycle | The report gets OPEN |
+| `report.routed` | routing-engine | status-lifecycle | ASSIGNED, set by the system ("routed to DSA") |
+| `report.routed` | routing-engine | reassignment | The Category Head (`category_head_id`, `target_position`) is recorded as the first ROUTED assignee |
+| `report.routed` | routing-engine | sla-tracking | The SLA timer starts, with the deadline from sla-policy |
+| `status.changed` to RESOLVED | status-lifecycle | sla-tracking | The timer stops, so a resolved report is never escalated |
+
+`report.routed` can be read before `report.submitted`, because the two streams are read in parallel. status-lifecycle then registers the report itself, and the late `report.submitted` counts as done. A repeated event changes nothing: an existing status, assignment or timer counts as done. If sla-tracking cannot start a timer (for example no SLA window is set for the category), the event is tried 3 times and then kept in `events:report.routed.dead`, where it can be seen.
+
+Tests: `tests/saga/flow_test.go` (submitted and routed, then escalated after the SLA; resolved stops the timer; routed before submitted; repeated routed event).
+
 ## Happy path
 
 1. The `sla-escalation-checker` function calls sla-tracking `ListDueTimers`. sla-tracking marks the timer LAPSED and publishes `events:sla.lapsed`. That event starts one Saga run: it gets a new `correlation_id`, and every later event of the run repeats it.

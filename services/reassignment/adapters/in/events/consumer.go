@@ -1,9 +1,12 @@
-// Package events reads the escalation Saga's events from the shared event bus
-// and calls reassignment's use cases. The consumer group is "reassignment".
+// Package events reads reassignment's events from the shared event bus:
+// report.routed records the first assignee (the Category Head), and the
+// escalation Saga's sla.lapsed and escalation.compensated. The consumer group
+// is "reassignment".
 package events
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 
 	"google.golang.org/protobuf/proto"
@@ -11,6 +14,7 @@ import (
 	"github.com/jurwaCST/Jurwa/pkg/eventbus"
 	eventsv1 "github.com/jurwaCST/Jurwa/proto/gen/events/v1"
 	"github.com/jurwaCST/Jurwa/services/reassignment/application"
+	"github.com/jurwaCST/Jurwa/services/reassignment/domain"
 )
 
 // Group is the consumer group, named after the service (pkg/eventbus rule).
@@ -18,15 +22,33 @@ const Group = "reassignment"
 
 // Saga is the part of the application the consumers call.
 type Saga interface {
+	RecordRouted(ctx context.Context, reportID, assigneeUserID, positionCode string) (domain.Assignment, error)
 	EscalateOnLapse(ctx context.Context, ev application.SagaEvent) error
 	CompensateEscalation(ctx context.Context, ev application.SagaEvent) error
 }
 
-// Start subscribes to sla.lapsed and escalation.compensated in goroutines.
-// They stop when ctx is cancelled. consumer names this instance (the hostname).
+// Start subscribes to report.routed, sla.lapsed and escalation.compensated in
+// goroutines. They stop when ctx is cancelled. consumer names this instance.
 func Start(ctx context.Context, bus eventbus.Subscriber, consumer string, app Saga) {
+	go subscribe(ctx, bus, eventbus.StreamReportRouted, consumer, OnReportRouted(app))
 	go subscribe(ctx, bus, eventbus.StreamSlaLapsed, consumer, OnSlaLapsed(app))
 	go subscribe(ctx, bus, eventbus.StreamEscalationCompensated, consumer, OnEscalationCompensated(app))
+}
+
+// OnReportRouted records the Category Head that routing chose as the first
+// assignee. A report that already has an assignment (a repeated event) counts as done.
+func OnReportRouted(app Saga) eventbus.Handler {
+	return func(ctx context.Context, payload []byte) error {
+		var e eventsv1.ReportRouted
+		if err := proto.Unmarshal(payload, &e); err != nil {
+			return err
+		}
+		_, err := app.RecordRouted(ctx, e.GetReportId(), e.GetCategoryHeadId(), e.GetTargetPosition())
+		if errors.Is(err, domain.ErrAlreadyAssigned) {
+			return nil
+		}
+		return err
+	}
 }
 
 func subscribe(ctx context.Context, bus eventbus.Subscriber, stream, consumer string, h eventbus.Handler) {
