@@ -21,6 +21,12 @@ func (f *fakeHistoryClient) ListReportsByReporter(_ context.Context, in *reporth
 	return &reporthistoryv1.ListReportsByReporterResponse{NextPageToken: "n"}, nil
 }
 
+// ListReportsByAssignee is not used by these tests yet; it is here so the fake
+// still implements the client after report-history added the RPC (SCRUM-131).
+func (f *fakeHistoryClient) ListReportsByAssignee(context.Context, *reporthistoryv1.ListReportsByAssigneeRequest, ...grpc.CallOption) (*reporthistoryv1.ListReportsByAssigneeResponse, error) {
+	return &reporthistoryv1.ListReportsByAssigneeResponse{}, nil
+}
+
 func (f *fakeHistoryClient) GetReportTimeline(_ context.Context, in *reporthistoryv1.GetReportTimelineRequest, _ ...grpc.CallOption) (*reporthistoryv1.GetReportTimelineResponse, error) {
 	f.tl = in
 	return &reporthistoryv1.GetReportTimelineResponse{}, nil
