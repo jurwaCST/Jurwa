@@ -86,7 +86,7 @@ Every request gives one line on stdout, for example:
 
 On 6 November 2026, on a local k3d cluster: Prometheus scraped identity and authorization (`up` = 1 for both), 2.5 minutes of logins and permission checks gave about 1.3 to 1.4 requests per second per service, the wrong-password logins showed as `Unauthenticated` errors, and p95 was about 97 ms for identity (password hashing) and 5 ms for authorization.
 
-Evidence in `docs/evidence/gayley/sprint3/`: `observability-tests.txt` (20 tests, 98.8% coverage), `observability-live.txt` (one service on a laptop), `observability-k8s.txt` (Prometheus queries in the cluster), `observability-grafana.png` (the dashboard).
+Evidence in `docs/evidence/gayley/sprint3/`: `observability-tests.txt` (20 tests, 98.8% coverage), `observability-live.txt` (one service on a laptop), `observability-k8s.txt` (Prometheus queries in the cluster), `observability-grafana.png` (the dashboard on 7 November 2026 with live traffic: identity about 1.2 req/s with wrong-password logins as errors, authorization about 0.8 req/s, p95 about 100 to 150 ms for identity and 5 ms for authorization, both pods up).
 
 ## Not done
 
