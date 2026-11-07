@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Starts what the Cypress tests need (SCRUM-108): api-gateway and six services,
+# Starts what the Cypress tests need (SCRUM-108): api-gateway and eight services,
 # in memory, with the demo accounts seeded. Git Bash, from the repo root:
 #
 #   export SEED_DEMO_PASSWORD='<any 8+ characters, never commit it>'
@@ -10,6 +10,7 @@ set -euo pipefail
 
 : "${SEED_DEMO_PASSWORD:?set SEED_DEMO_PASSWORD first, the password of the demo accounts}"
 GATEWAY_HTTP_PORT="${GATEWAY_HTTP_PORT:-8080}"
+GATEWAY_GRPC_PORT="${GATEWAY_GRPC_PORT:-9010}" # the gateway's gRPC health check
 IDENTITY_PORT="${IDENTITY_PORT:-9016}"
 AUTHORIZATION_PORT="${AUTHORIZATION_PORT:-9017}"
 CATEGORY_PORT="${CATEGORY_PORT:-9009}"
@@ -19,7 +20,7 @@ ext="$(go env GOEXE)" # ".exe" on Windows
 logs="web/cypress/logs"
 mkdir -p "$logs"
 echo "Building into $bin ..."
-for s in api-gateway identity authorization category-taxonomy location-taxonomy report-submission internal-notes; do
+for s in api-gateway identity authorization category-taxonomy location-taxonomy report-submission internal-notes photo-media report-history; do
   go build -o "$bin/$s$ext" "./services/$s/cmd/server"
 done
 
@@ -42,8 +43,10 @@ start category-taxonomy PORT="$CATEGORY_PORT"
 start location-taxonomy
 start report-submission
 start internal-notes
+start photo-media
+start report-history
 sleep 2
-start api-gateway HTTP_PORT="$GATEWAY_HTTP_PORT" \
+start api-gateway HTTP_PORT="$GATEWAY_HTTP_PORT" PORT="$GATEWAY_GRPC_PORT" \
   IDENTITY_ADDR="localhost:$IDENTITY_PORT" \
   AUTHORIZATION_ADDR="localhost:$AUTHORIZATION_PORT" \
   CATEGORY_TAXONOMY_ADDR="localhost:$CATEGORY_PORT"

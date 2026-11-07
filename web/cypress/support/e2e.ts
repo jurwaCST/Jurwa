@@ -10,7 +10,13 @@ declare global {
       apiLogin(email: string, password: string): Chainable<string>
       /** The input inside the <label> with this text, the way a user finds it. */
       findLabel(text: string): Chainable<JQuery<HTMLElement>>
+      /** Uploads a photo the way the web app does (multipart through /api). */
+      uploadPhoto(token: string, bytes: Uint8Array, type: string, name: string): Chainable<UploadResult>
     }
+  }
+  interface UploadResult {
+    status: number
+    body: { photoId?: string; error?: string }
   }
 }
 
@@ -42,6 +48,19 @@ Cypress.Commands.add('apiLogin', (email: string, password: string) => {
 
 Cypress.Commands.add('findLabel', (text: string) => {
   return cy.contains('label', text).find('input, select, textarea')
+})
+
+// The browser's own fetch and FormData, through the dev server's /api proxy,
+// so the multipart body is exactly what the report form will send.
+Cypress.Commands.add('uploadPhoto', (token: string, bytes: Uint8Array, type: string, name: string) => {
+  cy.visit('/login')
+  return cy.window().then((win) => {
+    const form = new win.FormData()
+    form.append('photo', new win.Blob([new Uint8Array(bytes)], { type }), name)
+    return win
+      .fetch('/api/photos', { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: form })
+      .then(async (res) => ({ status: res.status, body: await res.json() }))
+  })
 })
 
 export {}
