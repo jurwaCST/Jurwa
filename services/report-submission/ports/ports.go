@@ -14,6 +14,12 @@ type ReportRepository interface {
 	FindByID(ctx context.Context, id string) (domain.Report, error)
 }
 
+// EventPublisher tells other services about new reports
+// (stream events:report.submitted).
+type EventPublisher interface {
+	ReportSubmitted(ctx context.Context, report domain.Report) error
+}
+
 // IDGenerator creates new report ids (UUIDs).
 type IDGenerator interface {
 	NewID() string

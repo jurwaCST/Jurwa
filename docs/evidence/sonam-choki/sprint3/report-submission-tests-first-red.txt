@@ -1,0 +1,10 @@
+$ go test ./services/report-submission/adapters/out/...
+?   	github.com/jurwaCST/Jurwa/services/report-submission/adapters/out	[no test files]
+# github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/mongo [github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/mongo.test]
+services/report-submission/adapters/out/mongo/document_test.go:26:9: undefined: toDocument
+services/report-submission/adapters/out/mongo/document_test.go:36:9: undefined: toDocument
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/memory	0.966s
+FAIL	github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/mongo [build failed]
+?   	github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/repotest	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/uuid	1.434s
+FAIL

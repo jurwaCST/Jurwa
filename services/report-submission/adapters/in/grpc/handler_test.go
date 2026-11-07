@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"log/slog"
 	"strings"
 	"testing"
 	"time"
@@ -14,6 +15,7 @@ import (
 
 	commonv1 "github.com/jurwaCST/Jurwa/proto/gen/common/v1"
 	reportsubmissionv1 "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1"
+	"github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/logpublisher"
 	"github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/memory"
 	"github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/uuid"
 	"github.com/jurwaCST/Jurwa/services/report-submission/application"
@@ -22,7 +24,7 @@ import (
 const reporter = "0b9e8d7c-6a5b-4c3d-9e2f-1a0b9c8d7e6f"
 
 func newTestHandler() *Handler {
-	app := application.NewService(memory.NewRepository(), uuid.Generator{}, time.Now)
+	app := application.NewService(memory.NewRepository(), uuid.Generator{}, logpublisher.New(slog.New(slog.DiscardHandler)), time.Now)
 	return NewHandler(app)
 }
 

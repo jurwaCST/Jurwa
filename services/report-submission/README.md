@@ -28,9 +28,13 @@ Form rules (in `domain/report.go`, tested in `domain/report_test.go`):
 ```
 domain/report.go                 Report, form rules, RoutingKey (category + location only)
 application/service.go           SubmitReport and GetReport use cases
-ports/ports.go                   ReportRepository and IDGenerator interfaces
+ports/ports.go                   ReportRepository, EventPublisher and IDGenerator interfaces
 adapters/in/grpc/handler.go      gRPC handler: protobuf <-> domain, errors -> gRPC codes
-adapters/out/memory/             in-memory repository (Sprint 1)
+adapters/out/memory/             in-memory repository (no MONGO_URL)
+adapters/out/mongo/              MongoDB repository, collection "reports" (MONGO_URL)
+adapters/out/repotest/           checks every repository must pass (memory and mongo)
+adapters/out/logpublisher/       logs events (no REDIS_URL)
+adapters/out/eventpublisher/     publishes events:report.submitted with pkg/eventbus (REDIS_URL)
 adapters/out/uuid/               UUID v4 generator
 cmd/server/main.go               wires everything and starts the server
 ```
@@ -41,8 +45,11 @@ cmd/server/main.go               wires everything and starts the server
 |---|---|---|
 | `PORT` | `9001` | gRPC port |
 | `SERVICE_NAME` | `report-submission` | Name written in every log line |
+| `MONGO_URL` | none | For example `mongodb://jurwa:PASSWORD@localhost:27017/?authSource=admin`. Not set: reports are kept in memory and lost on restart |
+| `MONGO_DB` | `report_submission` | Database name |
+| `REDIS_URL` | none | For example `redis://:PASSWORD@localhost:6379/0`. Set: every new report is published on `events:report.submitted` (payload `ReportSubmitted`, correlation id = report id). Not set: the event is only logged |
 
-Storage is in memory in Sprint 1, so reports are lost on restart. Sprint 2 adds a MongoDB adapter (`DATABASE_URL`) and publishes `events:report.submitted` on Redis Streams.
+The first log lines say which is used: `storage: mongodb` or `storage: memory`, `events: redis streams` or `events: log only`. In Kubernetes both variables come from the Secret `jurwa-secrets` (see `deploy/README.md`). Passwords are in `dev/.env` locally, never in Git.
 
 ## Run
 
@@ -80,4 +87,10 @@ make test
 go test ./services/report-submission/... -cover
 ```
 
-Coverage: 100% on `domain`, `application` and the adapters.
+Coverage: 100% on `domain`, `application` and the adapters. The MongoDB adapter is tested on a real MongoDB (Docker must be running):
+
+```bash
+go test -tags=integration ./services/report-submission/adapters/out/mongo/... -v
+```
+
+Evidence: `docs/evidence/sonam-choki/sprint3/report-submission-integration.txt`.

@@ -1,0 +1,38 @@
+$ go test ./services/report-submission/...
+github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/logpublisher: no non-test Go files in /Users/macbookairm5chip/Desktop/Jurwa/services/report-submission/adapters/out/logpublisher
+FAIL	github.com/jurwaCST/Jurwa/services/report-submission/adapters/in/grpc [build failed]
+?   	github.com/jurwaCST/Jurwa/services/report-submission/adapters/out	[no test files]
+# github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/logpublisher [github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/logpublisher.test]
+services/report-submission/adapters/out/logpublisher/publisher_test.go:19:9: undefined: New
+# github.com/jurwaCST/Jurwa/services/report-submission/application [github.com/jurwaCST/Jurwa/services/report-submission/application.test]
+services/report-submission/application/service_test.go:44:61: too many arguments in call to NewService
+	have (*memory.Repository, fixedIDs, *recordingPublisher, func() "time".Time)
+	want (ports.ReportRepository, ports.IDGenerator, func() "time".Time)
+services/report-submission/application/service_test.go:87:53: too many arguments in call to NewService
+	have (*failingRepo, fixedIDs, *recordingPublisher, func() "time".Time)
+	want (ports.ReportRepository, ports.IDGenerator, func() "time".Time)
+services/report-submission/application/service_test.go:98:61: too many arguments in call to NewService
+	have (*memory.Repository, fixedIDs, *recordingPublisher, func() "time".Time)
+	want (ports.ReportRepository, ports.IDGenerator, func() "time".Time)
+services/report-submission/application/service_test.go:109:61: too many arguments in call to NewService
+	have (*memory.Repository, fixedIDs, *recordingPublisher, func() "time".Time)
+	want (ports.ReportRepository, ports.IDGenerator, func() "time".Time)
+services/report-submission/application/service_test.go:121:61: too many arguments in call to NewService
+	have (*memory.Repository, fixedIDs, *recordingPublisher, func() "time".Time)
+	want (ports.ReportRepository, ports.IDGenerator, func() "time".Time)
+# github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/eventpublisher [github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/eventpublisher.test]
+services/report-submission/adapters/out/eventpublisher/publisher_test.go:38:9: undefined: New
+services/report-submission/adapters/out/eventpublisher/publisher_test.go:88:25: undefined: toProto
+services/report-submission/adapters/out/eventpublisher/publisher_test.go:95:16: undefined: toProto
+services/report-submission/adapters/out/eventpublisher/publisher_test.go:105:9: undefined: New
+FAIL	github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/eventpublisher [build failed]
+FAIL	github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/logpublisher [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/memory	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/mongo	0.737s
+?   	github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/repotest	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/uuid	(cached)
+FAIL	github.com/jurwaCST/Jurwa/services/report-submission/application [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/cmd/server	1.146s
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/domain	1.604s
+?   	github.com/jurwaCST/Jurwa/services/report-submission/ports	[no test files]
+FAIL
