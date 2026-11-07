@@ -33,6 +33,7 @@ const (
 
 	ActionReportListOwn      = "report.list_own"
 	ActionReportTimelineRead = "report.timeline.read"
+	ActionReportListAssigned = "report.list_assigned"
 
 	ActionPhotoUpload = "photo.upload"
 	ActionPhotoRead   = "photo.read"
