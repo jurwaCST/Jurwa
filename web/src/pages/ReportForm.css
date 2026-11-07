@@ -1,45 +1,275 @@
-/* Report form (SCRUM-35). One column, large touch targets, for phones first. */
+/* Report form (SCRUM-35). Owner: Nyendrak.
+   Scoped to .report-page, so the shared styles in index.css are not changed.
+   Built on Gayley's colour tokens (--bg, --text, --muted, --border, --accent,
+   --accent-text, --danger), so it follows the light and dark theme. */
+
+.report-page {
+  --surface: color-mix(in srgb, var(--text) 4%, var(--bg));
+  --surface-strong: color-mix(in srgb, var(--text) 8%, var(--bg));
+  --danger-soft: color-mix(in srgb, var(--danger) 12%, var(--bg));
+  --accent-soft: color-mix(in srgb, var(--accent) 14%, var(--bg));
+  --success: #1a7f37;
+  --radius: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .report-page {
+    --success: #3fb950;
+  }
+}
+
+.report-page h1 {
+  margin-bottom: 0.25rem;
+}
+
+.report-intro {
+  margin-top: 0;
+}
+
+/* The card around the form and around the success message. */
+.report-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--text) 10%, transparent);
+}
+
+.report-form {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.report-section {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.report-section + .report-section {
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+/* "1 What kind of problem?" with a round step number. */
+.report-step {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.report-step span {
+  display: inline-grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-size: 0.9rem;
+}
+
+/* Fields: full width, large touch targets (at least 44px high). */
+.report-form label {
+  display: grid;
+  gap: 0.35rem;
+  font-weight: 600;
+}
 
 .report-form select,
-.report-form textarea,
-.report-form input[type='file'] {
+.report-form textarea {
   font: inherit;
+  font-weight: 400;
   width: 100%;
   min-height: 2.75rem;
-  padding: 0.5rem;
+  padding: 0.6rem 0.75rem;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 8px;
   background: var(--bg);
   color: var(--text);
 }
 
 .report-form textarea {
   resize: vertical;
+  line-height: 1.5;
 }
 
-.report-form button[type='submit'] {
-  min-height: 2.75rem;
+.report-form select:focus-visible,
+.report-form textarea:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 1px;
+  border-color: var(--accent);
 }
 
-.report-form .counter {
-  margin: -0.5rem 0 0;
+.report-form [aria-invalid='true'] {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.report-hint {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.report-counter {
+  margin: -0.35rem 0 0;
   text-align: right;
-  font-size: 0.875rem;
+  font-size: 0.85rem;
 }
 
-.photo-preview {
-  display: grid;
-  gap: 0.5rem;
-  justify-items: start;
+.report-counter-full {
+  color: var(--danger);
+  font-weight: 600;
 }
 
-.photo-preview img {
-  max-width: 100%;
-  max-height: 12rem;
+/* Messages next to a field, and problems from the server. */
+.report-field-error,
+.report-problem {
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+  border-left: 4px solid var(--danger);
   border-radius: 6px;
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.report-problem {
+  margin-bottom: 1rem;
+}
+
+.report-problem a {
+  color: inherit;
+}
+
+/* Photo: a dashed box around the file picker. */
+.report-photo-drop {
+  padding: 1.25rem;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  text-align: center;
+  cursor: pointer;
+}
+
+.report-photo-drop:hover,
+.report-photo-drop:focus-within {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.report-photo-drop input[type='file'] {
+  font: inherit;
+  font-weight: 400;
+  justify-self: center;
+  max-width: 100%;
+}
+
+.report-photo-drop input[type='file']::file-selector-button {
+  font: inherit;
+  margin-right: 0.75rem;
+  padding: 0.5rem 1rem;
+  border: 0;
+  border-radius: 6px;
+  background: var(--accent);
+  color: var(--accent-text);
+  cursor: pointer;
+}
+
+.report-photo-preview {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+
+.report-photo-preview img {
+  width: 6rem;
+  height: 6rem;
+  object-fit: cover;
+  border-radius: 8px;
   border: 1px solid var(--border);
 }
 
-.report-sent {
+.report-photo-name {
+  margin: 0 0 0.25rem;
   font-weight: 600;
+  word-break: break-all;
+}
+
+/* The main button: full width on a phone. */
+.report-submit {
+  width: 100%;
+  min-height: 3rem;
+  font-weight: 600;
+  font-size: 1.05rem;
+  border-radius: 8px;
+}
+
+/* Success screen. */
+.report-done {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: center;
+  text-align: center;
+}
+
+.report-done-icon {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: var(--success);
+  color: #ffffff;
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.report-done-text {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.report-number {
+  display: inline-block;
+  margin-top: 0.35rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  background: var(--surface-strong);
+  font-size: 0.95rem;
+  word-break: break-all;
+}
+
+.report-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  width: 100%;
+}
+
+.report-actions button,
+.report-secondary {
+  min-height: 2.75rem;
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.report-secondary {
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.report-secondary:hover {
+  background: var(--surface-strong);
 }
