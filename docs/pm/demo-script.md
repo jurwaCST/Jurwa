@@ -58,6 +58,7 @@ Demo accounts come from identity's seed (`SEED_DEMO_USERS=true`, SCRUM-126). The
 | Day before | Zangmo | Second machine: the small demo set synced, as backup for steps 2 to 5 |
 | Day before | All | One full rehearsal with a stopwatch, recorded (section 4) |
 | T minus 90 min | Nyendrak | SLA window for HOSTEL set to 1 hour (the smallest allowed: `window_hours` is a whole number of hours) and the escalation report submitted, so it is overdue during step 6 |
+| T minus 90 min to the demo | All | **Do not restart sla-tracking** (no redeploy, no `rollout restart`, no Argo CD sync of it): its timers are in memory until its database adapter lands, so a restart loses the escalation report's timer. Check with `kubectl -n jurwa get pods` that its RESTARTS stays the same |
 | T minus 30 min | Choki | `kubectl -n jurwa get pods` all Running; `curl /health` through Traefik |
 | T minus 15 min | Zangmo | Sign in once with every demo account; phone and laptop on the same Wi-Fi; screen sharing tested |
 | T minus 5 min | All | Close other apps; notifications off; browser zoom 125% |
@@ -83,8 +84,9 @@ These block parts of the script. Each owner says when it is merged.
 
 | Item | Blocks step | Owner | Card |
 |---|---|---|---|
-| Nothing calls sla-tracking `StartTimer`, so no report gets an SLA timer in a real run | 6 | Nyendrak | to decide (status-lifecycle or sla-tracking reacting to `report.routed`) |
-| The escalation checker is not deployed: Knative is not done, and there is no CronJob fallback in `deploy/k8s` | 6 | Nyendrak, Choki | SCRUM-104 |
+| Nothing calls sla-tracking `StartTimer`, so no report gets an SLA timer in a real run. Nyendrak is adding the consumers: report.submitted registers OPEN in status-lifecycle; report.routed sets ASSIGNED, records the first assignee in reassignment and starts the timer; status.changed to RESOLVED stops it | 6 | Nyendrak | in progress |
+| The escalation checker is not deployed. Nyendrak adds a run-once mode and a CronJob every minute in `deploy/knative/` (fallback while Knative is not done); Choki tests it on the cluster | 6 | Nyendrak, Choki | SCRUM-104 |
+| sla-tracking keeps timers in memory until its database adapter lands (see the T minus 90 rule) | 6 | Nyendrak | |
 | `report.list_assigned` in the authorization policy | 5 | Gayley | SCRUM-137 |
 | PWA installable (manifest, service worker) | 3 | Nyendrak | SCRUM-98 |
 | Gateway has no feedback, notifications, reassignment or admin (SLA policy) routes; SLA policy is set with grpcurl before the demo | 6, and the feedback step that is left out | Zangmo | after the demo, if wanted |
