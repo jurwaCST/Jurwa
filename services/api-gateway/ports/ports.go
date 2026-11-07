@@ -6,6 +6,7 @@ package ports
 import (
 	"context"
 
+	analyticsv1 "github.com/jurwaCST/Jurwa/proto/gen/analytics/v1"
 	categorytaxonomyv1 "github.com/jurwaCST/Jurwa/proto/gen/category-taxonomy/v1"
 	commonv1 "github.com/jurwaCST/Jurwa/proto/gen/common/v1"
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
@@ -70,4 +71,11 @@ type Photos interface {
 type Status interface {
 	ChangeStatus(ctx context.Context, in *statuslifecyclev1.ChangeStatusRequest) (*statuslifecyclev1.ChangeStatusResponse, error)
 	GetStatus(ctx context.Context, reportID string) (*statuslifecyclev1.GetStatusResponse, error)
+}
+
+// Analytics is the analytics service (Gayley): dashboard counts. A nil period
+// means all time.
+type Analytics interface {
+	GetSummary(ctx context.Context, period *analyticsv1.Period) (*analyticsv1.GetSummaryResponse, error)
+	GetCategoryBreakdown(ctx context.Context, period *analyticsv1.Period) (*analyticsv1.GetCategoryBreakdownResponse, error)
 }

@@ -33,6 +33,8 @@ Every gRPC client goes through `pkg/resilience` (2 s timeout, up to 3 attempts f
 | `GET /reports/{reportId}/timeline` | report-history GetReportTimeline | Student (own, checked with report-submission), Category Head, Staff, System Administrator |
 | `POST /reports/{reportId}/status` | status-lifecycle ChangeStatus (body `{"toStatus": "IN_PROGRESS", "expectedVersion": 1, "reason": "..."}`) | Category Head, Staff; the actor id comes from the JWT |
 | `GET /reports/{reportId}/status` | status-lifecycle GetStatus | Student (own, checked with report-submission), Category Head, Staff, System Administrator |
+| `GET /dashboard/summary` | analytics GetSummary (optional `?from=` and `?to=`, RFC 3339) | System Administrator, College President |
+| `GET /dashboard/categories` | analytics GetCategoryBreakdown (same `?from=` and `?to=`) | System Administrator, College President |
 | `POST /photos` | photo-media UploadPhoto (returns 201 `{"photoId": "..."}`) | Student; the uploader id comes from the JWT |
 | `GET /photos/{photoId}` | photo-media GetPhoto (returns the raw image) | Student (own), Category Head, Staff, System Administrator |
 
@@ -41,6 +43,10 @@ The other routes in `api-routes.md` are added as their services are merged.
 ## Status changes
 
 The report id comes from the path and the actor id from the JWT; both are ignored in the body. The actor is never empty, because an empty actor means the system, which is the only one allowed to set `ESCALATED`. status-lifecycle checks the flow (OPEN, ASSIGNED, IN_PROGRESS, RESOLVED): a change the flow does not allow is 422, and a stale `expectedVersion` (someone changed it first) is 409. `api-routes.md` says "Staff (assignee)": the gateway checks the role only for now, because no service knows the assignee yet; the assignee check follows when report-history has it (SCRUM-131).
+
+## Dashboard
+
+Both dashboard routes take an optional period: `?from=2026-11-01T00:00:00+06:00&to=2026-11-08T00:00:00+06:00` (RFC 3339, with a time zone). Neither given means all time; only one given leaves the other side open. A value that is not RFC 3339 (for example `2026-11-08` without a time), or `from` after `to`, is 400 and never reaches analytics. Counts are int64, so protojson sends them as strings (`"total": "3"`); counts of 0 are still sent.
 
 ## Photos
 
@@ -90,6 +96,7 @@ Error bodies are `{"error": "<message>"}`.
 | `REPORT_HISTORY_ADDR` | `localhost:9003` | report-history |
 | `PHOTO_MEDIA_ADDR` | `localhost:9002` | photo-media |
 | `STATUS_LIFECYCLE_ADDR` | `localhost:9011` | status-lifecycle |
+| `ANALYTICS_ADDR` | `localhost:9020` | analytics |
 
 ## Run
 
@@ -104,6 +111,7 @@ make run SERVICE=internal-notes
 make run SERVICE=report-history
 make run SERVICE=photo-media
 make run SERVICE=status-lifecycle
+SEED_DEMO_DATA=true make run SERVICE=analytics
 make run SERVICE=api-gateway
 ```
 

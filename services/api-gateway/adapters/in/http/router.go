@@ -13,12 +13,15 @@ import (
 	"net"
 	"net/http"
 	"strconv"
+	"time"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
+	analyticsv1 "github.com/jurwaCST/Jurwa/proto/gen/analytics/v1"
 	commonv1 "github.com/jurwaCST/Jurwa/proto/gen/common/v1"
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
 	internalnotesv1 "github.com/jurwaCST/Jurwa/proto/gen/internal-notes/v1"
@@ -53,6 +56,7 @@ type Deps struct {
 	History    ports.History
 	Photos     ports.Photos
 	Status     ports.Status
+	Analytics  ports.Analytics
 	Limiter    *domain.Limiter
 }
 
@@ -79,6 +83,8 @@ func NewRouter(d Deps) http.Handler {
 	mux.Handle("GET /me/reports", r.protected(domain.ActionReportListOwn, r.myReports))
 	mux.Handle("POST /reports/{reportId}/status", r.protected(domain.ActionReportStatusChange, r.changeStatus))
 	mux.Handle("GET /reports/{reportId}/status", r.protected(domain.ActionReportStatusRead, r.getStatus))
+	mux.Handle("GET /dashboard/summary", r.protected(domain.ActionDashboardRead, r.dashboardSummary))
+	mux.Handle("GET /dashboard/categories", r.protected(domain.ActionDashboardRead, r.dashboardCategories))
 	mux.Handle("POST /photos", r.protected(domain.ActionPhotoUpload, r.uploadPhoto))
 	mux.Handle("GET /photos/{photoId}", r.protected(domain.ActionPhotoRead, r.getPhoto))
 	mux.Handle("GET /reports/{reportId}/timeline", r.protected(domain.ActionReportTimelineRead, r.timeline))
@@ -295,6 +301,61 @@ func (r router) getStatus(w http.ResponseWriter, req *http.Request) {
 	}
 	resp, err := r.Status.GetStatus(req.Context(), reportID)
 	reply(w, http.StatusOK, resp, err)
+}
+
+func (r router) dashboardSummary(w http.ResponseWriter, req *http.Request) {
+	period, ok := readPeriod(w, req)
+	if !ok {
+		return
+	}
+	resp, err := r.Analytics.GetSummary(req.Context(), period)
+	reply(w, http.StatusOK, resp, err)
+}
+
+func (r router) dashboardCategories(w http.ResponseWriter, req *http.Request) {
+	period, ok := readPeriod(w, req)
+	if !ok {
+		return
+	}
+	resp, err := r.Analytics.GetCategoryBreakdown(req.Context(), period)
+	reply(w, http.StatusOK, resp, err)
+}
+
+// readPeriod reads the optional ?from= and ?to= (RFC 3339, for example
+// 2026-11-01T00:00:00+06:00). Neither given: nil, meaning all time. A bad time,
+// or from after to, writes 400 and returns false.
+func readPeriod(w http.ResponseWriter, req *http.Request) (*analyticsv1.Period, bool) {
+	from, ok := queryTime(w, req, "from")
+	if !ok {
+		return nil, false
+	}
+	to, ok := queryTime(w, req, "to")
+	if !ok {
+		return nil, false
+	}
+	switch {
+	case from == nil && to == nil:
+		return nil, true
+	case from != nil && to != nil && from.AsTime().After(to.AsTime()):
+		writeJSONError(w, http.StatusBadRequest, "from must not be after to")
+		return nil, false
+	}
+	return &analyticsv1.Period{From: from, To: to}, true
+}
+
+// queryTime reads one RFC 3339 query value: nil when it is not given. A bad
+// value writes 400 and returns false.
+func queryTime(w http.ResponseWriter, req *http.Request, name string) (*timestamppb.Timestamp, bool) {
+	v := req.URL.Query().Get(name)
+	if v == "" {
+		return nil, true
+	}
+	t, err := time.Parse(time.RFC3339, v)
+	if err != nil {
+		writeJSONError(w, http.StatusBadRequest, name+" must be an RFC 3339 time, for example 2026-11-01T00:00:00+06:00")
+		return nil, false
+	}
+	return timestamppb.New(t), true
 }
 
 // uploadPhoto reads the multipart field "photo" and sends it to photo-media.

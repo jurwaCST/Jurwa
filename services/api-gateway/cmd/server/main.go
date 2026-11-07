@@ -21,6 +21,7 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	"github.com/jurwaCST/Jurwa/pkg/resilience"
+	analyticsv1 "github.com/jurwaCST/Jurwa/proto/gen/analytics/v1"
 	authorizationv1 "github.com/jurwaCST/Jurwa/proto/gen/authorization/v1"
 	categorytaxonomyv1 "github.com/jurwaCST/Jurwa/proto/gen/category-taxonomy/v1"
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
@@ -72,6 +73,7 @@ func main() {
 		"report-history":    envOr("REPORT_HISTORY_ADDR", "localhost:9003"),
 		"photo-media":       envOr("PHOTO_MEDIA_ADDR", "localhost:9002"),
 		"status-lifecycle":  envOr("STATUS_LIFECYCLE_ADDR", "localhost:9011"),
+		"analytics":         envOr("ANALYTICS_ADDR", "localhost:9020"),
 	} {
 		var extra []grpc.DialOption
 		if name == "photo-media" {
@@ -97,6 +99,7 @@ func main() {
 		History:    grpcclients.History{C: reporthistoryv1.NewReportHistoryServiceClient(conns["report-history"])},
 		Photos:     grpcclients.Photos{C: photomediav1.NewPhotoMediaServiceClient(conns["photo-media"])},
 		Status:     grpcclients.Status{C: statuslifecyclev1.NewStatusLifecycleServiceClient(conns["status-lifecycle"])},
+		Analytics:  grpcclients.Analytics{C: analyticsv1.NewAnalyticsServiceClient(conns["analytics"])},
 		Limiter:    domain.NewLimiter(rateLimit, time.Now),
 	})
 	httpSrv := &http.Server{
