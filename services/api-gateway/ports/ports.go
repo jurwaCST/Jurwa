@@ -11,6 +11,7 @@ import (
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
 	internalnotesv1 "github.com/jurwaCST/Jurwa/proto/gen/internal-notes/v1"
 	locationtaxonomyv1 "github.com/jurwaCST/Jurwa/proto/gen/location-taxonomy/v1"
+	reporthistoryv1 "github.com/jurwaCST/Jurwa/proto/gen/report-history/v1"
 	reportsubmissionv1 "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1"
 )
 
@@ -48,4 +49,10 @@ type Reports interface {
 type Notes interface {
 	AddNote(ctx context.Context, role string, in *internalnotesv1.AddNoteRequest) (*internalnotesv1.AddNoteResponse, error)
 	ListNotes(ctx context.Context, role, reportID string) (*internalnotesv1.ListNotesResponse, error)
+}
+
+// History is report-history (Choki): the "My reports" list and report timelines.
+type History interface {
+	ListReportsByReporter(ctx context.Context, reporterID string, pageSize int32, pageToken string) (*reporthistoryv1.ListReportsByReporterResponse, error)
+	GetReportTimeline(ctx context.Context, reportID string) (*reporthistoryv1.GetReportTimelineResponse, error)
 }

@@ -30,6 +30,9 @@ const (
 
 	ActionReportNoteAdd  = "report.notes.add"
 	ActionReportNoteRead = "report.notes.read"
+
+	ActionReportListOwn      = "report.list_own"
+	ActionReportTimelineRead = "report.timeline.read"
 )
 
 // Principal is the signed-in user, taken from a validated JWT.
