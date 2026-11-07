@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/jurwaCST/Jurwa/services/report-history/domain"
@@ -14,6 +15,11 @@ import (
 type Service struct {
 	repo  ports.HistoryRepository
 	newID func() string
+	// writeMu makes each write (read summary, append entry, write summary) one
+	// step, so two consumers recording events for the same report at the same
+	// time cannot overwrite each other's change. Enough for one instance; a
+	// PostgreSQL adapter would use a transaction instead.
+	writeMu sync.Mutex
 }
 
 // NewService wires the use cases to their port. newID is usually uuid.NewString.
@@ -35,6 +41,8 @@ type SubmittedInput struct {
 // RecordSubmitted stores the summary of a new report and the first timeline entry.
 // Called by the events:report.submitted consumer (adapters/in/events).
 func (s *Service) RecordSubmitted(ctx context.Context, in SubmittedInput) (domain.Summary, error) {
+	s.writeMu.Lock()
+	defer s.writeMu.Unlock()
 	summary, err := domain.NewSummary(in.ReportID, in.ReporterID, in.Category, in.Location, in.CreatedAt.UTC())
 	if err != nil {
 		return domain.Summary{}, err
@@ -81,6 +89,8 @@ func (s *Service) RecordEvent(ctx context.Context, eventID string, in domain.Ent
 }
 
 func (s *Service) record(ctx context.Context, id string, in domain.EntryInput) (domain.Entry, error) {
+	s.writeMu.Lock()
+	defer s.writeMu.Unlock()
 	in.OccurredAt = in.OccurredAt.UTC()
 	entry, err := domain.NewEntry(id, in)
 	if err != nil {
