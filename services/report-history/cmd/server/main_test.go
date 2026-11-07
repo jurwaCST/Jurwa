@@ -45,7 +45,12 @@ func TestSeedSample(t *testing.T) {
 
 	timeline, err := app.GetReportTimeline(ctx, sampleReport1)
 	require.NoError(t, err)
-	assert.Len(t, timeline, 3)
+	assert.Len(t, timeline, 4, "submitted, routed, assigned, in progress")
+
+	assigned, _, err := app.ListReportsByAssignee(ctx, sampleDSAID, 0, "")
+	require.NoError(t, err)
+	require.Len(t, assigned, 1)
+	assert.Equal(t, sampleReport1, assigned[0].ReportID, "the sample DSA has one report")
 
 	assert.Error(t, seedSample(ctx, app), "seeding twice is rejected")
 }

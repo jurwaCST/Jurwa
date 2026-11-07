@@ -16,6 +16,7 @@ import (
 // UseCases is what the handler needs from the application layer.
 type UseCases interface {
 	ListReportsByReporter(ctx context.Context, reporterID string, pageSize int32, pageToken string) ([]domain.Summary, string, error)
+	ListReportsByAssignee(ctx context.Context, assigneeID string, pageSize int32, pageToken string) ([]domain.Summary, string, error)
 	GetReportTimeline(ctx context.Context, reportID string) ([]domain.Entry, error)
 }
 
@@ -38,6 +39,23 @@ func (h *Handler) ListReportsByReporter(ctx context.Context, req *reporthistoryv
 		return nil, toStatus(err)
 	}
 	resp := &reporthistoryv1.ListReportsByReporterResponse{
+		Reports:       make([]*reporthistoryv1.ReportSummary, 0, len(summaries)),
+		NextPageToken: next,
+	}
+	for _, s := range summaries {
+		resp.Reports = append(resp.Reports, summaryToProto(s))
+	}
+	return resp, nil
+}
+
+// ListReportsByAssignee returns one page of the reports assigned to one person,
+// newest first. A bad assignee id, page size or page token returns INVALID_ARGUMENT.
+func (h *Handler) ListReportsByAssignee(ctx context.Context, req *reporthistoryv1.ListReportsByAssigneeRequest) (*reporthistoryv1.ListReportsByAssigneeResponse, error) {
+	summaries, next, err := h.app.ListReportsByAssignee(ctx, req.GetAssigneeId(), req.GetPageSize(), req.GetPageToken())
+	if err != nil {
+		return nil, toStatus(err)
+	}
+	resp := &reporthistoryv1.ListReportsByAssigneeResponse{
 		Reports:       make([]*reporthistoryv1.ReportSummary, 0, len(summaries)),
 		NextPageToken: next,
 	}

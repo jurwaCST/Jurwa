@@ -330,6 +330,118 @@ func (x *ListReportsByReporterResponse) GetNextPageToken() string {
 	return ""
 }
 
+type ListReportsByAssigneeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AssigneeId    string                 `protobuf:"bytes,1,opt,name=assignee_id,json=assigneeId,proto3" json:"assignee_id,omitempty"` // required, UUID
+	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`      // optional, 1 to 100, default 20
+	PageToken     string                 `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`    // optional, next_page_token from the previous call
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListReportsByAssigneeRequest) Reset() {
+	*x = ListReportsByAssigneeRequest{}
+	mi := &file_report_history_v1_report_history_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListReportsByAssigneeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListReportsByAssigneeRequest) ProtoMessage() {}
+
+func (x *ListReportsByAssigneeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_report_history_v1_report_history_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListReportsByAssigneeRequest.ProtoReflect.Descriptor instead.
+func (*ListReportsByAssigneeRequest) Descriptor() ([]byte, []int) {
+	return file_report_history_v1_report_history_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ListReportsByAssigneeRequest) GetAssigneeId() string {
+	if x != nil {
+		return x.AssigneeId
+	}
+	return ""
+}
+
+func (x *ListReportsByAssigneeRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *ListReportsByAssigneeRequest) GetPageToken() string {
+	if x != nil {
+		return x.PageToken
+	}
+	return ""
+}
+
+type ListReportsByAssigneeResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Reports       []*ReportSummary       `protobuf:"bytes,1,rep,name=reports,proto3" json:"reports,omitempty"`
+	NextPageToken string                 `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"` // "" when there are no more pages
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListReportsByAssigneeResponse) Reset() {
+	*x = ListReportsByAssigneeResponse{}
+	mi := &file_report_history_v1_report_history_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListReportsByAssigneeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListReportsByAssigneeResponse) ProtoMessage() {}
+
+func (x *ListReportsByAssigneeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_report_history_v1_report_history_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListReportsByAssigneeResponse.ProtoReflect.Descriptor instead.
+func (*ListReportsByAssigneeResponse) Descriptor() ([]byte, []int) {
+	return file_report_history_v1_report_history_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ListReportsByAssigneeResponse) GetReports() []*ReportSummary {
+	if x != nil {
+		return x.Reports
+	}
+	return nil
+}
+
+func (x *ListReportsByAssigneeResponse) GetNextPageToken() string {
+	if x != nil {
+		return x.NextPageToken
+	}
+	return ""
+}
+
 type GetReportTimelineRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ReportId      string                 `protobuf:"bytes,1,opt,name=report_id,json=reportId,proto3" json:"report_id,omitempty"` // required, UUID
@@ -339,7 +451,7 @@ type GetReportTimelineRequest struct {
 
 func (x *GetReportTimelineRequest) Reset() {
 	*x = GetReportTimelineRequest{}
-	mi := &file_report_history_v1_report_history_proto_msgTypes[4]
+	mi := &file_report_history_v1_report_history_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -351,7 +463,7 @@ func (x *GetReportTimelineRequest) String() string {
 func (*GetReportTimelineRequest) ProtoMessage() {}
 
 func (x *GetReportTimelineRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_report_history_v1_report_history_proto_msgTypes[4]
+	mi := &file_report_history_v1_report_history_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -364,7 +476,7 @@ func (x *GetReportTimelineRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetReportTimelineRequest.ProtoReflect.Descriptor instead.
 func (*GetReportTimelineRequest) Descriptor() ([]byte, []int) {
-	return file_report_history_v1_report_history_proto_rawDescGZIP(), []int{4}
+	return file_report_history_v1_report_history_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *GetReportTimelineRequest) GetReportId() string {
@@ -383,7 +495,7 @@ type GetReportTimelineResponse struct {
 
 func (x *GetReportTimelineResponse) Reset() {
 	*x = GetReportTimelineResponse{}
-	mi := &file_report_history_v1_report_history_proto_msgTypes[5]
+	mi := &file_report_history_v1_report_history_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -395,7 +507,7 @@ func (x *GetReportTimelineResponse) String() string {
 func (*GetReportTimelineResponse) ProtoMessage() {}
 
 func (x *GetReportTimelineResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_report_history_v1_report_history_proto_msgTypes[5]
+	mi := &file_report_history_v1_report_history_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -408,7 +520,7 @@ func (x *GetReportTimelineResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetReportTimelineResponse.ProtoReflect.Descriptor instead.
 func (*GetReportTimelineResponse) Descriptor() ([]byte, []int) {
-	return file_report_history_v1_report_history_proto_rawDescGZIP(), []int{5}
+	return file_report_history_v1_report_history_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *GetReportTimelineResponse) GetEntries() []*TimelineEntry {
@@ -456,13 +568,23 @@ const file_report_history_v1_report_history_proto_rawDesc = "" +
 	"page_token\x18\x03 \x01(\tR\tpageToken\"\x88\x01\n" +
 	"\x1dListReportsByReporterResponse\x12?\n" +
 	"\areports\x18\x01 \x03(\v2%.jurwa.reporthistory.v1.ReportSummaryR\areports\x12&\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"{\n" +
+	"\x1cListReportsByAssigneeRequest\x12\x1f\n" +
+	"\vassignee_id\x18\x01 \x01(\tR\n" +
+	"assigneeId\x12\x1b\n" +
+	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\x12\x1d\n" +
+	"\n" +
+	"page_token\x18\x03 \x01(\tR\tpageToken\"\x88\x01\n" +
+	"\x1dListReportsByAssigneeResponse\x12?\n" +
+	"\areports\x18\x01 \x03(\v2%.jurwa.reporthistory.v1.ReportSummaryR\areports\x12&\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"7\n" +
 	"\x18GetReportTimelineRequest\x12\x1b\n" +
 	"\treport_id\x18\x01 \x01(\tR\breportId\"\\\n" +
 	"\x19GetReportTimelineResponse\x12?\n" +
-	"\aentries\x18\x01 \x03(\v2%.jurwa.reporthistory.v1.TimelineEntryR\aentries2\x97\x02\n" +
+	"\aentries\x18\x01 \x03(\v2%.jurwa.reporthistory.v1.TimelineEntryR\aentries2\x9e\x03\n" +
 	"\x14ReportHistoryService\x12\x84\x01\n" +
-	"\x15ListReportsByReporter\x124.jurwa.reporthistory.v1.ListReportsByReporterRequest\x1a5.jurwa.reporthistory.v1.ListReportsByReporterResponse\x12x\n" +
+	"\x15ListReportsByReporter\x124.jurwa.reporthistory.v1.ListReportsByReporterRequest\x1a5.jurwa.reporthistory.v1.ListReportsByReporterResponse\x12\x84\x01\n" +
+	"\x15ListReportsByAssignee\x124.jurwa.reporthistory.v1.ListReportsByAssigneeRequest\x1a5.jurwa.reporthistory.v1.ListReportsByAssigneeResponse\x12x\n" +
 	"\x11GetReportTimeline\x120.jurwa.reporthistory.v1.GetReportTimelineRequest\x1a1.jurwa.reporthistory.v1.GetReportTimelineResponseBGZEgithub.com/jurwaCST/Jurwa/proto/gen/report-history/v1;reporthistoryv1b\x06proto3"
 
 var (
@@ -477,39 +599,44 @@ func file_report_history_v1_report_history_proto_rawDescGZIP() []byte {
 	return file_report_history_v1_report_history_proto_rawDescData
 }
 
-var file_report_history_v1_report_history_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_report_history_v1_report_history_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_report_history_v1_report_history_proto_goTypes = []any{
 	(*ReportSummary)(nil),                 // 0: jurwa.reporthistory.v1.ReportSummary
 	(*TimelineEntry)(nil),                 // 1: jurwa.reporthistory.v1.TimelineEntry
 	(*ListReportsByReporterRequest)(nil),  // 2: jurwa.reporthistory.v1.ListReportsByReporterRequest
 	(*ListReportsByReporterResponse)(nil), // 3: jurwa.reporthistory.v1.ListReportsByReporterResponse
-	(*GetReportTimelineRequest)(nil),      // 4: jurwa.reporthistory.v1.GetReportTimelineRequest
-	(*GetReportTimelineResponse)(nil),     // 5: jurwa.reporthistory.v1.GetReportTimelineResponse
-	(v1.Category)(0),                      // 6: jurwa.common.v1.Category
-	(*v1.Location)(nil),                   // 7: jurwa.common.v1.Location
-	(v1.Status)(0),                        // 8: jurwa.common.v1.Status
-	(*timestamppb.Timestamp)(nil),         // 9: google.protobuf.Timestamp
+	(*ListReportsByAssigneeRequest)(nil),  // 4: jurwa.reporthistory.v1.ListReportsByAssigneeRequest
+	(*ListReportsByAssigneeResponse)(nil), // 5: jurwa.reporthistory.v1.ListReportsByAssigneeResponse
+	(*GetReportTimelineRequest)(nil),      // 6: jurwa.reporthistory.v1.GetReportTimelineRequest
+	(*GetReportTimelineResponse)(nil),     // 7: jurwa.reporthistory.v1.GetReportTimelineResponse
+	(v1.Category)(0),                      // 8: jurwa.common.v1.Category
+	(*v1.Location)(nil),                   // 9: jurwa.common.v1.Location
+	(v1.Status)(0),                        // 10: jurwa.common.v1.Status
+	(*timestamppb.Timestamp)(nil),         // 11: google.protobuf.Timestamp
 }
 var file_report_history_v1_report_history_proto_depIdxs = []int32{
-	6,  // 0: jurwa.reporthistory.v1.ReportSummary.category:type_name -> jurwa.common.v1.Category
-	7,  // 1: jurwa.reporthistory.v1.ReportSummary.location:type_name -> jurwa.common.v1.Location
-	8,  // 2: jurwa.reporthistory.v1.ReportSummary.status:type_name -> jurwa.common.v1.Status
-	9,  // 3: jurwa.reporthistory.v1.ReportSummary.created_at:type_name -> google.protobuf.Timestamp
-	9,  // 4: jurwa.reporthistory.v1.ReportSummary.updated_at:type_name -> google.protobuf.Timestamp
-	8,  // 5: jurwa.reporthistory.v1.TimelineEntry.from_status:type_name -> jurwa.common.v1.Status
-	8,  // 6: jurwa.reporthistory.v1.TimelineEntry.to_status:type_name -> jurwa.common.v1.Status
-	9,  // 7: jurwa.reporthistory.v1.TimelineEntry.occurred_at:type_name -> google.protobuf.Timestamp
+	8,  // 0: jurwa.reporthistory.v1.ReportSummary.category:type_name -> jurwa.common.v1.Category
+	9,  // 1: jurwa.reporthistory.v1.ReportSummary.location:type_name -> jurwa.common.v1.Location
+	10, // 2: jurwa.reporthistory.v1.ReportSummary.status:type_name -> jurwa.common.v1.Status
+	11, // 3: jurwa.reporthistory.v1.ReportSummary.created_at:type_name -> google.protobuf.Timestamp
+	11, // 4: jurwa.reporthistory.v1.ReportSummary.updated_at:type_name -> google.protobuf.Timestamp
+	10, // 5: jurwa.reporthistory.v1.TimelineEntry.from_status:type_name -> jurwa.common.v1.Status
+	10, // 6: jurwa.reporthistory.v1.TimelineEntry.to_status:type_name -> jurwa.common.v1.Status
+	11, // 7: jurwa.reporthistory.v1.TimelineEntry.occurred_at:type_name -> google.protobuf.Timestamp
 	0,  // 8: jurwa.reporthistory.v1.ListReportsByReporterResponse.reports:type_name -> jurwa.reporthistory.v1.ReportSummary
-	1,  // 9: jurwa.reporthistory.v1.GetReportTimelineResponse.entries:type_name -> jurwa.reporthistory.v1.TimelineEntry
-	2,  // 10: jurwa.reporthistory.v1.ReportHistoryService.ListReportsByReporter:input_type -> jurwa.reporthistory.v1.ListReportsByReporterRequest
-	4,  // 11: jurwa.reporthistory.v1.ReportHistoryService.GetReportTimeline:input_type -> jurwa.reporthistory.v1.GetReportTimelineRequest
-	3,  // 12: jurwa.reporthistory.v1.ReportHistoryService.ListReportsByReporter:output_type -> jurwa.reporthistory.v1.ListReportsByReporterResponse
-	5,  // 13: jurwa.reporthistory.v1.ReportHistoryService.GetReportTimeline:output_type -> jurwa.reporthistory.v1.GetReportTimelineResponse
-	12, // [12:14] is the sub-list for method output_type
-	10, // [10:12] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	0,  // 9: jurwa.reporthistory.v1.ListReportsByAssigneeResponse.reports:type_name -> jurwa.reporthistory.v1.ReportSummary
+	1,  // 10: jurwa.reporthistory.v1.GetReportTimelineResponse.entries:type_name -> jurwa.reporthistory.v1.TimelineEntry
+	2,  // 11: jurwa.reporthistory.v1.ReportHistoryService.ListReportsByReporter:input_type -> jurwa.reporthistory.v1.ListReportsByReporterRequest
+	4,  // 12: jurwa.reporthistory.v1.ReportHistoryService.ListReportsByAssignee:input_type -> jurwa.reporthistory.v1.ListReportsByAssigneeRequest
+	6,  // 13: jurwa.reporthistory.v1.ReportHistoryService.GetReportTimeline:input_type -> jurwa.reporthistory.v1.GetReportTimelineRequest
+	3,  // 14: jurwa.reporthistory.v1.ReportHistoryService.ListReportsByReporter:output_type -> jurwa.reporthistory.v1.ListReportsByReporterResponse
+	5,  // 15: jurwa.reporthistory.v1.ReportHistoryService.ListReportsByAssignee:output_type -> jurwa.reporthistory.v1.ListReportsByAssigneeResponse
+	7,  // 16: jurwa.reporthistory.v1.ReportHistoryService.GetReportTimeline:output_type -> jurwa.reporthistory.v1.GetReportTimelineResponse
+	14, // [14:17] is the sub-list for method output_type
+	11, // [11:14] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_report_history_v1_report_history_proto_init() }
@@ -525,7 +652,7 @@ func file_report_history_v1_report_history_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_report_history_v1_report_history_proto_rawDesc), len(file_report_history_v1_report_history_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

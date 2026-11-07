@@ -276,3 +276,36 @@ func TestIsUUID(t *testing.T) {
 	assert.True(t, IsUUID(reportA))
 	assert.False(t, IsUUID("report-1"))
 }
+
+func TestNewEntryAssignee(t *testing.T) {
+	in := validEntryInput()
+	in.AssigneeID = headActor
+	e, err := NewEntry(entryID, in)
+	require.NoError(t, err)
+	assert.Equal(t, headActor, e.AssigneeID)
+
+	in.AssigneeID = "dsa"
+	_, err = NewEntry(entryID, in)
+	assert.ErrorIs(t, err, ErrInvalidAssigneeID)
+}
+
+func TestApplySetsAssigneeOnlyWhenTheEntryHasOne(t *testing.T) {
+	s, err := NewSummary(reportA, studentA, CategoryHostel, hostelLoc, t0)
+	require.NoError(t, err)
+
+	routed := Entry{ReportID: reportA, EventType: EventReportRouted, AssigneeID: headActor, Summary: "Routed to DSA", OccurredAt: t0.Add(time.Minute)}
+	s = s.Apply(routed)
+	assert.Equal(t, headActor, s.AssigneeID)
+
+	change := Entry{ReportID: reportA, EventType: EventStatusChanged, FromStatus: StatusOpen, ToStatus: StatusAssigned, Summary: "Assigned", OccurredAt: t0.Add(2 * time.Minute)}
+	s = s.Apply(change)
+	assert.Equal(t, headActor, s.AssigneeID, "a status change keeps the assignee")
+	assert.Equal(t, StatusAssigned, s.Status)
+}
+
+func TestFilterByAssignee(t *testing.T) {
+	a := Summary{ReportID: reportA, AssigneeID: headActor}
+	b := Summary{ReportID: reportB, AssigneeID: ""}
+	assert.Equal(t, []Summary{a}, FilterByAssignee([]Summary{a, b}, headActor))
+	assert.Empty(t, FilterByAssignee([]Summary{b}, headActor))
+}

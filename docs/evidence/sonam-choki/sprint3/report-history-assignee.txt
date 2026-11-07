@@ -1,0 +1,59 @@
+# SCRUM-131 report-history ListReportsByAssignee (2026-11-07 22:29)
+
+## 1. Unit tests
+$ go test ./services/report-history/... -cover
+ok  	github.com/jurwaCST/Jurwa/services/report-history/adapters/in/grpc	0.440s	coverage: 100.0% of statements
+?   	github.com/jurwaCST/Jurwa/services/report-history/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/report-history/adapters/out/memory	1.157s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/report-history/application	0.864s	coverage: 98.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/report-history/cmd/server	1.901s	coverage: 26.7% of statements
+ok  	github.com/jurwaCST/Jurwa/services/report-history/domain	1.574s	coverage: 100.0% of statements
+?   	github.com/jurwaCST/Jurwa/services/report-history/ports	[no test files]
+
+## 2. Called with grpcurl (sample data)
+$ SEED_SAMPLE=true PORT=19003 go run ./services/report-history/cmd/server
+"msg":"sample data loaded","service":"report-history","reporter_id":"1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d","assignee_id":"4e5f6071-8293-4d0e-9f2a-3b4c5d6e7f80"
+
+$ grpcurl -plaintext -d '{"assignee_id":"4e5f6071-8293-4d0e-9f2a-3b4c5d6e7f80"}' localhost:19003 jurwa.reporthistory.v1.ReportHistoryService/ListReportsByAssignee   (the DSA)
+{
+  "reports": [
+    {
+      "reportId": "6f1c2a7e-3b4d-4c5e-8f90-1a2b3c4d5e6f",
+      "reporterId": "1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d",
+      "category": "HOSTEL",
+      "location": {
+        "building": "Hostel A",
+        "wing": "Wing 1",
+        "area": "Bathroom 1"
+      },
+      "status": "IN_PROGRESS",
+      "currentAssigneeId": "4e5f6071-8293-4d0e-9f2a-3b4c5d6e7f80",
+      "createdAt": "2026-10-30T09:00:00Z",
+      "updatedAt": "2026-10-30T12:00:00Z"
+    }
+  ]
+}
+
+$ grpcurl -plaintext -d '{"assignee_id":"5f607182-93a4-4e1f-8a3b-4c5d6e7f8091"}' localhost:19003 jurwa.reporthistory.v1.ReportHistoryService/ListReportsByAssignee   (the SSO)
+{
+  "reports": [
+    {
+      "reportId": "9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d",
+      "reporterId": "1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d",
+      "category": "OTHERS",
+      "location": {
+        "building": "Campus",
+        "area": "Wi-Fi"
+      },
+      "status": "OPEN",
+      "currentAssigneeId": "5f607182-93a4-4e1f-8a3b-4c5d6e7f8091",
+      "createdAt": "2026-10-31T09:00:00Z",
+      "updatedAt": "2026-10-31T09:00:30Z"
+    }
+  ]
+}
+
+$ grpcurl -plaintext -d '{"assignee_id":"dsa"}' localhost:19003 jurwa.reporthistory.v1.ReportHistoryService/ListReportsByAssignee   (not a UUID)
+ERROR:
+  Code: InvalidArgument
+  Message: invalid input: assignee id must be a UUID
