@@ -47,7 +47,9 @@ type Location struct {
 }
 
 // Summary is the read model of one report, used for "my reports" lists.
-// AssigneeID is "" until the report is routed.
+// AssigneeID is "" until the report is routed. StatusAt and AssigneeAt are the
+// times of the events that set Status and AssigneeID, so events that arrive in
+// a different order than they happened still give the right result.
 type Summary struct {
 	ReportID   string
 	ReporterID string
@@ -57,6 +59,8 @@ type Summary struct {
 	AssigneeID string
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
+	StatusAt   time.Time
+	AssigneeAt time.Time
 }
 
 // Entry is one line of a report's timeline. ActorID is "" when the system acted.
@@ -151,6 +155,7 @@ func NewSummary(reportID, reporterID string, category Category, loc Location, cr
 		Status:     StatusOpen,
 		CreatedAt:  createdAt,
 		UpdatedAt:  createdAt,
+		StatusAt:   createdAt,
 	}, nil
 }
 
@@ -187,19 +192,22 @@ func NewEntry(id string, in EntryInput) (Entry, error) {
 	}, nil
 }
 
-// Apply returns the summary after entry e. Only an entry newer than the
-// summary changes it, so an event that arrives late never moves the status back.
+// Apply returns the summary after entry e. The status only changes for a
+// status event newer than the one that set it, and the assignee only for an
+// assignment newer than the one that set it, so an event that arrives late
+// never moves either back. UpdatedAt is the time of the newest event.
 func (s Summary) Apply(e Entry) Summary {
-	if !e.OccurredAt.After(s.UpdatedAt) {
-		return s
-	}
-	if e.ToStatus != "" {
+	if e.ToStatus != "" && e.OccurredAt.After(s.StatusAt) {
 		s.Status = e.ToStatus
+		s.StatusAt = e.OccurredAt
 	}
-	if e.AssigneeID != "" {
+	if e.AssigneeID != "" && e.OccurredAt.After(s.AssigneeAt) {
 		s.AssigneeID = e.AssigneeID
+		s.AssigneeAt = e.OccurredAt
 	}
-	s.UpdatedAt = e.OccurredAt
+	if e.OccurredAt.After(s.UpdatedAt) {
+		s.UpdatedAt = e.OccurredAt
+	}
 	return s
 }
 
