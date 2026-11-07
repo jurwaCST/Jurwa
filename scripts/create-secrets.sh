@@ -3,8 +3,8 @@
 # from dev/.env. The values never go into Git.
 #   cp dev/.env.example dev/.env   (then change the passwords)
 #   bash scripts/create-secrets.sh
-# JWT_SECRET: taken from dev/.env if set, otherwise the value already in the
-# cluster is kept, otherwise a random one is made.
+# JWT_SECRET and SEED_DEMO_PASSWORD: taken from dev/.env if set, otherwise the
+# value already in the cluster is kept, otherwise a random one is made.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -37,6 +37,12 @@ fi
 if [ -z "${JWT_SECRET:-}" ]; then
   JWT_SECRET="$(openssl rand -hex 32)"
 fi
+if [ -z "${SEED_DEMO_PASSWORD:-}" ]; then
+  SEED_DEMO_PASSWORD="$(kubectl -n "$NS" get secret jurwa-secrets -o jsonpath='{.data.demo-password}' 2>/dev/null | base64 --decode || true)"
+fi
+if [ -z "${SEED_DEMO_PASSWORD:-}" ]; then
+  SEED_DEMO_PASSWORD="$(openssl rand -hex 8)"
+fi
 
 kubectl apply -f deploy/k8s/base/namespace.yaml >/dev/null
 kubectl -n "$NS" create secret generic jurwa-secrets \
@@ -46,7 +52,10 @@ kubectl -n "$NS" create secret generic jurwa-secrets \
   --from-literal=mongo-password="$MONGO_PASSWORD" \
   --from-literal=redis-password="$REDIS_PASSWORD" \
   --from-literal=jwt-secret="$JWT_SECRET" \
+  --from-literal=demo-password="$SEED_DEMO_PASSWORD" \
   --dry-run=client -o yaml | kubectl apply -f -
 
 echo "Secret jurwa-secrets is ready in namespace $NS (keys only):"
 kubectl -n "$NS" describe secret jurwa-secrets | sed -n '/^Data/,$p'
+echo "Demo accounts password (dsa.demo@jurwa.example and the others):"
+echo "  kubectl -n $NS get secret jurwa-secrets -o jsonpath='{.data.demo-password}' | base64 --decode; echo"

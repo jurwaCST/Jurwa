@@ -15,3 +15,4 @@ configMapGenerator:
       - PORT=9016
       - SERVICE_NAME=identity
       - LOG_LEVEL=info
+      - SEED_DEMO_USERS=true

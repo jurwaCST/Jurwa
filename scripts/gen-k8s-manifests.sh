@@ -117,6 +117,8 @@ EOF
   esac
   if [ "$name" = "identity" ]; then
     secret_env JWT_SECRET jwt-secret
+    # Password of the demo accounts (SEED_DEMO_USERS in the ConfigMap).
+    secret_env SEED_DEMO_PASSWORD demo-password
   fi
   cat <<EOF
           readinessProbe:
@@ -196,6 +198,11 @@ EOF
   fi
   if [ "$store" = "mongo" ]; then
     echo "      - MONGO_DB=$db"
+  fi
+  if [ "$name" = "identity" ]; then
+    # Demo accounts for the roles that cannot register (services/identity/README.md).
+    # Local demo cluster only.
+    echo "      - SEED_DEMO_USERS=true"
   fi
   for kv in $calls; do
     echo "      - $kv"

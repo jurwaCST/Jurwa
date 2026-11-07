@@ -57,6 +57,11 @@ spec:
                 secretKeyRef:
                   name: jurwa-secrets
                   key: jwt-secret
+            - name: SEED_DEMO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: jurwa-secrets
+                  key: demo-password
           readinessProbe:
             grpc:
               port: 9016
