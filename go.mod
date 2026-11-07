@@ -21,6 +21,8 @@ require (
 	google.golang.org/protobuf v1.36.12
 )
 
+require google.golang.org/genproto/googleapis/api v0.0.0-20260803160001-6ac0973c030d // indirect
+
 require (
 	dario.cat/mergo v1.0.2 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
