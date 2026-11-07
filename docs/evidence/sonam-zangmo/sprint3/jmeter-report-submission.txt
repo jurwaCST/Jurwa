@@ -1,6 +1,8 @@
 # SCRUM-109 JMeter load test of POST /reports through the api-gateway, 2026-11-07
 # Apache JMeter 5.6.3 (non-GUI), tests/load/report-submission.jmx run by tests/load/run.sh.
-# Laptop: Apple silicon, 8 cores, macOS. Local binaries: identity, authorization, report-submission (in-memory store), api-gateway on :8080.
+# Where it ran: locally on one laptop, not in k3d. Go binaries built from main: identity, authorization, report-submission (in-memory store), api-gateway on :8080. JMeter ran on the same laptop.
+# Laptop: MacBook with Apple M3 (8 cores: 4 performance, 4 efficiency), 8 GB RAM, macOS 26.7.2, OpenJDK 21.0.12. The k3d cluster and Docker image builds were stopped during the runs.
+# Tokens: made beforehand. run.sh registers and logs in one Student per virtual user, one at a time, before the timed part; each JMeter user then reuses its own token for every request. Only POST /reports is timed.
 # Target (proposed to the team for NFR-02): 50 users at the same time for 2 minutes, p95 under 500 ms, under 1% errors.
 # Tokens are never saved: run.sh deletes tokens.csv after the run.
 

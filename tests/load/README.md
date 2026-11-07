@@ -45,4 +45,9 @@ Close other heavy programs first (Docker builds, a running k3d cluster): the num
 
 ## Results
 
-`docs/evidence/sonam-zangmo/sprint3/jmeter-report-submission.txt`. On 7 November 2026: 5,617 reports in 2 minutes (47 a second), 0 errors, p95 252 ms. Target met.
+`docs/evidence/sonam-zangmo/sprint3/jmeter-report-submission.txt`. Two runs on 7 November 2026, locally (not in k3d) on a MacBook with an Apple M3 (8 cores) and 8 GB RAM, tokens made beforehand by `run.sh`:
+
+| Run | Gateway limit | Result |
+|---|---|---|
+| Load: 50 users, 2 minutes, 1 report a second each | `RATE_LIMIT_PER_SECOND=1000` | 5,617 reports (47 a second), 0 errors, p95 252 ms. Target met |
+| Rate limit: 5 users, 15 s, about 50 a second in total | 20 (default) | 308 accepted (about 20 a second), 408 refused with 429 |
