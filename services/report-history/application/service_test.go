@@ -281,6 +281,53 @@ func TestListReportsByAssigneeErrors(t *testing.T) {
 	assert.ErrorIs(t, err, errDB)
 }
 
+func TestRecordEventUsesTheEventIDAndIgnoresARepeat(t *testing.T) {
+	ctx := context.Background()
+	svc := newTestService()
+	_, err := svc.RecordSubmitted(ctx, submitted(reportA, studentA, t0))
+	require.NoError(t, err)
+	eventID := "0e000000-0000-4000-8000-000000000001"
+
+	require.NoError(t, svc.RecordEvent(ctx, eventID, routedTo(reportA, dsa, t0.Add(time.Minute))))
+	require.NoError(t, svc.RecordEvent(ctx, eventID, routedTo(reportA, dsa, t0.Add(time.Minute))), "a repeated event is not an error")
+
+	timeline, err := svc.GetReportTimeline(ctx, reportA)
+	require.NoError(t, err)
+	require.Len(t, timeline, 2, "submitted and routed, the repeat is ignored")
+	assert.Equal(t, eventID, timeline[1].ID)
+
+	page, _, err := svc.ListReportsByAssignee(ctx, dsa, 0, "")
+	require.NoError(t, err)
+	assert.Len(t, page, 1)
+}
+
+func TestRecordEventErrors(t *testing.T) {
+	ctx := context.Background()
+	svc := newTestService()
+	eventID := "0e000000-0000-4000-8000-000000000002"
+
+	assert.ErrorIs(t, svc.RecordEvent(ctx, eventID, routedTo(reportA, dsa, t0)), domain.ErrReportNotFound)
+	assert.ErrorIs(t, svc.RecordEvent(ctx, "not-a-uuid", routedTo(reportA, dsa, t0)), domain.ErrInvalidEntryID)
+
+	broken := NewService(brokenRepo{Repository: memory.NewRepository(), failOn: "AppendEntry"}, sequentialIDs())
+	_, err := broken.RecordSubmitted(ctx, submitted(reportA, studentA, t0))
+	require.Error(t, err)
+}
+
+func TestRecordSubmittedUsesTheEventIDForTheFirstEntry(t *testing.T) {
+	ctx := context.Background()
+	svc := newTestService()
+	in := submitted(reportA, studentA, t0)
+	in.EventID = "0e000000-0000-4000-8000-000000000003"
+
+	_, err := svc.RecordSubmitted(ctx, in)
+	require.NoError(t, err)
+
+	timeline, err := svc.GetReportTimeline(ctx, reportA)
+	require.NoError(t, err)
+	assert.Equal(t, in.EventID, timeline[0].ID)
+}
+
 // brokenRepo wraps the memory repository and fails the chosen method.
 type brokenRepo struct {
 	*memory.Repository

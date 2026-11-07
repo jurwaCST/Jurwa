@@ -1,0 +1,33 @@
+$ go test ./pkg/eventbus/... ./services/report-history/...
+# github.com/jurwaCST/Jurwa/services/report-history/adapters/out/memory [github.com/jurwaCST/Jurwa/services/report-history/adapters/out/memory.test]
+services/report-history/adapters/out/memory/repository_test.go:107:53: undefined: domain.ErrEntryExists
+# github.com/jurwaCST/Jurwa/services/report-history/adapters/in/events [github.com/jurwaCST/Jurwa/services/report-history/adapters/in/events.test]
+services/report-history/adapters/in/events/consumer_test.go:73:27: undefined: Consumer
+services/report-history/adapters/in/events/consumer_test.go:88:9: undefined: NewConsumer
+services/report-history/adapters/in/events/consumer_test.go:130:7: undefined: NewConsumer
+services/report-history/adapters/in/events/consumer_test.go:145:7: undefined: NewConsumer
+services/report-history/adapters/in/events/consumer_test.go:161:7: undefined: NewConsumer
+services/report-history/adapters/in/events/consumer_test.go:171:7: undefined: NewConsumer
+services/report-history/adapters/in/events/consumer_test.go:190:7: undefined: NewConsumer
+services/report-history/adapters/in/events/consumer_test.go:211:36: undefined: Group
+services/report-history/adapters/in/events/consumer_test.go:214:5: undefined: Streams
+# github.com/jurwaCST/Jurwa/services/report-history/application [github.com/jurwaCST/Jurwa/services/report-history/application.test]
+services/report-history/application/service_test.go:291:25: svc.RecordEvent undefined (type *Service has no field or method RecordEvent)
+services/report-history/application/service_test.go:292:25: svc.RecordEvent undefined (type *Service has no field or method RecordEvent)
+services/report-history/application/service_test.go:309:24: svc.RecordEvent undefined (type *Service has no field or method RecordEvent)
+services/report-history/application/service_test.go:310:24: svc.RecordEvent undefined (type *Service has no field or method RecordEvent)
+services/report-history/application/service_test.go:321:5: in.EventID undefined (type SubmittedInput has no field or method EventID)
+services/report-history/application/service_test.go:328:21: in.EventID undefined (type SubmittedInput has no field or method EventID)
+# github.com/jurwaCST/Jurwa/pkg/eventbus_test [github.com/jurwaCST/Jurwa/pkg/eventbus.test]
+pkg/eventbus/redis_test.go:86:25: bus.Rewind undefined (type *eventbus.Redis has no field or method Rewind)
+pkg/eventbus/redis_test.go:97:24: bus.Rewind undefined (type *eventbus.Redis has no field or method Rewind)
+FAIL	github.com/jurwaCST/Jurwa/pkg/eventbus [build failed]
+FAIL	github.com/jurwaCST/Jurwa/services/report-history/adapters/in/events [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/report-history/adapters/in/grpc	0.776s
+?   	github.com/jurwaCST/Jurwa/services/report-history/adapters/out	[no test files]
+FAIL	github.com/jurwaCST/Jurwa/services/report-history/adapters/out/memory [build failed]
+FAIL	github.com/jurwaCST/Jurwa/services/report-history/application [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/report-history/cmd/server	1.333s
+ok  	github.com/jurwaCST/Jurwa/services/report-history/domain	1.904s
+?   	github.com/jurwaCST/Jurwa/services/report-history/ports	[no test files]
+FAIL

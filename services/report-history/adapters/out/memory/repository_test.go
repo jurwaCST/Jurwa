@@ -98,3 +98,15 @@ func TestListSummariesByAssignee(t *testing.T) {
 	require.NoError(t, err)
 	assert.Empty(t, got)
 }
+
+func TestAppendEntryTwiceWithTheSameIDIsRejected(t *testing.T) {
+	ctx := context.Background()
+	repo := NewRepository()
+	e := domain.Entry{ID: "3d4e5f60-7182-4c9d-8e1f-2a3b4c5d6e7f", ReportID: reportA, EventType: domain.EventStatusChanged, Summary: "x", OccurredAt: t0}
+	require.NoError(t, repo.AppendEntry(ctx, e))
+	assert.ErrorIs(t, repo.AppendEntry(ctx, e), domain.ErrEntryExists)
+
+	got, err := repo.ListEntries(ctx, reportA)
+	require.NoError(t, err)
+	assert.Len(t, got, 1)
+}
