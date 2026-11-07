@@ -276,7 +276,7 @@ Defects found in Sprints 2 and 3.
 | D-04 | The identity, authorization, notification and analytics Dockerfiles did not copy `pkg/` after they started using `pkg/observability` | Image build for SCRUM-105 | Gayley | SCRUM-105 |
 | D-05 | The reassignment, sla-tracking and status-lifecycle Dockerfiles did not copy `pkg/` after the Saga, so every pull request had 3 red checks | The Images check on every pull request | Nyendrak | SCRUM-89 (PR #93) |
 | D-06 | Passing health checks wrote a log line every few seconds and filled the logs | Live run of the observability work | Gayley (tests first) | SCRUM-105 |
-| D-07 | The gateway retries calls that create something after a timeout, so a retry can make a duplicate or fail with 409 | JMeter first attempt | Open, Sonam Zangmo | SCRUM-134 |
+| D-07 | The gateway retries calls that create something after a timeout, so a retry can make a duplicate or fail with 409 | JMeter first attempt | Open, Sonam Zangmo | SCRUM-132 |
 | D-08 | report-submission saves the report, then publishes the event; if the publish fails the student gets an error but the report is saved, so a retry makes a duplicate | Code review of SCRUM-125 | Open, noted for Sprint 4 | SCRUM-125 |
 | D-09 | The dashboard time example `+06:00` gives 400 when typed into a URL, because `+` is read as a space | Code review of SCRUM-129 | Note asked of Sonam Zangmo | SCRUM-129 |
 | D-10 | The regular expression `/\/+$/` in the web API client can be slow on a long run of slashes | SonarQube | Open, Gayley (low risk: the input is the configured API address) | SCRUM-111 |
@@ -297,4 +297,4 @@ Defects found in Sprints 2 and 3.
 | Knative schedule (SCRUM-104) not tested | The escalation checker's logic is tested, not its schedule | CronJob fallback agreed |
 | Jaeger tracing not done | No traces; the correlation id in the logs is used instead | Stretch |
 | Cypress and JMeter are not in CI | They depend on runs on a laptop | Evidence files are kept for each run |
-| D-07 and D-08 open | Duplicate reports are possible when a service is slow | SCRUM-134, Sprint 4 |
+| D-07 and D-08 open | Duplicate reports are possible when a service is slow | SCRUM-132, Sprint 4 |
