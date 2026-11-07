@@ -68,6 +68,19 @@ func (r *Repository) ListSummariesByReporter(_ context.Context, reporterID strin
 	return out, nil
 }
 
+// ListSummariesByAssignee returns the summaries assigned to one person, in no fixed order.
+func (r *Repository) ListSummariesByAssignee(_ context.Context, assigneeID string) ([]domain.Summary, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	out := make([]domain.Summary, 0)
+	for _, s := range r.summaries {
+		if s.AssigneeID == assigneeID {
+			out = append(out, s)
+		}
+	}
+	return out, nil
+}
+
 // AppendEntry adds an entry to the end of its report's timeline.
 func (r *Repository) AppendEntry(_ context.Context, e domain.Entry) error {
 	r.mu.Lock()

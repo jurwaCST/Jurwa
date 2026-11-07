@@ -12,11 +12,13 @@ import (
 const (
 	sampleStudentID = "1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d"
 	sampleDSAID     = "4e5f6071-8293-4d0e-9f2a-3b4c5d6e7f80"
+	sampleSSOID     = "5f607182-93a4-4e1f-8a3b-4c5d6e7f8091"
 	sampleReport1   = "6f1c2a7e-3b4d-4c5e-8f90-1a2b3c4d5e6f"
 	sampleReport2   = "9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d"
 )
 
-// seedSample records two reports of one student, for local demos only.
+// seedSample records two reports of one student, routed to the DSA and the SSO,
+// for local demos only.
 // In Sprint 3 the data comes from Redis Streams events instead.
 func seedSample(ctx context.Context, app *application.Service) error {
 	t0 := time.Date(2026, 10, 30, 9, 0, 0, 0, time.UTC)
@@ -32,6 +34,10 @@ func seedSample(ctx context.Context, app *application.Service) error {
 		}
 	}
 	changes := []domain.EntryInput{
+		{ReportID: sampleReport1, EventType: domain.EventReportRouted, AssigneeID: sampleDSAID,
+			Summary: "Routed to DSA", OccurredAt: t0.Add(30 * time.Second)},
+		{ReportID: sampleReport2, EventType: domain.EventReportRouted, AssigneeID: sampleSSOID,
+			Summary: "Routed to SSO", OccurredAt: t0.Add(24*time.Hour + 30*time.Second)},
 		{ReportID: sampleReport1, EventType: domain.EventStatusChanged, FromStatus: domain.StatusOpen, ToStatus: domain.StatusAssigned,
 			Summary: "Assigned to DSA", OccurredAt: t0.Add(time.Minute)},
 		{ReportID: sampleReport1, EventType: domain.EventStatusChanged, FromStatus: domain.StatusAssigned, ToStatus: domain.StatusInProgress,

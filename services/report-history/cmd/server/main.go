@@ -55,7 +55,7 @@ func main() {
 			slog.Error("cannot load sample data", "error", err)
 			os.Exit(1)
 		}
-		slog.Info("sample data loaded", "reporter_id", sampleStudentID)
+		slog.Info("sample data loaded", "reporter_id", sampleStudentID, "assignee_id", sampleDSAID)
 	}
 	reporthistoryv1.RegisterReportHistoryServiceServer(srv, grpcadapter.NewHandler(app))
 

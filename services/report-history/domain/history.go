@@ -33,8 +33,10 @@ const (
 // Event types written in the timeline. They match the stream names in
 // proto/events/v1/events.proto without the "events:" prefix.
 const (
-	EventReportSubmitted = "report.submitted"
-	EventStatusChanged   = "status.changed"
+	EventReportSubmitted  = "report.submitted"
+	EventReportRouted     = "report.routed"
+	EventStatusChanged    = "status.changed"
+	EventReportReassigned = "report.reassigned"
 )
 
 // Location says where the problem is. Building is required; wing and area are "" when not used.
@@ -58,6 +60,8 @@ type Summary struct {
 }
 
 // Entry is one line of a report's timeline. ActorID is "" when the system acted.
+// AssigneeID is who the report is assigned to after this event (report.routed,
+// report.reassigned), or "" when the event does not change it.
 type Entry struct {
 	ID         string
 	ReportID   string
@@ -65,6 +69,7 @@ type Entry struct {
 	FromStatus Status
 	ToStatus   Status
 	ActorID    string
+	AssigneeID string
 	Summary    string
 	OccurredAt time.Time
 }
@@ -76,6 +81,7 @@ type EntryInput struct {
 	FromStatus Status
 	ToStatus   Status
 	ActorID    string
+	AssigneeID string
 	Summary    string
 	OccurredAt time.Time
 }
@@ -95,6 +101,7 @@ var (
 	ErrInvalidReporterID = fmt.Errorf("%w: reporter id must be a UUID", ErrInvalidInput)
 	ErrInvalidEntryID    = fmt.Errorf("%w: entry id must be a UUID", ErrInvalidInput)
 	ErrInvalidActorID    = fmt.Errorf("%w: actor id must be a UUID or empty", ErrInvalidInput)
+	ErrInvalidAssigneeID = fmt.Errorf("%w: assignee id must be a UUID", ErrInvalidInput)
 	ErrInvalidCategory   = fmt.Errorf("%w: category must be HOSTEL, ACADEMIC_BLOCK or OTHERS", ErrInvalidInput)
 	ErrInvalidStatus     = fmt.Errorf("%w: unknown status", ErrInvalidInput)
 	ErrMissingBuilding   = fmt.Errorf("%w: location building is required", ErrInvalidInput)
@@ -159,6 +166,8 @@ func NewEntry(id string, in EntryInput) (Entry, error) {
 		return Entry{}, ErrMissingTime
 	case in.ActorID != "" && !IsUUID(in.ActorID):
 		return Entry{}, ErrInvalidActorID
+	case in.AssigneeID != "" && !IsUUID(in.AssigneeID):
+		return Entry{}, ErrInvalidAssigneeID
 	case !validStatusOrNone(in.FromStatus), !validStatusOrNone(in.ToStatus):
 		return Entry{}, ErrInvalidStatus
 	}
@@ -169,6 +178,7 @@ func NewEntry(id string, in EntryInput) (Entry, error) {
 		FromStatus: in.FromStatus,
 		ToStatus:   in.ToStatus,
 		ActorID:    in.ActorID,
+		AssigneeID: in.AssigneeID,
 		Summary:    strings.TrimSpace(in.Summary),
 		OccurredAt: in.OccurredAt,
 	}, nil
@@ -182,6 +192,9 @@ func (s Summary) Apply(e Entry) Summary {
 	}
 	if e.ToStatus != "" {
 		s.Status = e.ToStatus
+	}
+	if e.AssigneeID != "" {
+		s.AssigneeID = e.AssigneeID
 	}
 	s.UpdatedAt = e.OccurredAt
 	return s
@@ -203,6 +216,17 @@ func FilterByReporter(summaries []Summary, reporterID string) []Summary {
 	out := make([]Summary, 0, len(summaries))
 	for _, s := range summaries {
 		if s.ReporterID == reporterID {
+			out = append(out, s)
+		}
+	}
+	return out
+}
+
+// FilterByAssignee returns only the summaries assigned to one person, in the same order.
+func FilterByAssignee(summaries []Summary, assigneeID string) []Summary {
+	out := make([]Summary, 0, len(summaries))
+	for _, s := range summaries {
+		if s.AssigneeID == assigneeID {
 			out = append(out, s)
 		}
 	}

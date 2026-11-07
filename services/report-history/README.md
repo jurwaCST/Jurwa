@@ -11,6 +11,7 @@ Keeps a read model of reports for the PWA: one summary per report (for "My repor
 | RPC | Does | Errors |
 |---|---|---|
 | `ListReportsByReporter` | One page of a student's reports, newest first, with `next_page_token` | `INVALID_ARGUMENT` for a missing reporter id, page size outside 1 to 100, or a bad page token |
+| `ListReportsByAssignee` | One page of the reports currently assigned to one person (Category Head or staff), newest first, with `next_page_token`. The assignee comes from `report.routed` and `report.reassigned` entries | `INVALID_ARGUMENT` for a missing or malformed assignee id, page size outside 1 to 100, or a bad page token |
 | `GetReportTimeline` | Every timeline entry of one report, oldest first | `INVALID_ARGUMENT` when the id is not a UUID, `NOT_FOUND` when the report is unknown |
 
 Two application methods fill the store. They have no RPC, because only events call them:
@@ -34,7 +35,7 @@ Rules (in `domain/history.go`, tested in `domain/history_test.go`):
 
 ```
 domain/history.go                Summary, Entry, statuses, ordering, paging and rules
-application/service.go           RecordSubmitted, Record, ListReportsByReporter, GetReportTimeline
+application/service.go           RecordSubmitted, Record, ListReportsByReporter, ListReportsByAssignee, GetReportTimeline
 ports/ports.go                   HistoryRepository interface
 adapters/in/grpc/handler.go      gRPC handler: protobuf <-> domain, errors -> gRPC codes
 adapters/out/memory/             in-memory repository
@@ -48,7 +49,7 @@ cmd/server/sample.go             optional sample data for local demos
 |---|---|---|
 | `PORT` | `9003` | gRPC port |
 | `SERVICE_NAME` | `report-history` | Name written in every log line |
-| `SEED_SAMPLE` | unset | `true` loads two sample reports of student `1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d`. Local demos only |
+| `SEED_SAMPLE` | unset | `true` loads two sample reports of student `1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d`, routed to the DSA `4e5f6071-8293-4d0e-9f2a-3b4c5d6e7f80` and the SSO `5f607182-93a4-4e1f-8a3b-4c5d6e7f8091`. Local demos only |
 
 Storage is in memory in Sprint 2. Sprint 3 adds a PostgreSQL adapter (`DATABASE_URL`, `docs/design/schema/report-history.sql`) and the Redis Streams consumers.
 
@@ -66,11 +67,14 @@ grpcurl -plaintext localhost:9003 grpc.health.v1.Health/Check
 grpcurl -plaintext -d '{"reporter_id":"1b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d"}' \
   localhost:9003 jurwa.reporthistory.v1.ReportHistoryService/ListReportsByReporter
 
+grpcurl -plaintext -d '{"assignee_id":"4e5f6071-8293-4d0e-9f2a-3b4c5d6e7f80"}' \
+  localhost:9003 jurwa.reporthistory.v1.ReportHistoryService/ListReportsByAssignee
+
 grpcurl -plaintext -d '{"report_id":"6f1c2a7e-3b4d-4c5e-8f90-1a2b3c4d5e6f"}' \
   localhost:9003 jurwa.reporthistory.v1.ReportHistoryService/GetReportTimeline
 ```
 
-Expected: health `SERVING`; two reports, the Wi-Fi one first; the hostel report's timeline is `OPEN`, `ASSIGNED`, `IN_PROGRESS`.
+Expected: health `SERVING`; two reports, the Wi-Fi one first; the DSA has one report (the hostel one, `currentAssigneeId` set); the hostel report's timeline is submitted, routed to DSA, `ASSIGNED`, `IN_PROGRESS`.
 
 Docker:
 

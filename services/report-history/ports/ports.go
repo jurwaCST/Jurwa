@@ -17,6 +17,8 @@ type HistoryRepository interface {
 	UpdateSummary(ctx context.Context, s domain.Summary) error
 	// ListSummariesByReporter returns the summaries of one reporter, in any order.
 	ListSummariesByReporter(ctx context.Context, reporterID string) ([]domain.Summary, error)
+	// ListSummariesByAssignee returns the summaries currently assigned to one person, in any order.
+	ListSummariesByAssignee(ctx context.Context, assigneeID string) ([]domain.Summary, error)
 	AppendEntry(ctx context.Context, e domain.Entry) error
 	// ListEntries returns the entries of one report in the order they were appended.
 	ListEntries(ctx context.Context, reportID string) ([]domain.Entry, error)

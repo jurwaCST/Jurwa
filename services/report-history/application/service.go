@@ -93,6 +93,21 @@ func (s *Service) ListReportsByReporter(ctx context.Context, reporterID string, 
 	return domain.Paginate(summaries, pageSize, pageToken)
 }
 
+// ListReportsByAssignee returns one page of the reports currently assigned to
+// one person, newest first, and the token of the next page ("" on the last page).
+func (s *Service) ListReportsByAssignee(ctx context.Context, assigneeID string, pageSize int32, pageToken string) ([]domain.Summary, string, error) {
+	if !domain.IsUUID(assigneeID) {
+		return nil, "", domain.ErrInvalidAssigneeID
+	}
+	summaries, err := s.repo.ListSummariesByAssignee(ctx, assigneeID)
+	if err != nil {
+		return nil, "", fmt.Errorf("list summaries: %w", err)
+	}
+	summaries = domain.FilterByAssignee(summaries, assigneeID)
+	domain.SortNewestFirst(summaries)
+	return domain.Paginate(summaries, pageSize, pageToken)
+}
+
 // GetReportTimeline returns every entry of one report, oldest first, or
 // domain.ErrReportNotFound when the report is unknown.
 func (s *Service) GetReportTimeline(ctx context.Context, reportID string) ([]domain.Entry, error) {
