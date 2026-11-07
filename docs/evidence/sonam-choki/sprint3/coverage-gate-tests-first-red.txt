@@ -1,0 +1,17 @@
+$ bash scripts/tests/check-coverage_test.sh
+FAIL  all pass: exit code 0
+FAIL  all pass: one line per critical package (10)
+FAIL  all pass: routing-rules/domain listed with its coverage
+FAIL  all pass: status-lifecycle/application listed
+FAIL  all pass: summary line
+FAIL  low: exit code 1
+FAIL  low: sla-policy/application is LOW
+FAIL  low: summary names 9 of 10
+FAIL  failing tests: exit code 1
+FAIL  failing tests: routing-engine/domain is FAIL
+FAIL  no tests: exit code 1
+FAIL  no tests: sla-tracking/domain is NO TESTS
+FAIL  MIN_COVERAGE=95: 92.5% is LOW, exit code 1
+
+13 check(s) failed.
+exit code: 1

@@ -84,6 +84,9 @@ spec:
         app.kubernetes.io/name: $name
         app.kubernetes.io/part-of: jurwa
     spec:
+      # No Jurwa service calls the Kubernetes API, so no service account token is
+      # mounted (SonarQube rule: bind to RBAC or disable automounting).
+      automountServiceAccountToken: false
       containers:
         - name: $name
           image: $REGISTRY/$name:latest
