@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -27,11 +28,20 @@ const (
 
 var t0 = time.Date(2026, 10, 31, 9, 0, 0, 0, time.UTC)
 
+// uniqueIDs returns a new valid UUID on every call, like uuid.NewString.
+func uniqueIDs() func() string {
+	n := 0
+	return func() string {
+		n++
+		return fmt.Sprintf("0b000000-0000-4000-8000-%012d", n)
+	}
+}
+
 // newSeededHandler returns a handler with one hostel report that was assigned an hour later.
 func newSeededHandler(t *testing.T) *Handler {
 	t.Helper()
 	ctx := context.Background()
-	app := application.NewService(memory.NewRepository(), func() string { return entryID })
+	app := application.NewService(memory.NewRepository(), uniqueIDs())
 	_, err := app.RecordSubmitted(ctx, application.SubmittedInput{
 		ReportID: reportA, ReporterID: studentA, Category: domain.CategoryHostel,
 		Location: domain.Location{Building: "Hostel A", Wing: "Wing 1", Area: "Bathroom 1"}, CreatedAt: t0,
@@ -99,7 +109,7 @@ func TestListReportsByReporter(t *testing.T) {
 
 func TestListReportsByAssignee(t *testing.T) {
 	ctx := context.Background()
-	app := application.NewService(memory.NewRepository(), func() string { return entryID })
+	app := application.NewService(memory.NewRepository(), uniqueIDs())
 	_, err := app.RecordSubmitted(ctx, application.SubmittedInput{
 		ReportID: reportA, ReporterID: studentA, Category: domain.CategoryHostel,
 		Location: domain.Location{Building: "Hostel A"}, CreatedAt: t0,

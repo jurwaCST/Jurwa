@@ -117,6 +117,9 @@ var (
 	ErrReportNotFound = errors.New("report not found")
 	// ErrReportExists is returned when a report is recorded twice.
 	ErrReportExists = errors.New("report already recorded")
+	// ErrEntryExists is returned when an entry with the same id is appended twice
+	// (the same event delivered again).
+	ErrEntryExists = errors.New("timeline entry already recorded")
 )
 
 var uuidPattern = regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`)

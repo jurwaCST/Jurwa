@@ -64,9 +64,9 @@ func TestListSummariesByReporter(t *testing.T) {
 func TestEntriesKeepAppendOrderPerReport(t *testing.T) {
 	ctx := context.Background()
 	repo := NewRepository()
-	first := domain.Entry{ReportID: reportA, Summary: "first"}
-	second := domain.Entry{ReportID: reportA, Summary: "second"}
-	other := domain.Entry{ReportID: reportB, Summary: "other report"}
+	first := domain.Entry{ID: "0a000000-0000-4000-8000-000000000001", ReportID: reportA, Summary: "first"}
+	second := domain.Entry{ID: "0a000000-0000-4000-8000-000000000002", ReportID: reportA, Summary: "second"}
+	other := domain.Entry{ID: "0a000000-0000-4000-8000-000000000003", ReportID: reportB, Summary: "other report"}
 	for _, e := range []domain.Entry{first, other, second} {
 		require.NoError(t, repo.AppendEntry(ctx, e))
 	}

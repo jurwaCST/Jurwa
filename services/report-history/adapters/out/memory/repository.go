@@ -81,10 +81,16 @@ func (r *Repository) ListSummariesByAssignee(_ context.Context, assigneeID strin
 	return out, nil
 }
 
-// AppendEntry adds an entry to the end of its report's timeline.
+// AppendEntry adds an entry to the end of its report's timeline, or returns
+// domain.ErrEntryExists when the report already has an entry with that id.
 func (r *Repository) AppendEntry(_ context.Context, e domain.Entry) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+	for _, old := range r.entries[e.ReportID] {
+		if old.ID == e.ID {
+			return domain.ErrEntryExists
+		}
+	}
 	r.entries[e.ReportID] = append(r.entries[e.ReportID], e)
 	return nil
 }

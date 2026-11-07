@@ -115,6 +115,19 @@ func (r *Redis) handle(ctx context.Context, stream, group string, m redis.XMessa
 	return r.client.XAck(ctx, stream, group, m.ID).Err()
 }
 
+// Rewind makes the group read the stream again from its first entry the next
+// time Subscribe runs: the group is deleted and Subscribe creates it again at
+// the start. A service that keeps its data in memory calls it on start to
+// rebuild its data from the events. Only use it when one consumer runs, and
+// make sure the handlers ignore repeated event ids.
+func (r *Redis) Rewind(ctx context.Context, stream, group string) error {
+	n, err := r.client.Exists(ctx, stream).Result()
+	if err != nil || n == 0 {
+		return err
+	}
+	return r.client.XGroupDestroy(ctx, stream, group).Err()
+}
+
 // stopped turns an error caused by cancelling ctx into a clean stop.
 func stopped(ctx context.Context, err error) error {
 	if ctx.Err() != nil {

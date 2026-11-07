@@ -419,9 +419,10 @@ func TestStorageErrorsArePassedOn(t *testing.T) {
 		t.Run(tt.failOn, func(t *testing.T) {
 			ctx := context.Background()
 			mem := memory.NewRepository()
-			_, err := NewService(mem, sequentialIDs()).RecordSubmitted(ctx, submitted(reportA, studentA, t0))
+			ids := sequentialIDs() // one generator, so entry ids stay unique
+			_, err := NewService(mem, ids).RecordSubmitted(ctx, submitted(reportA, studentA, t0))
 			require.NoError(t, err)
-			svc := NewService(brokenRepo{Repository: mem, failOn: tt.failOn}, sequentialIDs())
+			svc := NewService(brokenRepo{Repository: mem, failOn: tt.failOn}, ids)
 
 			err = tt.call(ctx, svc)
 
