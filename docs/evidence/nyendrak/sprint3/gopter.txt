@@ -1,0 +1,30 @@
+> go test ./tests/property/... -v -count=1   (2026-11-07 23:21 +0600)
+=== RUN   TestSLAWindowProperties
++ 1. the deadline is never before the start time: OK, passed 100 tests.
+Elapsed time: 710.1µs
++ 2. deadline minus start equals the policy window for the category: OK,
+   passed 100 tests.
+Elapsed time: 575.4µs
++ 3. a timer is due exactly when now is at or after the deadline: OK,
+   passed 100 tests.
+Elapsed time: 560.7µs
++ 3b. Lapse succeeds exactly when the timer is due, and only once: OK,
+   passed 100 tests.
+Elapsed time: 625.2µs
++ 4. a longer window never gives an earlier deadline: OK, passed 100 tests.
+Elapsed time: 1.2887ms
++ 5. starting later never gives an earlier deadline: OK, passed 100 tests.
+Elapsed time: 577.7µs
++ 6. a stopped timer is never due, however late it is: OK, passed 100
+   tests.
+Elapsed time: 0s
+--- PASS: TestSLAWindowProperties (0.01s)
+=== RUN   TestPolicyWindowProperties
++ 7. sla-policy accepts every window of 1 hour or more: OK, passed 100
+   tests.
+Elapsed time: 0s
++ 8. sla-policy refuses a window of 0 hours or less: OK, passed 100 tests.
+Elapsed time: 661.6µs
+--- PASS: TestPolicyWindowProperties (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/tests/property	2.679s
