@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	ReportHistoryService_ListReportsByReporter_FullMethodName = "/jurwa.reporthistory.v1.ReportHistoryService/ListReportsByReporter"
+	ReportHistoryService_ListReportsByAssignee_FullMethodName = "/jurwa.reporthistory.v1.ReportHistoryService/ListReportsByAssignee"
 	ReportHistoryService_GetReportTimeline_FullMethodName     = "/jurwa.reporthistory.v1.ReportHistoryService/GetReportTimeline"
 )
 
@@ -32,6 +33,9 @@ const (
 type ReportHistoryServiceClient interface {
 	// Reports submitted by one student, newest first.
 	ListReportsByReporter(ctx context.Context, in *ListReportsByReporterRequest, opts ...grpc.CallOption) (*ListReportsByReporterResponse, error)
+	// Reports currently assigned to one person (current_assignee_id), newest first.
+	// Used by the Category Head and staff "assigned to me" page.
+	ListReportsByAssignee(ctx context.Context, in *ListReportsByAssigneeRequest, opts ...grpc.CallOption) (*ListReportsByAssigneeResponse, error)
 	// Every event for one report, oldest first.
 	// Errors: NOT_FOUND when the report is unknown.
 	GetReportTimeline(ctx context.Context, in *GetReportTimelineRequest, opts ...grpc.CallOption) (*GetReportTimelineResponse, error)
@@ -55,6 +59,16 @@ func (c *reportHistoryServiceClient) ListReportsByReporter(ctx context.Context, 
 	return out, nil
 }
 
+func (c *reportHistoryServiceClient) ListReportsByAssignee(ctx context.Context, in *ListReportsByAssigneeRequest, opts ...grpc.CallOption) (*ListReportsByAssigneeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListReportsByAssigneeResponse)
+	err := c.cc.Invoke(ctx, ReportHistoryService_ListReportsByAssignee_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *reportHistoryServiceClient) GetReportTimeline(ctx context.Context, in *GetReportTimelineRequest, opts ...grpc.CallOption) (*GetReportTimelineResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetReportTimelineResponse)
@@ -71,6 +85,9 @@ func (c *reportHistoryServiceClient) GetReportTimeline(ctx context.Context, in *
 type ReportHistoryServiceServer interface {
 	// Reports submitted by one student, newest first.
 	ListReportsByReporter(context.Context, *ListReportsByReporterRequest) (*ListReportsByReporterResponse, error)
+	// Reports currently assigned to one person (current_assignee_id), newest first.
+	// Used by the Category Head and staff "assigned to me" page.
+	ListReportsByAssignee(context.Context, *ListReportsByAssigneeRequest) (*ListReportsByAssigneeResponse, error)
 	// Every event for one report, oldest first.
 	// Errors: NOT_FOUND when the report is unknown.
 	GetReportTimeline(context.Context, *GetReportTimelineRequest) (*GetReportTimelineResponse, error)
@@ -86,6 +103,9 @@ type UnimplementedReportHistoryServiceServer struct{}
 
 func (UnimplementedReportHistoryServiceServer) ListReportsByReporter(context.Context, *ListReportsByReporterRequest) (*ListReportsByReporterResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListReportsByReporter not implemented")
+}
+func (UnimplementedReportHistoryServiceServer) ListReportsByAssignee(context.Context, *ListReportsByAssigneeRequest) (*ListReportsByAssigneeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListReportsByAssignee not implemented")
 }
 func (UnimplementedReportHistoryServiceServer) GetReportTimeline(context.Context, *GetReportTimelineRequest) (*GetReportTimelineResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetReportTimeline not implemented")
@@ -129,6 +149,24 @@ func _ReportHistoryService_ListReportsByReporter_Handler(srv interface{}, ctx co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ReportHistoryService_ListReportsByAssignee_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListReportsByAssigneeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReportHistoryServiceServer).ListReportsByAssignee(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReportHistoryService_ListReportsByAssignee_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReportHistoryServiceServer).ListReportsByAssignee(ctx, req.(*ListReportsByAssigneeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ReportHistoryService_GetReportTimeline_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetReportTimelineRequest)
 	if err := dec(in); err != nil {
@@ -157,6 +195,10 @@ var ReportHistoryService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListReportsByReporter",
 			Handler:    _ReportHistoryService_ListReportsByReporter_Handler,
+		},
+		{
+			MethodName: "ListReportsByAssignee",
+			Handler:    _ReportHistoryService_ListReportsByAssignee_Handler,
 		},
 		{
 			MethodName: "GetReportTimeline",

@@ -12,6 +12,9 @@ option go_package = "github.com/jurwaCST/Jurwa/proto/gen/report-history/v1;repor
 service ReportHistoryService {
   // Reports submitted by one student, newest first.
   rpc ListReportsByReporter(ListReportsByReporterRequest) returns (ListReportsByReporterResponse);
+  // Reports currently assigned to one person (current_assignee_id), newest first.
+  // Used by the Category Head and staff "assigned to me" page.
+  rpc ListReportsByAssignee(ListReportsByAssigneeRequest) returns (ListReportsByAssigneeResponse);
   // Every event for one report, oldest first.
   // Errors: NOT_FOUND when the report is unknown.
   rpc GetReportTimeline(GetReportTimelineRequest) returns (GetReportTimelineResponse);
@@ -45,6 +48,17 @@ message ListReportsByReporterRequest {
 }
 
 message ListReportsByReporterResponse {
+  repeated ReportSummary reports = 1;
+  string next_page_token = 2; // "" when there are no more pages
+}
+
+message ListReportsByAssigneeRequest {
+  string assignee_id = 1; // required, UUID
+  int32 page_size = 2; // optional, 1 to 100, default 20
+  string page_token = 3; // optional, next_page_token from the previous call
+}
+
+message ListReportsByAssigneeResponse {
   repeated ReportSummary reports = 1;
   string next_page_token = 2; // "" when there are no more pages
 }
