@@ -19,6 +19,7 @@ import (
 
 	slapolicyv1 "github.com/jurwaCST/Jurwa/proto/gen/sla-policy/v1"
 	slatrackingv1 "github.com/jurwaCST/Jurwa/proto/gen/sla-tracking/v1"
+	"github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/in/events"
 	grpcadapter "github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/in/grpc"
 	"github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/out/eventpublisher"
 	"github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/out/logpublisher"
@@ -80,7 +81,6 @@ func main() {
 	if bus != nil {
 		defer bus.Close()
 		pub = eventpublisher.New(bus, uuid.NewString, time.Now)
-		slog.Info("event bus connected")
 	}
 	app := application.NewService(
 		memory.New(),
@@ -88,6 +88,11 @@ func main() {
 		pub,
 		time.Now,
 	)
+	if bus != nil {
+		// report.routed starts the timer, status.changed to RESOLVED stops it.
+		events.Start(ctx, bus, consumerName(serviceName), app)
+		slog.Info("event bus connected", "group", events.Group)
+	}
 	slatrackingv1.RegisterSlaTrackingServiceServer(srv, grpcadapter.NewHandler(app))
 
 	// Reflection lets grpcurl list and call methods without the .proto files.

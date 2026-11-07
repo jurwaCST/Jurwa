@@ -9,8 +9,8 @@ import (
 )
 
 // eventBus connects to Redis Streams when REDIS_URL is set. Without it the
-// service keeps its log publisher, so sla.lapsed never reaches the escalation Saga,
-// so `make run` and the unit tests need no Redis.
+// service keeps its log publisher and reads no events: timers start only
+// through the StartTimer RPC, and `make run` and the unit tests need no Redis.
 func eventBus(ctx context.Context) (*eventbus.Redis, error) {
 	url := os.Getenv("REDIS_URL")
 	if url == "" {
@@ -27,4 +27,13 @@ func eventBus(ctx context.Context) (*eventbus.Redis, error) {
 		return nil, err
 	}
 	return bus, nil
+}
+
+// consumerName names this instance in its consumer group: the pod name in
+// Kubernetes, or the service name.
+func consumerName(fallback string) string {
+	if h, err := os.Hostname(); err == nil && h != "" {
+		return h
+	}
+	return fallback
 }
