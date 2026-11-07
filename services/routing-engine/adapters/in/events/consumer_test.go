@@ -96,7 +96,9 @@ func TestSubmittedReportIsRoutedOnTheBus(t *testing.T) {
 	n := 0
 	pub := eventpublisher.New(bus, func() string { n++; return "id-" + string(rune('0'+n)) }, time.Now)
 	app := application.NewService(rules{}, holders{}, pub)
-	go func() { _ = bus.Subscribe(ctx, eventbus.StreamReportSubmitted, "routing-engine", "c1", New(app).Handle) }()
+	go func() {
+		_ = bus.Subscribe(ctx, eventbus.StreamReportSubmitted, "routing-engine", "c1", New(app).Handle)
+	}()
 
 	got := make(chan *eventsv1.ReportRouted, 4)
 	go func() {

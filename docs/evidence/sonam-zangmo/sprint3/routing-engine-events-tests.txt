@@ -1,0 +1,31 @@
+# SCRUM-133 go test -race -cover ./services/routing-engine/..., 2026-11-07 22:57
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/adapters/in/events	2.042s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/adapters/in/grpc	2.758s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/adapters/out/directoryclient	3.367s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/adapters/out/eventpublisher	4.488s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/adapters/out/logpublisher	5.209s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/adapters/out/rulesclient	6.019s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/application	6.150s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/cmd/server	8.844s	coverage: 22.1% of statements
+ok  	github.com/jurwaCST/Jurwa/services/routing-engine/domain	7.094s	coverage: 100.0% of statements
+
+=== RUN   TestHandleRoutesTheSubmittedReport
+--- PASS: TestHandleRoutesTheSubmittedReport (0.00s)
+=== RUN   TestHandleMapsEveryCategory
+--- PASS: TestHandleMapsEveryCategory (0.00s)
+=== RUN   TestHandleReturnsErrors
+--- PASS: TestHandleReturnsErrors (0.00s)
+=== RUN   TestSubmittedReportIsRoutedOnTheBus
+--- PASS: TestSubmittedReportIsRoutedOnTheBus (0.00s)
+=== RUN   TestPublishReportRoutedSendsEveryField
+--- PASS: TestPublishReportRoutedSendsEveryField (0.00s)
+=== RUN   TestTheSameSubmittedEventGivesTheSameRoutedEventID
+--- PASS: TestTheSameSubmittedEventGivesTheSameRoutedEventID (0.00s)
+=== RUN   TestCategoriesMapToTheProtoEnum
+--- PASS: TestCategoriesMapToTheProtoEnum (0.00s)
+=== RUN   TestRouteSubmittedKeepsTheSourceEventID
+--- PASS: TestRouteSubmittedKeepsTheSourceEventID (0.00s)
+=== RUN   TestRouteSubmittedNeedsAReportID
+--- PASS: TestRouteSubmittedNeedsAReportID (0.00s)
+=== RUN   TestOpenBus
+--- PASS: TestOpenBus (2.13s)

@@ -26,9 +26,14 @@ type ReportRouted struct {
 	CategoryHeadID string
 	TargetPosition string
 	RuleID         string
+	// SourceEventID is the report.submitted event that caused this routing, ""
+	// when the RPC was called. The publisher derives the event id from it, so a
+	// redelivered report.submitted gives the same report.routed id.
+	SourceEventID string
 }
 
-// EventPublisher sends events to other services (Redis Streams in Sprint 3).
+// EventPublisher sends events to other services: Redis Streams when REDIS_URL
+// is set, otherwise the log.
 type EventPublisher interface {
 	PublishReportRouted(ctx context.Context, ev ReportRouted) error
 }

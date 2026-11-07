@@ -1,0 +1,32 @@
+# SCRUM-133 live check, 2026-11-07 22:57: report-submission publishes report.submitted, routing-engine reads it and publishes report.routed.
+# Redis 7 from dev/docker-compose.yml (password from dev/.env, not shown). Local binaries with REDIS_URL set: report-submission, routing-engine; routing-rules and department-directory in memory.
+
+## Logs at start
+{"time":"2026-11-07T22:56:03.562152+06:00","level":"INFO","msg":"events: redis streams","service":"routing-engine","reads":"events:report.submitted","publishes":"events:report.routed"}
+{"time":"2026-11-07T22:56:04.759089+06:00","level":"INFO","msg":"events: redis streams","service":"report-submission","stream":"events:report.submitted"}
+
+## 1. Three reports through report-submission SubmitReport (grpcurl). The HOSTEL one says "please send this to DAA".
+# report id, category, building
+9af48cb2-41fb-41fa-87b8-6a29c201863b HOSTEL Hostel B
+18b9a024-6f27-46cc-b75d-bacac84df069 ACADEMIC_BLOCK Academic Block 2
+c1b7a24d-fb67-4564-84ac-529c45124aa6 OTHERS Football Ground
+
+## 2. Streams after: XLEN and the routing-engine consumer group
+events:report.submitted length: 3
+events:report.routed length: 3
+XINFO GROUPS events:report.submitted: name routing-engine, consumers 1, pending 0, entries-read 3, lag 0
+
+## 3. events:report.routed, decoded from protobuf
+{"meta":{"eventId":"cf5828b6-d76c-5d7e-87fa-390c2b40c0bb","occurredAt":"2026-11-07T16:56:20.356177Z","producer":"routing-engine","correlationId":"9af48cb2-41fb-41fa-87b8-6a29c201863b"},"reportId":"9af48cb2-41fb-41fa-87b8-6a29c201863b","category":"HOSTEL","categoryHeadId":"00000000-0000-4000-8000-000000000001","targetPosition":"DSA","ruleId":"1ca51bc2-c863-41fb-aca3-4417c16e7de2"}
+{"meta":{"eventId":"df5431a6-42ae-51cf-a49f-5a526d785fe4","occurredAt":"2026-11-07T16:56:20.538775Z","producer":"routing-engine","correlationId":"18b9a024-6f27-46cc-b75d-bacac84df069"},"reportId":"18b9a024-6f27-46cc-b75d-bacac84df069","category":"ACADEMIC_BLOCK","categoryHeadId":"00000000-0000-4000-8000-000000000002","targetPosition":"DAA","ruleId":"231c2a87-e831-4d4a-ac96-6a1a6774206c"}
+{"meta":{"eventId":"bba789ae-07f6-581c-9ae9-58f84918a1b5","occurredAt":"2026-11-07T16:56:20.568842Z","producer":"routing-engine","correlationId":"c1b7a24d-fb67-4564-84ac-529c45124aa6"},"reportId":"c1b7a24d-fb67-4564-84ac-529c45124aa6","category":"OTHERS","categoryHeadId":"00000000-0000-4000-8000-000000000003","targetPosition":"SSO","ruleId":"d83ab667-d7bb-4dd7-b8c9-35eaa2ca5423"}
+# HOSTEL went to DSA (00000000-0000-4000-8000-000000000001) although the description asks for DAA: the description is never used. DAA ...0002 and SSO ...0003 are the SCRUM-126 demo accounts.
+
+## 4. Redelivery: the first report.submitted entry added again (as after a crash)
+copied the first entry; events:report.routed length is now 4
+# event id, report id, position
+cf5828b6-d76c-5d7e-87fa-390c2b40c0bb 9af48cb2-41fb-41fa-87b8-6a29c201863b DSA
+df5431a6-42ae-51cf-a49f-5a526d785fe4 18b9a024-6f27-46cc-b75d-bacac84df069 DAA
+bba789ae-07f6-581c-9ae9-58f84918a1b5 c1b7a24d-fb67-4564-84ac-529c45124aa6 SSO
+cf5828b6-d76c-5d7e-87fa-390c2b40c0bb 9af48cb2-41fb-41fa-87b8-6a29c201863b DSA
+# The 4th event has the same event id as the 1st, so report-history drops it.
