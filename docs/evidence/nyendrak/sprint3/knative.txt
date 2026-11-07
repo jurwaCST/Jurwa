@@ -1,0 +1,76 @@
+SCRUM-104 Knative on the k3d cluster, collected 2026-11-08 03:19:38 +0600
+
+# Cluster (deploy/k3d/create-cluster.sh, k3d built with go install)
+> kubectl get nodes
+NAME                 STATUS   ROLES                  AGE   VERSION
+k3d-jurwa-agent-0    Ready    <none>                 19m   v1.32.5+k3s1
+k3d-jurwa-agent-1    Ready    <none>                 19m   v1.32.5+k3s1
+k3d-jurwa-server-0   Ready    control-plane,master   19m   v1.32.5+k3s1
+
+# First try: Knative v1.24.0 (the current release) does not run on Kubernetes 1.32
+From the webhook and controller logs at the time:
+  "message":"Version check failed", "error":"kubernetes version \"1.32.5+k3s1\" is not compatible, need at least \"1.35.0-0\""
+So Knative 1.20 is used (Serving v1.20.3, Eventing v1.20.3, Kourier v1.20.1). See docs/ops/knative.md.
+
+> kubectl get pods -n knative-serving
+NAME                                      READY   STATUS    RESTARTS   AGE
+activator-74579f868b-8psdx                1/1     Running   0          11m
+autoscaler-54d889549-n2rvd                1/1     Running   0          11m
+controller-7d769b4956-96fhb               1/1     Running   0          11m
+net-kourier-controller-6c4fbc86b8-grndp   1/1     Running   0          11m
+webhook-7799f7b4d5-r2tgj                  1/1     Running   0          11m
+
+> kubectl get pods -n kourier-system ; kubectl get svc -n kourier-system
+NAME                                      READY   STATUS    RESTARTS   AGE
+3scale-kourier-gateway-5bf57bb969-bx94v   1/1     Running   0          11m
+NAME               TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+kourier            ClusterIP   10.43.3.20      <none>        80/TCP,443/TCP   11m
+kourier-internal   ClusterIP   10.43.217.143   <none>        80/TCP,443/TCP   11m
+
+> kubectl get pods -n knative-eventing
+NAME                                    READY   STATUS    RESTARTS   AGE
+eventing-controller-7555dc7b6b-wkjg5    1/1     Running   0          10m
+eventing-webhook-7bd587b845-x967k       1/1     Running   0          10m
+job-sink-c659d464-bxrx9                 1/1     Running   0          10m
+pingsource-mt-adapter-f78b585ff-t8627   1/1     Running   0          7m13s
+request-reply-0                         1/1     Running   0          10m
+
+> installed versions (label app.kubernetes.io/version)
+knative-serving controller: 1.20.3
+knative-eventing eventing-controller: 1.20.3
+
+# The function and its schedule
+> kubectl -n jurwa get ksvc,pingsource
+NAME                                                 URL                                                     LATESTCREATED                  LATESTREADY                    READY   REASON
+service.serving.knative.dev/sla-escalation-checker   http://sla-escalation-checker.jurwa.svc.cluster.local   sla-escalation-checker-00001   sla-escalation-checker-00001   True    
+
+NAME                                       SINK                                                    SCHEDULE      AGE     READY   REASON
+pingsource.sources.knative.dev/sla-check   http://sla-escalation-checker.jurwa.svc.cluster.local   */2 * * * *   7m25s   True    
+
+> kubectl -n jurwa get pods (the services the function calls, plus Redis)
+NAME                                                      READY   STATUS        RESTARTS   AGE
+reassignment-766669d7c7-8lr5d                             1/1     Running       0          111s
+redis-0                                                   1/1     Running       0          6m18s
+sla-escalation-checker-00001-deployment-d8f9cd9c7-qqcfv   1/2     Terminating   0          93s
+sla-policy-7fb585997b-hw2lk                               1/1     Running       0          115s
+sla-tracking-5fd5c655b5-cj2dp                             1/1     Running       0          113s
+status-lifecycle-646769f799-fghc2                         1/1     Running       0          112s
+
+# Scale to zero: the function's pods, sampled every 10 seconds (only changes shown; empty = no pod running)
+03:12:43  sla-escalation-checker-00001-deployment-d8f9cd9c7-wgmhm Running
+03:13:37  sla-escalation-checker-00001-deployment-d8f9cd9c7-wgmhm Terminating
+03:14:10  sla-escalation-checker-00001-deployment-d8f9cd9c7-m4gvk Running
+03:15:26  sla-escalation-checker-00001-deployment-d8f9cd9c7-m4gvk Terminating
+03:15:59 
+03:16:10  sla-escalation-checker-00001-deployment-d8f9cd9c7-4c6kj ContainerCreating
+03:16:21  sla-escalation-checker-00001-deployment-d8f9cd9c7-4c6kj Running
+03:17:27  sla-escalation-checker-00001-deployment-d8f9cd9c7-4c6kj Terminating
+03:18:00 
+03:18:12  sla-escalation-checker-00001-deployment-d8f9cd9c7-qqcfv Running
+03:19:21  sla-escalation-checker-00001-deployment-d8f9cd9c7-qqcfv Terminating
+(03:12 is the first deploy; 03:14, 03:16 and 03:18 are PingSource wake-ups on */2 * * * *, each pod removed about a minute later)
+
+# Function log from the 03:18 wake-up (real check against sla-tracking in the cluster; nothing was due)
+03:18:14 pod started: pod/sla-escalation-checker-00001-deployment-d8f9cd9c7-qqcfv
+{"level":"INFO","msg":"function started","service":"sla-escalation-checker","port":"8080"}
+{"level":"INFO","msg":"escalation run finished","service":"sla-escalation-checker","lapsed":0,"escalated":0,"skipped":0,"errors":0}
