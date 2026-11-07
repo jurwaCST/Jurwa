@@ -1,0 +1,9 @@
+# SCRUM-136 tests first: go test ./services/api-gateway/... before the code exists, 2026-11-07 23:33
+# github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients [github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients.test]
+services/api-gateway/adapters/out/grpcclients/history_test.go:54:30: History{…}.ListReportsByAssignee undefined (type History has no field or method ListReportsByAssignee)
+# github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http [github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http.test]
+services/api-gateway/adapters/in/http/router_test.go:118:14: undefined: domain.ActionReportListAssigned
+FAIL	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient	(cached)
+FAIL	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/application	(cached)
