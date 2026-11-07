@@ -43,7 +43,7 @@ Waits use `cy.intercept(...).as('login')` and `cy.wait('@login')`, never a fixed
 
 - `web/cypress/fixtures/users.json`: the demo account emails from the identity seed (SCRUM-126) and the student password. Test accounts only, never real ones. The student is new on every run (`student-<time>@e2e.jurwa.example`).
 - `web/cypress/fixtures/photo.png`: a real 8 x 8 PNG of 74 bytes, for the photo step.
-- The demo accounts' password is not in the repo: pass it as `CYPRESS_DEMO_PASSWORD` when a test needs a demo account.
+- The demo accounts' password is not in the repo: pass it as `CYPRESS_demoPassword` (this exact case) when a test needs a demo account.
 
 ## Run it
 

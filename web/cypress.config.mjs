@@ -15,6 +15,13 @@ export default defineConfig({
     supportFile: 'cypress/support/e2e.ts',
     setupNodeEvents(on) {
       on('file:preprocessor', createBundler())
+      // cy.task('log', text) prints in the terminal (used for axe violations).
+      on('task', {
+        log(text) {
+          console.log(text)
+          return null
+        },
+      })
     },
   },
   video: true,
@@ -24,7 +31,7 @@ export default defineConfig({
     // dev server's /api proxy like a real user.
     apiUrl: 'http://localhost:8080',
     // The demo accounts' password (SEED_DEMO_PASSWORD of identity). Never commit
-    // it: pass it with CYPRESS_DEMO_PASSWORD=... npx cypress run
+    // it: pass it with CYPRESS_demoPassword=... npx cypress run (this exact case)
     demoPassword: '',
   },
 })
