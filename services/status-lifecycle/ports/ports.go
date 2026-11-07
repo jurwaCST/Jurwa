@@ -26,9 +26,22 @@ type StatusChanged struct {
 	ActorID  string // "" when the system acted
 	Version  int32
 	Reason   string
+	// CorrelationID ties the event to one escalation Saga run. "" outside a Saga.
+	CorrelationID string
 }
 
-// EventPublisher sends events to other services (Redis Streams in Sprint 2).
+// EscalationCompensated is published when status-lifecycle cannot set
+// ESCALATED, so the earlier Saga step (reassignment's escalation) is undone.
+type EscalationCompensated struct {
+	ReportID      string
+	FailedStep    string // "status-lifecycle.set-escalated"
+	UndoneStep    string // "reassignment.escalate"
+	Reason        string
+	CorrelationID string
+}
+
+// EventPublisher sends events to other services (Redis Streams).
 type EventPublisher interface {
 	PublishStatusChanged(ctx context.Context, ev StatusChanged) error
+	PublishEscalationCompensated(ctx context.Context, ev EscalationCompensated) error
 }

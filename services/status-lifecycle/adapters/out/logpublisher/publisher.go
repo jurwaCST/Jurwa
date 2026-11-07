@@ -31,3 +31,15 @@ func (p *Publisher) PublishStatusChanged(ctx context.Context, ev ports.StatusCha
 	)
 	return nil
 }
+
+func (p *Publisher) PublishEscalationCompensated(ctx context.Context, ev ports.EscalationCompensated) error {
+	p.logger.InfoContext(ctx, "event published",
+		"event", "escalation.compensated",
+		"report_id", ev.ReportID,
+		"failed_step", ev.FailedStep,
+		"undone_step", ev.UndoneStep,
+		"reason", ev.Reason,
+		"correlation_id", ev.CorrelationID,
+	)
+	return nil
+}
