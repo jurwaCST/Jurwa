@@ -148,3 +148,29 @@ func TestRouteReportErrors(t *testing.T) {
 		})
 	}
 }
+
+// A report routed because of report.submitted carries that event's id, so the
+// publisher can give a redelivered event the same report.routed id.
+func TestRouteSubmittedKeepsTheSourceEventID(t *testing.T) {
+	pub := &fakePublisher{}
+	s := NewService(defaultRules(), defaultHolders(), pub)
+
+	d, err := s.RouteSubmitted(context.Background(), "ev-submitted-1", domain.Request{ReportID: "r1", Category: domain.Hostel, Building: "Hostel B"})
+	require.NoError(t, err)
+	assert.Equal(t, "DSA", d.TargetPosition)
+	require.Len(t, pub.events, 1)
+	assert.Equal(t, "ev-submitted-1", pub.events[0].SourceEventID)
+	assert.Equal(t, "r1", pub.events[0].ReportID)
+
+	_, err = s.RouteReport(context.Background(), domain.Request{ReportID: "r2", Category: domain.Hostel, Building: "Hostel B"})
+	require.NoError(t, err)
+	assert.Empty(t, pub.events[1].SourceEventID, "a call through the RPC has no source event")
+}
+
+func TestRouteSubmittedNeedsAReportID(t *testing.T) {
+	pub := &fakePublisher{}
+	_, err := NewService(defaultRules(), defaultHolders(), pub).
+		RouteSubmitted(context.Background(), "ev-1", domain.Request{Category: domain.Hostel, Building: "Hostel B"})
+	assert.ErrorIs(t, err, domain.ErrMissingReportID)
+	assert.Empty(t, pub.events)
+}

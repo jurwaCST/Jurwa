@@ -17,7 +17,19 @@ The service is stateless (database-schema.md, row 7), so it has no repository an
 |---|---|---|
 | `adapters/out/rulesclient` | `ports.RuleLookup` | gRPC client for routing-rules `GetRule` |
 | `adapters/out/directoryclient` | `ports.HolderLookup` | gRPC client for department-directory `GetStaff` |
-| `adapters/out/logpublisher` | `ports.EventPublisher` | Writes `report.routed` as a JSON log line. Redis Streams replaces it in Sprint 3 |
+| `adapters/out/eventpublisher` | `ports.EventPublisher` | Publishes `report.routed` on Redis Streams (`pkg/eventbus`), used when `REDIS_URL` is set |
+| `adapters/out/logpublisher` | `ports.EventPublisher` | Writes `report.routed` as a JSON log line, used when `REDIS_URL` is not set |
+
+## Events (SCRUM-133)
+
+With `REDIS_URL` set, routing-engine reads `events:report.submitted` in the consumer group `routing-engine` (`adapters/in/events`) and routes every new report: report-submission publishes, routing-engine routes, and `events:report.routed` goes to report-history and the other readers. Without `REDIS_URL`, events go to the log and only the `RouteReport` RPC routes.
+
+| Event | Stream | Notes |
+|---|---|---|
+| reads `ReportSubmitted` | `events:report.submitted` | Only the report id, category and building are used, never the description |
+| publishes `ReportRouted` | `events:report.routed` | `correlation_id` is the report id. `category_head_id` is the holder from department-directory |
+
+A message can arrive twice. Routing it again is safe (routing is stateless), and the `report.routed` it publishes gets **the same `event_id`**: a UUID v5 made from the `report.submitted` event id, so readers drop the copy. A routing through the RPC gets a new random id. A handler error (bad payload, no rule, a service down) makes the bus try 3 times, then move the message to `events:report.submitted.dead`.
 
 Tests use fakes for all three ports. Both gRPC connections use `pkg/resilience` (SCRUM-91): a 2 second timeout per attempt, up to 3 attempts for Unavailable or DeadlineExceeded, and a circuit breaker per downstream service that opens after 5 failures in a row for 10 seconds.
 
@@ -37,6 +49,7 @@ Contract: `proto/routing-engine/v1/routing-engine.proto`, service `jurwa.routing
 | `SERVICE_NAME` | `routing-engine` | Name written in every log line |
 | `ROUTING_RULES_ADDR` | `localhost:9006` | routing-rules gRPC address |
 | `DEPARTMENT_DIRECTORY_ADDR` | `localhost:9008` | department-directory gRPC address |
+| `REDIS_URL` | empty | Redis Streams, for example `redis://:PASSWORD@localhost:6379/0`. Empty: events go to the log. Set but not answering: the server stops |
 
 ## Run
 
