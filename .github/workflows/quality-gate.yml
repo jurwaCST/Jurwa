@@ -1,0 +1,46 @@
+name: Quality gate
+
+# Fails a pull request when a critical package (domain and application of the
+# routing, SLA and status-flow services) is under 70% statement coverage or its
+# tests fail. SonarQube runs on a laptop (CI cannot reach it), so this script is
+# the gate in CI. See docs/testing/sonarqube.md.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  coverage:
+    name: Coverage of critical packages (70%)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Go (version from go.mod)
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Test the gate script itself
+        run: bash scripts/tests/check-coverage_test.sh
+
+      - name: Coverage gate
+        run: bash scripts/check-coverage.sh
+
+      - name: Coverage report for the whole repository
+        if: always()
+        run: |
+          go test ./... -coverprofile=coverage.out > /dev/null
+          go tool cover -func=coverage.out | tail -1
+
+      - name: Keep coverage.out (for SonarQube on a laptop)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage.out
+          if-no-files-found: ignore

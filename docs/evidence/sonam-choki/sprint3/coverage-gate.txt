@@ -1,0 +1,48 @@
+# SCRUM-111 coverage quality gate (2026-11-07 23:18)
+
+## 1. Gate script tests (go faked)
+$ bash scripts/tests/check-coverage_test.sh
+PASS  all pass: exit code 0
+PASS  all pass: one line per critical package (10)
+PASS  all pass: routing-rules/domain listed with its coverage
+PASS  all pass: status-lifecycle/application listed
+PASS  all pass: summary line
+PASS  low: exit code 1
+PASS  low: sla-policy/application is LOW
+PASS  low: summary names 9 of 10
+PASS  failing tests: exit code 1
+PASS  failing tests: routing-engine/domain is FAIL
+PASS  no tests: exit code 1
+PASS  no tests: sla-tracking/domain is NO TESTS
+PASS  MIN_COVERAGE=95: 92.5% is LOW, exit code 1
+
+All checks passed.
+
+## 2. Gate on the real code
+$ bash scripts/check-coverage.sh; echo "exit code: $?"
+services/routing-rules/domain            100.0%  OK
+services/routing-rules/application       100.0%  OK
+services/routing-engine/domain           100.0%  OK
+services/routing-engine/application      100.0%  OK
+services/sla-policy/domain               100.0%  OK
+services/sla-policy/application          100.0%  OK
+services/sla-tracking/domain             100.0%  OK
+services/sla-tracking/application        98.1%   OK
+services/status-lifecycle/domain         100.0%  OK
+services/status-lifecycle/application    96.9%   OK
+10 of 10 critical packages at or above 70%
+exit code: 0
+
+## 3. Whole repository (go test ./... -coverprofile=coverage.out)
+total:													(statements)								35.1%
+
+## 4. SonarQube Community Build 26.11.0.134175, scan of commit 2df9616 (6 Nov 2026)
+ANALYSIS SUCCESSFUL, EXECUTION SUCCESS (scanner output in the PR conversation; screenshots sonarqube-*.png)
+Security 3 issues (C), Reliability 4 issues (C), Maintainability 5 issues (A), Coverage 61.7% on 5.3k lines, Duplications 7.8% on 19k lines, Security Hotspots: none
+
+## 5. Fix for the service-account finding, applied to our 20 Deployments
+$ bash scripts/gen-k8s-manifests.sh && kubectl apply -k deploy/k8s
+$ kubectl -n jurwa get pod -l app.kubernetes.io/name=api-gateway -o jsonpath={.items[0].spec.automountServiceAccountToken}
+false
+$ bash scripts/check-all-health.sh --k8s
+20 up, 0 down
