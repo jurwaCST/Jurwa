@@ -1,0 +1,10 @@
+# SCRUM-137 tests first: report.list_assigned in the authorization policy (expected to fail)
+$ go test ./services/authorization/domain/
+# github.com/jurwaCST/Jurwa/services/authorization/domain [github.com/jurwaCST/Jurwa/services/authorization/domain.test]
+services\authorization\domain\policy_test.go:31:2: undefined: ActionReportListAssigned
+services\authorization\domain\policy_test.go:100:63: undefined: ActionReportListAssigned
+services\authorization\domain\policy_test.go:101:55: undefined: ActionReportListAssigned
+services\authorization\domain\policy_test.go:102:47: undefined: ActionReportListAssigned
+services\authorization\domain\policy_test.go:103:50: undefined: ActionReportListAssigned
+FAIL	github.com/jurwaCST/Jurwa/services/authorization/domain [build failed]
+FAIL
