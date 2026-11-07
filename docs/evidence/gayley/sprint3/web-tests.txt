@@ -1,0 +1,10 @@
+# npx vitest run, 2026-11-08 00:38, main at 7799360
+
+ RUN  v5.1.0 C:/Users/Acer/Desktop/Jurwa/web
+
+
+ Test Files  3 passed (3)
+      Tests  47 passed (47)
+   Start at  00:38:26
+   Duration  7.12s (tests 62%, environment 27%, setup 6%, import 3%, transform 1%)
+
