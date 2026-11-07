@@ -1,0 +1,57 @@
+SCRUM-127 live run: identity and authorization against a local PostgreSQL 16 in Docker (postgres:16-alpine, port 55432).
+Date: 2026-11-06. JWT_SECRET was a random local value; tokens are not shown.
+identity:      DATABASE_URL=postgres://jurwa:<local>@localhost:55432/identity?sslmode=disable PORT=9116
+authorization: DATABASE_URL=postgres://jurwa:<local>@localhost:55432/authorization_db?sslmode=disable PORT=9117
+
+--- identity started with DATABASE_URL (log line below was captured from the second start)
+"msg":"storage: postgres"
+--- Register
+{
+  "user": {
+    "id": "bd7e6074-4922-4115-92c9-bdd316fc6d52",
+    "email": "karma.test@rub.edu.bt",
+    "fullName": "Karma Test",
+    "roles": [
+      "STUDENT"
+    ],
+    "active": true,
+    "createdAt": "2026-11-06T07:01:34.789981200Z"
+  }
+}
+--- Same email again
+ERROR:
+  Code: AlreadyExists
+  Message: email is already registered
+--- identity stopped and started again
+--- Login after restart
+{
+  "expiresAt": "2026-11-06T07:16:39.238801900Z",
+  "user": {
+    "id": "bd7e6074-4922-4115-92c9-bdd316fc6d52",
+    "email": "karma.test@rub.edu.bt",
+    "fullName": "Karma Test",
+    "roles": [
+      "STUDENT"
+    ],
+    "active": true,
+    "createdAt": "2026-11-06T07:01:34.789981Z"
+  }
+}
+--- Row in PostgreSQL (password_hash shortened)
+         email         | full_name  |   roles   | is_active | password_hash 
+-----------------------+------------+-----------+-----------+---------------
+ karma.test@rub.edu.bt | Karma Test | {STUDENT} | t         | $2a$10$...
+(1 row)
+
+--- authorization started with DATABASE_URL (log line)
+"msg":"storage: postgres"
+--- PRESIDENT dashboard.read
+{
+  "allowed": true
+}
+--- STUDENT dashboard.read
+{
+  "reason": "STUDENT may not dashboard.read"
+}
+--- Rows in role_permissions
+64 rows, 25 actions

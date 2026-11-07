@@ -1,0 +1,35 @@
+name: Integration
+
+# Runs the adapter tests tagged "integration" against real PostgreSQL, MongoDB
+# and Redis containers (Testcontainers). The GitHub Ubuntu runner has Docker.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  integration:
+    name: Integration tests (Testcontainers)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20 # the first image pulls are slow
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Go (version from go.mod)
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Docker version (Testcontainers needs it)
+        run: docker version
+
+      # The normal go vet skips files with the integration tag, so vet them here.
+      - name: go vet with the integration tag
+        run: go vet -tags=integration ./...
+
+      - name: make test-integration
+        run: make test-integration

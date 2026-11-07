@@ -10,7 +10,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/jurwaCST/Jurwa/services/analytics/adapters/out/repotest"
 	"github.com/jurwaCST/Jurwa/services/analytics/domain"
+	"github.com/jurwaCST/Jurwa/services/analytics/ports"
 )
 
 var t0 = time.Date(2026, 11, 2, 9, 0, 0, 0, time.UTC)
@@ -50,4 +52,8 @@ func TestApplyFromManyGoroutines(t *testing.T) {
 	reports, err := s.Reports(ctx)
 	require.NoError(t, err)
 	assert.Len(t, reports, 50)
+}
+
+func TestContract(t *testing.T) {
+	repotest.Run(t, func(*testing.T) ports.ProjectionStore { return New() })
 }

@@ -29,7 +29,7 @@ Every service is one bounded context: it owns its data and its rules, has its ow
 | Service | Owns | Never | Store |
 |---|---|---|---|
 | identity (9016) | User accounts, password hashes, issuing and checking JWTs (FR-01, FR-24, FR-26) | Decide what a role may do; store or log plain passwords | PostgreSQL `identity` |
-| authorization (9017) | Roles per user and the role, action, resource permission rules (FR-22, FR-26, FR-30) | Check passwords or issue tokens | PostgreSQL `authorization_db` |
+| authorization (9017) | The role, action, resource permission rules (FR-22, FR-26, FR-30); each user's roles are held by identity and travel in the token | Check passwords or issue tokens | PostgreSQL `authorization_db` |
 
 ### Reporting
 

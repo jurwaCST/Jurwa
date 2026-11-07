@@ -15,11 +15,11 @@ import (
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/jurwaCST/Jurwa/pkg/observability"
 	"github.com/jurwaCST/Jurwa/pkg/resilience"
 	feedbackv1 "github.com/jurwaCST/Jurwa/proto/gen/feedback/v1"
 	statuslifecyclev1 "github.com/jurwaCST/Jurwa/proto/gen/status-lifecycle/v1"
 	grpcadapter "github.com/jurwaCST/Jurwa/services/feedback/adapters/in/grpc"
-	"github.com/jurwaCST/Jurwa/services/feedback/adapters/out/memory"
 	"github.com/jurwaCST/Jurwa/services/feedback/adapters/out/statusclient"
 	"github.com/jurwaCST/Jurwa/services/feedback/application"
 )
@@ -35,7 +35,13 @@ func main() {
 	serviceName := envOr("SERVICE_NAME", defaultServiceName)
 	port := envOr("PORT", defaultPort)
 
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil)).With("service", serviceName)
+	// Metrics on METRICS_ADDR (off when empty) and one JSON log line per request.
+	obs, err := observability.Init(serviceName)
+	if err != nil {
+		slog.Error("cannot start observability", "error", err)
+		os.Exit(1)
+	}
+	logger := obs.Logger()
 	slog.SetDefault(logger)
 
 	lis, err := net.Listen("tcp", ":"+port)
@@ -44,14 +50,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	srv := grpc.NewServer()
+	srv := grpc.NewServer(grpc.ChainUnaryInterceptor(obs.Unary()))
 
 	// Standard gRPC health service (grpc.health.v1), used by grpcurl and Kubernetes probes.
 	hs := health.NewServer()
 	healthpb.RegisterHealthServer(srv, hs)
 
 	// feedback asks status-lifecycle whether a report is RESOLVED.
-	// In-memory store for now; a database in Sprint 3.
 	statusConn, err := dial(envOr("STATUS_LIFECYCLE_ADDR", statusclient.DefaultAddr))
 	if err != nil {
 		slog.Error("cannot create status-lifecycle client", "error", err)
@@ -59,8 +64,15 @@ func main() {
 	}
 	defer statusConn.Close()
 
+	// PostgreSQL when DATABASE_URL is set, otherwise in memory (lost on restart).
+	repo, closeRepo, err := openRepo(os.Getenv("DATABASE_URL"))
+	if err != nil {
+		slog.Error("cannot open the database", "error", err)
+		os.Exit(1)
+	}
+	defer closeRepo()
 	app := application.NewService(
-		memory.New(),
+		repo,
 		statusclient.New(statuslifecyclev1.NewStatusLifecycleServiceClient(statusConn)),
 	)
 	feedbackv1.RegisterFeedbackServiceServer(srv, grpcadapter.NewHandler(app))

@@ -21,6 +21,7 @@ var (
 	ErrUserNotFound       = errors.New("user not found")
 	ErrInvalidCredentials = errors.New("wrong email or password")
 	ErrInvalidToken       = errors.New("invalid or expired token")
+	ErrInvalidRole        = errors.New("unknown role")
 )
 
 const (
@@ -74,9 +75,24 @@ func ValidatePassword(password string) error {
 	return nil
 }
 
+// validRoles are the roles of jurwa.common.v1.Role.
+var validRoles = map[Role]bool{
+	RoleStudent: true, RoleCategoryHead: true, RoleStaff: true, RoleSystemAdmin: true, RolePresident: true,
+}
+
 // NewUser validates the input and creates an active Student account with a
-// bcrypt hash of the password.
+// bcrypt hash of the password. Register uses only this, so a self-registered
+// account is always a Student.
 func NewUser(id, email, fullName, password string, now time.Time) (User, error) {
+	return NewUserWithRole(id, email, fullName, password, RoleStudent, now)
+}
+
+// NewUserWithRole is NewUser with a chosen role. Only the demo seed calls it
+// with a role other than Student; no RPC can.
+func NewUserWithRole(id, email, fullName, password string, role Role, now time.Time) (User, error) {
+	if !validRoles[role] {
+		return User{}, ErrInvalidRole
+	}
 	e, err := NormalizeEmail(email)
 	if err != nil {
 		return User{}, err
@@ -97,7 +113,7 @@ func NewUser(id, email, fullName, password string, now time.Time) (User, error) 
 		Email:        e,
 		FullName:     name,
 		PasswordHash: string(hash),
-		Roles:        []Role{RoleStudent},
+		Roles:        []Role{role},
 		Active:       true,
 		CreatedAt:    now,
 	}, nil

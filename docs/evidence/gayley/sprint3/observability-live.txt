@@ -1,0 +1,33 @@
+SCRUM-105 live check, authorization on this branch, METRICS_ADDR=127.0.0.1:19100, Windows 11, 2026-11-06.
+Calls: PRESIDENT and STUDENT asking for dashboard.read (allowed, denied: both answer OK), one call with no role (InvalidArgument), one health check.
+duration_ms shows 0 here because the Windows clock is coarser than these sub-millisecond in-memory calls.
+
+$ CheckPermission role=PRESIDENT
+{
+  "allowed": true
+}
+$ CheckPermission role=STUDENT
+{
+  "reason": "STUDENT may not dashboard.read"
+}
+$ CheckPermission with no role
+ERROR:
+  Code: InvalidArgument
+  Message: role is required
+$ Health/Check
+{
+  "status": "SERVING"
+}
+
+$ curl -s localhost:19100/metrics | grep -E '^grpc_requests_total|^grpc_request_duration_seconds_count'
+grpc_request_duration_seconds_count{method="/grpc.health.v1.Health/Check",service="authorization"} 1
+grpc_request_duration_seconds_count{method="/jurwa.authorization.v1.AuthorizationService/CheckPermission",service="authorization"} 3
+grpc_requests_total{code="InvalidArgument",method="/jurwa.authorization.v1.AuthorizationService/CheckPermission",service="authorization"} 1
+grpc_requests_total{code="OK",method="/grpc.health.v1.Health/Check",service="authorization"} 1
+grpc_requests_total{code="OK",method="/jurwa.authorization.v1.AuthorizationService/CheckPermission",service="authorization"} 2
+
+--- service log (the passing health check has no line)
+{"time":"2026-11-06T16:44:21.7330855+06:00","level":"INFO","msg":"server started","service":"authorization","port":"19017"}
+{"time":"2026-11-06T16:44:24.8208497+06:00","level":"INFO","msg":"grpc request","service":"authorization","method":"/jurwa.authorization.v1.AuthorizationService/CheckPermission","code":"OK","duration_ms":0,"correlation_id":"demo-corr-1"}
+{"time":"2026-11-06T16:44:24.908198+06:00","level":"INFO","msg":"grpc request","service":"authorization","method":"/jurwa.authorization.v1.AuthorizationService/CheckPermission","code":"OK","duration_ms":0,"correlation_id":"demo-corr-1"}
+{"time":"2026-11-06T16:44:24.9875211+06:00","level":"WARN","msg":"grpc request","service":"authorization","method":"/jurwa.authorization.v1.AuthorizationService/CheckPermission","code":"InvalidArgument","duration_ms":0,"correlation_id":"5f2ec140-46e5-4688-b329-91d8bec2c6e9"}

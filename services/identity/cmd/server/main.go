@@ -17,9 +17,9 @@ import (
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/jurwaCST/Jurwa/pkg/observability"
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
 	grpcadapter "github.com/jurwaCST/Jurwa/services/identity/adapters/in/grpc"
-	"github.com/jurwaCST/Jurwa/services/identity/adapters/out/memory"
 	"github.com/jurwaCST/Jurwa/services/identity/application"
 	"github.com/jurwaCST/Jurwa/services/identity/domain"
 )
@@ -37,7 +37,13 @@ func main() {
 	serviceName := envOr("SERVICE_NAME", defaultServiceName)
 	port := envOr("PORT", defaultPort)
 
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil)).With("service", serviceName)
+	// Metrics on METRICS_ADDR (off when empty) and one JSON log line per request.
+	obs, err := observability.Init(serviceName)
+	if err != nil {
+		slog.Error("cannot start observability", "error", err)
+		os.Exit(1)
+	}
+	logger := obs.Logger()
 	slog.SetDefault(logger)
 
 	tokens, err := newTokenIssuer(os.Getenv("JWT_SECRET"), envOr("JWT_TTL", defaultJWTTTL))
@@ -45,8 +51,24 @@ func main() {
 		slog.Error("bad token config", "error", err)
 		os.Exit(1)
 	}
-	// In-memory store for Sprint 1; PostgreSQL replaces it in Sprint 2.
-	app := application.NewService(memory.NewUsers(), tokens)
+	// PostgreSQL when DATABASE_URL is set, otherwise in memory (lost on restart).
+	users, closeUsers, err := openRepo(os.Getenv("DATABASE_URL"))
+	if err != nil {
+		slog.Error("cannot open the database", "error", err)
+		os.Exit(1)
+	}
+	defer closeUsers()
+	app := application.NewService(users, tokens)
+
+	// Demo accounts for the roles that cannot register (SEED_DEMO_USERS=true).
+	created, err := seedFromEnv(context.Background(), app, os.Getenv)
+	if err != nil {
+		slog.Error("cannot seed demo users", "error", err)
+		os.Exit(1)
+	}
+	if created > 0 {
+		slog.Warn("demo users seeded, for the demo only", "created", created)
+	}
 
 	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
@@ -54,7 +76,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	srv := grpc.NewServer()
+	srv := grpc.NewServer(grpc.ChainUnaryInterceptor(obs.Unary()))
 
 	// Standard gRPC health service (grpc.health.v1), used by grpcurl and Kubernetes probes.
 	hs := health.NewServer()

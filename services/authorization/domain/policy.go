@@ -43,6 +43,17 @@ func (r Role) String() string {
 	return "ROLE_UNKNOWN"
 }
 
+// ParseRole returns the role for a proto enum name such as "STUDENT".
+// ROLE_UNSPECIFIED and unknown names give false.
+func ParseRole(name string) (Role, bool) {
+	for r, n := range roleNames {
+		if n == name && r != RoleUnspecified {
+			return r, true
+		}
+	}
+	return RoleUnspecified, false
+}
+
 // Actions, one per route in docs/design/api-routes.md. The api-gateway sends
 // these strings. The first five match services/api-gateway/domain/auth.go.
 const (
@@ -136,6 +147,12 @@ func (p Policy) Actions() []string {
 	}
 	slices.Sort(out)
 	return out
+}
+
+// Roles returns a copy of the roles allowed to do action, or nil when the
+// action is unknown.
+func (p Policy) Roles(action string) []Role {
+	return slices.Clone(p.rules[action])
 }
 
 // Check says whether role may do action on resource. Missing input is an

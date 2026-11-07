@@ -3,7 +3,7 @@
 
 PROTO_FILES := $(shell find proto -name '*.proto' -not -path 'proto/gen/*' 2>/dev/null)
 
-.PHONY: help proto test run build docker-build lint new-service check-service template-check
+.PHONY: help proto test test-integration run build docker-build lint new-service check-service template-check
 
 # Go skips folders starting with "_", so services/_template is never in ./...
 # These targets do nothing (and pass) until the first real service exists.
@@ -12,6 +12,7 @@ HAS_GO := $(shell go list ./... 2>/dev/null | head -1)
 help:
 	@echo "make proto                          generate Go code from proto/**/*.proto into proto/gen/"
 	@echo "make test                           run all unit tests with coverage"
+	@echo "make test-integration               unit tests plus adapter tests on real containers (Docker must be running)"
 	@echo "make lint                           gofmt check and go vet"
 	@echo "make template-check                 build and test a temporary copy of services/_template"
 	@echo "make run SERVICE=name               run a service locally"
@@ -35,6 +36,15 @@ ifeq ($(HAS_GO),)
 	@echo "No Go packages yet. Nothing to test."
 else
 	go test ./... -cover
+endif
+
+# Also runs the files tagged "integration", which start real PostgreSQL, MongoDB
+# or Redis containers with Testcontainers. -count=1 so results are never cached.
+test-integration:
+ifeq ($(HAS_GO),)
+	@echo "No Go packages yet. Nothing to test."
+else
+	go test -tags=integration ./... -count=1
 endif
 
 lint:

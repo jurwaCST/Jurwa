@@ -66,7 +66,9 @@ Plus `grpc.health.v1.Health/Check` and server reflection.
 | `application/` | Use case: `CheckPermission` |
 | `ports/` | `PolicyRepository` interface |
 | `adapters/in/grpc/` | gRPC handler, maps errors to gRPC codes |
-| `adapters/out/memory/` | In-memory store with the default table (a database in Sprint 3) |
+| `adapters/out/memory/` | In-memory store with the default table, used when `DATABASE_URL` is not set |
+| `adapters/out/postgres/` | PostgreSQL store, used when `DATABASE_URL` is set |
+| `adapters/out/repotest/` | Checks both stores must pass |
 
 ## Configuration
 
@@ -74,6 +76,9 @@ Plus `grpc.health.v1.Health/Check` and server reflection.
 |---|---|---|
 | `PORT` | `9017` | gRPC port |
 | `SERVICE_NAME` | `authorization` | Name written in every log line |
+| `DATABASE_URL` | none | For example `postgres://jurwa:<password>@localhost:5432/authorization_db?sslmode=disable`. Unset: built-in default table. A wrong URL stops the service instead of falling back. The password comes from the environment (a Kubernetes Secret), never from the repository |
+
+Storage: when `DATABASE_URL` is set the table is kept in PostgreSQL (`adapters/out/postgres`, database `authorization_db`, table `role_permissions`). On start the service runs `docs/design/schema/authorization.sql` (embedded as `adapters/out/postgres/schema.sql`, a test keeps the two equal), which creates the tables if needed and seeds the default table once. Without `DATABASE_URL` it uses the built-in default table. Both adapters pass the same checks (`adapters/out/repotest`), which prove the seeded SQL table is the same as `DefaultPolicy`.
 
 ## Run (PowerShell)
 
@@ -102,3 +107,11 @@ docker run --rm -p 9017:9017 jurwa/authorization
 ```powershell
 go test ./services/authorization/... -cover
 ```
+
+Integration tests on a real PostgreSQL 16 (Docker Desktop must be running):
+
+```powershell
+go test -tags=integration ./services/authorization/adapters/out/postgres/... -v
+```
+
+Evidence: `docs/evidence/gayley/sprint3/db-adapters-integration.txt` and `db-adapters-live.txt`.
