@@ -31,10 +31,16 @@ jobs:
       - name: Coverage gate
         run: bash scripts/check-coverage.sh
 
-      - name: Coverage report for the whole repository
+      # Information only: every test of the repository is already a required
+      # check in CI / Go checks. A failing test is printed here, not hidden.
+      - name: Coverage report for the whole repository (information only)
         if: always()
+        continue-on-error: true
         run: |
-          go test ./... -coverprofile=coverage.out > /dev/null
+          if ! go test ./... -coverprofile=coverage.out > test-output.txt 2>&1; then
+            grep -E -- '^(--- FAIL|FAIL|panic)' -A 8 test-output.txt
+            exit 1
+          fi
           go tool cover -func=coverage.out | tail -1
 
       - name: Keep coverage.out (for SonarQube on a laptop)

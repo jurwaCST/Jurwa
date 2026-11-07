@@ -31,7 +31,7 @@ Result on 6 Nov 2026 (`docs/evidence/sonam-choki/sprint3/coverage-gate.txt`):
 | sla-tracking domain, application | 100%, 98.1% |
 | status-lifecycle domain, application | 100%, 96.9% |
 
-10 of 10 at or above 70%. The workflow also prints the total for the whole repository (`go tool cover -func`), 35.1% today, and keeps `coverage.out` as an artifact. That total is low because it also counts `cmd/server/main.go` files, adapters without unit tests and the generated `proto/gen` code.
+10 of 10 at or above 70%. The workflow also prints the total for the whole repository (`go tool cover -func`), 35.1% today, and keeps `coverage.out` as an artifact. That step is information only (`continue-on-error`): it prints a failing test, but the required check for all tests is CI / Go checks. That total is low because it also counts `cmd/server/main.go` files, adapters without unit tests and the generated `proto/gen` code.
 
 ## 2. SonarQube on a laptop
 
