@@ -1,0 +1,122 @@
+# SCRUM-39 health check script (2026-11-07 22:08)
+
+## 1. Script tests (grpcurl and kubectl faked)
+$ bash scripts/tests/check-all-health_test.sh
+PASS  all up: exit code 0
+PASS  all up: 20 service lines
+PASS  all up: total line says 20 up, 0 down
+PASS  all up: report-submission on 9001 is UP
+PASS  all up: analytics on 9020 is UP
+PASS  one down: exit code 1
+PASS  one down: feedback on 9019 is DOWN
+PASS  one down: total line says 19 up, 1 down
+PASS  k8s all ready: exit code 0
+PASS  k8s all ready: 20 lines with ready/desired
+PASS  k8s: exit code 1
+PASS  k8s: identity 0/1 is DOWN
+PASS  k8s: notification scaled to 0/0 is DOWN
+PASS  k8s: total line says 18 up, 2 down
+PASS  unknown option: exit code 2
+
+All checks passed.
+
+## 2. gRPC mode, all 20 services (cluster ports forwarded to localhost: kubectl -n jurwa port-forward svc/<name> <port>:<port>)
+$ bash scripts/check-all-health.sh
+report-submission      9001   UP
+photo-media            9002   UP
+report-history         9003   UP
+location-taxonomy      9004   UP
+internal-notes         9005   UP
+routing-rules          9006   UP
+routing-engine         9007   UP
+department-directory   9008   UP
+category-taxonomy      9009   UP
+api-gateway            9010   UP
+status-lifecycle       9011   UP
+sla-tracking           9012   UP
+sla-policy             9013   UP
+reassignment           9014   UP
+audit-log              9015   UP
+identity               9016   UP
+authorization          9017   UP
+notification           9018   UP
+feedback               9019   UP
+analytics              9020   UP
+20 up, 0 down
+
+## 3. One service stopped on purpose
+$ kubectl -n jurwa scale deploy/feedback --replicas=0
+$ bash scripts/check-all-health.sh; echo "exit code: $?"
+report-submission      9001   UP
+photo-media            9002   UP
+report-history         9003   UP
+location-taxonomy      9004   UP
+internal-notes         9005   UP
+routing-rules          9006   UP
+routing-engine         9007   UP
+department-directory   9008   UP
+category-taxonomy      9009   UP
+api-gateway            9010   UP
+status-lifecycle       9011   UP
+sla-tracking           9012   UP
+sla-policy             9013   UP
+reassignment           9014   UP
+audit-log              9015   UP
+identity               9016   UP
+authorization          9017   UP
+notification           9018   UP
+feedback               9019   DOWN
+analytics              9020   UP
+19 up, 1 down
+exit code: 1
+
+## 4. Kubernetes mode, feedback still stopped
+$ bash scripts/check-all-health.sh --k8s; echo "exit code: $?"
+report-submission      1/1    UP
+photo-media            1/1    UP
+report-history         1/1    UP
+location-taxonomy      1/1    UP
+internal-notes         1/1    UP
+routing-rules          1/1    UP
+routing-engine         1/1    UP
+department-directory   1/1    UP
+category-taxonomy      1/1    UP
+api-gateway            1/1    UP
+status-lifecycle       1/1    UP
+sla-tracking           1/1    UP
+sla-policy             1/1    UP
+reassignment           1/1    UP
+audit-log              1/1    UP
+identity               1/1    UP
+authorization          1/1    UP
+notification           1/1    UP
+feedback               0/0    DOWN
+analytics              1/1    UP
+19 up, 1 down
+exit code: 1
+
+## 5. feedback started again
+$ kubectl -n jurwa scale deploy/feedback --replicas=1
+$ bash scripts/check-all-health.sh --k8s; echo "exit code: $?"
+report-submission      1/1    UP
+photo-media            1/1    UP
+report-history         1/1    UP
+location-taxonomy      1/1    UP
+internal-notes         1/1    UP
+routing-rules          1/1    UP
+routing-engine         1/1    UP
+department-directory   1/1    UP
+category-taxonomy      1/1    UP
+api-gateway            1/1    UP
+status-lifecycle       1/1    UP
+sla-tracking           1/1    UP
+sla-policy             1/1    UP
+reassignment           1/1    UP
+audit-log              1/1    UP
+identity               1/1    UP
+authorization          1/1    UP
+notification           1/1    UP
+feedback               1/1    UP
+analytics              1/1    UP
+20 up, 0 down
+exit code: 0
