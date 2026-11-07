@@ -1,0 +1,12 @@
+# What Argo CD (or kubectl apply -k deploy/knative) deploys: the Knative
+# Service and its PingSource. The CronJob fallback is left out on purpose, so
+# the two never run together; apply it by hand only if Knative is not available:
+#   kubectl apply -f deploy/knative/cronjob-fallback.yaml
+# Knative Serving and Eventing must be installed first (docs/ops/knative.md).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: jurwa
+
+resources:
+  - sla-escalation-checker.yaml
+  - pingsource.yaml
