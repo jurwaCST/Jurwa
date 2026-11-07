@@ -72,3 +72,13 @@ report-submission   1/1     1            1           5m55s   jurwa
 $ kubectl -n argocd get application jurwa-demo
 NAME         REVISION                                   SYNC     HEALTH
 jurwa-demo   e98775bfe1478380c37a049304708dfce1a975ff   Synced   Healthy
+
+## Screenshots (taken by Sonam Zangmo on her laptop, 2026-11-08)
+# argocd-docker-6gb.png: Docker Desktop, Resources, Memory limit 6 GB.
+# argocd-repo-credentials.png: VS Code terminal running deploy/argocd/add-repo-credentials.sh; the token was typed hidden and does not appear.
+# argocd-ui-synced-healthy.png: Argo CD v3.5.6 UI, application jurwa-demo Healthy and Synced, repo https://github.com/jurwaCST/Jurwa.git, path deploy/argocd/demo, last sync 00:14:34 (the pushed commit above).
+
+## After the merge (#96)
+$ kubectl apply -f deploy/argocd/application-demo.yaml   (targetRevision main)
+TARGET   REVISION                                   SYNC     HEALTH
+main     70fdb0908a435a5e8cb391355bded34b71f5b4c9   Synced   Healthy
