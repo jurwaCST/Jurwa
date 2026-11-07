@@ -132,3 +132,26 @@ m
 $851b147d-1bb2-4665-a9de-e7f39dfe11d9report-submission"$ace11ee9-9108-4112-be78-f83245c49ccc
 $ace11ee9-9108-4112-be78-f83245c49ccc$2e55300e-648b-43da-b8a2-12102be8b20b"
 Hostel BEast*)Tap leaking in bathroom 2 (cluster check)8B
+
+## 5. Re-run after moving testcontainers to v0.40.0 (team version, 2026-11-07 21:52)
+$ go test -tags=integration ./services/report-submission/adapters/out/mongo/... -v -count=1
+=== RUN   TestDocumentRoundTrip
+--- PASS: TestDocumentRoundTrip (0.00s)
+=== RUN   TestDocumentWithoutPhoto
+--- PASS: TestDocumentWithoutPhoto (0.00s)
+=== RUN   TestMongoRepositoryContract
+=== RUN   TestMongoRepositoryContract/save_then_find_returns_the_same_report
+=== RUN   TestMongoRepositoryContract/report_without_photo_and_optional_location_parts_keeps_them_empty
+=== RUN   TestMongoRepositoryContract/unknown_id_is_ErrReportNotFound
+=== RUN   TestMongoRepositoryContract/saving_the_same_id_again_replaces_the_report
+=== RUN   TestMongoRepositoryContract/reports_are_kept_apart
+--- PASS: TestMongoRepositoryContract (0.82s)
+    --- PASS: TestMongoRepositoryContract/save_then_find_returns_the_same_report (0.01s)
+    --- PASS: TestMongoRepositoryContract/report_without_photo_and_optional_location_parts_keeps_them_empty (0.01s)
+    --- PASS: TestMongoRepositoryContract/unknown_id_is_ErrReportNotFound (0.01s)
+    --- PASS: TestMongoRepositoryContract/saving_the_same_id_again_replaces_the_report (0.01s)
+    --- PASS: TestMongoRepositoryContract/reports_are_kept_apart (0.01s)
+=== RUN   TestConnectFailsOnBadURL
+--- PASS: TestConnectFailsOnBadURL (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/mongo	1.258s
