@@ -1,0 +1,72 @@
+# SCRUM-120 live check, 2026-11-07 22:03. Local binaries: identity (SEED_DEMO_USERS=true, demo password and JWT_SECRET are local throwaway values, not shown), authorization, photo-media (in-memory store), api-gateway on :8080. Tokens are never printed.
+# Test files: tap.jpg 2048 bytes, five.jpg 5242880 bytes, fivehalf.jpg 5767168 bytes, seven.jpg 7340032 bytes (all start with the JPG signature), fake.jpg = PNG bytes.
+
+$ POST /photos as student Pema: tap.jpg (2 KB JPG) plus a forged uploaderId form field
+{"photoId":"ab73a997-b083-40ed-a35f-1649f903de8a"}
+HTTP 201
+
+$ POST /photos as Pema: five.jpg (exactly 5 MB = 5242880 bytes)
+{"photoId":"42cc03d6-47a2-4575-8fe6-d1858c24fd54"}
+HTTP 201
+
+$ POST /photos as Pema: fivehalf.jpg (5.5 MB), photo-media refuses
+{"error":"invalid photo: photo is larger than 5 MB"}
+
+HTTP 400
+
+$ POST /photos as Pema: seven.jpg (7 MB), the gateway refuses
+{"error":"invalid photo: photo is larger than 5 MB"}
+
+HTTP 400
+
+$ POST /photos as Pema: PNG bytes labelled image/jpeg
+{"error":"invalid photo: file bytes do not match the content type"}
+
+HTTP 400
+
+$ POST /photos as Pema: field named file instead of photo
+{"error":"invalid photo: send multipart/form-data with the file in the field \"photo\""}
+
+HTTP 400
+
+$ POST /photos as dsa.demo (Category Head)
+{"error":"not allowed"}
+
+HTTP 403
+
+$ POST /photos with no token
+{"error":"missing bearer token"}
+
+HTTP 401
+
+$ GET /photos/42cc03d6-47a2-4575-8fe6-d1858c24fd54 as Pema (owner): headers, then size and sha256 against the uploaded file
+HTTP/1.1 200 OK
+Cache-Control: private, no-store
+Content-Type: image/jpeg
+X-Content-Type-Options: nosniff
+downloaded 5242880 bytes, same sha256 as five.jpg: yes
+
+$ GET /photos/42cc03d6-47a2-4575-8fe6-d1858c24fd54 as dsa.demo (Category Head)
+HTTP 200, image/jpeg, 5242880 bytes
+
+$ GET /photos/42cc03d6-47a2-4575-8fe6-d1858c24fd54 as staff.demo (Staff)
+HTTP 200, image/jpeg, 5242880 bytes
+
+$ GET /photos/42cc03d6-47a2-4575-8fe6-d1858c24fd54 as Karma (another student)
+{"error":"not allowed"}
+
+HTTP 403
+
+$ GET /photos/<unknown id> as dsa.demo
+{"error":"photo not found"}
+
+HTTP 404
+
+$ GET /photos/42cc03d6-47a2-4575-8fe6-d1858c24fd54 with no token
+{"error":"missing bearer token"}
+
+HTTP 401
+
+$ Forged form field check: grpcurl photo-media GetPhoto for the tap.jpg photo ab73a997-b083-40ed-a35f-1649f903de8a (uploaderId, sizeBytes)
+ea347f3a-c018-4f2c-88ef-c461730fcd32 2048   (the forged 00000000-0000-4000-8000-000000000999 was ignored)
+Pema's user id from GET /me: ea347f3a-c018-4f2c-88ef-c461730fcd32

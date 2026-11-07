@@ -1,0 +1,42 @@
+SCRUM-127 PostgreSQL adapters: integration tests on a real PostgreSQL 16 (postgres:16-alpine, started by testcontainers in Docker Desktop).
+Date: 2026-11-06 13:00
+$ go test -tags=integration -p 1 -count=1 -v ./services/identity/adapters/out/postgres/... ./services/authorization/adapters/out/postgres/...
+=== RUN   TestRepositoryContract
+=== RUN   TestRepositoryContract/a_saved_user_is_found_by_email_and_by_id_with_every_field
+=== RUN   TestRepositoryContract/several_roles_are_kept_in_order
+=== RUN   TestRepositoryContract/an_inactive_user_stays_inactive
+=== RUN   TestRepositoryContract/a_second_account_with_the_same_email_is_refused
+=== RUN   TestRepositoryContract/an_unknown_email_or_id_is_not_found
+=== RUN   TestRepositoryContract/an_id_that_is_not_a_UUID_is_not_found
+--- PASS: TestRepositoryContract (2.48s)
+    --- PASS: TestRepositoryContract/a_saved_user_is_found_by_email_and_by_id_with_every_field (0.03s)
+    --- PASS: TestRepositoryContract/several_roles_are_kept_in_order (0.01s)
+    --- PASS: TestRepositoryContract/an_inactive_user_stays_inactive (0.01s)
+    --- PASS: TestRepositoryContract/a_second_account_with_the_same_email_is_refused (0.01s)
+    --- PASS: TestRepositoryContract/an_unknown_email_or_id_is_not_found (0.01s)
+    --- PASS: TestRepositoryContract/an_id_that_is_not_a_UUID_is_not_found (0.01s)
+=== RUN   TestEmailIsUniqueIgnoringCase
+--- PASS: TestEmailIsUniqueIgnoringCase (1.79s)
+=== RUN   TestDataSurvivesARestart
+--- PASS: TestDataSurvivesARestart (1.92s)
+=== RUN   TestSchemaMatchesTheDesignFile
+--- PASS: TestSchemaMatchesTheDesignFile (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/identity/adapters/out/postgres	7.432s
+=== RUN   TestRepositoryContract
+=== RUN   TestRepositoryContract/loads_the_default_permission_table
+=== RUN   TestRepositoryContract/loading_twice_gives_the_same_table
+--- PASS: TestRepositoryContract (1.90s)
+    --- PASS: TestRepositoryContract/loads_the_default_permission_table (0.03s)
+    --- PASS: TestRepositoryContract/loading_twice_gives_the_same_table (0.01s)
+=== RUN   TestChangesInTheDatabaseAreLoaded
+--- PASS: TestChangesInTheDatabaseAreLoaded (1.76s)
+=== RUN   TestSchemaMatchesTheDesignFile
+--- PASS: TestSchemaMatchesTheDesignFile (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/authorization/adapters/out/postgres	5.112s
+
+$ docker exec -i pgtest bash /schema/test-schema.sh   (team schema check, docs/design/schema, every file run twice)
+OK    authorization.sql -> database authorization_db: role_permissions, roles
+OK    identity.sql -> database identity: users
+All schema files ran with no errors. (all 13 files OK; the two lines above are ours)

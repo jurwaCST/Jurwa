@@ -7,7 +7,7 @@ import (
 )
 
 // ProjectionStore keeps the reports built from events.
-// In-memory for now; a database in Sprint 3.
+// adapters/out/memory, or adapters/out/postgres when DATABASE_URL is set.
 type ProjectionStore interface {
 	// Apply records one event. applied is false for a repeat or unusable event.
 	Apply(ctx context.Context, e domain.Event) (applied bool, err error)

@@ -41,7 +41,9 @@ Plus `grpc.health.v1.Health/Check` and server reflection.
 | `application/` | Use cases: `Submit`, `Get` |
 | `ports/` | `FeedbackRepository` and `StatusChecker` interfaces |
 | `adapters/in/grpc/` | gRPC handler, maps errors to gRPC codes |
-| `adapters/out/memory/` | In-memory store (a database in Sprint 3) |
+| `adapters/out/memory/` | In-memory store, used when `DATABASE_URL` is not set |
+| `adapters/out/postgres/` | PostgreSQL store, used when `DATABASE_URL` is set |
+| `adapters/out/repotest/` | Checks both must pass |
 | `adapters/out/statusclient/` | `StatusChecker` that calls status-lifecycle `GetStatus`, with `pkg/resilience` (timeout, retries, circuit breaker) |
 
 ## Configuration
@@ -51,6 +53,9 @@ Plus `grpc.health.v1.Health/Check` and server reflection.
 | `PORT` | `9019` | gRPC port |
 | `SERVICE_NAME` | `feedback` | Name written in every log line |
 | `STATUS_LIFECYCLE_ADDR` | `localhost:9011` | Address of status-lifecycle |
+| `DATABASE_URL` | none | For example `postgres://jurwa:<password>@localhost:5432/feedback?sslmode=disable`. Unset: in memory, lost on restart. A wrong URL stops the service instead of falling back. The password comes from the environment (a Kubernetes Secret), never from the repository |
+
+Storage: with `DATABASE_URL` the service uses PostgreSQL (database `feedback`, table `feedback`). On start it runs `docs/design/schema/feedback.sql` (embedded as `adapters/out/postgres/schema.sql`, a test keeps the two equal), which creates the table if needed. Both stores pass the same checks (`adapters/out/repotest`).
 
 ## Run (PowerShell)
 
@@ -89,3 +94,11 @@ docker run --rm -p 9019:9019 -e STATUS_LIFECYCLE_ADDR=host.docker.internal:9011 
 ```powershell
 go test ./services/feedback/... -cover
 ```
+
+Integration tests on a real PostgreSQL 16 (Docker Desktop must be running):
+
+```powershell
+go test -tags=integration ./services/feedback/adapters/out/postgres/... -v
+```
+
+Evidence: `docs/evidence/gayley/sprint3/db-adapters-3b-integration.txt` and `db-adapters-3b-live.txt`.

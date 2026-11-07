@@ -1,0 +1,78 @@
+SCRUM-127 part 2: notification, feedback and analytics PostgreSQL adapters, integration tests on a real PostgreSQL 16 (postgres:16-alpine, started by testcontainers in Docker Desktop).
+Date: 2026-11-06 13:15
+$ go test -tags=integration -p 1 -count=1 -v -cover ./services/notification/adapters/out/postgres/... ./services/feedback/adapters/out/postgres/... ./services/analytics/adapters/out/postgres/...
+=== RUN   TestRepositoryContract
+=== RUN   TestRepositoryContract/every_field_is_kept
+=== RUN   TestRepositoryContract/only_sent_messages_of_that_user,_newest_first
+=== RUN   TestRepositoryContract/pages
+=== RUN   TestRepositoryContract/unread_only
+=== RUN   TestRepositoryContract/saving_the_same_id_again_replaces_it_and_keeps_its_place
+--- PASS: TestRepositoryContract (2.12s)
+    --- PASS: TestRepositoryContract/every_field_is_kept (0.03s)
+    --- PASS: TestRepositoryContract/only_sent_messages_of_that_user,_newest_first (0.02s)
+    --- PASS: TestRepositoryContract/pages (0.02s)
+    --- PASS: TestRepositoryContract/unread_only (0.01s)
+    --- PASS: TestRepositoryContract/saving_the_same_id_again_replaces_it_and_keeps_its_place (0.01s)
+=== RUN   TestDataSurvivesARestart
+--- PASS: TestDataSurvivesARestart (1.93s)
+=== RUN   TestSchemaMatchesTheDesignFile
+--- PASS: TestSchemaMatchesTheDesignFile (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/out/postgres	5.327s	coverage: 85.0% of statements
+=== RUN   TestRepositoryContract
+=== RUN   TestRepositoryContract/saved_feedback_is_found_by_report_with_every_field
+=== RUN   TestRepositoryContract/an_empty_comment_stays_empty
+=== RUN   TestRepositoryContract/a_second_feedback_for_the_same_report_is_refused_and_the_first_is_kept
+=== RUN   TestRepositoryContract/a_report_with_no_feedback_is_not_found
+=== RUN   TestRepositoryContract/a_report_id_that_is_not_a_UUID_is_not_found
+--- PASS: TestRepositoryContract (1.95s)
+    --- PASS: TestRepositoryContract/saved_feedback_is_found_by_report_with_every_field (0.02s)
+    --- PASS: TestRepositoryContract/an_empty_comment_stays_empty (0.01s)
+    --- PASS: TestRepositoryContract/a_second_feedback_for_the_same_report_is_refused_and_the_first_is_kept (0.01s)
+    --- PASS: TestRepositoryContract/a_report_with_no_feedback_is_not_found (0.01s)
+    --- PASS: TestRepositoryContract/a_report_id_that_is_not_a_UUID_is_not_found (0.01s)
+=== RUN   TestDataSurvivesARestart
+--- PASS: TestDataSurvivesARestart (1.78s)
+=== RUN   TestSchemaMatchesTheDesignFile
+--- PASS: TestSchemaMatchesTheDesignFile (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/feedback/adapters/out/postgres	5.406s	coverage: 85.7% of statements
+=== RUN   TestRepositoryContract
+=== RUN   TestRepositoryContract/empty_store_has_no_reports
+=== RUN   TestRepositoryContract/reports_are_built_from_events_and_sorted_by_id
+=== RUN   TestRepositoryContract/reopening_a_resolved_report_clears_its_resolved_time
+=== RUN   TestRepositoryContract/a_repeated_event_is_applied_once
+=== RUN   TestRepositoryContract/unusable_events_change_nothing
+=== RUN   TestRepositoryContract/an_event_that_was_not_usable_can_be_used_later
+--- PASS: TestRepositoryContract (2.09s)
+    --- PASS: TestRepositoryContract/empty_store_has_no_reports (0.04s)
+    --- PASS: TestRepositoryContract/reports_are_built_from_events_and_sorted_by_id (0.02s)
+    --- PASS: TestRepositoryContract/reopening_a_resolved_report_clears_its_resolved_time (0.02s)
+    --- PASS: TestRepositoryContract/a_repeated_event_is_applied_once (0.02s)
+    --- PASS: TestRepositoryContract/unusable_events_change_nothing (0.04s)
+    --- PASS: TestRepositoryContract/an_event_that_was_not_usable_can_be_used_later (0.02s)
+=== RUN   TestDataSurvivesARestart
+--- PASS: TestDataSurvivesARestart (1.79s)
+=== RUN   TestSchemaMatchesTheDesignFile
+--- PASS: TestSchemaMatchesTheDesignFile (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/analytics/adapters/out/postgres	5.525s	coverage: 82.8% of statements
+
+$ docker exec -i pgtest bash /schema/test-schema.sh   (team schema check, docs/design/schema, every file run twice)
+OK    analytics.sql -> database analytics: processed_events, report_facts
+OK    authorization.sql -> database authorization_db: role_permissions, roles
+OK    category-taxonomy.sql -> database category_taxonomy: categories
+OK    department-directory.sql -> database department_directory: departments, positions
+OK    feedback.sql -> database feedback: feedback
+OK    identity.sql -> database identity: users
+OK    location-taxonomy.sql -> database location_taxonomy: locations
+OK    notification.sql -> database notification: notifications
+OK    reassignment.sql -> database reassignment: assignments
+OK    report-history.sql -> database report_history: report_summaries, report_timeline
+OK    routing-rules.sql -> database routing_rules: routing_rules
+OK    sla-policy.sql -> database sla_policy: sla_policies
+OK    status-lifecycle.sql -> database status_lifecycle: report_status
+All schema files ran with no errors.
+
+$ make test   (whole repo, no database needed)
+126 packages ok, 0 FAIL

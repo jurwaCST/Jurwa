@@ -7,7 +7,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/jurwaCST/Jurwa/services/feedback/adapters/out/repotest"
 	"github.com/jurwaCST/Jurwa/services/feedback/domain"
+	"github.com/jurwaCST/Jurwa/services/feedback/ports"
 )
 
 const reportID = "33333333-3333-3333-3333-333333333333"
@@ -39,4 +41,8 @@ func TestCreateTwiceIsAlreadyExists(t *testing.T) {
 func TestGetUnknownIsNotFound(t *testing.T) {
 	_, err := New().GetByReport(context.Background(), reportID)
 	assert.ErrorIs(t, err, domain.ErrNotFound)
+}
+
+func TestContract(t *testing.T) {
+	repotest.Run(t, func(*testing.T) ports.FeedbackRepository { return New() })
 }

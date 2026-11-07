@@ -42,6 +42,8 @@ Group 6, BE Software Engineering Year III. Modules: SWE303, WEB303, SWE302.
 
 | Sprint | Dates | Focus |
 |---|---|---|
-| Sprint 1 | 19-25 Oct | Design, planning, first working slice, k3d and CI |
-| Sprint 2 | 26 Oct-1 Nov | Build everything |
-| Sprint 3 | 2-8 Nov | Deployment, testing, presentation |
+| Sprint 1 | 22 to 27 October | Design, planning, first working slice, k3d and CI |
+| Sprint 2 | 28 October to 3 November | Build everything |
+| Sprint 3 | 3 to 8 November | Deployment, testing, presentation |
+
+Dates are the Jira sprint dates. Reviews and retrospectives of each sprint are in [`docs/sprint-reviews/`](docs/sprint-reviews/).

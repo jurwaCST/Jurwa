@@ -1,0 +1,20 @@
+# TLS certificate for jurwa.localtest.me (resolves to 127.0.0.1, no hosts file
+# change). cert-manager stores the key and certificate in Secret jurwa-tls and
+# renews it before it expires.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: jurwa-tls
+spec:
+  secretName: jurwa-tls
+  commonName: jurwa.localtest.me
+  dnsNames:
+    - jurwa.localtest.me
+  duration: 2160h # 90 days
+  renewBefore: 360h # 15 days
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: jurwa-selfsigned
+    kind: ClusterIssuer

@@ -1,0 +1,45 @@
+SCRUM-105 pkg/observability tests, 2026-11-06, Windows 11, Go go1.27.0.
+
+=== RUN   TestNewNeedsAServiceName
+--- PASS: TestNewNeedsAServiceName (0.00s)
+=== RUN   TestUnaryCountsOneRequestWithItsLabels
+--- PASS: TestUnaryCountsOneRequestWithItsLabels (0.00s)
+=== RUN   TestUnaryRecordsADuration
+--- PASS: TestUnaryRecordsADuration (0.00s)
+=== RUN   TestUnaryCountsAHandlerErrorWithItsCode
+=== RUN   TestUnaryCountsAHandlerErrorWithItsCode/gRPC_status_error
+=== RUN   TestUnaryCountsAHandlerErrorWithItsCode/unauthenticated
+=== RUN   TestUnaryCountsAHandlerErrorWithItsCode/plain_Go_error_is_Unknown
+--- PASS: TestUnaryCountsAHandlerErrorWithItsCode (0.00s)
+    --- PASS: TestUnaryCountsAHandlerErrorWithItsCode/gRPC_status_error (0.00s)
+    --- PASS: TestUnaryCountsAHandlerErrorWithItsCode/unauthenticated (0.00s)
+    --- PASS: TestUnaryCountsAHandlerErrorWithItsCode/plain_Go_error_is_Unknown (0.00s)
+=== RUN   TestUnaryWritesOneJSONLogLine
+--- PASS: TestUnaryWritesOneJSONLogLine (0.00s)
+=== RUN   TestUnaryCountsHealthChecksWithoutALogLine
+--- PASS: TestUnaryCountsHealthChecksWithoutALogLine (0.00s)
+=== RUN   TestUnaryLogsAFailedHealthCheck
+--- PASS: TestUnaryLogsAFailedHealthCheck (0.00s)
+=== RUN   TestUnaryCreatesACorrelationIDWhenMissing
+--- PASS: TestUnaryCreatesACorrelationIDWhenMissing (0.00s)
+=== RUN   TestUnaryGivesTheHandlerTheIncomingCorrelationID
+--- PASS: TestUnaryGivesTheHandlerTheIncomingCorrelationID (0.00s)
+=== RUN   TestCorrelationIDIsEmptyOutsideARequest
+--- PASS: TestCorrelationIDIsEmptyOutsideARequest (0.00s)
+=== RUN   TestLoggerAddsTheServiceName
+--- PASS: TestLoggerAddsTheServiceName (0.00s)
+=== RUN   TestMetricsServerIsOffWithoutAnAddress
+--- PASS: TestMetricsServerIsOffWithoutAnAddress (0.00s)
+=== RUN   TestMetricsServerServesTheCounters
+--- PASS: TestMetricsServerServesTheCounters (0.00s)
+=== RUN   TestMetricsServerFailsOnABadAddress
+--- PASS: TestMetricsServerFailsOnABadAddress (0.00s)
+=== RUN   TestInitReadsMetricsAddrFromTheEnvironment
+--- PASS: TestInitReadsMetricsAddrFromTheEnvironment (0.00s)
+=== RUN   TestInitWithoutMetricsAddrServesNothing
+--- PASS: TestInitWithoutMetricsAddrServesNothing (0.00s)
+=== RUN   TestTwoObsDoNotShareCounters
+--- PASS: TestTwoObsDoNotShareCounters (0.00s)
+PASS
+coverage: 98.8% of statements
+ok  	github.com/jurwaCST/Jurwa/pkg/observability	2.574s	coverage: 98.8% of statements

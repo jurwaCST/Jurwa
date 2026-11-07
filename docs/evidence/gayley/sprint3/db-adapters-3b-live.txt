@@ -1,0 +1,87 @@
+SCRUM-127 part 2 live run: analytics and notification against a local PostgreSQL 16 in Docker (postgres:16-alpine, port 55432).
+Date: 2026-11-06.
+analytics:    DATABASE_URL=postgres://jurwa:<local>@localhost:55432/analytics?sslmode=disable SEED_DEMO_DATA=true PORT=9120
+notification: DATABASE_URL=postgres://jurwa:<local>@localhost:55432/notification?sslmode=disable PORT=9118
+feedback is covered by the integration tests only: SubmitFeedback needs status-lifecycle running to confirm the report is RESOLVED.
+
+=== analytics, first start (SEED_DEMO_DATA=true)
+log: "msg":"storage: postgres"
+log: "msg":"demo data loaded","events":15
+--- GetSummary
+{
+  "counts": {
+    "total": "6",
+    "open": "1",
+    "assigned": "1",
+    "inProgress": "1",
+    "resolved": "2",
+    "escalated": "1"
+  },
+  "averageResolutionHours": 9
+}
+=== analytics stopped and started again (seed runs again)
+log: "msg":"storage: postgres"
+log: "msg":"demo data loaded","events":0   <- all 15 demo events were already applied
+--- GetSummary after restart (same numbers, nothing counted twice)
+{
+  "counts": {
+    "total": "6",
+    "open": "1",
+    "assigned": "1",
+    "inProgress": "1",
+    "resolved": "2",
+    "escalated": "1"
+  },
+  "averageResolutionHours": 9
+}
+--- Rows in PostgreSQL
+ report_id  | category_code  |   status    | was_escalated | resolved 
+------------+----------------+-------------+---------------+----------
+ academic-1 | ACADEMIC_BLOCK | IN_PROGRESS | f             | f
+ academic-2 | ACADEMIC_BLOCK | ESCALATED   | t             | f
+ hostel-1   | HOSTEL         | OPEN        | f             | f
+ hostel-2   | HOSTEL         | RESOLVED    | f             | t
+ others-1   | OTHERS         | ASSIGNED    | f             | f
+ others-2   | OTHERS         | RESOLVED    | f             | t
+(6 rows)
+
+ processed_events 
+------------------
+               15
+(1 row)
+
+
+=== notification
+log: "msg":"storage: postgres"
+--- SendNotification
+{
+  "notification": {
+    "id": "5a459130-d350-4dbc-b5f4-fb296b949cd4",
+    "recipientUserId": "22222222-2222-4222-8222-222222222222",
+    "channel": "IN_APP",
+    "eventType": "status.changed",
+    "reportId": "33333333-3333-4333-8333-333333333333",
+    "subject": "Report updated",
+    "body": "Your report is now In Progress.",
+    "deliveryStatus": "SENT",
+    "createdAt": "2026-11-06T07:16:13.520733900Z",
+    "sentAt": "2026-11-06T07:16:13.520733900Z"
+  }
+}
+--- notification stopped and started again; ListNotifications
+{
+  "notifications": [
+    {
+      "id": "5a459130-d350-4dbc-b5f4-fb296b949cd4",
+      "recipientUserId": "22222222-2222-4222-8222-222222222222",
+      "channel": "IN_APP",
+      "eventType": "status.changed",
+      "reportId": "33333333-3333-4333-8333-333333333333",
+      "subject": "Report updated",
+      "body": "Your report is now In Progress.",
+      "deliveryStatus": "SENT",
+      "createdAt": "2026-11-06T07:16:13.520733Z",
+      "sentAt": "2026-11-06T07:16:13.520733Z"
+    }
+  ]
+}

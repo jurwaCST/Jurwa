@@ -13,17 +13,18 @@ import (
 type Service struct {
 	repo ports.ReportRepository
 	ids  ports.IDGenerator
+	pub  ports.EventPublisher
 	now  func() time.Time
 }
 
 // NewService wires the use cases to their ports. now is usually time.Now.
-func NewService(repo ports.ReportRepository, ids ports.IDGenerator, now func() time.Time) *Service {
-	return &Service{repo: repo, ids: ids, now: now}
+func NewService(repo ports.ReportRepository, ids ports.IDGenerator, pub ports.EventPublisher, now func() time.Time) *Service {
+	return &Service{repo: repo, ids: ids, pub: pub, now: now}
 }
 
-// SubmitReport validates the form, stores the report as OPEN and returns it.
-// A form rule error wraps domain.ErrInvalidReport and nothing is stored.
-// TODO(Sprint 2): publish events:report.submitted on Redis Streams.
+// SubmitReport validates the form, stores the report as OPEN, publishes
+// report.submitted and returns the report. A form rule error wraps
+// domain.ErrInvalidReport and nothing is stored or published.
 func (s *Service) SubmitReport(ctx context.Context, in domain.NewReportInput) (domain.Report, error) {
 	report, err := domain.NewReport(s.ids.NewID(), in, s.now().UTC())
 	if err != nil {
@@ -31,6 +32,9 @@ func (s *Service) SubmitReport(ctx context.Context, in domain.NewReportInput) (d
 	}
 	if err := s.repo.Save(ctx, report); err != nil {
 		return domain.Report{}, fmt.Errorf("save report: %w", err)
+	}
+	if err := s.pub.ReportSubmitted(ctx, report); err != nil {
+		return domain.Report{}, fmt.Errorf("publish report.submitted: %w", err)
 	}
 	return report, nil
 }

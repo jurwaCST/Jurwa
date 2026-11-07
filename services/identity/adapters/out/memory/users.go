@@ -1,5 +1,5 @@
 // Package memory is an in-memory UserRepository for local runs and tests.
-// Data is lost when the server stops. PostgreSQL replaces it in Sprint 2.
+// Data is lost when the server stops. Used when DATABASE_URL is not set.
 package memory
 
 import (

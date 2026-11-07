@@ -214,3 +214,38 @@ func TestStringNames(t *testing.T) {
 	assert.Equal(t, "ESCALATED", Escalated.String())
 	assert.Equal(t, "STATUS_UNSPECIFIED", Status(9).String())
 }
+
+// Next is the rule both stores use: what one event does to one report.
+func TestNext(t *testing.T) {
+	open := Report{ID: "r1", Category: Hostel, Status: Open, CreatedAt: t0}
+	resolved := Report{ID: "r1", Category: Hostel, Status: Resolved, CreatedAt: t0, ResolvedAt: t0.Add(time.Hour)}
+	tests := []struct {
+		name    string
+		current Report
+		exists  bool
+		event   Event
+		want    Report
+		ok      bool
+	}{
+		{"submitted creates an open report", Report{}, false, Event{ID: "e", Type: ReportSubmitted, ReportID: "r1", Category: Hostel, OccurredAt: t0}, open, true},
+		{"submitted again is ignored", open, true, Event{ID: "e", Type: ReportSubmitted, ReportID: "r1", Category: Others, OccurredAt: t0}, Report{}, false},
+		{"bad category", Report{}, false, Event{ID: "e", Type: ReportSubmitted, ReportID: "r1", Category: Category(9)}, Report{}, false},
+		{"resolved sets the time", open, true, Event{ID: "e", Type: StatusChanged, ReportID: "r1", ToStatus: Resolved, OccurredAt: t0.Add(time.Hour)}, resolved, true},
+		{"reopened clears the time", resolved, true, Event{ID: "e", Type: StatusChanged, ReportID: "r1", ToStatus: InProgress, OccurredAt: t0}, Report{ID: "r1", Category: Hostel, Status: InProgress, CreatedAt: t0}, true},
+		{"escalated is remembered", open, true, Event{ID: "e", Type: StatusChanged, ReportID: "r1", ToStatus: Escalated}, Report{ID: "r1", Category: Hostel, Status: Escalated, CreatedAt: t0, WasEscalated: true}, true},
+		{"status for an unknown report", Report{}, false, Event{ID: "e", Type: StatusChanged, ReportID: "r1", ToStatus: Resolved}, Report{}, false},
+		{"bad status", open, true, Event{ID: "e", Type: StatusChanged, ReportID: "r1", ToStatus: Status(9)}, Report{}, false},
+		{"no event id", Report{}, false, Event{Type: ReportSubmitted, ReportID: "r1", Category: Hostel}, Report{}, false},
+		{"no report id", Report{}, false, Event{ID: "e", Type: ReportSubmitted, Category: Hostel}, Report{}, false},
+		{"unknown event type", open, true, Event{ID: "e", Type: EventType(9), ReportID: "r1"}, Report{}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, ok := Next(tt.current, tt.exists, tt.event)
+			assert.Equal(t, tt.ok, ok)
+			if tt.ok {
+				assert.Equal(t, tt.want, got)
+			}
+		})
+	}
+}

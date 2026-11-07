@@ -26,8 +26,22 @@ func (*failingRepo) Save(context.Context, domain.Report) error { return errors.N
 
 var fixedNow = time.Date(2026, 10, 27, 10, 0, 0, 0, time.UTC)
 
+// recordingPublisher remembers every published report, or fails when err is set.
+type recordingPublisher struct {
+	published []domain.Report
+	err       error
+}
+
+func (p *recordingPublisher) ReportSubmitted(_ context.Context, r domain.Report) error {
+	if p.err != nil {
+		return p.err
+	}
+	p.published = append(p.published, r)
+	return nil
+}
+
 func newTestService(repo *memory.Repository) *Service {
-	return NewService(repo, fixedIDs{}, func() time.Time { return fixedNow })
+	return NewService(repo, fixedIDs{}, &recordingPublisher{}, func() time.Time { return fixedNow })
 }
 
 func validForm() domain.NewReportInput {
@@ -69,12 +83,47 @@ func TestSubmitReportInvalidIsNotStored(t *testing.T) {
 }
 
 func TestSubmitReportSaveError(t *testing.T) {
-	svc := NewService(&failingRepo{}, fixedIDs{}, func() time.Time { return fixedNow })
+	pub := &recordingPublisher{}
+	svc := NewService(&failingRepo{}, fixedIDs{}, pub, func() time.Time { return fixedNow })
 
 	_, err := svc.SubmitReport(context.Background(), validForm())
 
 	require.Error(t, err)
 	assert.NotErrorIs(t, err, domain.ErrInvalidReport)
+	assert.Empty(t, pub.published, "nothing is published when the report was not stored")
+}
+
+func TestSubmitReportPublishesReportSubmitted(t *testing.T) {
+	pub := &recordingPublisher{}
+	svc := NewService(memory.NewRepository(), fixedIDs{}, pub, func() time.Time { return fixedNow })
+
+	report, err := svc.SubmitReport(context.Background(), validForm())
+
+	require.NoError(t, err)
+	require.Len(t, pub.published, 1)
+	assert.Equal(t, report, pub.published[0])
+}
+
+func TestSubmitReportInvalidIsNotPublished(t *testing.T) {
+	pub := &recordingPublisher{}
+	svc := NewService(memory.NewRepository(), fixedIDs{}, pub, func() time.Time { return fixedNow })
+	form := validForm()
+	form.Category = ""
+
+	_, err := svc.SubmitReport(context.Background(), form)
+
+	require.ErrorIs(t, err, domain.ErrMissingCategory)
+	assert.Empty(t, pub.published)
+}
+
+func TestSubmitReportPublishErrorIsReturned(t *testing.T) {
+	pub := &recordingPublisher{err: errors.New("redis down")}
+	svc := NewService(memory.NewRepository(), fixedIDs{}, pub, func() time.Time { return fixedNow })
+
+	_, err := svc.SubmitReport(context.Background(), validForm())
+
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "publish report.submitted")
 }
 
 func TestGetReport(t *testing.T) {

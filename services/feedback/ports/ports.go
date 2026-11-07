@@ -7,7 +7,7 @@ import (
 )
 
 // FeedbackRepository stores at most one feedback per report.
-// In-memory for now; a database in Sprint 3.
+// adapters/out/memory, or adapters/out/postgres when DATABASE_URL is set.
 type FeedbackRepository interface {
 	// Create returns domain.ErrAlreadyExists when the report already has feedback.
 	Create(ctx context.Context, f domain.Feedback) error
