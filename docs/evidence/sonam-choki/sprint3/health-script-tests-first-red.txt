@@ -1,0 +1,19 @@
+$ bash scripts/tests/check-all-health_test.sh
+FAIL  all up: exit code 0
+FAIL  all up: 20 service lines
+FAIL  all up: total line says 20 up, 0 down
+FAIL  all up: report-submission on 9001 is UP
+FAIL  all up: analytics on 9020 is UP
+FAIL  one down: exit code 1
+FAIL  one down: feedback on 9019 is DOWN
+FAIL  one down: total line says 19 up, 1 down
+FAIL  k8s all ready: exit code 0
+FAIL  k8s all ready: 20 lines with ready/desired
+FAIL  k8s: exit code 1
+FAIL  k8s: identity 0/1 is DOWN
+FAIL  k8s: notification scaled to 0/0 is DOWN
+FAIL  k8s: total line says 18 up, 2 down
+FAIL  unknown option: exit code 2
+
+15 check(s) failed.
+exit code: 1
