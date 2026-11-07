@@ -1,0 +1,30 @@
+# SCRUM-129 go test -race -v ./services/api-gateway/... (dashboard tests), 2026-11-07 23:05
+=== RUN   TestDashboardRoutesNeedAToken
+--- PASS: TestDashboardRoutesNeedAToken (0.00s)
+=== RUN   TestDashboardRoles
+--- PASS: TestDashboardRoles (0.01s)
+=== RUN   TestDashboardSummaryJSON
+--- PASS: TestDashboardSummaryJSON (0.00s)
+=== RUN   TestDashboardCategoriesJSON
+--- PASS: TestDashboardCategoriesJSON (0.00s)
+=== RUN   TestDashboardPeriod
+--- PASS: TestDashboardPeriod (0.00s)
+=== RUN   TestDashboardBadPeriod
+--- PASS: TestDashboardBadPeriod (0.00s)
+=== RUN   TestDashboardAnalyticsDown
+--- PASS: TestDashboardAnalyticsDown (0.00s)
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http	3.957s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient	3.727s
+=== RUN   TestAnalytics
+--- PASS: TestAnalytics (0.00s)
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients	2.147s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/application	4.523s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/cmd/server	5.425s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/domain	6.114s
+
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http	1.634s	coverage: 97.4% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient	0.794s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients	2.392s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/application	3.080s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/cmd/server	3.657s	coverage: 8.8% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/domain	4.271s	coverage: 97.0% of statements
