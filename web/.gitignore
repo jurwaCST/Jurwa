@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Cypress output (SCRUM-108)
+cypress/videos
+cypress/screenshots
+cypress/downloads
+cypress/logs
