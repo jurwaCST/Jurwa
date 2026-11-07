@@ -52,6 +52,10 @@ func (brokenApp) ListReportsByReporter(context.Context, string, int32, string) (
 	return nil, "", errors.New("list summaries: postgres password is wrong")
 }
 
+func (brokenApp) ListReportsByAssignee(context.Context, string, int32, string) ([]domain.Summary, string, error) {
+	return nil, "", errors.New("list summaries: postgres password is wrong")
+}
+
 func (brokenApp) GetReportTimeline(context.Context, string) ([]domain.Entry, error) {
 	return nil, errors.New("list entries: postgres password is wrong")
 }
@@ -63,6 +67,10 @@ type fixedApp struct {
 }
 
 func (a fixedApp) ListReportsByReporter(context.Context, string, int32, string) ([]domain.Summary, string, error) {
+	return a.summaries, "", nil
+}
+
+func (a fixedApp) ListReportsByAssignee(context.Context, string, int32, string) ([]domain.Summary, string, error) {
 	return a.summaries, "", nil
 }
 
@@ -87,6 +95,35 @@ func TestListReportsByReporter(t *testing.T) {
 	assert.Equal(t, t0, r.GetCreatedAt().AsTime())
 	assert.Equal(t, t0.Add(time.Hour), r.GetUpdatedAt().AsTime())
 	assert.Empty(t, resp.GetNextPageToken())
+}
+
+func TestListReportsByAssignee(t *testing.T) {
+	ctx := context.Background()
+	app := application.NewService(memory.NewRepository(), func() string { return entryID })
+	_, err := app.RecordSubmitted(ctx, application.SubmittedInput{
+		ReportID: reportA, ReporterID: studentA, Category: domain.CategoryHostel,
+		Location: domain.Location{Building: "Hostel A"}, CreatedAt: t0,
+	})
+	require.NoError(t, err)
+	_, err = app.Record(ctx, domain.EntryInput{
+		ReportID: reportA, EventType: domain.EventReportRouted, AssigneeID: dsa, Summary: "Routed to DSA", OccurredAt: t0.Add(time.Minute),
+	})
+	require.NoError(t, err)
+
+	resp, err := NewHandler(app).ListReportsByAssignee(ctx, &reporthistoryv1.ListReportsByAssigneeRequest{AssigneeId: dsa})
+
+	require.NoError(t, err)
+	require.Len(t, resp.GetReports(), 1)
+	assert.Equal(t, reportA, resp.GetReports()[0].GetReportId())
+	assert.Equal(t, dsa, resp.GetReports()[0].GetCurrentAssigneeId())
+	assert.Empty(t, resp.GetNextPageToken())
+
+	_, err = NewHandler(app).ListReportsByAssignee(ctx, &reporthistoryv1.ListReportsByAssigneeRequest{})
+	assert.Equal(t, codes.InvalidArgument, status.Code(err), "empty assignee id")
+
+	_, err = NewHandler(brokenApp{}).ListReportsByAssignee(ctx, &reporthistoryv1.ListReportsByAssigneeRequest{AssigneeId: dsa})
+	assert.Equal(t, codes.Internal, status.Code(err))
+	assert.NotContains(t, err.Error(), "password")
 }
 
 func TestGetReportTimeline(t *testing.T) {

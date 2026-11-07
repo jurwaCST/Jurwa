@@ -184,6 +184,103 @@ func TestListReportsByReporterErrors(t *testing.T) {
 	assert.ErrorIs(t, err, domain.ErrInvalidPageSize)
 }
 
+func routedTo(reportID, assigneeID string, at time.Time) domain.EntryInput {
+	return domain.EntryInput{ReportID: reportID, EventType: domain.EventReportRouted, AssigneeID: assigneeID, Summary: "Routed", OccurredAt: at}
+}
+
+func TestListReportsByAssigneeNewestFirstAndOnlyTheirs(t *testing.T) {
+	ctx := context.Background()
+	svc := newTestService()
+	daa := "5f607182-93a4-4e1f-8a3b-4c5d6e7f8091"
+	older := "0c000000-0000-4000-8000-000000000001"
+	newer := "0c000000-0000-4000-8000-000000000002"
+	for _, in := range []SubmittedInput{
+		submitted(older, studentA, t0),
+		submitted(reportB, studentB, t0.Add(30*time.Minute)),
+		submitted(newer, studentB, t0.Add(time.Hour)),
+	} {
+		_, err := svc.RecordSubmitted(ctx, in)
+		require.NoError(t, err)
+	}
+	for _, in := range []domain.EntryInput{
+		routedTo(older, dsa, t0.Add(2*time.Hour)),
+		routedTo(reportB, daa, t0.Add(2*time.Hour)),
+		routedTo(newer, dsa, t0.Add(2*time.Hour)),
+	} {
+		_, err := svc.Record(ctx, in)
+		require.NoError(t, err)
+	}
+
+	page, next, err := svc.ListReportsByAssignee(ctx, dsa, 0, "")
+	require.NoError(t, err)
+	assert.Empty(t, next)
+	require.Len(t, page, 2)
+	assert.Equal(t, newer, page[0].ReportID)
+	assert.Equal(t, older, page[1].ReportID)
+
+	other, _, err := svc.ListReportsByAssignee(ctx, daa, 0, "")
+	require.NoError(t, err)
+	require.Len(t, other, 1)
+	assert.Equal(t, reportB, other[0].ReportID)
+}
+
+func TestListReportsByAssigneeFollowsReassignment(t *testing.T) {
+	ctx := context.Background()
+	svc := newTestService()
+	hod := "6071a2b3-c4d5-4e6f-9a0b-1c2d3e4f5a6b"
+	_, err := svc.RecordSubmitted(ctx, submitted(reportA, studentA, t0))
+	require.NoError(t, err)
+	_, err = svc.Record(ctx, routedTo(reportA, dsa, t0.Add(time.Minute)))
+	require.NoError(t, err)
+	_, err = svc.Record(ctx, domain.EntryInput{ReportID: reportA, EventType: domain.EventReportReassigned, AssigneeID: hod, ActorID: dsa, Summary: "Reassigned to HoD", OccurredAt: t0.Add(time.Hour)})
+	require.NoError(t, err)
+
+	old, _, err := svc.ListReportsByAssignee(ctx, dsa, 0, "")
+	require.NoError(t, err)
+	assert.Empty(t, old, "the old assignee no longer sees it")
+
+	now, _, err := svc.ListReportsByAssignee(ctx, hod, 0, "")
+	require.NoError(t, err)
+	require.Len(t, now, 1)
+	assert.Equal(t, reportA, now[0].ReportID)
+}
+
+func TestListReportsByAssigneePages(t *testing.T) {
+	ctx := context.Background()
+	svc := newTestService()
+	for i := range 3 {
+		id := fmt.Sprintf("0d000000-0000-4000-8000-%012d", i)
+		_, err := svc.RecordSubmitted(ctx, submitted(id, studentA, t0.Add(time.Duration(i)*time.Minute)))
+		require.NoError(t, err)
+		_, err = svc.Record(ctx, routedTo(id, dsa, t0.Add(time.Hour)))
+		require.NoError(t, err)
+	}
+
+	first, next, err := svc.ListReportsByAssignee(ctx, dsa, 2, "")
+	require.NoError(t, err)
+	assert.Len(t, first, 2)
+	require.Equal(t, "2", next)
+
+	second, next, err := svc.ListReportsByAssignee(ctx, dsa, 2, next)
+	require.NoError(t, err)
+	assert.Len(t, second, 1)
+	assert.Empty(t, next)
+}
+
+func TestListReportsByAssigneeErrors(t *testing.T) {
+	svc := newTestService()
+
+	_, _, err := svc.ListReportsByAssignee(context.Background(), "", 0, "")
+	assert.ErrorIs(t, err, domain.ErrInvalidAssigneeID)
+
+	_, _, err = svc.ListReportsByAssignee(context.Background(), dsa, 500, "")
+	assert.ErrorIs(t, err, domain.ErrInvalidPageSize)
+
+	_, _, err = NewService(brokenRepo{Repository: memory.NewRepository(), failOn: "ListSummariesByAssignee"}, sequentialIDs()).
+		ListReportsByAssignee(context.Background(), dsa, 0, "")
+	assert.ErrorIs(t, err, errDB)
+}
+
 // brokenRepo wraps the memory repository and fails the chosen method.
 type brokenRepo struct {
 	*memory.Repository
@@ -225,6 +322,13 @@ func (r brokenRepo) ListSummariesByReporter(ctx context.Context, id string) ([]d
 		return nil, err
 	}
 	return r.Repository.ListSummariesByReporter(ctx, id)
+}
+
+func (r brokenRepo) ListSummariesByAssignee(ctx context.Context, id string) ([]domain.Summary, error) {
+	if err := r.fail("ListSummariesByAssignee"); err != nil {
+		return nil, err
+	}
+	return r.Repository.ListSummariesByAssignee(ctx, id)
 }
 
 func (r brokenRepo) ListEntries(ctx context.Context, id string) ([]domain.Entry, error) {

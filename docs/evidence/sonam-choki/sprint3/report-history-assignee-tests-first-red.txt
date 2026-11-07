@@ -1,0 +1,36 @@
+$ go test ./services/report-history/...
+# github.com/jurwaCST/Jurwa/services/report-history/adapters/out/memory [github.com/jurwaCST/Jurwa/services/report-history/adapters/out/memory.test]
+services/report-history/adapters/out/memory/repository_test.go:93:19: repo.ListSummariesByAssignee undefined (type *Repository has no field or method ListSummariesByAssignee)
+services/report-history/adapters/out/memory/repository_test.go:97:18: repo.ListSummariesByAssignee undefined (type *Repository has no field or method ListSummariesByAssignee)
+# github.com/jurwaCST/Jurwa/services/report-history/application [github.com/jurwaCST/Jurwa/services/report-history/application.test]
+services/report-history/application/service_test.go:188:65: undefined: domain.EventReportRouted
+services/report-history/application/service_test.go:188:84: unknown field AssigneeID in struct literal of type domain.EntryInput
+services/report-history/application/service_test.go:214:25: svc.ListReportsByAssignee undefined (type *Service has no field or method ListReportsByAssignee)
+services/report-history/application/service_test.go:221:23: svc.ListReportsByAssignee undefined (type *Service has no field or method ListReportsByAssignee)
+services/report-history/application/service_test.go:235:82: undefined: domain.EventReportReassigned
+services/report-history/application/service_test.go:235:105: unknown field AssigneeID in struct literal of type domain.EntryInput
+services/report-history/application/service_test.go:238:21: svc.ListReportsByAssignee undefined (type *Service has no field or method ListReportsByAssignee)
+services/report-history/application/service_test.go:242:21: svc.ListReportsByAssignee undefined (type *Service has no field or method ListReportsByAssignee)
+services/report-history/application/service_test.go:259:26: svc.ListReportsByAssignee undefined (type *Service has no field or method ListReportsByAssignee)
+services/report-history/application/service_test.go:264:27: svc.ListReportsByAssignee undefined (type *Service has no field or method ListReportsByAssignee)
+services/report-history/application/service_test.go:264:27: too many errors
+# github.com/jurwaCST/Jurwa/services/report-history/domain [github.com/jurwaCST/Jurwa/services/report-history/domain.test]
+services/report-history/domain/history_test.go:282:5: in.AssigneeID undefined (type EntryInput has no field or method AssigneeID)
+services/report-history/domain/history_test.go:285:31: e.AssigneeID undefined (type Entry has no field or method AssigneeID)
+services/report-history/domain/history_test.go:287:5: in.AssigneeID undefined (type EntryInput has no field or method AssigneeID)
+services/report-history/domain/history_test.go:289:25: undefined: ErrInvalidAssigneeID
+services/report-history/domain/history_test.go:296:48: undefined: EventReportRouted
+services/report-history/domain/history_test.go:296:67: unknown field AssigneeID in struct literal of type Entry
+services/report-history/domain/history_test.go:309:32: undefined: FilterByAssignee
+services/report-history/domain/history_test.go:310:18: undefined: FilterByAssignee
+# github.com/jurwaCST/Jurwa/services/report-history/adapters/in/grpc [github.com/jurwaCST/Jurwa/services/report-history/adapters/in/grpc.test]
+services/report-history/adapters/in/grpc/handler_test.go:109:40: undefined: domain.EventReportRouted
+services/report-history/adapters/in/grpc/handler_test.go:109:59: unknown field AssigneeID in struct literal of type domain.EntryInput
+FAIL	github.com/jurwaCST/Jurwa/services/report-history/adapters/in/grpc [build failed]
+?   	github.com/jurwaCST/Jurwa/services/report-history/adapters/out	[no test files]
+FAIL	github.com/jurwaCST/Jurwa/services/report-history/adapters/out/memory [build failed]
+FAIL	github.com/jurwaCST/Jurwa/services/report-history/application [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/report-history/cmd/server	0.771s
+FAIL	github.com/jurwaCST/Jurwa/services/report-history/domain [build failed]
+?   	github.com/jurwaCST/Jurwa/services/report-history/ports	[no test files]
+FAIL

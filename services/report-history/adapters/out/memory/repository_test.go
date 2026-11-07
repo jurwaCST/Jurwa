@@ -80,3 +80,21 @@ func TestEntriesKeepAppendOrderPerReport(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "first", again[0].Summary, "the caller gets a copy")
 }
+
+func TestListSummariesByAssignee(t *testing.T) {
+	ctx := context.Background()
+	repo := NewRepository()
+	dsa := "4e5f6071-8293-4d0e-9f2a-3b4c5d6e7f80"
+	a := domain.Summary{ReportID: reportA, ReporterID: studentA, AssigneeID: dsa}
+	b := domain.Summary{ReportID: reportB, ReporterID: studentB}
+	require.NoError(t, repo.CreateSummary(ctx, a))
+	require.NoError(t, repo.CreateSummary(ctx, b))
+
+	got, err := repo.ListSummariesByAssignee(ctx, dsa)
+	require.NoError(t, err)
+	assert.Equal(t, []domain.Summary{a}, got)
+
+	got, err = repo.ListSummariesByAssignee(ctx, studentA)
+	require.NoError(t, err)
+	assert.Empty(t, got)
+}
