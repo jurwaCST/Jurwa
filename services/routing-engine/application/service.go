@@ -22,6 +22,19 @@ func NewService(rules ports.RuleLookup, holders ports.HolderLookup, pub ports.Ev
 // RouteReport decides who receives a report, using only category and building.
 // When the request has a report id it publishes report.routed.
 func (s *Service) RouteReport(ctx context.Context, req domain.Request) (domain.Decision, error) {
+	return s.route(ctx, req, "")
+}
+
+// RouteSubmitted routes a report because of the report.submitted event
+// sourceEventID. It always publishes report.routed, so it needs a report id.
+func (s *Service) RouteSubmitted(ctx context.Context, sourceEventID string, req domain.Request) (domain.Decision, error) {
+	if req.ReportID == "" {
+		return domain.Decision{}, domain.ErrMissingReportID
+	}
+	return s.route(ctx, req, sourceEventID)
+}
+
+func (s *Service) route(ctx context.Context, req domain.Request, sourceEventID string) (domain.Decision, error) {
 	if err := req.Validate(); err != nil {
 		return domain.Decision{}, err
 	}
@@ -42,7 +55,7 @@ func (s *Service) RouteReport(ctx context.Context, req domain.Request) (domain.D
 	}
 	ev := ports.ReportRouted{
 		ReportID: d.ReportID, Category: d.Category, CategoryHeadID: d.CategoryHeadID,
-		TargetPosition: d.TargetPosition, RuleID: d.RuleID,
+		TargetPosition: d.TargetPosition, RuleID: d.RuleID, SourceEventID: sourceEventID,
 	}
 	if err := s.pub.PublishReportRouted(ctx, ev); err != nil {
 		return domain.Decision{}, fmt.Errorf("publish report.routed: %w", err)

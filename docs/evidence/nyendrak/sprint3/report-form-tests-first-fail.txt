@@ -1,0 +1,50 @@
+     × shows the active categories from the API in their order 1045ms
+     × loads the locations of the chosen category and narrows building, wing and area 1028ms
+     × has no wing step when the locations have no wing (Others) 1026ms
+     × needs a category and a full location before sending 1018ms
+     × shows a message when the categories cannot be loaded 1014ms
+     × shows a live counter and stops at 500 characters 1012ms
+     × needs a description that is not only spaces 1008ms
+     × refuses a photo that is not JPG or PNG 1006ms
+     × refuses a photo over 5 MB and accepts exactly 5 MB 1010ms
+     × shows a preview and can remove the photo 1018ms
+     × sends the report and shows the report id 1013ms
+     × uploads the photo first and sends its photoId with the report 1015ms
+     × shows the reason for a 400 and keeps the form 1010ms
+     × asks to try again when a service is unavailable or the server cannot be reached 1006ms
+     × does not send the report when the photo upload fails 1008ms
+     × disables the button while sending, so a report is sent only once 1016ms
+⎯⎯⎯⎯⎯⎯ Failed Tests 16 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/pages/ReportForm.test.tsx > SCRUM-65 category and location dropdowns > shows the active categories from the API in their order
+TestingLibraryElementError: Unable to find a label with the text of: Category
+ FAIL  src/pages/ReportForm.test.tsx > SCRUM-65 category and location dropdowns > loads the locations of the chosen category and narrows building, wing and area
+TestingLibraryElementError: Unable to find a label with the text of: Category
+ FAIL  src/pages/ReportForm.test.tsx > SCRUM-65 category and location dropdowns > has no wing step when the locations have no wing (Others)
+TestingLibraryElementError: Unable to find a label with the text of: Category
+ FAIL  src/pages/ReportForm.test.tsx > SCRUM-65 category and location dropdowns > needs a category and a full location before sending
+TestingLibraryElementError: Unable to find a label with the text of: Category
+ FAIL  src/pages/ReportForm.test.tsx > SCRUM-65 category and location dropdowns > shows a message when the categories cannot be loaded
+ FAIL  src/pages/ReportForm.test.tsx > SCRUM-66 description and photo field > shows a live counter and stops at 500 characters
+TestingLibraryElementError: Unable to find a label with the text of: Description
+ FAIL  src/pages/ReportForm.test.tsx > SCRUM-66 description and photo field > needs a description that is not only spaces
+TestingLibraryElementError: Unable to find a label with the text of: Category
+ FAIL  src/pages/ReportForm.test.tsx > SCRUM-66 description and photo field > refuses a photo that is not JPG or PNG
+TestingLibraryElementError: Unable to find a label with the text of: Photo (optional)
+ FAIL  src/pages/ReportForm.test.tsx > SCRUM-66 description and photo field > refuses a photo over 5 MB and accepts exactly 5 MB
+TestingLibraryElementError: Unable to find a label with the text of: Photo (optional)
+ FAIL  src/pages/ReportForm.test.tsx > SCRUM-66 description and photo field > shows a preview and can remove the photo
+TestingLibraryElementError: Unable to find a label with the text of: Photo (optional)
+ FAIL  src/pages/ReportForm.test.tsx > SCRUM-67 submit to report-submission > sends the report and shows the report id
+TestingLibraryElementError: Unable to find a label with the text of: Category
+ FAIL  src/pages/ReportForm.test.tsx > SCRUM-67 submit to report-submission > uploads the photo first and sends its photoId with the report
+TestingLibraryElementError: Unable to find a label with the text of: Category
+ FAIL  src/pages/ReportForm.test.tsx > SCRUM-67 submit to report-submission > shows the reason for a 400 and keeps the form
+TestingLibraryElementError: Unable to find a label with the text of: Category
+ FAIL  src/pages/ReportForm.test.tsx > SCRUM-67 submit to report-submission > asks to try again when a service is unavailable or the server cannot be reached
+TestingLibraryElementError: Unable to find a label with the text of: Category
+ FAIL  src/pages/ReportForm.test.tsx > SCRUM-67 submit to report-submission > does not send the report when the photo upload fails
+TestingLibraryElementError: Unable to find a label with the text of: Category
+ FAIL  src/pages/ReportForm.test.tsx > SCRUM-67 submit to report-submission > disables the button while sending, so a report is sent only once
+TestingLibraryElementError: Unable to find a label with the text of: Category
+ Test Files  1 failed (1)
+      Tests  16 failed (16)

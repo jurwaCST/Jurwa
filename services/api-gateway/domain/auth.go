@@ -39,6 +39,8 @@ const (
 
 	ActionReportStatusRead   = "report.status.read"
 	ActionReportStatusChange = "report.status.change"
+
+	ActionDashboardRead = "dashboard.read"
 )
 
 // Principal is the signed-in user, taken from a validated JWT.

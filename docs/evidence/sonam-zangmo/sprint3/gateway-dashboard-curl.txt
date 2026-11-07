@@ -1,0 +1,38 @@
+# SCRUM-129 live check, 2026-11-07 23:05. Local binaries: identity (SEED_DEMO_USERS=true; demo password and JWT_SECRET are throwaway values, not shown), authorization, analytics (SEED_DEMO_DATA=true: 6 demo reports), api-gateway on :8080. Tokens are never printed.
+
+$ GET /dashboard/summary as admin.demo (all time)
+{"counts":{"total":"6", "open":"1", "assigned":"1", "inProgress":"1", "resolved":"2", "escalated":"1"}, "averageResolutionHours":9}
+HTTP 200
+
+$ GET /dashboard/categories as president.demo (all time)
+{"categories":[{"category":"HOSTEL", "counts":{"total":"2", "open":"1", "assigned":"0", "inProgress":"0", "resolved":"1", "escalated":"0"}}, {"category":"ACADEMIC_BLOCK", "counts":{"total":"2", "open":"0", "assigned":"0", "inProgress":"1", "resolved":"0", "escalated":"1"}}, {"category":"OTHERS", "counts":{"total":"2", "open":"0", "assigned":"1", "inProgress":"0", "resolved":"1", "escalated":"0"}}]}
+HTTP 200
+
+$ GET /dashboard/summary as admin.demo, period far in the past (?from=2020-01-01T00:00:00Z&to=2020-12-31T23:59:59Z)
+{"counts":{"total":"0", "open":"0", "assigned":"0", "inProgress":"0", "resolved":"0", "escalated":"0"}, "averageResolutionHours":0}
+HTTP 200
+
+$ GET /dashboard/summary as admin.demo, ?from=2026-11-08 (date without a time)
+{"error":"from must be an RFC 3339 time, for example 2026-11-01T00:00:00+06:00"}
+
+HTTP 400
+
+$ GET /dashboard/summary as admin.demo, from after to
+{"error":"from must not be after to"}
+
+HTTP 400
+
+$ GET /dashboard/summary as dsa.demo (Category Head)
+{"error":"not allowed"}
+
+HTTP 403
+
+$ GET /dashboard/categories as a student
+{"error":"not allowed"}
+
+HTTP 403
+
+$ GET /dashboard/summary with no token
+{"error":"missing bearer token"}
+
+HTTP 401

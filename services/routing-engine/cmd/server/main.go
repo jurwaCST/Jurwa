@@ -8,6 +8,9 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
+
+	"github.com/google/uuid"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -15,15 +18,19 @@ import (
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/jurwaCST/Jurwa/pkg/eventbus"
 	"github.com/jurwaCST/Jurwa/pkg/resilience"
 	departmentdirectoryv1 "github.com/jurwaCST/Jurwa/proto/gen/department-directory/v1"
 	routingenginev1 "github.com/jurwaCST/Jurwa/proto/gen/routing-engine/v1"
 	routingrulesv1 "github.com/jurwaCST/Jurwa/proto/gen/routing-rules/v1"
+	"github.com/jurwaCST/Jurwa/services/routing-engine/adapters/in/events"
 	grpcadapter "github.com/jurwaCST/Jurwa/services/routing-engine/adapters/in/grpc"
 	"github.com/jurwaCST/Jurwa/services/routing-engine/adapters/out/directoryclient"
+	"github.com/jurwaCST/Jurwa/services/routing-engine/adapters/out/eventpublisher"
 	"github.com/jurwaCST/Jurwa/services/routing-engine/adapters/out/logpublisher"
 	"github.com/jurwaCST/Jurwa/services/routing-engine/adapters/out/rulesclient"
 	"github.com/jurwaCST/Jurwa/services/routing-engine/application"
+	"github.com/jurwaCST/Jurwa/services/routing-engine/ports"
 )
 
 // Defaults used when the environment variables are not set.
@@ -53,8 +60,7 @@ func main() {
 	healthpb.RegisterHealthServer(srv, hs)
 
 	// routing-engine is stateless: it asks routing-rules for the rule and
-	// department-directory for the holder. Events go to the log until Redis
-	// Streams arrives in Sprint 3.
+	// department-directory for the holder.
 	rulesConn, err := dial(envOr("ROUTING_RULES_ADDR", rulesclient.DefaultAddr))
 	if err != nil {
 		slog.Error("cannot create routing-rules client", "error", err)
@@ -68,21 +74,47 @@ func main() {
 	}
 	defer dirConn.Close()
 
+	// Stop cleanly on Ctrl+C (SIGINT) or when Kubernetes stops the pod (SIGTERM).
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	// With REDIS_URL: publish report.routed on Redis Streams and route every
+	// report.submitted. Without it: events go to the log and only the RPC routes.
+	bus, err := openBus(ctx, os.Getenv("REDIS_URL"))
+	if err != nil {
+		slog.Error("cannot connect to the event bus", "error", err)
+		os.Exit(1)
+	}
+	var pub ports.EventPublisher = logpublisher.New(logger)
+	if bus != nil {
+		defer bus.Close()
+		pub = eventpublisher.New(bus, uuid.NewString, time.Now)
+	}
+
 	app := application.NewService(
 		rulesclient.New(routingrulesv1.NewRoutingRulesServiceClient(rulesConn)),
 		directoryclient.New(departmentdirectoryv1.NewDepartmentDirectoryServiceClient(dirConn)),
-		logpublisher.New(logger),
+		pub,
 	)
+
+	if bus != nil {
+		consumer, _ := os.Hostname() // one consumer name per pod
+		go func() {
+			if err := bus.Subscribe(ctx, eventbus.StreamReportSubmitted, events.Group, consumer, events.New(app).Handle); err != nil {
+				slog.Error("report.submitted consumer stopped", "error", err)
+				stop()
+			}
+		}()
+		slog.Info("events: redis streams", "reads", eventbus.StreamReportSubmitted, "publishes", eventbus.StreamReportRouted)
+	} else {
+		slog.Info("events: log only (REDIS_URL not set)")
+	}
 	routingenginev1.RegisterRoutingEngineServiceServer(srv, grpcadapter.NewHandler(app))
 
 	// Reflection lets grpcurl list and call methods without the .proto files.
 	reflection.Register(srv)
 
 	hs.SetServingStatus("", healthpb.HealthCheckResponse_SERVING)
-
-	// Stop cleanly on Ctrl+C (SIGINT) or when Kubernetes stops the pod (SIGTERM).
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer stop()
 
 	go func() {
 		<-ctx.Done()
@@ -97,6 +129,25 @@ func main() {
 		os.Exit(1)
 	}
 	slog.Info("server stopped")
+}
+
+// openBus connects to Redis Streams when url is set, and nil when it is not.
+// A Redis that does not answer within 10 seconds is an error.
+func openBus(ctx context.Context, url string) (*eventbus.Redis, error) {
+	if url == "" {
+		return nil, nil
+	}
+	bus, err := eventbus.NewRedis(url)
+	if err != nil {
+		return nil, err
+	}
+	pingCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	if err := bus.Ping(pingCtx); err != nil {
+		_ = bus.Close()
+		return nil, err
+	}
+	return bus, nil
 }
 
 // envOr returns the environment variable key, or fallback when it is empty.

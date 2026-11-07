@@ -21,8 +21,18 @@ const (
 
 // fakePublisher records events so tests can check them.
 type fakePublisher struct {
-	events []ports.StatusChanged
-	err    error
+	events      []ports.StatusChanged
+	compensated []ports.EscalationCompensated
+	err         error
+	compensErr  error
+}
+
+func (f *fakePublisher) PublishEscalationCompensated(_ context.Context, ev ports.EscalationCompensated) error {
+	if f.compensErr != nil {
+		return f.compensErr
+	}
+	f.compensated = append(f.compensated, ev)
+	return nil
 }
 
 func (f *fakePublisher) PublishStatusChanged(_ context.Context, ev ports.StatusChanged) error {

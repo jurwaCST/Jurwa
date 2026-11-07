@@ -21,6 +21,7 @@ type Service struct {
 	repo ports.StatusRepository
 	pub  ports.EventPublisher
 	now  func() time.Time
+	seen seenEvents // Saga events already handled (saga.go)
 }
 
 // NewService wires the use cases to their ports. now is time.Now outside tests.
@@ -35,6 +36,7 @@ type ChangeStatusCommand struct {
 	ActorID         string // "" when the system acts
 	ExpectedVersion int32  // 0 means do not check
 	Reason          string
+	CorrelationID   string // set when the change is a Saga step
 }
 
 // Register gives a newly submitted report the status OPEN.
@@ -87,7 +89,7 @@ func (s *Service) ChangeStatus(ctx context.Context, cmd ChangeStatusCommand) (do
 
 	ev := ports.StatusChanged{
 		ReportID: rs.ReportID, From: from, To: rs.Status,
-		ActorID: cmd.ActorID, Version: rs.Version, Reason: cmd.Reason,
+		ActorID: cmd.ActorID, Version: rs.Version, Reason: cmd.Reason, CorrelationID: cmd.CorrelationID,
 	}
 	if err := s.pub.PublishStatusChanged(ctx, ev); err != nil {
 		return domain.ReportStatus{}, fmt.Errorf("publish status.changed: %w", err)

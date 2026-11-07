@@ -21,6 +21,7 @@ var (
 	ErrRuleNotFound    = errors.New("no routing rule matches")
 	ErrNoHolder        = errors.New("target position has no holder")
 	ErrUnavailable     = errors.New("a service routing depends on is unavailable")
+	ErrMissingReportID = errors.New("report id is required to route a submitted report")
 )
 
 // Valid reports whether c is one of the three agreed categories.
