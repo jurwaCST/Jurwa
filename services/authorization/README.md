@@ -31,6 +31,7 @@ From `docs/design/api-routes.md`. S = Student, CH = Category Head, SF = Staff, A
 | `report.submit` | `POST /reports` | yes | | | | |
 | `report.read` | `GET /reports/{reportId}` | yes | yes | yes | yes | |
 | `report.list_own` | `GET /me/reports` | yes | | | | |
+| `report.list_assigned` | `GET /me/assigned-reports` | | yes | yes | | |
 | `report.timeline.read` | `GET /reports/{reportId}/timeline` | yes | yes | yes | yes | |
 | `report.status.read` | `GET /reports/{reportId}/status` | yes | yes | yes | yes | |
 | `report.status.change` | `POST /reports/{reportId}/status` | | yes | yes | | |

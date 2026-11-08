@@ -1,0 +1,64 @@
+# SCRUM-137 report.list_assigned in the authorization policy, 2026-11-08 00:49
+$ go test ./services/authorization/... -cover
+ok  	github.com/jurwaCST/Jurwa/services/authorization/adapters/in/grpc	2.262s	coverage: 100.0% of statements
+?   	github.com/jurwaCST/Jurwa/services/authorization/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/authorization/adapters/out/memory	2.619s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/authorization/adapters/out/postgres	2.563s	coverage: 0.0% of statements
+	github.com/jurwaCST/Jurwa/services/authorization/adapters/out/repotest		coverage: 0.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/authorization/application	2.578s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/authorization/cmd/server	3.527s	coverage: 10.7% of statements
+ok  	github.com/jurwaCST/Jurwa/services/authorization/domain	2.026s	coverage: 100.0% of statements
+?   	github.com/jurwaCST/Jurwa/services/authorization/ports	[no test files]
+
+$ go test ./services/authorization/domain/ -run 'TestRoleRules|TestEveryRoleAgainstEveryAction' -v | grep -i assigned
+=== RUN   TestEveryRoleAgainstEveryAction/STUDENT_report.list_assigned
+=== RUN   TestEveryRoleAgainstEveryAction/CATEGORY_HEAD_report.list_assigned
+=== RUN   TestEveryRoleAgainstEveryAction/STAFF_report.list_assigned
+=== RUN   TestEveryRoleAgainstEveryAction/SYSTEM_ADMIN_report.list_assigned
+=== RUN   TestEveryRoleAgainstEveryAction/PRESIDENT_report.list_assigned
+    --- PASS: TestEveryRoleAgainstEveryAction/STUDENT_report.list_assigned (0.00s)
+    --- PASS: TestEveryRoleAgainstEveryAction/CATEGORY_HEAD_report.list_assigned (0.00s)
+    --- PASS: TestEveryRoleAgainstEveryAction/STAFF_report.list_assigned (0.00s)
+    --- PASS: TestEveryRoleAgainstEveryAction/SYSTEM_ADMIN_report.list_assigned (0.00s)
+    --- PASS: TestEveryRoleAgainstEveryAction/PRESIDENT_report.list_assigned (0.00s)
+=== RUN   TestRoleRules/category_head_can_list_the_reports_assigned_to_them
+=== RUN   TestRoleRules/staff_can_list_the_reports_assigned_to_them
+=== RUN   TestRoleRules/student_cannot_list_assigned_reports
+=== RUN   TestRoleRules/president_cannot_list_assigned_reports
+    --- PASS: TestRoleRules/category_head_can_list_the_reports_assigned_to_them (0.00s)
+    --- PASS: TestRoleRules/staff_can_list_the_reports_assigned_to_them (0.00s)
+    --- PASS: TestRoleRules/student_cannot_list_assigned_reports (0.00s)
+    --- PASS: TestRoleRules/president_cannot_list_assigned_reports (0.00s)
+
+$ DOCKER_HOST=npipe:////./pipe/docker_engine go test -tags=integration ./services/authorization/adapters/out/postgres/... -v   (real PostgreSQL, Testcontainers)
+=== RUN   TestRepositoryContract
+=== RUN   TestRepositoryContract/loads_the_default_permission_table
+=== RUN   TestRepositoryContract/loading_twice_gives_the_same_table
+--- PASS: TestRepositoryContract (2.52s)
+=== RUN   TestChangesInTheDatabaseAreLoaded
+--- PASS: TestChangesInTheDatabaseAreLoaded (2.51s)
+=== RUN   TestSchemaMatchesTheDesignFile
+--- PASS: TestSchemaMatchesTheDesignFile (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/authorization/adapters/out/postgres	7.071s
+
+# Live check 2026-11-08 00:52: web/cypress/start-stack.sh (gateway :18080, all in memory, demo users seeded; password and tokens not shown).
+# The lists are empty because reports are assigned by routing-engine over Redis, which this stack does not run.
+$ GET /me/assigned-reports as Category Head (dsa.demo)
+{"reports":[], "nextPageToken":""}
+HTTP 200
+$ GET /me/assigned-reports as Staff (staff.demo)
+{"reports":[], "nextPageToken":""}
+HTTP 200
+$ GET /me/assigned-reports as Student
+{"error":"not allowed"}
+
+HTTP 403
+$ GET /me/assigned-reports as President
+{"error":"not allowed"}
+
+HTTP 403
+$ GET /me/assigned-reports without a token
+{"error":"missing bearer token"}
+
+HTTP 401

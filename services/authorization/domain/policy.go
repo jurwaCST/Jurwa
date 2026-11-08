@@ -66,6 +66,7 @@ const (
 	ActionReportSubmit         = "report.submit"
 	ActionReportRead           = "report.read"
 	ActionReportListOwn        = "report.list_own"
+	ActionReportListAssigned   = "report.list_assigned"
 	ActionReportTimelineRead   = "report.timeline.read"
 	ActionReportStatusRead     = "report.status.read"
 	ActionReportStatusChange   = "report.status.change"
@@ -120,6 +121,7 @@ func DefaultPolicy() Policy {
 		ActionReportSubmit:         {Student},
 		ActionReportRead:           reportReaders,
 		ActionReportListOwn:        {Student},
+		ActionReportListAssigned:   {CategoryHead, Staff},
 		ActionReportTimelineRead:   reportReaders,
 		ActionReportStatusRead:     reportReaders,
 		ActionReportStatusChange:   {CategoryHead, Staff},

@@ -28,6 +28,7 @@ var expected = map[string][]Role{
 	ActionReportSubmit:         {S},
 	ActionReportRead:           {S, CH, SF, AD},
 	ActionReportListOwn:        {S},
+	ActionReportListAssigned:   {CH, SF},
 	ActionReportTimelineRead:   {S, CH, SF, AD},
 	ActionReportStatusRead:     {S, CH, SF, AD},
 	ActionReportStatusChange:   {CH, SF},
@@ -48,7 +49,7 @@ var expected = map[string][]Role{
 
 var allRoles = []Role{S, CH, SF, AD, PR}
 
-// TestEveryRoleAgainstEveryAction checks all 5 roles x 25 actions.
+// TestEveryRoleAgainstEveryAction checks all 5 roles x 26 actions.
 func TestEveryRoleAgainstEveryAction(t *testing.T) {
 	p := DefaultPolicy()
 	require.Len(t, p.Actions(), len(expected), "the policy has exactly the actions in the route table")
@@ -96,6 +97,10 @@ func TestRoleRules(t *testing.T) {
 		{"category head can reassign", CH, ActionReportReassign, true},
 		{"category head can list departments", CH, ActionDepartmentList, true},
 		{"category head cannot submit a report", CH, ActionReportSubmit, false},
+		{"category head can list the reports assigned to them", CH, ActionReportListAssigned, true},
+		{"staff can list the reports assigned to them", SF, ActionReportListAssigned, true},
+		{"student cannot list assigned reports", S, ActionReportListAssigned, false},
+		{"president cannot list assigned reports", PR, ActionReportListAssigned, false},
 		{"admin can manage routing rules", AD, ActionRoutingRuleWrite, true},
 		{"admin can see the dashboard", AD, ActionDashboardRead, true},
 		{"admin can read the audit log", AD, ActionReportAuditRead, true},
