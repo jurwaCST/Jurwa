@@ -18,7 +18,7 @@ Every number here comes from a file in `docs/evidence/`. Where a test was not ru
 | Q2 | At least 70% coverage on routing, SLA and status-flow packages | Met: 10 of 10 critical packages at 98.2% or more (section 5.1) |
 | Q3 | No report is silently forgotten | Met for the domain: every status pair tested (S-10), 9 gopter properties hold (P-01 to P-09), Saga tests pass (SG-01 to SG-05). The full flow in the browser is not yet tested (section 7) |
 | Q4 | A student submits a report with a photo in under two minutes | Not measured here: pilot usability sessions (Sonam Choki) |
-| Q5 | The PWA is accessible | Met for the automated checks: 0 axe-core violations on 12 page states, Lighthouse 100 on `/login`, keyboard pass on the report form (A-01 to A-03). No screen reader pass yet (section 7) |
+| Q5 | The PWA is accessible | Met for the pages that exist: 0 axe-core violations on 12 page states, Lighthouse 100 on `/login`, keyboard pass on the report form (A-01 to A-03). The staff, admin and President pages are still placeholders, and there is no screen reader pass yet (section 7) |
 | Q6 | Report submission holds up under load | Met: p95 252 ms, 0 errors at 50 users (L-01) |
 | Q7 | No untested code reaches `main` | Met: CI runs unit tests, the coverage gate and image builds on every pull request; branch protection blocks the merge when a check fails |
 

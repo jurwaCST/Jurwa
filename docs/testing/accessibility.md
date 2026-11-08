@@ -33,6 +33,8 @@ Run on 8 November 2026 (`docs/evidence/gayley/sprint3/a11y.txt`, video `a11y-run
 
 **12 of 12 pass, 0 violations.** The pages are signed in through the real login page, so each one is checked as its user sees it.
 
+`/staff`, `/admin` and `/president` are still placeholder pages (a heading and one line: SCRUM-36 and SCRUM-37 were moved to Sprint 4, SCRUM-99 is Stretch). Their result only shows the shared layout passes; the checks must be run again when the real pages are built. The real content checked today is the sign-in page, the home page and the report form. The report form was checked before Nyendrak's styling update (`SCRUM-35-form-polish`, not merged), so it is run again after that merge.
+
 ## 2. Lighthouse
 
 | Page | Accessibility score | Scored checks | Evidence |
