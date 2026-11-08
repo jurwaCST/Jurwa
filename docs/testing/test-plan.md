@@ -1,6 +1,6 @@
 # Test plan and test cases (SCRUM-112)
 
-Owner: Gayley Choden (Scrum Master). Version 1.0, 8 November 2026, end of Sprint 3. Module: SWE302.
+Owner: Gayley Choden (Scrum Master). Version 1.1, 8 November 2026, end of Sprint 3 (1.1 adds the accessibility results). Module: SWE302.
 
 Every number here comes from a file in `docs/evidence/`. Where a test was not run, this plan says so. The quality objectives and rules behind it are in `docs/pm/quality-plan.md`; the requirement ids are in `docs/pm/requirements.md`.
 
@@ -18,7 +18,7 @@ Every number here comes from a file in `docs/evidence/`. Where a test was not ru
 | Q2 | At least 70% coverage on routing, SLA and status-flow packages | Met: 10 of 10 critical packages at 98.2% or more (section 5.1) |
 | Q3 | No report is silently forgotten | Met for the domain: every status pair tested (S-10), 9 gopter properties hold (P-01 to P-09), Saga tests pass (SG-01 to SG-05). The full flow in the browser is not yet tested (section 7) |
 | Q4 | A student submits a report with a photo in under two minutes | Not measured here: pilot usability sessions (Sonam Choki) |
-| Q5 | The PWA is accessible | **Not run yet** (axe-core and Lighthouse, section 7) |
+| Q5 | The PWA is accessible | Met for the automated checks: 0 axe-core violations on 12 page states, Lighthouse 100 on `/login`, keyboard pass on the report form (A-01 to A-03). No screen reader pass yet (section 7) |
 | Q6 | Report submission holds up under load | Met: p95 252 ms, 0 errors at 50 users (L-01) |
 | Q7 | No untested code reaches `main` | Met: CI runs unit tests, the coverage gate and image builds on every pull request; branch protection blocks the merge when a check fails |
 
@@ -38,7 +38,7 @@ Every number here comes from a file in `docs/evidence/`. Where a test was not ru
 | End-to-end | A real browser on the web app, through the gateway, to the services | Cypress 15.21.1 | Gayley | `web/cypress/` | SCRUM-108 |
 | Web unit | Pages, role guards and the API client | Vitest, Testing Library | Gayley, Nyendrak | `web/src/**/*.test.tsx` | SCRUM-118, SCRUM-35 |
 | Performance | `POST /reports` under load, and the rate limit | Apache JMeter | Sonam Zangmo | `tests/load/` | SCRUM-109 |
-| Accessibility | WCAG basics on the main screens | axe-core, Lighthouse | Gayley | not written yet | Step 7 |
+| Accessibility | WCAG 2.1 A and AA on every page; keyboard use of the report form | axe-core (cypress-axe), Lighthouse, by hand | Gayley | `web/cypress/e2e/a11y.cy.ts`, `docs/testing/accessibility.md` | SCRUM-110 |
 | Exploratory | The running app, off script, with a charter | Charter | Gayley (Sprint 3) | `docs/testing/exploratory-charter-sprint3.md` | SCRUM-112 |
 | Code quality | Bugs, vulnerabilities, smells, duplication | SonarQube Community Build | Sonam Choki | `sonar-project.properties` | SCRUM-111 |
 
@@ -119,6 +119,14 @@ Ids are used in the traceability matrix (section 4). Each row is a real test in 
 | I-01 | Each repository passes the same contract on a real database as in memory | `*_integration_test.go` in analytics, authorization, category-taxonomy, feedback, identity, notification, report-submission (MongoDB), routing-rules |
 | I-02 | Publish and consume on a real Redis Streams | `pkg/eventbus/redis_integration_test.go` |
 
+### 3.5b Accessibility (details in `docs/testing/accessibility.md`)
+
+| Id | What it checks | Input | Expected | Where |
+|---|---|---|---|---|
+| A-01 | WCAG 2.1 A and AA rules on every page | 12 page states: sign-in (and its error), home, 404, the student's home, report form (empty, category chosen, errors) and 403, the Category Head, admin and President pages | 0 axe-core violations | `web/cypress/e2e/a11y.cy.ts` |
+| A-02 | Lighthouse accessibility score | `/login` | 90 or more | `lighthouse-login.report.html` |
+| A-03 | The report form without a mouse | Tab, arrow keys, Enter | every field reached in order, focus visible, errors shown, report sent | `docs/testing/accessibility.md` section 3 |
+
 ### 3.6 End-to-end (`web/cypress/e2e/report-flow.cy.ts`)
 
 | Id | What it checks | Expected |
@@ -185,6 +193,7 @@ Ids are used in the traceability matrix (section 4). Each row is a real test in 
 | NFR-03 health checks | `TestUnaryCountsHealthChecksWithoutALogLine` (U-20); probes are in the manifests |
 | NFR-04 JWT and role checks | U-03, U-05, U-16, U-17, E-07, E-08 |
 | NFR-05 hashed passwords, rate limit | U-02, U-04, L-02 |
+| NFR-06 WCAG basics | A-01, A-02, A-03 |
 | NFR-08 JSON logs and metrics | U-20 |
 | NFR-10 70% coverage on critical code | coverage gate (section 5.1) |
 
@@ -194,7 +203,6 @@ Ids are used in the traceability matrix (section 4). Each row is a real test in 
 |---|---|
 | FR-24 staff represented by their supervisor (Could) | Not built |
 | NFR-01 submit with a photo in under two minutes | Measured by the pilot usability sessions, not by an automated test |
-| NFR-06 WCAG basics | axe-core and Lighthouse not run yet (Step 7) |
 | NFR-07 installable PWA | The PWA manifest and service worker (SCRUM-98) are not merged, so there is nothing to test |
 | NFR-09 hexagonal template, own database, gRPC only | Checked in code review, not by a test |
 | NFR-11 free tools only | A project rule, not testable |
@@ -262,7 +270,14 @@ All 50 users come from one laptop, so the rate limit was raised for L-01; on cam
 
 ### 5.7 Accessibility (axe-core, Lighthouse)
 
-**Not run yet.** No scores to report (section 7).
+| Check | Result | Evidence |
+|---|---|---|
+| axe-core, 12 page states, WCAG 2.1 A and AA | 12 of 12 pass, 0 violations | `docs/evidence/gayley/sprint3/a11y.txt`, `a11y-run.mp4` |
+| Lighthouse accessibility, `/login` | **100** (13 of 13 scored checks pass) | `lighthouse-login.report.html`, `.json` |
+| Keyboard pass, report form | 6 of 6 pass | `docs/testing/accessibility.md` section 3 |
+| Screen reader | Not run | section 7 |
+
+Lighthouse 12 and later has no PWA category, so the PWA install check is done in Chrome DevTools once SCRUM-98 is merged.
 
 ## 6. Defect log
 
@@ -284,12 +299,13 @@ Defects found in Sprints 2 and 3.
 | D-12 | A new report was not in report-history, so its timeline answered 404 | End-to-end check with curl | Sonam Choki: report-history reads the events | SCRUM-130 |
 | D-13 | Stopping the end-to-end stack by killing bash left the services running and holding ports | Ports taken on the next run | Gayley: documented, Ctrl+C stops all | SCRUM-108 |
 | D-14 | The first location-taxonomy slice was not test-first | Review | Sonam Choki: reverted and redone | issue I9 |
+| D-15 | The photo error message on the report form has no `role="alert"`, so a screen reader does not read it out (the other form errors are read) | Code check during the accessibility tests (axe-core does not flag it) | Open, Nyendrak | SCRUM-35, SCRUM-110 |
 
 ## 7. Known gaps and risks
 
 | Gap | Effect | Plan |
 |---|---|---|
-| Accessibility (axe-core, Lighthouse) not run | NFR-06 and Q5 not shown | Step 7, now that the report form (SCRUM-35) is merged |
+| No screen reader pass, and Lighthouse only on `/login` | A problem axe-core cannot see (D-15) could be missed | NVDA pass and Lighthouse on the signed-in pages, Sprint 4 |
 | PWA manifest and service worker not merged | NFR-07 cannot be tested; Traefik's HTTPS works but a self-signed certificate blocks a phone install | SCRUM-98 (Nyendrak) |
 | The Cypress story stops before the form, routing, status change and timeline steps | The full flow is tested by parts, not end to end in one browser test | Add them now that SCRUM-35, SCRUM-128, SCRUM-131 and SCRUM-136 are merged |
 | BDD scenarios are not executed | They document behaviour; the unit tests check it | godog step definitions, Sprint 4 |
