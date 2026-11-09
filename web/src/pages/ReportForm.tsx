@@ -1,13 +1,16 @@
 // Student report form (SCRUM-35). Owner: Nyendrak.
 // Category and location come from the gateway; the photo is uploaded first and
 // its photoId is sent with the report (report-submission SubmitReport).
-// Every field stays inside its <label> with the same text, so tests (Vitest and
-// Gayley's Cypress findLabel) find it by its label.
-// Built from Gayley's design (SCRUM-138): PageHeader, card, Icon, StatusBadge,
-// the tokens in index.css and the saffron .action for the one main action.
-import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react'
+// Built from Gayley's design (SCRUM-138, SCRUM-141): PageHeader, Field, Button,
+// Icon, StatusBadge, the card class and the tokens in index.css.
+// The category is a set of tiles (radio buttons, so the arrow keys move between
+// them); every other field stays inside its <label> with the same text, so
+// tests find it by its label.
+import { useEffect, useMemo, useState, type ChangeEvent, type DragEvent, type FormEvent, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { api, ApiError } from '../api/client'
+import Button from '../components/Button'
+import Field from '../components/Field'
 import Icon, { type IconName } from '../components/Icon'
 import PageHeader from '../components/PageHeader'
 import StatusBadge from '../components/StatusBadge'
@@ -25,7 +28,7 @@ type LocationEntry = { id: string; category: string; location: Location }
 
 // A problem to show: the text, and whether the student must sign in again.
 type Problem = { text: string; signIn: boolean }
-type Field = 'category' | 'location' | 'description'
+type FieldName = 'category' | 'location' | 'description'
 
 const EXPIRED: Problem = { text: 'Your sign-in has expired. Please sign in again.', signIn: true }
 
@@ -33,6 +36,9 @@ const EXPIRED: Problem = { text: 'Your sign-in has expired. Please sign in again
 // stroke and markup as Gayley's, so they look the same.
 const formPaths = {
   category: 'M3 12V4h8l10 10-8 8-10-10ZM7.5 8h.01',
+  hostel: 'M3 19V6M3 15h18M21 19v-6a3 3 0 0 0-3-3h-8v5M6.5 12.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z',
+  academic: 'M3 21h18M4 10h16M12 3 3.5 8h17L12 3ZM6 10v8M10 10v8M14 10v8M18 10v8',
+  others: 'M12 21v-5M6 16h12L12 3 6 16Z',
   place: 'M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21ZM12 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z',
   describe: 'M4 20h4L19 9l-4-4L4 16v4ZM13.5 6.5l4 4',
   camera: 'M4 8h3l2-3h6l2 3h3v11H4V8ZM12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z',
@@ -46,6 +52,13 @@ const formPaths = {
 } as const
 
 type FormIconName = keyof typeof formPaths
+
+// The icon on each category tile; a new category gets the general tag icon.
+const categoryIcons: Record<string, FormIconName> = {
+  HOSTEL: 'hostel',
+  ACADEMIC_BLOCK: 'academic',
+  OTHERS: 'others',
+}
 
 // FormIcon draws one of formPaths. Decorative: the text next to it says the same.
 function FormIcon({ name, size = 20 }: { name: FormIconName; size?: number }) {
@@ -110,7 +123,7 @@ function ProblemText({ problem }: { problem: Problem }) {
   )
 }
 
-// Step is one numbered part of the form, with its icon in a round badge.
+// Step is one part of the form, with its icon in a round badge.
 function Step({ icon, title, children }: { icon: FormIconName; title: string; children: ReactNode }) {
   return (
     <section className="report-section">
@@ -125,7 +138,7 @@ function Step({ icon, title, children }: { icon: FormIconName; title: string; ch
   )
 }
 
-// What happens after sending: the first two stops of Gayley's route on Home.
+// What happens after sending: the first stops of Gayley's route on Home.
 const nextSteps: { icon: IconName; title: string; text: string }[] = [
   { icon: 'open', title: 'Open', text: 'Your report gets a number as soon as it is sent.' },
   { icon: 'assigned', title: 'Assigned', text: 'It goes to the Category Head for its category, by category and place only.' },
@@ -168,7 +181,8 @@ export default function ReportForm() {
   const [photo, setPhoto] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [photoError, setPhotoError] = useState<string | null>(null)
-  const [fieldError, setFieldError] = useState<{ field: Field; text: string } | null>(null)
+  const [dragging, setDragging] = useState(false)
+  const [fieldError, setFieldError] = useState<{ field: FieldName; text: string } | null>(null)
   const [sendProblem, setSendProblem] = useState<Problem | null>(null)
   const [busy, setBusy] = useState(false)
   const [sentId, setSentId] = useState<string | null>(null)
@@ -230,43 +244,49 @@ export default function ReportForm() {
 
   // The chosen location is complete when every step that exists has a value.
   const locationDone = !!building && (!wings.length || !!wing) && (!areas.length || !!area)
+  const stepsDone = [!!category, locationDone, !!description.trim()].filter(Boolean).length
 
-  // errorFor gives a field's error props: aria-invalid and the id of its message.
-  function errorFor(field: Field, describedBy?: string) {
-    const invalid = fieldError?.field === field
-    const ids = [describedBy, invalid ? `${field}-error` : undefined].filter(Boolean).join(' ')
-    return { 'aria-invalid': invalid || undefined, 'aria-describedby': ids || undefined }
+  // errorText is a field's message, or null.
+  function errorText(field: FieldName): string | null {
+    return fieldError?.field === field ? fieldError.text : null
   }
 
-  // fieldErrorText shows a field's message under it, or nothing.
-  function fieldErrorText(field: Field) {
-    if (fieldError?.field !== field) return null
-    return (
-      <p id={`${field}-error`} role="alert" className="report-field-error">
-        <FormIcon name="alert" size={18} />
-        <span>{fieldError.text}</span>
-      </p>
-    )
-  }
+  // The location message goes under the first step still missing.
+  const locationError = errorText('location')
+  const missing = !building ? 'building' : wings.length && !wing ? 'wing' : 'area'
 
-  function onPhoto(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0] ?? null
+  // acceptFile checks a chosen or dropped photo the same way.
+  function acceptFile(file: File | null): boolean {
     setPhotoError(null)
     setPhoto(null)
     setPreview(null)
-    if (!file) return
+    if (!file) return true
     if (!PHOTO_TYPES.includes(file.type)) {
       setPhotoError('The photo must be a JPG or PNG image.')
-      e.target.value = ''
-      return
+      return false
     }
     if (file.size > MAX_PHOTO_BYTES) {
       setPhotoError('The photo must be 5 MB or smaller.')
-      e.target.value = ''
-      return
+      return false
     }
     setPhoto(file)
     setPreview(URL.createObjectURL(file))
+    return true
+  }
+
+  function onPhoto(e: ChangeEvent<HTMLInputElement>) {
+    if (!acceptFile(e.target.files?.[0] ?? null)) e.target.value = ''
+  }
+
+  function onDragOver(e: DragEvent<HTMLLabelElement>) {
+    e.preventDefault()
+    setDragging(true)
+  }
+
+  function onDrop(e: DragEvent<HTMLLabelElement>) {
+    e.preventDefault()
+    setDragging(false)
+    acceptFile(e.dataTransfer.files?.[0] ?? null)
   }
 
   function removePhoto() {
@@ -347,17 +367,17 @@ export default function ReportForm() {
           </p>
           <StatusBadge status="OPEN" />
           {canCopy && (
-            <button type="button" className="report-copy" onClick={copyNumber}>
+            <Button variant="secondary" onClick={copyNumber}>
               <FormIcon name={copied ? 'check' : 'copy'} size={18} />
               {copied ? 'Copied' : 'Copy report number'}
-            </button>
+            </Button>
           )}
           <p className="muted">It goes to the Category Head for this category. Keep the number to ask about it later.</p>
           <div className="report-actions">
-            <button type="button" className="action" onClick={startAgain}>
+            <Button onClick={startAgain}>
               <Icon name="report" />
               Report another issue
-            </button>
+            </Button>
             <Link to="/" className="report-secondary">
               <Icon name="home" />
               Back to home
@@ -368,6 +388,8 @@ export default function ReportForm() {
     )
   }
 
+  const categoryError = errorText('category')
+
   return (
     <div className="report-page">
       <PageHeader title="Report an issue" description="Tell us what is wrong and where. It takes about two minutes." />
@@ -376,27 +398,46 @@ export default function ReportForm() {
       <div className="report-layout">
         <form className="card report-form" onSubmit={onSubmit} noValidate>
           <Step icon="category" title="What kind of problem?">
-            <label>
+            <p id="category-label" className="report-label">
               Category
-              <select value={category} onChange={(e) => chooseCategory(e.target.value)} {...errorFor('category')}>
-                <option value="">Choose a category</option>
-                {categories.map((c) => (
-                  <option key={c.category} value={c.category}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {chosen?.description && <p className="muted report-hint">{chosen.description}</p>}
-            {fieldErrorText('category')}
+            </p>
+            <div
+              role="radiogroup"
+              aria-labelledby="category-label"
+              aria-invalid={categoryError ? true : undefined}
+              aria-describedby={categoryError ? 'category-error' : undefined}
+              className="report-tiles"
+            >
+              {categories.map((c) => (
+                <label key={c.category} className={c.category === category ? 'report-tile is-chosen' : 'report-tile'}>
+                  <input
+                    type="radio"
+                    name="category"
+                    className="visually-hidden"
+                    value={c.category}
+                    checked={c.category === category}
+                    onChange={() => chooseCategory(c.category)}
+                  />
+                  <span className="report-tile-icon">
+                    <FormIcon name={categoryIcons[c.category] ?? 'category'} size={26} />
+                  </span>
+                  <span className="report-tile-name">{c.name}</span>
+                </label>
+              ))}
+            </div>
+            {chosen?.description && <p className="field-hint">{chosen.description}</p>}
+            {categoryError && (
+              <p id="category-error" role="alert" className="field-error">
+                {categoryError}
+              </p>
+            )}
           </Step>
 
           <Step icon="place" title="Where is it?">
-            {!category && <p className="muted report-hint">Choose a category first.</p>}
+            {!category && <p className="field-hint">Choose a category first.</p>}
             <div className="report-place">
               {category && buildings.length > 0 && (
-                <label>
-                  Building
+                <Field label="Building" error={missing === 'building' ? locationError : null}>
                   <select
                     value={building}
                     onChange={(e) => {
@@ -404,7 +445,6 @@ export default function ReportForm() {
                       setWing('')
                       setArea('')
                     }}
-                    {...errorFor('location')}
                   >
                     <option value="">Choose a building</option>
                     {buildings.map((b) => (
@@ -413,40 +453,35 @@ export default function ReportForm() {
                       </option>
                     ))}
                   </select>
-                </label>
+                </Field>
               )}
 
               {building && wings.length > 0 && (
-                <div className="report-field">
-                  <label>
-                    Wing
-                    <select
-                      value={wing}
-                      aria-describedby="wing-hint"
-                      onChange={(e) => {
-                        setWing(e.target.value)
-                        setArea('')
-                      }}
-                    >
-                      <option value="">Choose a wing</option>
-                      {wings.map((w) => (
-                        <option key={w} value={w}>
-                          {w}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  {/* Pilot (SCRUM-113): students found the wing step confusing. */}
-                  <p id="wing-hint" className="muted report-hint report-hint-icon">
-                    <FormIcon name="info" size={16} />
-                    <span>The part of the building the problem is in. Not sure? Choose the nearest wing.</span>
-                  </p>
-                </div>
+                // Pilot (SCRUM-113): students found the wing step confusing.
+                <Field
+                  label="Wing"
+                  hint="The part of the building the problem is in. Not sure? Choose the nearest wing."
+                  error={missing === 'wing' ? locationError : null}
+                >
+                  <select
+                    value={wing}
+                    onChange={(e) => {
+                      setWing(e.target.value)
+                      setArea('')
+                    }}
+                  >
+                    <option value="">Choose a wing</option>
+                    {wings.map((w) => (
+                      <option key={w} value={w}>
+                        {w}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
               )}
 
               {building && (!wings.length || wing) && areas.length > 0 && (
-                <label>
-                  Area
+                <Field label="Area" error={missing === 'area' ? locationError : null}>
                   <select value={area} onChange={(e) => setArea(e.target.value)}>
                     <option value="">Choose an area</option>
                     {areas.map((a) => (
@@ -455,36 +490,48 @@ export default function ReportForm() {
                       </option>
                     ))}
                   </select>
-                </label>
+                </Field>
               )}
             </div>
-            {fieldErrorText('location')}
+            {/* No select on screen yet to put the message under. */}
+            {locationError && !buildings.length && (
+              <p role="alert" className="field-error">
+                {locationError}
+              </p>
+            )}
           </Step>
 
           <Step icon="describe" title="What is wrong?">
-            <label>
-              Description
+            <Field
+              label="Description"
+              error={errorText('description')}
+              after={
+                <p
+                  id="description-count"
+                  className={description.length >= MAX_DESCRIPTION ? 'field-counter over' : 'field-counter'}
+                >
+                  {description.length} / {MAX_DESCRIPTION}
+                </p>
+              }
+            >
               <textarea
                 rows={5}
                 maxLength={MAX_DESCRIPTION}
                 value={description}
                 placeholder="For example: the tap in Bathroom 1 has been leaking since Monday."
                 onChange={(e) => setDescription(e.target.value)}
-                {...errorFor('description', 'description-count')}
               />
-            </label>
-            <p
-              id="description-count"
-              className={`muted num report-counter${description.length >= MAX_DESCRIPTION ? ' report-counter-full' : ''}`}
-            >
-              {description.length} / {MAX_DESCRIPTION}
-            </p>
-            {fieldErrorText('description')}
+            </Field>
           </Step>
 
           <Step icon="camera" title="Add a photo">
             {!preview && (
-              <label className="report-photo-drop">
+              <label
+                className={dragging ? 'report-photo-drop is-dragging' : 'report-photo-drop'}
+                onDragOver={onDragOver}
+                onDragLeave={() => setDragging(false)}
+                onDrop={onDrop}
+              >
                 <span className="report-photo-drop-icon">
                   <FormIcon name="upload" size={24} />
                 </span>
@@ -492,15 +539,10 @@ export default function ReportForm() {
                 <input type="file" accept="image/jpeg,image/png" onChange={onPhoto} aria-describedby="photo-help" />
               </label>
             )}
-            <p id="photo-help" className="muted report-hint">
-              JPG or PNG, at most 5 MB.
+            <p id="photo-help" className="field-hint">
+              Drag a photo here or choose one. JPG or PNG, at most 5 MB.
             </p>
-            {photoError && (
-              <p className="report-field-error">
-                <FormIcon name="alert" size={18} />
-                <span>{photoError}</span>
-              </p>
-            )}
+            {photoError && <p className="field-error">{photoError}</p>}
             {preview && photo && (
               <div className="report-photo-preview">
                 <img src={preview} alt="Photo preview" />
@@ -508,20 +550,27 @@ export default function ReportForm() {
                   <p className="report-photo-name">
                     {photo.name}, {fileSize(photo.size)}
                   </p>
-                  <button type="button" className="report-remove" onClick={removePhoto}>
+                  <Button variant="secondary" className="report-remove" onClick={removePhoto}>
                     <FormIcon name="remove" size={18} />
                     Remove photo
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}
           </Step>
 
           {sendProblem && <ProblemText problem={sendProblem} />}
-          <button type="submit" className="action report-submit" disabled={busy}>
-            <FormIcon name="send" />
-            {busy ? 'Sending...' : 'Send report'}
-          </button>
+
+          {/* Stays at the bottom of the screen while the form scrolls. */}
+          <div className="report-submit-bar">
+            <p className="report-progress" aria-live="polite">
+              {stepsDone === 3 ? 'Ready to send' : `${stepsDone} of 3 steps done`}
+            </p>
+            <Button type="submit" loading={busy} loadingText="Sending...">
+              <FormIcon name="send" />
+              Send report
+            </Button>
+          </div>
         </form>
 
         <NextSteps />

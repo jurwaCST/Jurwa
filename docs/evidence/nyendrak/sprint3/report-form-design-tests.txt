@@ -1,0 +1,30 @@
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-65 category and location dropdowns > shows the active categories from the API in their order, as tiles 268ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-65 category and location dropdowns > loads the locations of the chosen category and narrows building, wing and area 386ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-65 category and location dropdowns > has no wing step when the locations have no wing (Others) 205ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-65 category and location dropdowns > needs a category and a full location before sending 617ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-65 category and location dropdowns > shows a message when the categories cannot be loaded 54ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-66 description and photo field > shows a live counter and stops at 500 characters 188ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-66 description and photo field > needs a description that is not only spaces 840ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-66 description and photo field > refuses a photo that is not JPG or PNG 84ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-66 description and photo field > refuses a photo over 5 MB and accepts exactly 5 MB 141ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-66 description and photo field > shows a preview and can remove the photo 134ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-67 submit to report-submission > sends the report and shows the report id 607ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-67 submit to report-submission > uploads the photo first and sends its photoId with the report 659ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-67 submit to report-submission > shows the reason for a 400 and keeps the form 628ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-67 submit to report-submission > asks to try again when a service is unavailable or the server cannot be reached 618ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-67 submit to report-submission > does not send the report when the photo upload fails 685ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-67 submit to report-submission > disables the button while sending, so a report is sent only once 667ms
+ ✓ src/pages/ReportForm.test.tsx > polish: clearer messages and screens > asks the student to sign in again when the sign-in has expired while loading 51ms
+ ✓ src/pages/ReportForm.test.tsx > polish: clearer messages and screens > asks the student to sign in again when the sign-in expires before sending 576ms
+ ✓ src/pages/ReportForm.test.tsx > polish: clearer messages and screens > shows the chosen photo with its name and size 77ms
+ ✓ src/pages/ReportForm.test.tsx > polish: clearer messages and screens > marks the field that needs attention 97ms
+ ✓ src/pages/ReportForm.test.tsx > polish: clearer messages and screens > can start another report from the success screen 666ms
+ ✓ src/pages/ReportForm.test.tsx > pilot feedback and icons > explains the wing step under the wing field 174ms
+ ✓ src/pages/ReportForm.test.tsx > pilot feedback and icons > copies the report number so the student does not have to remember it 595ms
+ ✓ src/pages/ReportForm.test.tsx > pilot feedback and icons > uses drawn icons that screen readers skip, not text symbols 636ms
+ ✓ src/pages/ReportForm.test.tsx > design items: tiles, drag and drop, submit bar > gives every category tile an icon and lets the arrow keys move between them 141ms
+ ✓ src/pages/ReportForm.test.tsx > design items: tiles, drag and drop, submit bar > takes a photo dropped on the photo area 35ms
+ ✓ src/pages/ReportForm.test.tsx > design items: tiles, drag and drop, submit bar > checks a dropped photo like a chosen one 36ms
+ ✓ src/pages/ReportForm.test.tsx > design items: tiles, drag and drop, submit bar > keeps the send button in a bar that says what is still needed 562ms
+ Test Files  1 passed (1)
+      Tests  28 passed (28)
