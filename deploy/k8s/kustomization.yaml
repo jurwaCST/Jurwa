@@ -28,3 +28,4 @@ resources:
   - services/sla-policy
   - services/sla-tracking
   - services/status-lifecycle
+  - web

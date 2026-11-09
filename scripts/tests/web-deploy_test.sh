@@ -59,7 +59,9 @@ check "ingress: /api still goes to api-gateway" "$(doc_named "$INGRESS" jurwa | 
 if command -v kubectl >/dev/null; then
   rendered="$(kubectl kustomize deploy/k8s 2>&1)"; code=$?
   check "kustomize: deploy/k8s renders" "$([ $code -eq 0 ]; echo $?)"
-  check "kustomize: web Deployment in namespace jurwa" "$(echo "$rendered" | grep -B2 -A4 '^kind: Deployment' | grep -A3 'name: web$' | grep -q 'namespace: jurwa'; echo $?)"
+  # kustomize sorts keys, so look at each rendered document as a whole.
+  web_deploy="$(echo "$rendered" | awk '/^---$/ { if (b ~ /kind: Deployment\n/ && b ~ /\n  name: web\n/) printf "%s", b; b = ""; next } { b = b $0 "\n" }')"
+  check "kustomize: web Deployment in namespace jurwa" "$(echo "$web_deploy" | grep -q '^  namespace: jurwa$'; echo $?)"
 else
   echo "SKIP  kustomize checks (no kubectl)"
 fi
