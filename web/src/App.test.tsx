@@ -37,9 +37,10 @@ afterEach(() => {
 })
 
 describe('routes', () => {
-  it('home shows the app name and a sign in link', () => {
+  it('home shows the app name, what it is for and a sign in link', () => {
     renderAt('/')
-    expect(screen.getByRole('heading', { level: 1, name: 'Jurwa' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Jurwa College of Science and Technology' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: 'See something broken on campus?' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Sign in' })).toBeInTheDocument()
   })
 
@@ -130,7 +131,7 @@ describe('login', () => {
     await user.click(screen.getByRole('button', { name: 'Sign in' }))
 
     expect(await screen.findByText('Signed in as Pema')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Report an issue' })).toBeInTheDocument()
+    expect(await screen.findByRole('link', { name: 'Report an issue' })).toBeInTheDocument()
 
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit]
     expect(url).toMatch(/\/auth\/login$/)
@@ -159,6 +160,11 @@ describe('login', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('invalid email or password')
   })
 
+  it('the sign-in page links to student sign-up', () => {
+    renderAt('/login')
+    expect(screen.getByRole('link', { name: 'Create a student account' })).toHaveAttribute('href', '/register')
+  })
+
   it('signing out goes back to the signed-out home page', async () => {
     signInAs('STUDENT', 'Pema')
     const user = userEvent.setup()
@@ -166,5 +172,63 @@ describe('login', () => {
     await user.click(screen.getByRole('button', { name: 'Sign out' }))
     expect(screen.getByRole('link', { name: 'Sign in' })).toBeInTheDocument()
     expect(sessionStorage.getItem(SESSION_KEY)).toBeNull()
+  })
+})
+
+describe('register', () => {
+  const json = (status: number, body: unknown) =>
+    new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
+
+  async function fillIn(password = 'secret-pass') {
+    const user = userEvent.setup()
+    renderAt('/register')
+    await user.type(screen.getByLabelText('Full name'), 'Pema Wangmo')
+    await user.type(screen.getByLabelText('Email'), 'pema@cst.edu.bt')
+    await user.type(screen.getByLabelText('Password'), password)
+    await user.click(screen.getByRole('button', { name: 'Create account' }))
+  }
+
+  it('creates a student account, signs in and goes home', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        json(201, { user: { id: 'u1', email: 'pema@cst.edu.bt', fullName: 'Pema Wangmo', roles: ['STUDENT'] } }),
+      )
+      .mockResolvedValueOnce(
+        json(200, {
+          accessToken: 'jwt-123',
+          expiresAt: new Date(Date.now() + 3600_000).toISOString(),
+          user: { id: 'u1', email: 'pema@cst.edu.bt', fullName: 'Pema Wangmo', roles: ['STUDENT'] },
+        }),
+      )
+    vi.stubGlobal('fetch', fetchMock)
+
+    await fillIn()
+
+    expect(await screen.findByText('Signed in as Pema Wangmo')).toBeInTheDocument()
+    const [regUrl, regInit] = fetchMock.mock.calls[0] as [string, RequestInit]
+    expect(regUrl).toMatch(/\/auth\/register$/)
+    expect(regInit.body).toBe(
+      JSON.stringify({ email: 'pema@cst.edu.bt', fullName: 'Pema Wangmo', password: 'secret-pass' }),
+    )
+    expect((fetchMock.mock.calls[1] as [string])[0]).toMatch(/\/auth\/login$/)
+  })
+
+  it('a password under 8 characters is refused before calling the server', async () => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+
+    await fillIn('short')
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('at least 8 characters')
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('shows the server error when the email is already registered', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(json(409, { error: 'email is already registered' })))
+
+    await fillIn()
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('email is already registered')
   })
 })

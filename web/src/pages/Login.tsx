@@ -1,7 +1,21 @@
 import { useState, type FormEvent } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ApiError } from '../api/client'
 import { useAuth } from '../auth/useAuth'
+import AuthLayout from '../components/AuthLayout'
+import PasswordField from '../components/PasswordField'
+import './Auth.css'
+
+// The demo accounts from the identity seed (SCRUM-126). Their password is
+// never written in the app; the team gives it out for the demo.
+const demoAccounts = [
+  ['Category Head, Hostel', 'dsa.demo@jurwa.example'],
+  ['Category Head, Academic Block', 'daa.demo@jurwa.example'],
+  ['Category Head, Others', 'sso.demo@jurwa.example'],
+  ['Staff', 'staff.demo@jurwa.example'],
+  ['System Administrator', 'admin.demo@jurwa.example'],
+  ['College President', 'president.demo@jurwa.example'],
+]
 
 export default function Login() {
   const { login } = useAuth()
@@ -29,8 +43,7 @@ export default function Login() {
   }
 
   return (
-    <>
-      <h1>Sign in</h1>
+    <AuthLayout title="Sign in" intro="Use your college email and password.">
       <form className="stack" onSubmit={onSubmit}>
         <label>
           Email
@@ -42,25 +55,33 @@ export default function Login() {
             onChange={(e) => setEmail(e.target.value)}
           />
         </label>
-        <label>
-          Password
-          <input
-            type="password"
-            autoComplete="current-password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </label>
+        <PasswordField value={password} onChange={setPassword} autoComplete="current-password" />
         {error && (
           <p role="alert" className="error">
             {error}
           </p>
         )}
-        <button type="submit" disabled={busy}>
+        <button type="submit" className="auth-submit" disabled={busy}>
           {busy ? 'Signing in...' : 'Sign in'}
         </button>
       </form>
-    </>
+
+      <p className="auth-switch">
+        New student? <Link to="/register">Create a student account</Link>
+      </p>
+
+      <details className="demo-accounts">
+        <summary>Demo accounts</summary>
+        <ul>
+          {demoAccounts.map(([role, mail]) => (
+            <li key={mail}>
+              <span className="muted">{role}</span>
+              <code>{mail}</code>
+            </li>
+          ))}
+        </ul>
+        <p className="muted">Ask the team for the demo password.</p>
+      </details>
+    </AuthLayout>
   )
 }

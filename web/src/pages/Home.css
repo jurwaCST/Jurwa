@@ -1,0 +1,353 @@
+/* Home page (Gayley, SCRUM-118). Values come from tokens in src/index.css. */
+
+/* ---- Hero: the CST hall with its solar-panel letters ---- */
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: flex-end;
+  min-height: min(78vh, 40rem);
+  /* Full screen width; the text inside keeps the page column. */
+  margin: calc(var(--s4) * -1) calc(50% - 50vw) var(--s6);
+  padding: var(--s8) max(var(--s2), calc(50vw - var(--content) / 2 + var(--s2))) var(--s6);
+  color: #ffffff;
+  overflow: hidden;
+}
+
+.hero-photo {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 60% 45%;
+}
+
+/* Forest shade from the left and the bottom, so the text always reads. */
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgb(11 38 28 / 0.88) 0%, rgb(11 38 28 / 0.62) 45%, rgb(11 38 28 / 0.05) 80%),
+    linear-gradient(0deg, rgb(11 38 28 / 0.55), transparent 45%);
+}
+
+.hero-text {
+  max-width: 36rem;
+}
+
+.hero h1 {
+  font-size: var(--text-display);
+  line-height: 1.02;
+  max-width: 13ch;
+  margin-bottom: var(--s2);
+  text-wrap: balance;
+}
+
+.hero-lead {
+  font-size: var(--text-lg);
+  color: #e3eee8;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s2) var(--s3);
+  margin-top: var(--s3);
+}
+
+.hero .hero-link {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* ---- Greeting (signed in) ---- */
+
+.greeting {
+  margin-bottom: var(--s3);
+}
+
+.greeting h1 {
+  font-size: var(--text-display);
+  margin-bottom: var(--s1);
+}
+
+.role-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1);
+}
+
+.role-chip {
+  padding: 0.2rem 0.8rem;
+  border-radius: var(--radius-pill);
+  background: var(--panel);
+  color: var(--text);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+/* ---- Quick-action tiles ---- */
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 24rem));
+  gap: var(--s2);
+  margin: 0 0 var(--s6);
+  padding: 0;
+  list-style: none;
+}
+
+.tile {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    'icon label'
+    'icon hint';
+  column-gap: var(--s2);
+  align-items: center;
+  min-height: 6rem;
+  padding: var(--s3);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: var(--card-border);
+  box-shadow: var(--shadow-1);
+  color: var(--text);
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tile:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-2);
+}
+
+.tile-icon {
+  grid-area: icon;
+  display: inline-grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--link);
+}
+
+.tile-label {
+  grid-area: label;
+  font-size: var(--text-lg);
+  font-weight: 800;
+}
+
+.tile-hint {
+  grid-area: hint;
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+/* The role's main action carries the marigold. */
+.tile-main {
+  background: var(--action);
+  color: var(--action-text);
+  box-shadow: 0 3px 0 var(--saffron-600);
+}
+
+.tile-main .tile-icon {
+  background: rgb(255 255 255 / 0.45);
+  color: var(--action-text);
+}
+
+.tile-main .tile-hint {
+  color: var(--action-text);
+  opacity: 0.85;
+}
+
+/* ---- The route: the one bold element ---- */
+
+.route {
+  margin-bottom: var(--s6);
+}
+
+.route h2 {
+  margin-bottom: var(--s3);
+}
+
+.route ol {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--s2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stop {
+  position: relative;
+  padding-top: 3.5rem;
+}
+
+/* The line between stops. */
+.stop::before {
+  content: '';
+  position: absolute;
+  top: 1.35rem;
+  left: 2.75rem;
+  right: calc(var(--s2) * -1);
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--tone), color-mix(in srgb, var(--tone) 25%, var(--border)));
+}
+
+.stop:last-child::before {
+  display: none;
+}
+
+.stop-dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--tone) 15%, var(--surface));
+  border: 2px solid var(--tone);
+  color: var(--tone);
+}
+
+.stop strong {
+  display: block;
+  font-size: var(--text-lg);
+}
+
+.stop p {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.stop-open {
+  --tone: var(--status-open);
+}
+.stop-assigned {
+  --tone: var(--status-assigned);
+}
+.stop-progress {
+  --tone: var(--status-progress);
+}
+.stop-resolved {
+  --tone: var(--status-resolved);
+}
+
+/* ---- Who fixes what: one photo per category ---- */
+
+.places {
+  margin-bottom: var(--s6);
+}
+
+.places h2 {
+  margin-bottom: var(--s3);
+}
+
+.places ul {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.place {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: var(--card-border);
+  box-shadow: var(--shadow-1);
+}
+
+.place img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.place-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: var(--s2) var(--s3) var(--s3);
+  border-top: 4px solid var(--teal-500);
+}
+
+.place-text p {
+  margin: 0 0 var(--s2);
+  color: var(--muted);
+}
+
+/* "Goes to the DSA": the answer the card exists for. */
+.place-text .place-head {
+  margin: auto 0 0;
+  color: var(--text);
+  font-size: var(--text-lg);
+}
+
+.route-escalation {
+  margin: var(--s4) 0 0;
+  padding: var(--s2) var(--s3);
+  max-width: 44rem;
+  border-left: 4px solid var(--status-escalated);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  background: color-mix(in srgb, var(--status-escalated) 7%, var(--surface));
+}
+
+/* ---- Phone ---- */
+
+@media (max-width: 47.99rem) {
+  .hero {
+    margin-top: calc(var(--s3) * -1);
+    min-height: 34rem;
+    padding-bottom: var(--s4);
+  }
+
+  .hero::after {
+    background: linear-gradient(0deg, rgb(11 38 28 / 0.92) 25%, rgb(11 38 28 / 0.35) 75%, rgb(11 38 28 / 0.1));
+  }
+
+  .route ol {
+    grid-template-columns: 1fr;
+    gap: var(--s3);
+  }
+
+  .stop {
+    padding: 0 0 0 3.75rem;
+    min-height: 2.75rem;
+  }
+
+  .stop::before {
+    top: 2.75rem;
+    left: 1.25rem;
+    right: auto;
+    bottom: calc(var(--s3) * -1);
+    width: 4px;
+    height: auto;
+    background: linear-gradient(180deg, var(--tone), color-mix(in srgb, var(--tone) 25%, var(--border)));
+  }
+
+  .places ul {
+    grid-template-columns: 1fr;
+  }
+
+  .place img {
+    aspect-ratio: 16 / 9;
+  }
+}
