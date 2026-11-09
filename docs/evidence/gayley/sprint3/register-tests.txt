@@ -1,0 +1,4 @@
+# SCRUM-138 sign-up page and redesign, all web tests, 2026-11-09 09:53
+$ npx vitest run
+ Test Files  3 passed (3)
+      Tests  51 passed (51)
