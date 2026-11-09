@@ -4,13 +4,15 @@
 // Built from Gayley's design (SCRUM-138, SCRUM-141): PageHeader, Button, TextArea,
 // BottomSheet, Toast, Timeline, Skeleton, EmptyState, ErrorState, StatusBadge,
 // the chip and tone classes and the tokens in index.css.
-// Reassign waits for the gateway route POST /reports/{reportId}/reassign.
+// Reassign uses Zangmo's GET /positions (the picker) and
+// POST /reports/{reportId}/reassign.
 import { useCallback, useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { api, ApiError } from '../api/client'
 import { useAuth } from '../auth/useAuth'
 import BottomSheet from '../components/BottomSheet'
 import Button from '../components/Button'
 import EmptyState from '../components/EmptyState'
+import Field from '../components/Field'
 import ErrorState from '../components/ErrorState'
 import Icon from '../components/Icon'
 import PageHeader from '../components/PageHeader'
@@ -43,6 +45,7 @@ type HistoryEntry = {
   occurredAt: string
 }
 type Note = { id: string; authorId: string; body: string; createdAt: string }
+type Position = { code: string; title: string; kind?: string; holderUserId?: string }
 
 /** The changes a person may make (status-lifecycle domain/transition.go). */
 const NEXT: Record<Status, Status[]> = {
@@ -80,6 +83,114 @@ function messageFor(err: unknown): string {
   return 'Something went wrong. Please try again.'
 }
 
+// ---- Reassign ----
+
+interface ReassignProps {
+  reportId: string
+  me: string
+  open: boolean
+  onClose: () => void
+  onDone: (reportId: string, toTitle: string) => void
+}
+
+// ReassignSheet moves a report to the holder of another position. The report
+// then leaves this person's list.
+function ReassignSheet({ reportId, me, open, onClose, onDone }: ReassignProps) {
+  const [positions, setPositions] = useState<Position[] | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [toUserId, setToUserId] = useState('')
+  const [reason, setReason] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [loadTry, setLoadTry] = useState(0)
+
+  // The picker loads the first time the sheet opens.
+  useEffect(() => {
+    if (!open || positions) return
+    let alive = true
+    api
+      .get<{ positions?: Position[] }>('/positions')
+      .then((res) => alive && setPositions(res.positions ?? []))
+      .catch((err) => alive && setLoadError(messageFor(err)))
+    return () => {
+      alive = false
+    }
+  }, [open, positions, loadTry])
+
+  // Only positions someone holds, never my own, by title.
+  const choices = (positions ?? [])
+    .filter((p) => p.holderUserId && p.holderUserId !== me)
+    .sort((a, b) => a.title.localeCompare(b.title))
+
+  async function send(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (busy) return
+    setError(null)
+    if (!toUserId) return setError('Choose who to reassign it to.')
+    const text = reason.trim()
+    if (!text) return setError('Write why you are reassigning it.')
+    if (reason.length > REASON_MAX) return setError(`The reason can be at most ${REASON_MAX} characters.`)
+    setBusy(true)
+    try {
+      await api.post(`/reports/${reportId}/reassign`, { toUserId, reason: text })
+      const to = choices.find((p) => p.holderUserId === toUserId)
+      onDone(reportId, to?.title ?? 'the new person')
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 403) {
+        setError('Only the person this report is assigned to can reassign it.')
+      } else if (err instanceof ApiError && err.status === 409) {
+        setError('Someone reassigned this report first. Go back to the list to see it.')
+      } else {
+        setError(messageFor(err))
+      }
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <BottomSheet open={open} title="Reassign" onClose={onClose}>
+      {loadError ? (
+        <ErrorState
+          message={loadError}
+          onRetry={() => {
+            setLoadError(null)
+            setLoadTry((n) => n + 1)
+          }}
+        />
+      ) : (
+        <form className="staff-sheet-form" onSubmit={send} noValidate>
+          <Field label="Reassign to" hint="The report leaves your list and goes to this person.">
+            <select value={toUserId} onChange={(e) => setToUserId(e.target.value)} disabled={!positions}>
+              <option value="">{positions ? 'Choose a person' : 'Loading...'}</option>
+              {choices.map((p) => (
+                <option key={p.code} value={p.holderUserId}>
+                  {p.title}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <TextArea
+            label="Why (the new person sees this)"
+            value={reason}
+            onChange={setReason}
+            max={REASON_MAX}
+            rows={3}
+          />
+          {error && (
+            <p role="alert" className="field-error">
+              {error}
+            </p>
+          )}
+          <Button type="submit" loading={busy} loadingText="Reassigning...">
+            Reassign report
+          </Button>
+        </form>
+      )}
+    </BottomSheet>
+  )
+}
+
 // ---- One report ----
 
 type Tab = 'details' | 'history' | 'notes'
@@ -95,9 +206,10 @@ interface DetailProps {
   onBack: () => void
   onStatus: (reportId: string, status: Status) => void
   onToast: (message: string) => void
+  onReassigned: (reportId: string, toTitle: string) => void
 }
 
-function ReportDetail({ summary, me, onBack, onStatus, onToast }: DetailProps) {
+function ReportDetail({ summary, me, onBack, onStatus, onToast, onReassigned }: DetailProps) {
   const id = summary.reportId
   const [report, setReport] = useState<Report | null>(null)
   const [current, setCurrent] = useState<ReportStatus>({ status: summary.status })
@@ -117,6 +229,7 @@ function ReportDetail({ summary, me, onBack, onStatus, onToast }: DetailProps) {
   const [reason, setReason] = useState('')
   const [sheetError, setSheetError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const [reassignOpen, setReassignOpen] = useState(false)
   const tabRefs = useRef<Record<Tab, HTMLButtonElement | null>>({ details: null, history: null, notes: null })
 
   const loadStatus = useCallback(
@@ -181,6 +294,7 @@ function ReportDetail({ summary, me, onBack, onStatus, onToast }: DetailProps) {
 
   // A stable function, so the sheet does not move the focus on every key press.
   const closeSheet = useCallback(() => setSheetOpen(false), [])
+  const closeReassign = useCallback(() => setReassignOpen(false), [])
 
   function openSheet() {
     setChoice('')
@@ -277,11 +391,12 @@ function ReportDetail({ summary, me, onBack, onStatus, onToast }: DetailProps) {
           Resolved. Nothing more to do.
         </p>
       ) : (
-        options.length > 0 && (
-          <div className="staff-actions">
-            <Button onClick={openSheet}>Update status</Button>
-          </div>
-        )
+        <div className="staff-actions">
+          {options.length > 0 && <Button onClick={openSheet}>Update status</Button>}
+          <Button variant="secondary" onClick={() => setReassignOpen(true)}>
+            Reassign
+          </Button>
+        </div>
       )}
 
       <div role="tablist" aria-label="Report" className="staff-tabs" onKeyDown={onTabKey}>
@@ -415,6 +530,8 @@ function ReportDetail({ summary, me, onBack, onStatus, onToast }: DetailProps) {
           </Button>
         </form>
       </BottomSheet>
+
+      <ReassignSheet reportId={id} me={me} open={reassignOpen} onClose={closeReassign} onDone={onReassigned} />
     </section>
   )
 }
@@ -476,6 +593,12 @@ export default function StaffView() {
     setReports((list) => list?.map((r) => (r.reportId === reportId ? { ...r, status } : r)) ?? list)
   }, [])
   const showToast = useCallback((message: string) => setToast(message), [])
+  // A reassigned report is no longer mine: it leaves the list.
+  const reassigned = useCallback((reportId: string, toTitle: string) => {
+    setReports((list) => list?.filter((r) => r.reportId !== reportId) ?? list)
+    setOpenId(null)
+    setToast(`Reassigned to ${toTitle}`)
+  }, [])
   const hideToast = useCallback(() => setToast(null), [])
   const closeDetail = useCallback(() => setOpenId(null), [])
 
@@ -559,6 +682,7 @@ export default function StaffView() {
             onBack={closeDetail}
             onStatus={updateStatus}
             onToast={showToast}
+            onReassigned={reassigned}
           />
         )}
       </div>
