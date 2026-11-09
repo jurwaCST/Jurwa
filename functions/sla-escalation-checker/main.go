@@ -8,10 +8,12 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"io"
 	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -38,6 +40,17 @@ func main() {
 		clients.NewSlaTracking(slatrackingv1.NewSlaTrackingServiceClient(trackingConn)),
 		clients.NewStatusLifecycle(statuslifecyclev1.NewStatusLifecycleServiceClient(lifecycleConn)),
 	)
+
+	// RUN_ONCE=true: one check, then exit. The Kubernetes CronJob fallback
+	// (deploy/knative/cronjob-fallback.yaml) runs the image this way.
+	if runOnceEnabled() {
+		ctx, cancel := context.WithTimeout(context.Background(), runOnceTimeout)
+		code := runOnce(ctx, c, os.Stdout)
+		cancel()
+		trackingConn.Close()
+		lifecycleConn.Close()
+		os.Exit(code)
+	}
 
 	srv := &http.Server{Addr: ":" + port, Handler: newHandler(c), ReadHeaderTimeout: 5 * time.Second}
 
@@ -116,4 +129,31 @@ func envOr(key, fallback string) string {
 		return v
 	}
 	return fallback
+}
+
+// runOnceTimeout bounds one CronJob run, well inside its 1 minute schedule.
+const runOnceTimeout = 45 * time.Second
+
+// runOnceEnabled reports whether RUN_ONCE asks for a single check.
+func runOnceEnabled() bool {
+	v := strings.ToLower(strings.TrimSpace(os.Getenv("RUN_ONCE")))
+	return v == "true" || v == "1"
+}
+
+// runOnce does one check and writes the counts as JSON, like the HTTP answer.
+// It returns the exit code: 0 when the check ran, 1 when sla-tracking could not
+// be asked, so the Kubernetes Job is marked failed.
+func runOnce(ctx context.Context, c runner, w io.Writer) int {
+	res, err := c.Run(ctx)
+	code := 0
+	if err != nil {
+		slog.ErrorContext(ctx, "escalation run failed", "error", err)
+		res.Errors++
+		code = 1
+	} else {
+		slog.InfoContext(ctx, "escalation run finished",
+			"lapsed", res.Lapsed, "escalated", res.Escalated, "skipped", res.Skipped, "errors", res.Errors)
+	}
+	_ = json.NewEncoder(w).Encode(res)
+	return code
 }

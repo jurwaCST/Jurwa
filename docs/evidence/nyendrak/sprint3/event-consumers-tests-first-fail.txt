@@ -1,0 +1,6 @@
+> go test ./tests/saga/... (before the event consumers exist)
+# github.com/jurwaCST/Jurwa/tests/saga
+tests\saga\flow_test.go:23:2: no required module provides package github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/in/events; to add it:
+	go get github.com/jurwaCST/Jurwa/services/sla-tracking/adapters/in/events
+FAIL	github.com/jurwaCST/Jurwa/tests/saga [setup failed]
+FAIL

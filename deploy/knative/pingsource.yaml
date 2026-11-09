@@ -1,0 +1,19 @@
+# Wakes sla-escalation-checker on a schedule (SCRUM-104). Owner: Nyendrak.
+# Every 2 minutes for the demo; a real deployment can check less often.
+apiVersion: sources.knative.dev/v1
+kind: PingSource
+metadata:
+  name: sla-check
+  namespace: jurwa
+  labels:
+    app.kubernetes.io/name: sla-check
+    app.kubernetes.io/part-of: jurwa
+spec:
+  schedule: "*/2 * * * *"
+  contentType: application/json
+  data: '{"source":"pingsource"}'
+  sink:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: sla-escalation-checker

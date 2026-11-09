@@ -3,7 +3,9 @@
 # (localhost:5050 from the laptop, jurwa-registry:5050 inside the cluster).
 #   bash scripts/push-local-registry.sh                       all 20 services
 #   bash scripts/push-local-registry.sh api-gateway identity  only these
-# Then restart to pull the new image: kubectl -n jurwa rollout restart deploy/<name>
+#   bash scripts/push-local-registry.sh web                   the web app (web/Dockerfile)
+# Then delete the pod to pull the new image (Argo CD reverts a rollout restart):
+#   kubectl -n jurwa delete pod -l app.kubernetes.io/name=<name>
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -28,7 +30,13 @@ fi
 failed=()
 for name in "${services[@]}"; do
   log="/tmp/jurwa-push-$name.log"
-  if make docker-build SERVICE="$name" >"$log" 2>&1 \
+  if [ "$name" = "web" ]; then
+    # Not a Go service: its own Dockerfile, with web/ as the build context.
+    build=(docker build -f web/Dockerfile -t "jurwa/web" web)
+  else
+    build=(make docker-build SERVICE="$name")
+  fi
+  if "${build[@]}" >"$log" 2>&1 \
     && docker tag "jurwa/$name" "$REGISTRY/$name:latest" >>"$log" 2>&1 \
     && docker push "$REGISTRY/$name:latest" >>"$log" 2>&1; then
     echo "OK      $name"

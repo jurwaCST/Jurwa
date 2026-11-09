@@ -1,0 +1,28 @@
+# Argo CD Application for the SLA escalation function on Knative (SCRUM-104):
+# the Knative Service sla-escalation-checker and its PingSource, from
+# deploy/knative (its kustomization leaves the CronJob fallback out on purpose).
+# Needs, once per cluster and before this is applied:
+#   - Knative Serving and Eventing, the version that matches the cluster's
+#     Kubernetes (docs/ops/knative.md)
+#   - the image localhost:5050/sla-escalation-checker:latest (docs/ops/knative.md)
+#   - sla-tracking and status-lifecycle running in namespace jurwa
+#     (application.yaml deploys them; the small demo set does not)
+#   kubectl apply -f deploy/argocd/application-knative.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: jurwa-knative
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/jurwaCST/Jurwa.git
+    targetRevision: main
+    path: deploy/knative
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: jurwa
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

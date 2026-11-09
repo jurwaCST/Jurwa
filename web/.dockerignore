@@ -1,0 +1,11 @@
+# Kept out of the image build context (SCRUM-140).
+node_modules
+dist
+cypress
+cypress.config.mjs
+*.log
+.env
+.env.*
+public/__preview.html
+Dockerfile
+.dockerignore

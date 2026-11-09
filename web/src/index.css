@@ -1,27 +1,112 @@
-:root {
-  --bg: #ffffff;
-  --text: #1b1f24;
-  --muted: #59636e;
-  --border: #d1d9e0;
-  --accent: #0b5cad;
-  --accent-text: #ffffff;
-  --danger: #b42318;
+/* Jurwa design tokens and base styles.
+   Every colour, space, radius, shadow and type size lives here, so pages and
+   components (src/components/components.css) only use variables.
 
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  line-height: 1.5;
+   Nyendrak's report form uses --bg, --text, --muted, --border, --accent,
+   --accent-text and --danger: keep those names. */
+
+:root {
+  /* Palette, taken from the CST campus: teal roofs, saffron walls, red
+     pillars and the forest on the hillside. */
+  --pine-900: #0b261c;
+  --pine-800: #12372a;
+  --pine-700: #1d4d3b;
+  --pine-100: #e2eee8;
+  --teal-500: #1f9e8f; /* the roofs */
+  --teal-700: #137566;
+  --saffron-500: #f2b233; /* the walls of the academic blocks */
+  --saffron-600: #c98f12;
+  --pillar-red: #b8372d; /* the pillars and roof bands */
+  --mist-50: #eaf3ef; /* the hills in the clouds */
+
+  /* Roles of colour */
+  --bg: #f7f6f1;
+  --surface: #ffffff;
+  --panel: var(--mist-50);
+  --text: #12372a;
+  --muted: #4c6158;
+  --border: #d6e0db;
+  --accent: var(--teal-700);
+  --accent-text: #ffffff;
+  --link: var(--teal-700);
+  --action: var(--saffron-500);
+  --action-text: #12372a;
+  --danger: #a8281f;
+  --focus: var(--teal-700);
+  --bar: var(--pine-800);
+  --bar-text: #ffffff;
+
+  /* Status: one meaning each, always with a label and an icon */
+  --status-open: #5b6b64;
+  --status-assigned: #1f6fb2;
+  --status-progress: #a86a00;
+  --status-resolved: #1e7a45;
+  --status-escalated: var(--pillar-red);
+
+  /* Shape and depth */
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+  --shadow-1: 0 1px 2px rgb(18 55 42 / 0.06), 0 1px 3px rgb(18 55 42 / 0.08);
+  --shadow-2: 0 2px 4px rgb(18 55 42 / 0.06), 0 8px 24px rgb(18 55 42 / 0.12);
+  --card-border: 1px solid transparent;
+
+  /* 8 px spacing grid */
+  --s1: 0.5rem;
+  --s2: 1rem;
+  --s3: 1.5rem;
+  --s4: 2rem;
+  --s6: 3rem;
+  --s8: 4rem;
+
+  /* Type scale (body 17 px) */
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.1875rem;
+  --text-xl: 1.5rem;
+  --text-2xl: clamp(1.75rem, 1.4rem + 1.4vw, 2.25rem);
+  --text-display: clamp(2.4rem, 1.6rem + 3.4vw, 3.75rem);
+
+  --content: 70rem;
+  --form: 34rem;
+  --tabbar-height: 4rem;
+
+  font-family: 'Atkinson Hyperlegible Next', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 106.25%;
+  line-height: 1.55;
   color: var(--text);
   background: var(--bg);
+  -webkit-font-smoothing: antialiased;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0f1419;
-    --text: #e6edf3;
-    --muted: #9198a1;
-    --border: #3d444d;
-    --accent: #4493f8;
-    --accent-text: #0f1419;
-    --danger: #ff7b72;
+    --bg: #0a1d16;
+    --surface: #112c23;
+    --panel: #15362b;
+    --text: #e6f0eb;
+    --muted: #a3bab0;
+    --border: #22473a;
+    --accent: #4fd1bd;
+    --accent-text: #0a1d16;
+    --link: #4fd1bd;
+    --action: #f2b233;
+    --action-text: #0b261c;
+    --danger: #ff8a7d;
+    --focus: #4fd1bd;
+    --bar: #0b261c;
+
+    --status-open: #a3bab0;
+    --status-assigned: #79b8ff;
+    --status-progress: #f2b233;
+    --status-resolved: #5fd08a;
+    --status-escalated: #ff8a7d;
+
+    /* Dark mode: 1 px borders instead of shadows */
+    --shadow-1: none;
+    --shadow-2: none;
+    --card-border: 1px solid var(--border);
   }
 }
 
@@ -29,74 +114,129 @@
   box-sizing: border-box;
 }
 
+html,
 body {
+  overflow-x: clip;
   margin: 0;
+}
+
+body {
   background: var(--bg);
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0 0 var(--s1);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: var(--text-2xl);
+  font-weight: 800;
+}
+
+h2 {
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+
+h3 {
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+p {
+  margin: 0 0 var(--s2);
+  max-width: 42rem;
 }
 
 a {
-  color: var(--accent);
+  color: var(--link);
+  text-underline-offset: 0.18em;
 }
 
 :focus-visible {
-  outline: 3px solid var(--accent);
+  outline: 3px solid var(--focus);
   outline-offset: 2px;
-}
-
-.layout {
-  max-width: 40rem;
-  margin: 0 auto;
-  padding: 1rem;
-}
-
-.layout header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.brand {
-  font-weight: 700;
-  font-size: 1.25rem;
-  text-decoration: none;
-  color: var(--text);
 }
 
 .muted {
   color: var(--muted);
 }
 
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---- Form controls (shared by every page) ---- */
+
 form.stack {
   display: grid;
-  gap: 0.75rem;
+  gap: var(--s2);
 }
 
 label {
   display: grid;
-  gap: 0.25rem;
-  font-weight: 600;
+  gap: 0.35rem;
+  font-weight: 700;
 }
 
-input {
+input,
+select,
+textarea {
   font: inherit;
-  padding: 0.5rem;
+  font-weight: 400;
+  min-height: 3rem;
+  padding: 0.6rem 0.85rem;
   border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--bg);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
   color: var(--text);
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  border-color: var(--focus);
 }
 
 button {
   font: inherit;
-  padding: 0.5rem 1rem;
+  font-weight: 700;
+  min-height: 3rem;
+  padding: 0.6rem 1.25rem;
   border: 0;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: var(--accent);
   color: var(--accent-text);
   cursor: pointer;
+  transition: transform 0.08s ease, filter 0.15s ease;
+}
+
+button:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px) scale(0.99);
 }
 
 button:disabled {
@@ -105,12 +245,31 @@ button:disabled {
 }
 
 button.link {
-  background: none;
-  color: var(--accent);
+  min-height: 0;
   padding: 0;
+  background: none;
+  color: var(--link);
+  font-weight: 400;
   text-decoration: underline;
+  text-underline-offset: 0.18em;
 }
 
 .error {
   color: var(--danger);
+}
+
+p.error[role='alert'] {
+  padding: 0.65rem 0.9rem;
+  border-left: 4px solid var(--danger);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: color-mix(in srgb, var(--danger) 9%, var(--surface));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }

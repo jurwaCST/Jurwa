@@ -8,16 +8,27 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/jurwaCST/Jurwa/pkg/eventbus"
 	eventsv1 "github.com/jurwaCST/Jurwa/proto/gen/events/v1"
 	"github.com/jurwaCST/Jurwa/services/reassignment/application"
+	"github.com/jurwaCST/Jurwa/services/reassignment/domain"
 )
 
 type fakeSaga struct {
 	mu          sync.Mutex
+	routed      []string // "report|assignee|position"
+	routedErr   error
 	escalated   []application.SagaEvent
 	compensated []application.SagaEvent
+}
+
+func (f *fakeSaga) RecordRouted(_ context.Context, reportID, assignee, position string) (domain.Assignment, error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.routed = append(f.routed, reportID+"|"+assignee+"|"+position)
+	return domain.Assignment{}, f.routedErr
 }
 
 func (f *fakeSaga) EscalateOnLapse(_ context.Context, ev application.SagaEvent) error {
@@ -84,13 +95,43 @@ func (f failingSubscriber) Subscribe(context.Context, string, string, string, ev
 }
 
 func TestStart_SubscriptionError(t *testing.T) {
-	sub := failingSubscriber{calls: make(chan struct{}, 2)}
+	sub := failingSubscriber{calls: make(chan struct{}, 3)}
 	Start(context.Background(), sub, "test", &fakeSaga{})
-	for range 2 {
+	for range 3 {
 		select {
 		case <-sub.calls:
 		case <-time.After(2 * time.Second):
 			t.Fatal("Subscribe was not called for both streams")
 		}
 	}
+}
+
+func TestOnReportRouted_RecordsTheCategoryHead(t *testing.T) {
+	bus := eventbus.NewMemory()
+	app := &fakeSaga{}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	Start(ctx, bus, "test", app)
+
+	require.NoError(t, bus.Publish(ctx, eventbus.StreamReportRouted, &eventsv1.ReportRouted{
+		Meta: &eventsv1.EventMeta{EventId: "e1"}, ReportId: "r1", CategoryHeadId: "head", TargetPosition: "DSA",
+	}))
+	assert.Eventually(t, func() bool {
+		app.mu.Lock()
+		defer app.mu.Unlock()
+		return len(app.routed) == 1
+	}, 2*time.Second, 5*time.Millisecond)
+	app.mu.Lock()
+	defer app.mu.Unlock()
+	assert.Equal(t, "r1|head|DSA", app.routed[0])
+}
+
+func TestOnReportRouted_RepeatedOrBadEvent(t *testing.T) {
+	payload := func() []byte {
+		b, _ := proto.Marshal(&eventsv1.ReportRouted{ReportId: "r1", CategoryHeadId: "head"})
+		return b
+	}()
+	assert.NoError(t, OnReportRouted(&fakeSaga{routedErr: domain.ErrAlreadyAssigned})(context.Background(), payload), "already assigned counts as done")
+	assert.ErrorIs(t, OnReportRouted(&fakeSaga{routedErr: application.ErrInvalidArgument})(context.Background(), payload), application.ErrInvalidArgument)
+	assert.Error(t, OnReportRouted(&fakeSaga{})(context.Background(), []byte{0xff, 0xff}))
 }

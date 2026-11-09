@@ -1,0 +1,7 @@
+> go test ./functions/sla-escalation-checker/ (before run-once exists)
+# github.com/jurwaCST/Jurwa/functions/sla-escalation-checker [github.com/jurwaCST/Jurwa/functions/sla-escalation-checker.test]
+functions\sla-escalation-checker\main_test.go:65:10: undefined: runOnce
+functions\sla-escalation-checker\main_test.go:72:10: undefined: runOnce
+functions\sla-escalation-checker\main_test.go:80:25: undefined: runOnceEnabled
+FAIL	github.com/jurwaCST/Jurwa/functions/sla-escalation-checker [build failed]
+FAIL

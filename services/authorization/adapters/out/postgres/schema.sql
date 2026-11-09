@@ -37,6 +37,7 @@ INSERT INTO role_permissions (action, role_code) VALUES
     ('report.submit', 'STUDENT'),
     ('report.read', 'STUDENT'), ('report.read', 'CATEGORY_HEAD'), ('report.read', 'STAFF'), ('report.read', 'SYSTEM_ADMIN'),
     ('report.list_own', 'STUDENT'),
+    ('report.list_assigned', 'CATEGORY_HEAD'), ('report.list_assigned', 'STAFF'),
     ('report.timeline.read', 'STUDENT'), ('report.timeline.read', 'CATEGORY_HEAD'), ('report.timeline.read', 'STAFF'), ('report.timeline.read', 'SYSTEM_ADMIN'),
     ('report.status.read', 'STUDENT'), ('report.status.read', 'CATEGORY_HEAD'), ('report.status.read', 'STAFF'), ('report.status.read', 'SYSTEM_ADMIN'),
     ('report.status.change', 'CATEGORY_HEAD'), ('report.status.change', 'STAFF'),
