@@ -1,0 +1,290 @@
+/* Staff view (SCRUM-36). Owner: Nyendrak.
+   Uses only Gayley's tokens from src/index.css and her shared classes (.card,
+   .chip, .tone-*, .btn, .badge, .timeline), so it follows her campus design in
+   light and dark. Phones show the list or one report; laptops show both. */
+
+.staff-layout {
+  display: grid;
+  gap: var(--s3);
+  align-items: start;
+}
+
+@media (min-width: 64rem) {
+  .staff-layout {
+    grid-template-columns: minmax(18rem, 26rem) minmax(0, 1fr);
+  }
+
+  .staff-detail {
+    position: sticky;
+    top: 6rem;
+  }
+
+  .staff-back {
+    display: none;
+  }
+}
+
+/* Phones and tablets: an opened report replaces the list. */
+@media (max-width: 63.99rem) {
+  .staff-page.has-detail .staff-list-pane {
+    display: none;
+  }
+}
+
+.staff-list-pane {
+  display: grid;
+  gap: var(--s2);
+}
+
+/* Status chips: the count in a small round tag. */
+.staff-chips {
+  gap: var(--s1);
+}
+
+.chip-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.6rem;
+  height: 1.6rem;
+  margin-left: 0.35rem;
+  padding: 0 0.4rem;
+  border-radius: var(--radius-pill);
+  background: var(--panel);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.chip[class*='tone-'] {
+  border-color: color-mix(in srgb, var(--tone) 45%, var(--border));
+}
+
+/* Report cards, edged in their status colour. */
+.staff-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.staff-card {
+  display: grid;
+  gap: 0.35rem;
+  justify-items: start;
+  width: 100%;
+  min-height: 0;
+  padding: var(--s2);
+  border: var(--card-border);
+  border-left: 6px solid var(--tone);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+  color: var(--text);
+  font-weight: 400;
+  text-align: left;
+}
+
+.staff-card:hover {
+  filter: none;
+  box-shadow: var(--shadow-2);
+}
+
+.staff-card.is-open {
+  background: color-mix(in srgb, var(--tone) 8%, var(--surface));
+  outline: 2px solid var(--tone);
+}
+
+.staff-card-place {
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.staff-card-meta {
+  font-size: var(--text-sm);
+}
+
+/* One report. */
+.staff-detail {
+  display: grid;
+  gap: var(--s2);
+}
+
+.staff-back {
+  justify-self: start;
+  min-height: 2.75rem;
+  padding: 0 0.5rem;
+}
+
+.staff-detail-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s1) var(--s2);
+}
+
+.staff-detail-head h2 {
+  margin: 0;
+}
+
+.staff-detail-head p {
+  margin: 0.25rem 0 0;
+}
+
+.staff-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.staff-done {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  color: var(--status-resolved);
+  font-weight: 700;
+}
+
+/* Tabs: underlined, at least 44 px high. */
+.staff-tabs {
+  display: flex;
+  gap: var(--s1);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+
+.staff-tab {
+  min-height: 2.75rem;
+  padding: 0 var(--s2);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  border-bottom: 3px solid transparent;
+  background: none;
+  color: var(--muted);
+}
+
+.staff-tab[aria-selected='true'] {
+  border-bottom-color: var(--accent);
+  color: var(--text);
+}
+
+.staff-panel {
+  min-height: 8rem;
+}
+
+.staff-panel:focus-visible {
+  outline-offset: 4px;
+}
+
+.staff-facts {
+  display: grid;
+  gap: var(--s2);
+  margin: 0;
+}
+
+.staff-facts dt {
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.staff-facts dd {
+  margin: 0.15rem 0 0;
+}
+
+.staff-description {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Notes. */
+.staff-notes {
+  display: grid;
+  gap: var(--s2);
+}
+
+.staff-notes > .btn {
+  justify-self: start;
+}
+
+.staff-note-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.staff-note {
+  padding: 0.75rem var(--s2);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.staff-note p {
+  margin: 0;
+}
+
+.staff-note-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: var(--text-sm);
+}
+
+.staff-note-body {
+  margin-top: 0.25rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Update status sheet. */
+.staff-sheet-form {
+  display: grid;
+  gap: var(--s2);
+}
+
+.staff-choices {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.staff-choices legend {
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.staff-choice {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 3rem;
+  padding: 0.5rem var(--s2);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.staff-choice .icon {
+  color: var(--tone);
+}
+
+.staff-choice:has(input:checked) {
+  border-color: var(--tone);
+  background: color-mix(in srgb, var(--tone) 10%, var(--surface));
+}
+
+.staff-choice input {
+  width: 1.25rem;
+  height: 1.25rem;
+  min-height: 0;
+  accent-color: var(--tone);
+}
+
+.staff-sheet-form .btn-primary {
+  width: 100%;
+}

@@ -1,0 +1,17 @@
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 assigned reports > lists the reports assigned to me with their place and status 305ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 assigned reports > counts the reports per status on the chips and filters by one 177ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 assigned reports > says so when nothing is assigned 53ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 assigned reports > offers to try again when the list does not load 162ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 assigned reports > loads the next page when there are more reports 122ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 one report: details, history and notes > opens a report on the Details tab with its description 162ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 one report: details, history and notes > moves between the tabs with the arrow keys 177ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 one report: details, history and notes > shows the history of status changes, oldest first 235ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 one report: details, history and notes > lists the notes and adds one 699ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 one report: details, history and notes > goes back to the list 167ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 update status > offers only the next allowed status and sends it with the version 618ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 update status > keeps every letter typed in the sheet 258ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 update status > says when someone else changed the report first, and shows the new status 305ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 update status > needs a status to be chosen 228ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 update status > has nothing to update on a resolved report 144ms
+ Test Files  1 passed (1)
+      Tests  15 passed (15)
