@@ -1,0 +1,6 @@
+# SCRUM-141 shared components, tests first (expected to fail: the components do not exist yet), 2026-11-09 11:09
+$ npx vitest run src/components/components.test.tsx
+ FAIL  src/components/components.test.tsx [ src/components/components.test.tsx ]
+Error: Failed to resolve import "./Field" from "src/components/components.test.tsx". Does the file exist?
+ Test Files  1 failed (1)
+      Tests  no tests
