@@ -1,0 +1,10 @@
+# SCRUM-99 President dashboard, tests first (expected to fail: the page is still the placeholder), 2026-11-09 11:39
+$ npx vitest run src/pages/PresidentDashboard.test.tsx
+     × shows the counts, the resolution rate and the average time from analytics 1045ms
+     × shows every category with its counts per status 1006ms
+     × is read-only: no form, no field, and the only buttons are the period chips 1018ms
+     × asks analytics for the chosen period 1011ms
+     × shows an error with a way to try again when analytics cannot be reached 1013ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  1 failed (1)
+      Tests  5 failed | 1 passed (6)
