@@ -24,6 +24,15 @@ The minimum Kubernetes version per Knative release (from `defaultMinimumVersion`
 
 1.20 is the newest line that supports 1.32, so we use its latest patches: **Serving v1.20.3, Eventing v1.20.3, Kourier v1.20.1**. Upgrading the cluster instead would have changed Choki's k3d setup for everyone on the day before the demo.
 
+Knative only checks a minimum, so pick the newest line your cluster meets: `kubectl get nodes` shows the version.
+
+| Cluster | Kubernetes | Knative installed |
+|---|---|---|
+| Nyendrak's laptop (test) | v1.32.5+k3s1 | Serving and Eventing v1.20.3, Kourier v1.20.1 |
+| Choki's laptop (demo, 9 November 2026) | v1.35.5+k3s1 | Serving, Eventing and Kourier v1.24.0 |
+
+For 1.24.0 set `S=knative-v1.24.0; K=knative-v1.24.0; E=knative-v1.24.0` in the install commands below; the patches after them are the same.
+
 ## Install (once per cluster)
 
 ```bash
