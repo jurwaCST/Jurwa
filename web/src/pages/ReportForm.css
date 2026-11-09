@@ -1,105 +1,104 @@
 /* Report form (SCRUM-35). Owner: Nyendrak.
-   Scoped to .report-page, so the shared styles in index.css are not changed.
-   Built on Gayley's colour tokens (--bg, --text, --muted, --border, --accent,
-   --accent-text, --danger), so it follows the light and dark theme. */
+   Uses only Gayley's tokens from src/index.css (colours, --s* spacing,
+   --radius*, --text-*) and her shared classes (.card, .action, .icon,
+   .badge), so it follows her campus design in light and dark.
+   Phones first; 48rem is the same breakpoint as her layout shell. */
 
 .report-page {
-  --surface: color-mix(in srgb, var(--text) 4%, var(--bg));
-  --surface-strong: color-mix(in srgb, var(--text) 8%, var(--bg));
-  --danger-soft: color-mix(in srgb, var(--danger) 12%, var(--bg));
-  --accent-soft: color-mix(in srgb, var(--accent) 14%, var(--bg));
-  --success: #1a7f37;
-  --radius: 12px;
+  --accent-soft: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  --danger-soft: color-mix(in srgb, var(--danger) 10%, var(--surface));
 }
 
-@media (prefers-color-scheme: dark) {
-  .report-page {
-    --success: #3fb950;
+/* Form and the "What happens next" card: one column on phones,
+   side by side on laptops. */
+.report-layout {
+  display: grid;
+  gap: var(--s3);
+  align-items: start;
+}
+
+@media (min-width: 48rem) {
+  .report-layout {
+    grid-template-columns: minmax(0, 1fr) 18rem;
+  }
+
+  .report-next {
+    position: sticky;
+    top: 6rem;
   }
 }
 
-.report-page h1 {
-  margin-bottom: 0.25rem;
-}
-
-.report-intro {
-  margin-top: 0;
-}
-
-/* The card around the form and around the success message. */
-.report-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.25rem;
-  box-shadow: 0 1px 3px color-mix(in srgb, var(--text) 10%, transparent);
+@media (min-width: 64rem) {
+  .report-layout {
+    grid-template-columns: minmax(0, 44rem) 20rem;
+  }
 }
 
 .report-form {
   display: grid;
-  gap: 1.5rem;
+  gap: var(--s3);
 }
 
 .report-section {
   display: grid;
-  gap: 0.6rem;
+  gap: 0.75rem;
 }
 
 .report-section + .report-section {
-  padding-top: 1.25rem;
+  padding-top: var(--s3);
   border-top: 1px solid var(--border);
 }
 
-/* "1 What kind of problem?" with a round step number. */
+/* Step heading: the icon in a round badge, then the question. */
 .report-step {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.75rem;
   margin: 0;
-  font-size: 1.05rem;
+  font-size: var(--text-lg);
 }
 
-.report-step span {
+.report-step-badge {
   display: inline-grid;
+  flex: none;
   place-items: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  border-radius: 50%;
-  background: var(--accent);
-  color: var(--accent-text);
-  font-size: 0.9rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
-/* Fields: full width, large touch targets (at least 44px high). */
-.report-form label {
+/* Building, wing and area: stacked on phones, in a row when there is room. */
+.report-place {
+  display: grid;
+  gap: 0.75rem;
+}
+
+@media (min-width: 36rem) {
+  .report-place {
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    align-items: start;
+  }
+}
+
+.report-place:empty {
+  display: none;
+}
+
+.report-field {
   display: grid;
   gap: 0.35rem;
-  font-weight: 600;
 }
 
 .report-form select,
 .report-form textarea {
-  font: inherit;
-  font-weight: 400;
   width: 100%;
-  min-height: 2.75rem;
-  padding: 0.6rem 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--bg);
-  color: var(--text);
 }
 
 .report-form textarea {
   resize: vertical;
   line-height: 1.5;
-}
-
-.report-form select:focus-visible,
-.report-form textarea:focus-visible {
-  outline: 3px solid var(--accent);
-  outline-offset: 1px;
-  border-color: var(--accent);
 }
 
 .report-form [aria-invalid='true'] {
@@ -109,34 +108,54 @@
 
 .report-hint {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
+}
+
+.report-hint-icon {
+  display: flex;
+  gap: 0.4rem;
+  align-items: flex-start;
+}
+
+.report-hint-icon .icon {
+  flex: none;
+  margin-top: 0.15rem;
 }
 
 .report-counter {
-  margin: -0.35rem 0 0;
+  margin: -0.4rem 0 0;
   text-align: right;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
 }
 
 .report-counter-full {
   color: var(--danger);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* Messages next to a field, and problems from the server. */
 .report-field-error,
 .report-problem {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
   margin: 0;
-  padding: 0.6rem 0.75rem;
+  padding: 0.65rem 0.85rem;
   border-left: 4px solid var(--danger);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: var(--danger-soft);
   color: var(--danger);
-  font-weight: 600;
+  font-weight: 700;
+}
+
+.report-field-error .icon,
+.report-problem .icon {
+  flex: none;
+  margin-top: 0.15rem;
 }
 
 .report-problem {
-  margin-bottom: 1rem;
+  margin-bottom: var(--s2);
 }
 
 .report-problem a {
@@ -145,10 +164,12 @@
 
 /* Photo: a dashed box around the file picker. */
 .report-photo-drop {
-  padding: 1.25rem;
+  justify-items: center;
+  gap: var(--s1);
+  padding: var(--s3) var(--s2);
   border: 2px dashed var(--border);
   border-radius: var(--radius);
-  background: var(--bg);
+  background: var(--panel);
   text-align: center;
   cursor: pointer;
 }
@@ -159,19 +180,32 @@
   background: var(--accent-soft);
 }
 
+.report-photo-drop-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--accent);
+}
+
 .report-photo-drop input[type='file'] {
-  font: inherit;
-  font-weight: 400;
-  justify-self: center;
+  min-height: 0;
   max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
 }
 
 .report-photo-drop input[type='file']::file-selector-button {
   font: inherit;
+  font-weight: 700;
+  min-height: 2.75rem;
   margin-right: 0.75rem;
   padding: 0.5rem 1rem;
   border: 0;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: var(--accent);
   color: var(--accent-text);
   cursor: pointer;
@@ -179,97 +213,156 @@
 
 .report-photo-preview {
   display: flex;
-  gap: 1rem;
+  gap: var(--s2);
   align-items: center;
   padding: 0.75rem;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: var(--bg);
+  background: var(--panel);
 }
 
 .report-photo-preview img {
+  flex: none;
   width: 6rem;
   height: 6rem;
   object-fit: cover;
-  border-radius: 8px;
-  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
 }
 
 .report-photo-name {
   margin: 0 0 0.25rem;
-  font-weight: 600;
-  word-break: break-all;
+  font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
-/* The main button: full width on a phone. */
+/* Secondary buttons: outlined, so the saffron .action stays the one main action. */
+.report-remove,
+.report-copy,
+.report-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.report-remove {
+  color: var(--danger);
+}
+
+.report-remove:hover,
+.report-copy:hover,
+.report-secondary:hover {
+  border-color: var(--accent);
+  filter: none;
+}
+
+/* The main button: full width, at the end of the form. */
 .report-submit {
   width: 100%;
-  min-height: 3rem;
-  font-weight: 600;
-  font-size: 1.05rem;
-  border-radius: 8px;
+  font-size: var(--text-lg);
+}
+
+/* What happens next. */
+.report-next h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--text-lg);
+}
+
+.report-next ol {
+  display: grid;
+  gap: var(--s2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.report-next li {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.report-next li p {
+  margin: 0.15rem 0 0;
+  font-size: var(--text-sm);
+}
+
+.report-next-icon {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-pill);
+  background: var(--panel);
+  color: var(--accent);
 }
 
 /* Success screen. */
 .report-done {
   display: grid;
-  gap: 0.75rem;
+  gap: var(--s2);
   justify-items: center;
+  max-width: var(--form);
+  margin: 0 auto;
   text-align: center;
+}
+
+.report-done p {
+  margin: 0;
 }
 
 .report-done-icon {
   display: grid;
   place-items: center;
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: 50%;
-  background: var(--success);
-  color: #ffffff;
-  font-size: 1.75rem;
-  font-weight: 700;
+  width: 4rem;
+  height: 4rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--status-resolved) 14%, var(--surface));
+  color: var(--status-resolved);
 }
 
 .report-done-text {
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: var(--text-lg);
+  font-weight: 700;
 }
 
 .report-number {
-  display: inline-block;
-  margin-top: 0.35rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 6px;
-  background: var(--surface-strong);
-  font-size: 0.95rem;
-  word-break: break-all;
+  display: block;
+  margin-top: var(--s1);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  font-size: var(--text-md);
+  overflow-wrap: anywhere;
 }
 
 .report-actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: 0.75rem;
-  justify-content: center;
   width: 100%;
 }
 
-.report-actions button,
-.report-secondary {
-  min-height: 2.75rem;
-  padding: 0.6rem 1.25rem;
-  border-radius: 8px;
-  font-weight: 600;
+@media (min-width: 36rem) {
+  .report-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 }
 
-.report-secondary {
-  display: inline-grid;
-  place-items: center;
-  border: 1px solid var(--border);
-  color: var(--text);
-  text-decoration: none;
-}
-
-.report-secondary:hover {
-  background: var(--surface-strong);
+/* Phones: a little less padding inside the cards. */
+@media (max-width: 47.99rem) {
+  .report-page .card {
+    padding: var(--s2);
+  }
 }
