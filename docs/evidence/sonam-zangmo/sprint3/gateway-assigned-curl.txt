@@ -1,0 +1,46 @@
+# SCRUM-136 live check of GET /me/assigned-reports, 2026-11-09 09:51, after Gayley's report.list_assigned permission (SCRUM-137, #101).
+# Local binaries from main with REDIS_URL (Redis 7 from dev/docker-compose.yml): identity (SEED_DEMO_USERS=true; the demo password and JWT_SECRET are throwaway values, not shown), authorization, location-taxonomy, report-submission, routing-engine, routing-rules, department-directory, report-history, api-gateway on :8080. Tokens are never printed.
+# Flow: report-submission publishes report.submitted, routing-engine routes it and publishes report.routed (SCRUM-133), report-history records category_head_id as the assignee (SCRUM-130), the gateway lists by the JWT user (SCRUM-136).
+# Status shows OPEN because status-lifecycle was not running in this check; the assignee is what this route shows.
+
+$ Student Tashi submits two HOSTEL reports and one ACADEMIC_BLOCK report (POST /reports)
+c80ac380-0f16-487c-875e-3b6c5dee373e HOSTEL
+b9e992f1-cbc5-4cec-b789-1792a3702625 HOSTEL
+59ff6c37-7f6e-4c55-b14d-ece219de17dd ACADEMIC_BLOCK
+
+$ GET /me/assigned-reports as dsa.demo (DSA, 00000000-0000-4000-8000-000000000001): the two HOSTEL reports, routed by routing-engine
+b9e992f1-cbc5-4cec-b789-1792a3702625 HOSTEL OPEN assignee 00000000-0000-4000-8000-000000000001
+c80ac380-0f16-487c-875e-3b6c5dee373e HOSTEL OPEN assignee 00000000-0000-4000-8000-000000000001
+nextPageToken: ''
+HTTP200
+
+$ GET /me/assigned-reports?pageSize=1 as dsa.demo
+1 report, nextPageToken set: True
+HTTP200
+
+$ GET /me/assigned-reports as daa.demo (DAA): the ACADEMIC_BLOCK report only
+59ff6c37-7f6e-4c55-b14d-ece219de17dd ACADEMIC_BLOCK assignee 00000000-0000-4000-8000-000000000002
+HTTP200
+
+$ GET /me/assigned-reports as staff.demo (nothing assigned yet)
+{"reports":[],"nextPageToken":""}
+HTTP 200
+
+$ GET /me/assigned-reports?assigneeId=00000000-0000-4000-8000-000000000001 as staff.demo (the query value is ignored)
+{"reports":[],"nextPageToken":""}
+HTTP 200
+
+$ GET /me/assigned-reports as the student
+{"error":"not allowed"}
+
+HTTP 403
+
+$ GET /me/assigned-reports as admin.demo
+{"error":"not allowed"}
+
+HTTP 403
+
+$ GET /me/assigned-reports with no token
+{"error":"missing bearer token"}
+
+HTTP 401
