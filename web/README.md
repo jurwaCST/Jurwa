@@ -33,6 +33,15 @@ curl -X POST http://localhost:5173/api/auth/register -H "Content-Type: applicati
   -d '{"email":"pema.test@cst.edu.bt","fullName":"Pema Test","password":"pema-pass-123"}'
 ```
 
+## Container image
+
+`Dockerfile` (SCRUM-140) builds the app with `VITE_API_URL=/api` and serves it with nginx on port **8080** as a non-root user (uid 101). `nginx.conf` sends every path that is not a file to `index.html`, so a reload on `/login` or `/report/new` still works, and caches the hashed files in `/assets/` for a year. The Kubernetes Deployment and the Traefik `/` route are SCRUM-139 (Sonam Choki).
+
+```bash
+docker build -f web/Dockerfile -t jurwa-web web     # from the repo root; the context is web/
+docker run --rm -p 8088:8080 jurwa-web              # http://localhost:8088
+```
+
 ## Folders
 
 | Path | Content | Owner |
