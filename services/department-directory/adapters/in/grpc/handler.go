@@ -51,6 +51,18 @@ func (h *Handler) GetStaff(ctx context.Context, req *departmentdirectoryv1.GetSt
 	return &departmentdirectoryv1.GetStaffResponse{Position: toProtoPosition(p)}, nil
 }
 
+func (h *Handler) ListPositions(ctx context.Context, req *departmentdirectoryv1.ListPositionsRequest) (*departmentdirectoryv1.ListPositionsResponse, error) {
+	positions, err := h.svc.ListPositions(ctx, req.GetHeldOnly())
+	if err != nil {
+		return nil, toStatus(err)
+	}
+	resp := &departmentdirectoryv1.ListPositionsResponse{}
+	for _, p := range positions {
+		resp.Positions = append(resp.Positions, toProtoPosition(p))
+	}
+	return resp, nil
+}
+
 func toProtoPosition(p domain.Position) *departmentdirectoryv1.Position {
 	return &departmentdirectoryv1.Position{
 		Code:           p.Code,

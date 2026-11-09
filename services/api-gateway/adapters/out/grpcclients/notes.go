@@ -9,7 +9,7 @@ import (
 )
 
 // RoleMetadataKey carries the caller's role to services whose messages have
-// no role field (internal-notes).
+// no role field (internal-notes, reassignment).
 const RoleMetadataKey = "x-user-role"
 
 // Notes implements ports.Notes.

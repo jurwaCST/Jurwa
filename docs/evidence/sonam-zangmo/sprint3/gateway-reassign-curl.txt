@@ -1,0 +1,78 @@
+# Live check of POST /reports/{reportId}/reassign and GET /positions, 2026-11-09 23:14, asked by Nyendrak for the staff view (SCRUM-36).
+# Local binaries from this branch with REDIS_URL (Redis 7 from dev/docker-compose.yml): identity (SEED_DEMO_USERS=true; the demo password and JWT_SECRET are throwaway values, not shown), authorization, location-taxonomy, report-submission, routing-engine, routing-rules, department-directory, reassignment, report-history, api-gateway on :8080. Tokens are never printed.
+# Flow: report-submission publishes report.submitted, routing-engine routes it to the DSA, reassignment records the ROUTED assignment from report.routed; the gateway sends the reassign with the actor from the JWT and the role as x-user-role; reassignment publishes report.reassigned and report-history sets the new assignee.
+# The two older HOSTEL reports in the DSA's list are from the SCRUM-136 check (same Redis volume).
+
+$ Student Tashi submits a HOSTEL report (POST /reports)
+report e4da823e-620c-4eb0-adde-1615fa355615
+
+$ GET /me/assigned-reports as dsa.demo: routed to the DSA (00000000-0000-4000-8000-000000000001)
+e4da823e-620c-4eb0-adde-1615fa355615 HOSTEL assignee 00000000-0000-4000-8000-000000000001
+b9e992f1-cbc5-4cec-b789-1792a3702625 HOSTEL assignee 00000000-0000-4000-8000-000000000001
+c80ac380-0f16-487c-875e-3b6c5dee373e HOSTEL assignee 00000000-0000-4000-8000-000000000001
+(3 reports) HTTP200
+
+$ GET /positions as dsa.demo: the positions someone holds, for the reassign picker
+DAA CATEGORY_HEAD 00000000-0000-4000-8000-000000000002 - Dean of Academic Affairs
+DSA CATEGORY_HEAD 00000000-0000-4000-8000-000000000001 - Dean of Student Affairs
+SSO CATEGORY_HEAD 00000000-0000-4000-8000-000000000003 - Student Service Officer
+SSO_MALE STAFF 00000000-0000-4000-8000-000000000010 - Student Service Officer (male)
+HTTP200
+
+$ POST /reports/e4da823e-620c-4eb0-adde-1615fa355615/reassign as staff.demo (not the assignee yet)
+{"error":"permission denied: only a Category Head or the current assignee can reassign"}
+
+HTTP 403
+
+$ POST /reports/e4da823e-620c-4eb0-adde-1615fa355615/reassign as dsa.demo with a blank reason
+{"error":"reason must not be blank and at most 500 characters"}
+
+HTTP 400
+
+$ POST /reports/e4da823e-620c-4eb0-adde-1615fa355615/reassign as dsa.demo to staff.demo (SSO_MALE); the body's actorId and reportId are ignored
+{"assignment":{"id":"3992fa64-1024-4e44-859c-0ece2bb0e817", "reportId":"e4da823e-620c-4eb0-adde-1615fa355615", "assigneeUserId":"00000000-0000-4000-8000-000000000010", "assigneePositionCode":"", "kind":"REASSIGNED", "assignedBy":"00000000-0000-4000-8000-000000000001", "reason":"Plumbing: hostel staff handle it", "current":true, "assignedAt":"2026-11-09T17:14:16.363994Z"}}
+HTTP 200
+
+$ GET /me/assigned-reports as staff.demo: the report is now theirs (report-history read report.reassigned)
+e4da823e-620c-4eb0-adde-1615fa355615 HOSTEL assignee 00000000-0000-4000-8000-000000000010
+(1 reports) HTTP200
+
+$ GET /me/assigned-reports as dsa.demo: no longer in the DSA's list
+b9e992f1-cbc5-4cec-b789-1792a3702625 HOSTEL assignee 00000000-0000-4000-8000-000000000001
+c80ac380-0f16-487c-875e-3b6c5dee373e HOSTEL assignee 00000000-0000-4000-8000-000000000001
+(2 reports) HTTP200
+
+$ GET /reports/e4da823e-620c-4eb0-adde-1615fa355615/timeline as staff.demo
+report.submitted - Report submitted
+report.routed - Routed to DSA
+report.reassigned - Reassigned: Plumbing: hostel staff handle it
+HTTP200
+
+$ POST /reports/e4da823e-620c-4eb0-adde-1615fa355615/reassign as staff.demo, now the assignee, back to the SSO (00000000-0000-4000-8000-000000000003)
+{"assignment":{"id":"19a2f6b6-bd9a-47ba-85d2-ced9fbaa51ba", "reportId":"e4da823e-620c-4eb0-adde-1615fa355615", "assigneeUserId":"00000000-0000-4000-8000-000000000003", "assigneePositionCode":"", "kind":"REASSIGNED", "assignedBy":"00000000-0000-4000-8000-000000000010", "reason":"Needs a purchase order", "current":true, "assignedAt":"2026-11-09T17:14:18.480141Z"}}
+HTTP 200
+
+$ POST /reports/6f1c2a7e-3b4d-4c5e-8f90-1a2b3c4d5e6f/reassign as dsa.demo (a report that was never routed)
+{"error":"report has no assignment"}
+
+HTTP 404
+
+$ POST /reports/e4da823e-620c-4eb0-adde-1615fa355615/reassign as the student
+{"error":"not allowed"}
+
+HTTP 403
+
+$ POST /reports/e4da823e-620c-4eb0-adde-1615fa355615/reassign as admin.demo
+{"error":"not allowed"}
+
+HTTP 403
+
+$ GET /positions as the student
+{"error":"not allowed"}
+
+HTTP 403
+
+$ GET /positions with no token
+{"error":"missing bearer token"}
+
+HTTP 401

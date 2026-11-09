@@ -151,23 +151,19 @@ export default function Home() {
       <nav aria-label="Your pages">
         <ul className="tiles">
           {actions.map((a, i) => (
-            <li key={a.to}>
-              <Link
-                to={a.to}
-                className={i === 0 ? 'tile tile-main' : 'tile'}
-                aria-labelledby={`tile-${i}-label`}
-                aria-describedby={`tile-${i}-hint`}
-              >
-                <span className="tile-icon">
-                  <Icon name={a.icon} size={26} />
-                </span>
-                <span className="tile-label" id={`tile-${i}-label`}>
-                  {a.label}
-                </span>
-                <span className="tile-hint" id={`tile-${i}-hint`}>
-                  {a.hint}
-                </span>
+            // Only the title is the link, so its name is exactly the words it shows
+            // (axe label-content-name-mismatch). The hint is its description, and
+            // the link's ::after covers the tile so the whole tile is clickable.
+            <li key={a.to} className={i === 0 ? 'tile tile-main' : 'tile'}>
+              <span className="tile-icon">
+                <Icon name={a.icon} size={26} />
+              </span>
+              <Link to={a.to} className="tile-label" aria-describedby={`tile-${i}-hint`}>
+                {a.label}
               </Link>
+              <span className="tile-hint" id={`tile-${i}-hint`}>
+                {a.hint}
+              </span>
             </li>
           ))}
         </ul>

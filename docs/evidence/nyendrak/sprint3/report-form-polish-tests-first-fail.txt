@@ -1,0 +1,9 @@
+> npx vitest run src/pages/ReportForm.test.tsx (before the polish)
+     × asks the student to sign in again when the sign-in has expired while loading 32ms
+     × asks the student to sign in again when the sign-in expires before sending 482ms
+     × shows the chosen photo with its name and size 46ms
+     × marks the field that needs attention 65ms
+     × can start another report from the success screen 550ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  1 failed (1)
+      Tests  5 failed | 16 passed (21)

@@ -47,9 +47,8 @@ func main() {
 	hs := health.NewServer()
 	healthpb.RegisterHealthServer(srv, hs)
 
-	// Sprint 2 keeps the directory in memory, with demo holders for DSA, DAA and
-	// SSO so routing-engine can route end to end. PostgreSQL (DATABASE_URL) and
-	// real holders from identity replace it in Sprint 3.
+	// The directory is kept in memory, with the identity demo accounts as holders
+	// of DSA, DAA, SSO (routing) and SSO_MALE (a staff member to reassign to).
 	repo := memory.NewRepository(domain.DefaultDepartments(), domain.WithDemoHolders(domain.DefaultPositions()))
 	departmentdirectoryv1.RegisterDepartmentDirectoryServiceServer(srv, grpcadapter.NewHandler(application.NewService(repo)))
 

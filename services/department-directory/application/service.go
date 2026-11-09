@@ -42,3 +42,16 @@ func (s *Service) GetStaff(ctx context.Context, positionCode string) (domain.Pos
 	}
 	return domain.FindPosition(positions, positionCode)
 }
+
+// ListPositions returns every position ordered by code, or with heldOnly only
+// the ones that have a holder.
+func (s *Service) ListPositions(ctx context.Context, heldOnly bool) ([]domain.Position, error) {
+	positions, err := s.repo.ListPositions(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if heldOnly {
+		return domain.HeldPositions(positions), nil
+	}
+	return positions, nil
+}

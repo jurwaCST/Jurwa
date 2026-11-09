@@ -15,6 +15,9 @@ service DepartmentDirectoryService {
   // One position and its holder, for example "DSA". Used by routing-engine.
   // Errors: NOT_FOUND when the position code is unknown.
   rpc GetStaff(GetStaffRequest) returns (GetStaffResponse);
+  // Every position ordered by code. With held_only, only the positions that
+  // have a holder: the people a report can be reassigned to.
+  rpc ListPositions(ListPositionsRequest) returns (ListPositionsResponse);
 }
 
 message Department {
@@ -51,4 +54,12 @@ message GetStaffRequest {
 
 message GetStaffResponse {
   Position position = 1;
+}
+
+message ListPositionsRequest {
+  bool held_only = 1; // true: leave out positions nobody holds
+}
+
+message ListPositionsResponse {
+  repeated Position positions = 1;
 }

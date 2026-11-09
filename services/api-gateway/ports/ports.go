@@ -9,10 +9,12 @@ import (
 	analyticsv1 "github.com/jurwaCST/Jurwa/proto/gen/analytics/v1"
 	categorytaxonomyv1 "github.com/jurwaCST/Jurwa/proto/gen/category-taxonomy/v1"
 	commonv1 "github.com/jurwaCST/Jurwa/proto/gen/common/v1"
+	departmentdirectoryv1 "github.com/jurwaCST/Jurwa/proto/gen/department-directory/v1"
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
 	internalnotesv1 "github.com/jurwaCST/Jurwa/proto/gen/internal-notes/v1"
 	locationtaxonomyv1 "github.com/jurwaCST/Jurwa/proto/gen/location-taxonomy/v1"
 	photomediav1 "github.com/jurwaCST/Jurwa/proto/gen/photo-media/v1"
+	reassignmentv1 "github.com/jurwaCST/Jurwa/proto/gen/reassignment/v1"
 	reporthistoryv1 "github.com/jurwaCST/Jurwa/proto/gen/report-history/v1"
 	reportsubmissionv1 "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1"
 	statuslifecyclev1 "github.com/jurwaCST/Jurwa/proto/gen/status-lifecycle/v1"
@@ -79,4 +81,16 @@ type Status interface {
 type Analytics interface {
 	GetSummary(ctx context.Context, period *analyticsv1.Period) (*analyticsv1.GetSummaryResponse, error)
 	GetCategoryBreakdown(ctx context.Context, period *analyticsv1.Period) (*analyticsv1.GetCategoryBreakdownResponse, error)
+}
+
+// Reassignment is the reassignment service (Nyendrak). role is the caller's
+// role, sent as the gRPC metadata x-user-role because the request has no role field.
+type Reassignment interface {
+	ReassignReport(ctx context.Context, role string, in *reassignmentv1.ReassignReportRequest) (*reassignmentv1.ReassignReportResponse, error)
+}
+
+// Directory is department-directory: the positions a report can be reassigned to.
+type Directory interface {
+	// ListHeldPositions returns the positions that have a holder, ordered by code.
+	ListHeldPositions(ctx context.Context) (*departmentdirectoryv1.ListPositionsResponse, error)
 }

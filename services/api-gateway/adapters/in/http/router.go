@@ -26,6 +26,7 @@ import (
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
 	internalnotesv1 "github.com/jurwaCST/Jurwa/proto/gen/internal-notes/v1"
 	photomediav1 "github.com/jurwaCST/Jurwa/proto/gen/photo-media/v1"
+	reassignmentv1 "github.com/jurwaCST/Jurwa/proto/gen/reassignment/v1"
 	reportsubmissionv1 "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1"
 	statuslifecyclev1 "github.com/jurwaCST/Jurwa/proto/gen/status-lifecycle/v1"
 	"github.com/jurwaCST/Jurwa/services/api-gateway/application"
@@ -57,6 +58,8 @@ type Deps struct {
 	Photos     ports.Photos
 	Status     ports.Status
 	Analytics  ports.Analytics
+	Reassign   ports.Reassignment
+	Directory  ports.Directory
 	Limiter    *domain.Limiter
 }
 
@@ -89,6 +92,8 @@ func NewRouter(d Deps) http.Handler {
 	mux.Handle("POST /photos", r.protected(domain.ActionPhotoUpload, r.uploadPhoto))
 	mux.Handle("GET /photos/{photoId}", r.protected(domain.ActionPhotoRead, r.getPhoto))
 	mux.Handle("GET /reports/{reportId}/timeline", r.protected(domain.ActionReportTimelineRead, r.timeline))
+	mux.Handle("POST /reports/{reportId}/reassign", r.protected(domain.ActionReportReassign, r.reassign))
+	mux.Handle("GET /positions", r.protected(domain.ActionReportReassign, r.positions))
 
 	return r.rateLimit(mux)
 }
@@ -322,6 +327,27 @@ func (r router) getStatus(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	resp, err := r.Status.GetStatus(req.Context(), reportID)
+	reply(w, http.StatusOK, resp, err)
+}
+
+// reassign hands a report to another user. reassignment checks that a Staff
+// caller is the current assignee (PERMISSION_DENIED, 403), and that nobody
+// reassigned it meanwhile (ABORTED, 409).
+func (r router) reassign(w http.ResponseWriter, req *http.Request) {
+	in := &reassignmentv1.ReassignReportRequest{}
+	if !readJSON(w, req, in) {
+		return
+	}
+	in.ReportId = req.PathValue("reportId") // from the path, never the body
+	in.ActorId = principal(req).UserID      // from the JWT, never the body (rule 2)
+	resp, err := r.Reassign.ReassignReport(req.Context(), actingRole(req), in)
+	reply(w, http.StatusOK, resp, err)
+}
+
+// positions lists the positions someone holds, for the reassign picker: the
+// PWA sends a position's holderUserId as toUserId.
+func (r router) positions(w http.ResponseWriter, req *http.Request) {
+	resp, err := r.Directory.ListHeldPositions(req.Context())
 	reply(w, http.StatusOK, resp, err)
 }
 

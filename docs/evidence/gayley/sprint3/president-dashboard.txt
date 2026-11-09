@@ -1,0 +1,40 @@
+# SCRUM-99 live check 2026-11-09 11:43: web/cypress/start-stack.sh (gateway :18080, analytics with SEED_DEMO_DATA=true: 6 demo reports). Passwords and tokens are not shown.
+
+## Reads the dashboard uses, as president.demo
+$ GET /dashboard/summary
+{"counts":{"total":"6", "open":"1", "assigned":"1", "inProgress":"1", "resolved":"2", "escalated":"1"}, "averageResolutionHours":9}
+HTTP 200
+$ GET /dashboard/categories
+{"categories":[{"category":"HOSTEL", "counts":{"total":"2", "open":"1", "assigned":"0", "inProgress":"0", "resolved":"1", "escalated":"0"}}, {"category":"ACADEMIC_BLOCK", "counts":{"total":"2", "open":"0", "assigned":"0", "inProgress":"1", "resolved":"0", "escalated":"1"}}, {"category":"OTHERS", "counts":{"total":"2", "open":"0", "assigned":"1", "inProgress":"0", "resolved":"1", "escalated":"0"}}]}
+HTTP 200
+$ GET /dashboard/summary?from=2026-11-02T05:43:16Z   (This week)
+{"counts":{"total":"6", "open":"1", "assigned":"1", "inProgress":"1", "resolved":"2", "escalated":"1"}, "averageResolutionHours":9}
+HTTP 200
+
+## Writes are refused for the President (FR-30)
+$ POST /reports
+{"error":"not allowed"}
+
+HTTP 403
+$ POST /reports/00000000-0000-4000-8000-000000000001/status
+{"error":"not allowed"}
+
+HTTP 403
+$ POST /photos
+{"error":"not allowed"}
+
+HTTP 403
+
+## The dashboard is not for other roles
+$ GET /dashboard/summary as a student
+{"error":"not allowed"}
+
+HTTP 403
+
+## Web tests and build
+$ npx vitest run
+ Test Files  5 passed (5)
+      Tests  73 passed (73)
+$ npm run build
+✓ 54 modules transformed.
+✓ built in 348ms
