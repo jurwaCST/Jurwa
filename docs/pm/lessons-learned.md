@@ -21,6 +21,8 @@ Facilitator: Gayley Choden (Scrum Master). Whole team, 30 minutes, after the fin
 | L5 | **A shared folder change breaks other services' images.** Services that started using `pkg/` had Dockerfiles that did not copy it, three times; the Images check caught it each time | Sprint 2, 3 | Defects D-03, D-04, D-05 |
 | L6 | **The baseline PV was never revised.** Action A3 (revise the per-sprint PV) was open after Sprint 1 and still open after Sprint 2, so SPI stayed high for the wrong reason | Sprint 1, 2 | `docs/pm/evm/week2.md` section 4 |
 | L7 | **Tests found real defects before users did.** The JMeter run found that retries can make duplicates (D-07); the end-to-end check found new reports missing from the timeline (D-12) | Sprint 3 | `docs/testing/test-plan.md` section 6 |
+| L8 | **Know the free limits of every tool before the last week.** The free GitHub Actions minutes for a private repository ran out two days before the demo and blocked every merge. Making the repository public fixed it at zero cost, but a check of the usage page each sprint would have shown it coming | Sprint 3 | Issue I10 |
+| L9 | **Re-run the tests after a redesign, on the build that is deployed.** Re-running the accessibility tests on the final design found a real problem (D-16) that the earlier passing run could not; and tests against the dev server failed at random under load, while the built app passed | Sprint 3 | `docs/testing/accessibility.md`; defect D-16 |
 
 ## 3. Session notes
 
