@@ -1,0 +1,23 @@
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 assigned reports > lists the reports assigned to me with their place and status 229ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 assigned reports > counts the reports per status on the chips and filters by one 115ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 assigned reports > says so when nothing is assigned 17ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 assigned reports > offers to try again when the list does not load 80ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 assigned reports > loads the next page when there are more reports 77ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 one report: details, history and notes > opens a report on the Details tab with its description 103ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 one report: details, history and notes > moves between the tabs with the arrow keys 147ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 one report: details, history and notes > shows the history of status changes, oldest first 150ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 one report: details, history and notes > lists the notes and adds one 563ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 one report: details, history and notes > goes back to the list 123ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 update status > offers only the next allowed status and sends it with the version 512ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 update status > keeps every letter typed in the sheet 218ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 update status > says when someone else changed the report first, and shows the new status 236ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 update status > needs a status to be chosen 233ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 update status > has nothing to update on a resolved report 117ms
+ × src/pages/StaffView.test.tsx > SCRUM-36 reassign > offers the positions that have someone in them, except my own 1097ms
+ × src/pages/StaffView.test.tsx > SCRUM-36 reassign > sends the chosen holder and the reason, then the report leaves my list 1073ms
+ × src/pages/StaffView.test.tsx > SCRUM-36 reassign > needs a person and a reason 1081ms
+ × src/pages/StaffView.test.tsx > SCRUM-36 reassign > explains a 403 and a 409 1090ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 reassign > has no reassign on a resolved report 91ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  1 failed (1)
+      Tests  4 failed | 16 passed (20)

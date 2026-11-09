@@ -51,6 +51,16 @@ const assigned = {
 
 let statuses: Record<string, { status: string; version: number }>
 
+// GET /positions (Zangmo): the people a report can be reassigned to.
+const positions = {
+  positions: [
+    { code: 'DSA', title: 'Dean of Student Affairs', kind: 'CATEGORY_HEAD', holderUserId: ME },
+    { code: 'WARDEN_A', title: 'Warden, Hostel A', kind: 'STAFF', holderUserId: 'staff-8' },
+    { code: 'ESTATE', title: 'Estate officer', kind: 'STAFF' },
+    { code: 'SSO_MALE', title: 'SSO, male hostels', kind: 'STAFF', holderUserId: 'staff-7' },
+  ],
+}
+
 function stubGet(overrides: Record<string, unknown> = {}) {
   get.mockImplementation(async (path: string) => {
     if (path in overrides) {
@@ -59,6 +69,7 @@ function stubGet(overrides: Record<string, unknown> = {}) {
       return v
     }
     if (path === '/me/assigned-reports') return assigned
+    if (path === '/positions') return positions
     let m = path.match(/^\/reports\/(r\d)$/)
     if (m) {
       return {
@@ -312,5 +323,83 @@ describe('SCRUM-36 update status', () => {
     await openReport(user, /Room 12/)
     expect(await screen.findByText('Resolved. Nothing more to do.')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Update status' })).not.toBeInTheDocument()
+  })
+})
+
+describe('SCRUM-36 reassign', () => {
+  async function openSheet(user: User) {
+    await openReport(user, /Bathroom 1/)
+    await user.click(await screen.findByRole('button', { name: 'Reassign' }))
+    return screen.getByRole('dialog', { name: 'Reassign' })
+  }
+
+  it('offers the positions that have someone in them, except my own', async () => {
+    const user = userEvent.setup()
+    renderView()
+    const sheet = await openSheet(user)
+    const to = await within(sheet).findByLabelText('Reassign to')
+    await waitFor(() => expect(within(to).getAllByRole('option')).toHaveLength(3))
+    expect(within(to).getAllByRole('option').map((o) => o.textContent)).toEqual([
+      'Choose a person',
+      'SSO, male hostels',
+      'Warden, Hostel A',
+    ])
+    expect(get).toHaveBeenCalledWith('/positions')
+  })
+
+  it('sends the chosen holder and the reason, then the report leaves my list', async () => {
+    post.mockResolvedValueOnce({ assignment: { reportId: 'r1', assigneeUserId: 'staff-7', kind: 'REASSIGNED', current: true } })
+    const user = userEvent.setup()
+    renderView()
+    const sheet = await openSheet(user)
+    await user.selectOptions(await within(sheet).findByLabelText('Reassign to'), 'staff-7')
+    await user.type(within(sheet).getByLabelText('Why (the new person sees this)'), 'Male hostel plumbing')
+    await user.click(within(sheet).getByRole('button', { name: 'Reassign report' }))
+
+    expect(post).toHaveBeenCalledWith('/reports/r1/reassign', { toUserId: 'staff-7', reason: 'Male hostel plumbing' })
+    expect(await screen.findByText('Reassigned to SSO, male hostels')).toBeInTheDocument()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Bathroom 1/ })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'All 3' })).toBeInTheDocument()
+  })
+
+  it('needs a person and a reason', async () => {
+    const user = userEvent.setup()
+    renderView()
+    const sheet = await openSheet(user)
+    await within(sheet).findByRole('option', { name: 'Warden, Hostel A' })
+    await user.click(within(sheet).getByRole('button', { name: 'Reassign report' }))
+    expect(await within(sheet).findByText('Choose who to reassign it to.')).toBeInTheDocument()
+    await user.selectOptions(within(sheet).getByLabelText('Reassign to'), 'staff-8')
+    await user.type(within(sheet).getByLabelText('Why (the new person sees this)'), '   ')
+    await user.click(within(sheet).getByRole('button', { name: 'Reassign report' }))
+    expect(await within(sheet).findByText('Write why you are reassigning it.')).toBeInTheDocument()
+    expect(post).not.toHaveBeenCalled()
+  })
+
+  it('explains a 403 and a 409', async () => {
+    post.mockRejectedValueOnce(new ApiError(403, 'not allowed'))
+    post.mockRejectedValueOnce(new ApiError(409, 'already reassigned'))
+    const user = userEvent.setup()
+    renderView()
+    const sheet = await openSheet(user)
+    await user.selectOptions(await within(sheet).findByLabelText('Reassign to'), 'staff-8')
+    await user.type(within(sheet).getByLabelText('Why (the new person sees this)'), 'Hostel A')
+    await user.click(within(sheet).getByRole('button', { name: 'Reassign report' }))
+    expect(await within(sheet).findByRole('alert')).toHaveTextContent(
+      'Only the person this report is assigned to can reassign it.',
+    )
+    await user.click(within(sheet).getByRole('button', { name: 'Reassign report' }))
+    expect(await within(sheet).findByRole('alert')).toHaveTextContent(
+      'Someone reassigned this report first. Go back to the list to see it.',
+    )
+  })
+
+  it('has no reassign on a resolved report', async () => {
+    const user = userEvent.setup()
+    renderView()
+    await openReport(user, /Room 12/)
+    await screen.findByText('Resolved. Nothing more to do.')
+    expect(screen.queryByRole('button', { name: 'Reassign' })).not.toBeInTheDocument()
   })
 })
