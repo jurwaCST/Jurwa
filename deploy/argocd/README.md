@@ -5,6 +5,7 @@ Card: SCRUM-102. Owner: Sonam Zangmo. Argo CD watches `main` and keeps the clust
 | File | What it is |
 |---|---|
 | `application.yaml` | Application `jurwa`: everything in `deploy/k8s` (20 services, data stores, ingress). Needs about 16 GB of RAM |
+| `application-knative.yaml` | Application `jurwa-knative`: the SLA escalation function on Knative (`deploy/knative`, SCRUM-104). Use it next to `application.yaml`, after Knative is installed (section 4b) |
 | `application-demo.yaml` | Application `jurwa-demo`: the small set in `demo/`, which fits on an 8 GB laptop |
 | `demo/kustomization.yaml` | PostgreSQL, MongoDB, Redis, api-gateway, identity, authorization, category-taxonomy, report-submission (sign-up, sign-in, categories, submit a report). It only points at the folders in `deploy/k8s`, it copies nothing |
 | `add-repo-credentials.sh` | Gives Argo CD read access to the private repo with a token you type in; the token goes only into a Secret in the cluster |
@@ -52,6 +53,16 @@ kubectl apply -f deploy/argocd/application-demo.yaml     # or application.yaml o
 kubectl -n argocd get applications                         # SYNC STATUS Synced, HEALTH Healthy
 kubectl -n jurwa get pods
 ```
+
+## 4b. The escalation function on Knative
+
+The function `sla-escalation-checker` is not in `deploy/k8s`; it lives in `deploy/knative` (Nyendrak, SCRUM-104). On the demo cluster, once:
+
+1. `kubectl get nodes` and pick the Knative version that matches that Kubernetes version (table in `docs/ops/knative.md`), then install Serving, Kourier and Eventing with the commands there.
+2. Build and push the image: `docker build -f functions/sla-escalation-checker/Dockerfile -t localhost:5050/sla-escalation-checker:latest .` and `docker push localhost:5050/sla-escalation-checker:latest`.
+3. `kubectl apply -f deploy/argocd/application-knative.yaml`, then `kubectl -n argocd get application jurwa-knative` until Synced and Healthy, and `kubectl -n jurwa get ksvc,pingsource`.
+
+If Knative cannot be installed, do not create this Application; apply the CronJob fallback by hand instead: `kubectl apply -f deploy/knative/cronjob-fallback.yaml`. Never run both, so a lapsed report is handled by one runner only.
 
 ## 5. Open the Argo CD UI
 
