@@ -39,6 +39,7 @@ The React PWA calls only the api-gateway over HTTP (port 8080, JSON). The gatewa
 | `GET /reports/{reportId}/audit` | audit-log | ListByReport | System Administrator |
 | `GET /me/notifications` | notification | ListNotifications | any signed-in user |
 | `GET /departments` | department-directory | ListDepartments | Category Head, System Administrator |
+| `GET /positions` | department-directory | ListPositions (held only) | Category Head, Staff (the reassign picker) |
 | `GET /admin/routing-rules` | routing-rules | ListRules | System Administrator |
 | `PUT /admin/routing-rules` | routing-rules | UpsertRule | System Administrator |
 | `GET /admin/sla-policies/{category}` | sla-policy | GetPolicy | System Administrator |

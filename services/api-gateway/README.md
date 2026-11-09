@@ -34,6 +34,8 @@ Every gRPC client goes through `pkg/resilience` (2 s timeout, up to 3 attempts f
 | `GET /reports/{reportId}/timeline` | report-history GetReportTimeline | Student (own, checked with report-submission), Category Head, Staff, System Administrator |
 | `POST /reports/{reportId}/status` | status-lifecycle ChangeStatus (body `{"toStatus": "IN_PROGRESS", "expectedVersion": 1, "reason": "..."}`) | Category Head, Staff; the actor id comes from the JWT |
 | `GET /reports/{reportId}/status` | status-lifecycle GetStatus | Student (own, checked with report-submission), Category Head, Staff, System Administrator |
+| `POST /reports/{reportId}/reassign` | reassignment ReassignReport (body `{"toUserId": "...", "reason": "..."}`) | Category Head, Staff (current assignee, checked by reassignment); the actor id comes from the JWT |
+| `GET /positions` | department-directory ListPositions (only positions someone holds) | Category Head, Staff |
 | `GET /dashboard/summary` | analytics GetSummary (optional `?from=` and `?to=`, RFC 3339) | System Administrator, College President |
 | `GET /dashboard/categories` | analytics GetCategoryBreakdown (same `?from=` and `?to=`) | System Administrator, College President |
 | `POST /photos` | photo-media UploadPhoto (returns 201 `{"photoId": "..."}`) | Student; the uploader id comes from the JWT |
@@ -44,6 +46,12 @@ The other routes in `api-routes.md` are added as their services are merged.
 ## Status changes
 
 The report id comes from the path and the actor id from the JWT; both are ignored in the body. The actor is never empty, because an empty actor means the system, which is the only one allowed to set `ESCALATED`. status-lifecycle checks the flow (OPEN, ASSIGNED, IN_PROGRESS, RESOLVED): a change the flow does not allow is 422, and a stale `expectedVersion` (someone changed it first) is 409. `api-routes.md` says "Staff (assignee)": the gateway checks the role only for now, because report-history only now learns the assignee (from report.routed and report.reassigned); the assignee check can follow.
+
+## Reassign
+
+The PWA fills its picker from `GET /positions`: each entry has `code`, `title`, `kind` (CATEGORY_HEAD, HOD, STAFF, COUNCILLOR) and `holderUserId`, and it sends the chosen `holderUserId` as `toUserId` to `POST /reports/{reportId}/reassign`. The report id comes from the path and the actor id from the JWT; both are ignored in the body. The caller's role goes to reassignment as the metadata `x-user-role`, and reassignment decides: a Category Head may reassign any report, a Staff member only one assigned to them (403 otherwise). Other answers: 400 for a missing `toUserId` or a blank `reason`, 404 for a report that was never routed, 409 when someone reassigned it first. `GET /positions` uses the `report.reassign` permission, so whoever may reassign may see whom to. The new assignee sees the report in `GET /me/assigned-reports` once report-history reads `report.reassigned` (about a second).
+
+ReassignReport is in `pkg/resilience` `CreateMethods`: after a timeout it is not retried, so one click never records two reassignments.
 
 ## Dashboard
 
@@ -98,6 +106,8 @@ Error bodies are `{"error": "<message>"}`.
 | `PHOTO_MEDIA_ADDR` | `localhost:9002` | photo-media |
 | `STATUS_LIFECYCLE_ADDR` | `localhost:9011` | status-lifecycle |
 | `ANALYTICS_ADDR` | `localhost:9020` | analytics |
+| `REASSIGNMENT_ADDR` | `localhost:9014` | reassignment |
+| `DEPARTMENT_DIRECTORY_ADDR` | `localhost:9008` | department-directory |
 
 ## Run
 

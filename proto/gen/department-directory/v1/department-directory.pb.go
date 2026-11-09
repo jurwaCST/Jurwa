@@ -416,6 +416,94 @@ func (x *GetStaffResponse) GetPosition() *Position {
 	return nil
 }
 
+type ListPositionsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	HeldOnly      bool                   `protobuf:"varint,1,opt,name=held_only,json=heldOnly,proto3" json:"held_only,omitempty"` // true: leave out positions nobody holds
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListPositionsRequest) Reset() {
+	*x = ListPositionsRequest{}
+	mi := &file_department_directory_v1_department_directory_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPositionsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPositionsRequest) ProtoMessage() {}
+
+func (x *ListPositionsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_department_directory_v1_department_directory_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPositionsRequest.ProtoReflect.Descriptor instead.
+func (*ListPositionsRequest) Descriptor() ([]byte, []int) {
+	return file_department_directory_v1_department_directory_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *ListPositionsRequest) GetHeldOnly() bool {
+	if x != nil {
+		return x.HeldOnly
+	}
+	return false
+}
+
+type ListPositionsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Positions     []*Position            `protobuf:"bytes,1,rep,name=positions,proto3" json:"positions,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListPositionsResponse) Reset() {
+	*x = ListPositionsResponse{}
+	mi := &file_department_directory_v1_department_directory_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPositionsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPositionsResponse) ProtoMessage() {}
+
+func (x *ListPositionsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_department_directory_v1_department_directory_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPositionsResponse.ProtoReflect.Descriptor instead.
+func (*ListPositionsResponse) Descriptor() ([]byte, []int) {
+	return file_department_directory_v1_department_directory_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *ListPositionsResponse) GetPositions() []*Position {
+	if x != nil {
+		return x.Positions
+	}
+	return nil
+}
+
 var File_department_directory_v1_department_directory_proto protoreflect.FileDescriptor
 
 const file_department_directory_v1_department_directory_proto_rawDesc = "" +
@@ -442,11 +530,16 @@ const file_department_directory_v1_department_directory_proto_rawDesc = "" +
 	"\x0fGetStaffRequest\x12#\n" +
 	"\rposition_code\x18\x01 \x01(\tR\fpositionCode\"V\n" +
 	"\x10GetStaffResponse\x12B\n" +
-	"\bposition\x18\x01 \x01(\v2&.jurwa.departmentdirectory.v1.PositionR\bposition2\xec\x02\n" +
+	"\bposition\x18\x01 \x01(\v2&.jurwa.departmentdirectory.v1.PositionR\bposition\"3\n" +
+	"\x14ListPositionsRequest\x12\x1b\n" +
+	"\theld_only\x18\x01 \x01(\bR\bheldOnly\"]\n" +
+	"\x15ListPositionsResponse\x12D\n" +
+	"\tpositions\x18\x01 \x03(\v2&.jurwa.departmentdirectory.v1.PositionR\tpositions2\xe6\x03\n" +
 	"\x1aDepartmentDirectoryService\x12~\n" +
 	"\x0fListDepartments\x124.jurwa.departmentdirectory.v1.ListDepartmentsRequest\x1a5.jurwa.departmentdirectory.v1.ListDepartmentsResponse\x12c\n" +
 	"\x06GetHoD\x12+.jurwa.departmentdirectory.v1.GetHoDRequest\x1a,.jurwa.departmentdirectory.v1.GetHoDResponse\x12i\n" +
-	"\bGetStaff\x12-.jurwa.departmentdirectory.v1.GetStaffRequest\x1a..jurwa.departmentdirectory.v1.GetStaffResponseBSZQgithub.com/jurwaCST/Jurwa/proto/gen/department-directory/v1;departmentdirectoryv1b\x06proto3"
+	"\bGetStaff\x12-.jurwa.departmentdirectory.v1.GetStaffRequest\x1a..jurwa.departmentdirectory.v1.GetStaffResponse\x12x\n" +
+	"\rListPositions\x122.jurwa.departmentdirectory.v1.ListPositionsRequest\x1a3.jurwa.departmentdirectory.v1.ListPositionsResponseBSZQgithub.com/jurwaCST/Jurwa/proto/gen/department-directory/v1;departmentdirectoryv1b\x06proto3"
 
 var (
 	file_department_directory_v1_department_directory_proto_rawDescOnce sync.Once
@@ -460,7 +553,7 @@ func file_department_directory_v1_department_directory_proto_rawDescGZIP() []byt
 	return file_department_directory_v1_department_directory_proto_rawDescData
 }
 
-var file_department_directory_v1_department_directory_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_department_directory_v1_department_directory_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_department_directory_v1_department_directory_proto_goTypes = []any{
 	(*Department)(nil),              // 0: jurwa.departmentdirectory.v1.Department
 	(*Position)(nil),                // 1: jurwa.departmentdirectory.v1.Position
@@ -470,22 +563,27 @@ var file_department_directory_v1_department_directory_proto_goTypes = []any{
 	(*GetHoDResponse)(nil),          // 5: jurwa.departmentdirectory.v1.GetHoDResponse
 	(*GetStaffRequest)(nil),         // 6: jurwa.departmentdirectory.v1.GetStaffRequest
 	(*GetStaffResponse)(nil),        // 7: jurwa.departmentdirectory.v1.GetStaffResponse
+	(*ListPositionsRequest)(nil),    // 8: jurwa.departmentdirectory.v1.ListPositionsRequest
+	(*ListPositionsResponse)(nil),   // 9: jurwa.departmentdirectory.v1.ListPositionsResponse
 }
 var file_department_directory_v1_department_directory_proto_depIdxs = []int32{
 	0, // 0: jurwa.departmentdirectory.v1.ListDepartmentsResponse.departments:type_name -> jurwa.departmentdirectory.v1.Department
 	1, // 1: jurwa.departmentdirectory.v1.GetHoDResponse.position:type_name -> jurwa.departmentdirectory.v1.Position
 	1, // 2: jurwa.departmentdirectory.v1.GetStaffResponse.position:type_name -> jurwa.departmentdirectory.v1.Position
-	2, // 3: jurwa.departmentdirectory.v1.DepartmentDirectoryService.ListDepartments:input_type -> jurwa.departmentdirectory.v1.ListDepartmentsRequest
-	4, // 4: jurwa.departmentdirectory.v1.DepartmentDirectoryService.GetHoD:input_type -> jurwa.departmentdirectory.v1.GetHoDRequest
-	6, // 5: jurwa.departmentdirectory.v1.DepartmentDirectoryService.GetStaff:input_type -> jurwa.departmentdirectory.v1.GetStaffRequest
-	3, // 6: jurwa.departmentdirectory.v1.DepartmentDirectoryService.ListDepartments:output_type -> jurwa.departmentdirectory.v1.ListDepartmentsResponse
-	5, // 7: jurwa.departmentdirectory.v1.DepartmentDirectoryService.GetHoD:output_type -> jurwa.departmentdirectory.v1.GetHoDResponse
-	7, // 8: jurwa.departmentdirectory.v1.DepartmentDirectoryService.GetStaff:output_type -> jurwa.departmentdirectory.v1.GetStaffResponse
-	6, // [6:9] is the sub-list for method output_type
-	3, // [3:6] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	1, // 3: jurwa.departmentdirectory.v1.ListPositionsResponse.positions:type_name -> jurwa.departmentdirectory.v1.Position
+	2, // 4: jurwa.departmentdirectory.v1.DepartmentDirectoryService.ListDepartments:input_type -> jurwa.departmentdirectory.v1.ListDepartmentsRequest
+	4, // 5: jurwa.departmentdirectory.v1.DepartmentDirectoryService.GetHoD:input_type -> jurwa.departmentdirectory.v1.GetHoDRequest
+	6, // 6: jurwa.departmentdirectory.v1.DepartmentDirectoryService.GetStaff:input_type -> jurwa.departmentdirectory.v1.GetStaffRequest
+	8, // 7: jurwa.departmentdirectory.v1.DepartmentDirectoryService.ListPositions:input_type -> jurwa.departmentdirectory.v1.ListPositionsRequest
+	3, // 8: jurwa.departmentdirectory.v1.DepartmentDirectoryService.ListDepartments:output_type -> jurwa.departmentdirectory.v1.ListDepartmentsResponse
+	5, // 9: jurwa.departmentdirectory.v1.DepartmentDirectoryService.GetHoD:output_type -> jurwa.departmentdirectory.v1.GetHoDResponse
+	7, // 10: jurwa.departmentdirectory.v1.DepartmentDirectoryService.GetStaff:output_type -> jurwa.departmentdirectory.v1.GetStaffResponse
+	9, // 11: jurwa.departmentdirectory.v1.DepartmentDirectoryService.ListPositions:output_type -> jurwa.departmentdirectory.v1.ListPositionsResponse
+	8, // [8:12] is the sub-list for method output_type
+	4, // [4:8] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_department_directory_v1_department_directory_proto_init() }
@@ -499,7 +597,7 @@ func file_department_directory_v1_department_directory_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_department_directory_v1_department_directory_proto_rawDesc), len(file_department_directory_v1_department_directory_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

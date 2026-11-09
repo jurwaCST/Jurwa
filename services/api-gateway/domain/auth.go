@@ -42,6 +42,10 @@ const (
 	ActionReportStatusChange = "report.status.change"
 
 	ActionDashboardRead = "dashboard.read"
+
+	// ActionReportReassign also guards GET /positions: whoever may reassign
+	// may see whom to reassign to.
+	ActionReportReassign = "report.reassign"
 )
 
 // Principal is the signed-in user, taken from a validated JWT.

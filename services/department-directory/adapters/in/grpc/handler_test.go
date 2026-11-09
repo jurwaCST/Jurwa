@@ -84,3 +84,30 @@ func TestToStatus(t *testing.T) {
 	assert.Equal(t, codes.InvalidArgument, status.Code(toStatus(domain.ErrInvalidPosition)))
 	assert.Equal(t, codes.Internal, status.Code(toStatus(errors.New("database down"))))
 }
+
+func TestListPositions(t *testing.T) {
+	resp, err := newHandler().ListPositions(context.Background(), &departmentdirectoryv1.ListPositionsRequest{HeldOnly: true})
+	require.NoError(t, err)
+	require.Len(t, resp.GetPositions(), 4)
+	staff := resp.GetPositions()[3]
+	assert.Equal(t, "SSO_MALE", staff.GetCode())
+	assert.Equal(t, "STAFF", staff.GetKind())
+	assert.Equal(t, "00000000-0000-4000-8000-000000000010", staff.GetHolderUserId())
+
+	all, err := newHandler().ListPositions(context.Background(), &departmentdirectoryv1.ListPositionsRequest{})
+	require.NoError(t, err)
+	assert.Len(t, all.GetPositions(), 15)
+
+	_, err = NewHandler(application.NewService(failRepo{})).ListPositions(context.Background(), &departmentdirectoryv1.ListPositionsRequest{})
+	assert.Equal(t, codes.Internal, status.Code(err))
+}
+
+// failRepo is a repository whose every call fails.
+type failRepo struct{}
+
+func (failRepo) ListDepartments(context.Context) ([]domain.Department, error) {
+	return nil, errors.New("database down")
+}
+func (failRepo) ListPositions(context.Context) ([]domain.Position, error) {
+	return nil, errors.New("database down")
+}

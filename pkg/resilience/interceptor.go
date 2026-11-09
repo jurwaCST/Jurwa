@@ -28,6 +28,7 @@ var CreateMethods = []string{
 	"/jurwa.photomedia.v1.PhotoMediaService/UploadPhoto",
 	"/jurwa.internalnotes.v1.InternalNotesService/AddNote",
 	"/jurwa.statuslifecycle.v1.StatusLifecycleService/ChangeStatus",
+	"/jurwa.reassignment.v1.ReassignmentService/ReassignReport",
 }
 
 // DefaultConfig is the team default: 2 second timeout per attempt, at most 3
