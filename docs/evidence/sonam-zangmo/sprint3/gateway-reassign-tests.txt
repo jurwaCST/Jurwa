@@ -1,0 +1,13 @@
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http	0.919s	coverage: 97.6% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient	1.460s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients	0.489s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/application	1.846s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/cmd/server	1.678s	coverage: 8.8% of statements
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/domain	3.703s	coverage: 97.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/department-directory/adapters/in/grpc	2.838s	coverage: 96.6% of statements
+ok  	github.com/jurwaCST/Jurwa/services/department-directory/adapters/out/memory	2.233s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/department-directory/application	3.365s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/department-directory/cmd/server	3.694s	coverage: 10.0% of statements
+ok  	github.com/jurwaCST/Jurwa/services/department-directory/domain	3.696s	coverage: 100.0% of statements
+ok  	github.com/jurwaCST/Jurwa/pkg/resilience	3.707s	coverage: 96.6% of statements
+	github.com/jurwaCST/Jurwa/pkg/resilience/mocks		coverage: 0.0% of statements

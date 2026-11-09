@@ -77,3 +77,21 @@ func TestRepositoryErrorsArePassedOn(t *testing.T) {
 	_, err = NewService(positionsFailRepo{}).GetHoD(ctx, "ARCH")
 	assert.ErrorIs(t, err, errDB)
 }
+
+func TestListPositions(t *testing.T) {
+	all, err := newService().ListPositions(context.Background(), false)
+	require.NoError(t, err)
+	assert.Len(t, all, 15, "3 Category Heads, 2 staff, 4 councillors, 6 HoDs")
+
+	held, err := newService().ListPositions(context.Background(), true)
+	require.NoError(t, err)
+	codes := make([]string, 0, len(held))
+	for _, p := range held {
+		assert.NotEmpty(t, p.HolderUserID)
+		codes = append(codes, p.Code)
+	}
+	assert.Equal(t, []string{"DAA", "DSA", "SSO", "SSO_MALE"}, codes, "ordered by code")
+
+	_, err = NewService(failingRepo{}).ListPositions(context.Background(), true)
+	assert.ErrorIs(t, err, errDB)
+}

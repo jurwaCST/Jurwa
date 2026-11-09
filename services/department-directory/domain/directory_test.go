@@ -144,6 +144,11 @@ func TestWithDemoHolders(t *testing.T) {
 		require.NoError(t, err)
 		assert.NotEmpty(t, p.HolderUserID, code)
 	}
+	// The staff demo account of identity (seed.go), so a Category Head can
+	// reassign a report to a staff member who can log in.
+	staff, err := FindPosition(positions, "SSO_MALE")
+	require.NoError(t, err)
+	assert.Equal(t, "00000000-0000-4000-8000-000000000010", staff.HolderUserID)
 	plain, err := FindPosition(DefaultPositions(), "DSA")
 	require.NoError(t, err)
 	assert.Empty(t, plain.HolderUserID, "the default list is not changed")
@@ -160,4 +165,18 @@ func TestMechanicalProgrammeLeaderActsAsHoD(t *testing.T) {
 	ct, err := FindHoD(DefaultDepartments(), DefaultPositions(), "CT")
 	require.NoError(t, err)
 	assert.Equal(t, "Head of Department, Computing Technologies", ct.Title, "other departments keep the normal title")
+}
+
+func TestHeldPositions(t *testing.T) {
+	positions := []Position{
+		{Code: "DSA", HolderUserID: "u1"},
+		{Code: "HOD_CT"},
+		{Code: "SSO_MALE", HolderUserID: "u2"},
+	}
+	held := HeldPositions(positions)
+	require.Len(t, held, 2)
+	assert.Equal(t, "DSA", held[0].Code)
+	assert.Equal(t, "SSO_MALE", held[1].Code)
+	assert.Len(t, positions, 3, "the input is not changed")
+	assert.Empty(t, HeldPositions(DefaultPositions()), "nobody holds a default position")
 }

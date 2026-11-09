@@ -26,7 +26,7 @@ routing-engine calls `GetStaff` to find who holds the Category Head position of 
 
 The proposal mentions 5 departmental HoDs, and https://cst.edu.bt/staff-directory/ lists exactly 5. Mechanical Engineering has none listed, so its Programme Leader acts as HoD: the position keeps the code `HOD_MECH` (reassignment works the same way) and its title is "Head of Department, Mechanical Engineering (Programme Leader, acting)". Staff names are not stored here: holders are user ids from identity, assigned by the System Administrator.
 
-**Demo holders:** identity has no seeded users yet, so DSA, DAA and SSO are given fixed demo user ids (`00000000-0000-4000-8000-00000000000{1,2,3}`) to let a report be routed end to end. Every other position has no holder. Real holders are entered by the System Administrator in Sprint 3.
+**Demo holders:** the positions are held by the demo accounts that identity seeds (`SEED_DEMO_USERS`): DSA, DAA and SSO by the three Category Heads (`00000000-0000-4000-8000-00000000000{1,2,3}`), so a report is routed end to end, and `SSO_MALE` by the staff account (`...000000000010`), so a Category Head can reassign a report to a staff member who can log in. Every other position has no holder.
 
 Sprint 2 keeps everything in memory (`adapters/out/memory`). The PostgreSQL adapter from `docs/design/schema/department-directory.sql` comes in Sprint 3.
 
@@ -39,6 +39,7 @@ Contract: `proto/department-directory/v1/department-directory.proto`, service `j
 | `ListDepartments` | The 6 academic departments | none |
 | `GetHoD` | The HoD position of one department | INVALID_ARGUMENT for an empty `department_code`, NOT_FOUND for an unknown department |
 | `GetStaff` | One position and its holder | INVALID_ARGUMENT for an empty `position_code`, NOT_FOUND for an unknown code |
+| `ListPositions` | Every position ordered by code; with `held_only` only the held ones (the reassign picker in the PWA, through api-gateway `GET /positions`) | none |
 
 ## Configuration
 
@@ -58,6 +59,7 @@ grpcurl -plaintext localhost:9008 list
 grpcurl -plaintext localhost:9008 jurwa.departmentdirectory.v1.DepartmentDirectoryService/ListDepartments
 grpcurl -plaintext -d '{"department_code":"CT"}' localhost:9008 jurwa.departmentdirectory.v1.DepartmentDirectoryService/GetHoD
 grpcurl -plaintext -d '{"position_code":"DSA"}' localhost:9008 jurwa.departmentdirectory.v1.DepartmentDirectoryService/GetStaff
+grpcurl -plaintext -d '{"held_only":true}' localhost:9008 jurwa.departmentdirectory.v1.DepartmentDirectoryService/ListPositions
 ```
 
 Docker:

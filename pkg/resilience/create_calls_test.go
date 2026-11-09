@@ -12,6 +12,7 @@ import (
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
 	internalnotesv1 "github.com/jurwaCST/Jurwa/proto/gen/internal-notes/v1"
 	photomediav1 "github.com/jurwaCST/Jurwa/proto/gen/photo-media/v1"
+	reassignmentv1 "github.com/jurwaCST/Jurwa/proto/gen/reassignment/v1"
 	reportsubmissionv1 "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1"
 	statuslifecyclev1 "github.com/jurwaCST/Jurwa/proto/gen/status-lifecycle/v1"
 )
@@ -59,6 +60,7 @@ func TestDefaultConfigListsTheCreateCalls(t *testing.T) {
 		photomediav1.PhotoMediaService_UploadPhoto_FullMethodName,
 		internalnotesv1.InternalNotesService_AddNote_FullMethodName,
 		statuslifecyclev1.StatusLifecycleService_ChangeStatus_FullMethodName,
+		reassignmentv1.ReassignmentService_ReassignReport_FullMethodName,
 	}
 	cfg := DefaultConfig()
 	for _, m := range want {

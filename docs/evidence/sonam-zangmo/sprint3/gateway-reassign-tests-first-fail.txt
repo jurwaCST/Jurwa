@@ -1,0 +1,46 @@
+# github.com/jurwaCST/Jurwa/services/department-directory/application [github.com/jurwaCST/Jurwa/services/department-directory/application.test]
+services/department-directory/application/service_test.go:82:27: newService().ListPositions undefined (type *Service has no field or method ListPositions)
+services/department-directory/application/service_test.go:86:28: newService().ListPositions undefined (type *Service has no field or method ListPositions)
+services/department-directory/application/service_test.go:95:37: NewService(failingRepo{}).ListPositions undefined (type *Service has no field or method ListPositions)
+# github.com/jurwaCST/Jurwa/services/department-directory/domain [github.com/jurwaCST/Jurwa/services/department-directory/domain.test]
+services/department-directory/domain/directory_test.go:176:10: undefined: HeldPositions
+services/department-directory/domain/directory_test.go:181:18: undefined: HeldPositions
+# github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients [github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients.test]
+services/api-gateway/adapters/out/grpcclients/reassignment_test.go:32:15: undefined: Reassignment
+services/api-gateway/adapters/out/grpcclients/reassignment_test.go:52:15: undefined: Directory
+# github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http [github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http.test]
+services/api-gateway/adapters/in/http/router_test.go:122:14: undefined: domain.ActionReportReassign
+services/api-gateway/adapters/in/http/router_test.go:209:3: unknown field Reassign in struct literal of type Deps
+services/api-gateway/adapters/in/http/router_test.go:210:3: unknown field Directory in struct literal of type Deps
+FAIL	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient	(cached)
+FAIL	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/application	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/cmd/server	2.259s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/domain	(cached)
+2026/11/09 23:19:39 ERROR department-directory request failed error="database down"
+--- FAIL: TestListPositions (0.00s)
+    handler_test.go:90: 
+        	Error Trace:	/Users/sonamzangmo/Downloads/Jurwa/services/department-directory/adapters/in/grpc/handler_test.go:90
+        	Error:      	Received unexpected error:
+        	            	rpc error: code = Unimplemented desc = method ListPositions not implemented
+        	Test:       	TestListPositions
+FAIL
+FAIL	github.com/jurwaCST/Jurwa/services/department-directory/adapters/in/grpc	1.698s
+ok  	github.com/jurwaCST/Jurwa/services/department-directory/adapters/out/memory	(cached)
+FAIL	github.com/jurwaCST/Jurwa/services/department-directory/application [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/department-directory/cmd/server	1.015s
+FAIL	github.com/jurwaCST/Jurwa/services/department-directory/domain [build failed]
+--- FAIL: TestDefaultConfigListsTheCreateCalls (0.00s)
+    create_calls_test.go:67: 
+        	Error Trace:	/Users/sonamzangmo/Downloads/Jurwa/pkg/resilience/create_calls_test.go:67
+        	Error:      	Should be true
+        	Test:       	TestDefaultConfigListsTheCreateCalls
+        	Messages:   	/jurwa.reassignment.v1.ReassignmentService/ReassignReport
+    create_calls_test.go:69: 
+        	Error Trace:	/Users/sonamzangmo/Downloads/Jurwa/pkg/resilience/create_calls_test.go:69
+        	Error:      	"map[/jurwa.identity.v1.IdentityService/Register:true /jurwa.internalnotes.v1.InternalNotesService/AddNote:true /jurwa.photomedia.v1.PhotoMediaService/UploadPhoto:true /jurwa.reportsubmission.v1.ReportSubmissionService/SubmitReport:true /jurwa.statuslifecycle.v1.StatusLifecycleService/ChangeStatus:true]" should have 6 item(s), but has 5
+        	Test:       	TestDefaultConfigListsTheCreateCalls
+FAIL
+FAIL	github.com/jurwaCST/Jurwa/pkg/resilience	2.953s
+FAIL
