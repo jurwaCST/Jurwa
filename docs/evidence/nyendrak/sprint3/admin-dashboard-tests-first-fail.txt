@@ -1,0 +1,10 @@
+ × src/pages/AdminDashboard.test.tsx > SCRUM-37 admin dashboard: counts > shows a tile per status with its count 100ms
+ × src/pages/AdminDashboard.test.tsx > SCRUM-37 admin dashboard: counts > lists every category with its counts, a missing count being 0 1025ms
+ × src/pages/AdminDashboard.test.tsx > SCRUM-37 admin dashboard: counts > points out what needs attention: escalated and not yet assigned 1021ms
+ × src/pages/AdminDashboard.test.tsx > SCRUM-37 admin dashboard: counts > says when nothing needs attention 1023ms
+ × src/pages/AdminDashboard.test.tsx > SCRUM-37 admin dashboard: counts > reloads the counts for a period 1039ms
+ × src/pages/AdminDashboard.test.tsx > SCRUM-37 admin dashboard: counts > offers to try again when the counts do not load 1018ms
+ × src/pages/AdminDashboard.test.tsx > SCRUM-37 admin dashboard: counts > tells the admin that rules and time limits are not editable here yet 1015ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  1 failed (1)
+      Tests  7 failed (7)
