@@ -372,8 +372,10 @@
   font-weight: 700;
 }
 
+/* inline-block, so the full stop after the number stays next to it. */
 .report-number {
-  display: block;
+  display: inline-block;
+  max-width: 100%;
   margin-top: var(--s1);
   padding: 0.5rem 0.75rem;
   border-radius: var(--radius-sm);
