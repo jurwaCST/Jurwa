@@ -1,0 +1,11 @@
+NAME                   READY   STATUS    RESTARTS   AGE
+web-6f4f994467-w47pg   1/1     Running   0          7m19s
+NAME                  CLASS     HOSTS                ADDRESS                            PORTS     AGE
+jurwa                 traefik   jurwa.localtest.me   172.19.0.3,172.19.0.4,172.19.0.5   80, 443   2d22h
+jurwa-http-redirect   traefik   jurwa.localtest.me   172.19.0.3,172.19.0.4,172.19.0.5   80        2d22h
+jurwa-web             traefik   jurwa.localtest.me   172.19.0.3,172.19.0.4,172.19.0.5   80, 443   7m19s
+NAME    SYNC STATUS   HEALTH STATUS
+jurwa   Synced        Healthy
+GET / -> 200
+GET /report/new -> 200
+GET /api/health -> {"status":"ok"}

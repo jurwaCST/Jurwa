@@ -1,5 +1,5 @@
 # Traefik (built into k3d) takes HTTPS on port 443 of the laptop and sends
-# /api to api-gateway. The web app (path /) is added when its Service exists.
+# /api to api-gateway. Everything else goes to the web app (Ingress jurwa-web below).
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -33,6 +33,45 @@ spec:
             backend:
               service:
                 name: api-gateway
+                port:
+                  name: http
+---
+# The web app on the same HTTPS address, so the browser calls /api without CORS
+# and a phone can install the PWA. Its own Ingress because the /api strip must
+# not apply here. Traefik tries the longer path first, so /api still goes to
+# api-gateway.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jurwa-web
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - jurwa.localtest.me
+      secretName: jurwa-tls
+  rules:
+    - host: jurwa.localtest.me
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web
+                port:
+                  name: http
+    # No host: a phone on the same Wi-Fi opens https://<laptop-ip>/
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web
                 port:
                   name: http
 ---

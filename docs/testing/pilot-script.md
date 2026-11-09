@@ -17,7 +17,7 @@ Owner: Sonam Choki. Goal (proposal objective 2): a student submits a report with
 2. Demo accounts switched on in identity (password from `dev/.env`, never written down here).
 3. Gateway reachable from the laptop: `kubectl -n jurwa port-forward svc/api-gateway 8080:8080`.
 4. Web app: in `web/`, `.env.local` contains `VITE_API_URL=/api`, then `npm run dev` and open http://localhost:5173.
-5. For each student, a fresh account is registered beforehand (email `p1.pilot@rub.edu.bt` and so on), so the timing measures the report, not sign-up.
+5. For each student, a fresh account is registered beforehand (email `p1.pilot@rub.edu.bt` and so on), so the timing measures the report, not sign-up. The web app has no sign-up page yet, so register through the gateway: `POST /auth/register` with `email`, `fullName` and `password`.
 6. A JPG photo of a real problem (for example a leaking tap) is on the laptop's desktop, under 5 MB.
 7. Stopwatch on a phone. One printed copy of the notes sheet below per participant.
 

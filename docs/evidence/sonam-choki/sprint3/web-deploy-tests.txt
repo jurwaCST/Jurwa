@@ -1,0 +1,28 @@
+PASS  deployment: file exists
+PASS  deployment: kind Deployment named web
+PASS  deployment: image from the in-cluster registry
+PASS  deployment: container port 8080 named http
+PASS  deployment: readiness probe is HTTP on /
+PASS  deployment: liveness probe is HTTP
+PASS  deployment: no service account token
+PASS  deployment: CPU and memory limits
+PASS  deployment: no secrets (static files only)
+PASS  service: kind Service named web
+PASS  service: port http 8080
+PASS  web kustomization lists deployment and service
+PASS  deploy/k8s lists web
+PASS  ingress: Ingress jurwa-web exists
+PASS  ingress: jurwa-web uses HTTPS (websecure, tls)
+PASS  ingress: jurwa-web does not strip /api
+PASS  ingress: jurwa-web sends / to service web, port http
+PASS  ingress: jurwa-web has the host rule and the no-host rule (phone by IP)
+PASS  ingress: /api still goes to api-gateway
+PASS  kustomize: deploy/k8s renders
+PASS  kustomize: web Deployment in namespace jurwa
+PASS  push web: exit code 0
+PASS  push web: builds web/Dockerfile with web/ as context
+PASS  push web: pushes localhost:5050/web:latest
+PASS  push web: does not use make (not a Go service)
+PASS  push web: prints OK web
+
+All checks passed.

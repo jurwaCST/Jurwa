@@ -1,11 +1,12 @@
 # deploy/knative
 
-Owner: Nyendrak Yoezer Zangmo (SCRUM-104). How the `sla-escalation-checker` function runs on the cluster.
+Owner: Nyendrak Yoezer Zangmo (SCRUM-104). How the `sla-escalation-checker` function runs on the cluster. Knative install, versions and problems found: `docs/ops/knative.md`. Use the Knative Service or the CronJob fallback, not both.
 
 | File | What |
 |---|---|
 | `cronjob-fallback.yaml` | Kubernetes CronJob that runs the function once a minute (risk R3 fallback). Works without Knative |
-| Knative Service and PingSource | Planned in SCRUM-104: scale to zero between runs. Not added yet |
+| `sla-escalation-checker.yaml` | Knative Service: scales to zero between runs, reachable only inside the cluster |
+| `pingsource.yaml` | PingSource `sla-check`: wakes the function every 2 minutes |
 
 ## CronJob fallback
 

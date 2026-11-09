@@ -1,0 +1,171 @@
+/* Sign in and Sign up (Gayley). Values come from tokens in src/index.css. */
+
+.auth {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  max-width: 62rem;
+  margin: 0 auto;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--surface);
+  border: var(--card-border);
+  box-shadow: var(--shadow-2);
+}
+
+.auth-aside {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--s1);
+  min-height: 34rem;
+  padding: var(--s4);
+  color: #ffffff;
+  overflow: hidden;
+}
+
+/* The CST gate, shaded from the bottom so the name reads on it. */
+.auth-photo {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 40%;
+}
+
+.auth-aside::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(0deg, rgb(11 38 28 / 0.92) 15%, rgb(11 38 28 / 0.25) 65%, rgb(11 38 28 / 0.05));
+}
+
+.auth-logo {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #ffffff;
+  object-fit: contain;
+}
+
+.auth-aside-title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.auth-aside-text {
+  margin: 0;
+  color: #dcebe4;
+}
+
+.auth-card {
+  padding: var(--s6) var(--s4) var(--s4);
+}
+
+.auth-card > .muted {
+  margin-bottom: var(--s3);
+}
+
+.auth-submit {
+  background: var(--action);
+  color: var(--action-text);
+  font-weight: 800;
+  box-shadow: 0 2px 0 var(--saffron-600);
+}
+
+/* Password with a Show / Hide button laid over the end of the field. */
+.password-field {
+  position: relative;
+}
+
+.password-field input {
+  width: 100%;
+  padding-right: 4.5rem;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0.35rem;
+  top: 1.95rem;
+  min-height: 2.4rem;
+  padding: 0 0.75rem;
+  background: transparent;
+  color: var(--link);
+  font-size: var(--text-sm);
+}
+
+.field-hint {
+  margin: 0.35rem 0 0;
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.auth-card form input {
+  width: 100%;
+}
+
+.auth-switch {
+  margin: var(--s3) 0 var(--s2);
+}
+
+.auth-switch a {
+  font-weight: 700;
+}
+
+.auth-note {
+  font-size: var(--text-sm);
+}
+
+.demo-accounts {
+  margin-top: var(--s2);
+  padding: var(--s2);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.demo-accounts summary {
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.demo-accounts ul {
+  display: grid;
+  gap: 0.4rem;
+  margin: var(--s2) 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-sm);
+}
+
+.demo-accounts li {
+  display: grid;
+}
+
+.demo-accounts code {
+  font-family: inherit;
+  font-weight: 700;
+}
+
+.demo-accounts p {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+@media (max-width: 47.99rem) {
+  .auth {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-aside {
+    display: none;
+  }
+
+  .auth-card {
+    padding: var(--s3) var(--s2);
+  }
+}

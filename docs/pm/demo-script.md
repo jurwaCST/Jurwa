@@ -42,7 +42,7 @@ Demo accounts come from identity's seed (`SEED_DEMO_USERS=true`, SCRUM-126). The
 | # | Who clicks | What to do | What the audience must see | Route or service |
 |---|---|---|---|---|
 | 2 | Zangmo | Open Argo CD (`kubectl -n argocd port-forward svc/argocd-server 8443:443`). Then `kubectl -n jurwa scale deploy/api-gateway --replicas=0` | App `jurwa` Synced and Healthy; the gateway is back to 1 within seconds | Argo CD selfHeal |
-| 3 | Nyendrak | On the phone: register a new student (or sign in), open "New report", pick Hostel, Hostel B, write "Tap leaking", attach a photo, submit | Confirmation with the report id, in under 2 minutes | `POST /photos`, `POST /reports` |
+| 3 | Nyendrak | On the phone: sign in with the prepared student account (the PWA has no sign-up page; the account is made with `POST /auth/register` before the demo, like the pilot accounts), open "New report", pick Hostel, Hostel B, write "Tap leaking", attach a photo, submit | Confirmation with the report id, in under 2 minutes | `POST /photos`, `POST /reports` |
 | 4 | Choki | Same phone: "My reports", open the report | Status ASSIGNED to DSA; timeline with "Report submitted" and "Routed to DSA" | `GET /me/reports`, `GET /reports/{id}/timeline`; routing-engine `report.routed` |
 | 5 | Zangmo | Laptop: sign in as `dsa.demo@jurwa.example`; "Assigned to me"; open the report; add the note "Plumber booked for 2 pm"; set status In Progress | The report is in the list; the note is saved; status IN_PROGRESS; the student's timeline updates | `GET /me/assigned-reports`, `POST /reports/{id}/notes`, `POST /reports/{id}/status` |
 | 6 | Nyendrak | Open the report prepared before the demo (section 3) | Status ESCALATED, timeline "SLA lapsed", reassigned by the Saga | sla-tracking, sla-escalation-checker, status-lifecycle, reassignment |
@@ -58,9 +58,10 @@ Demo accounts come from identity's seed (`SEED_DEMO_USERS=true`, SCRUM-126). The
 | Day before | Zangmo | Second machine: the small demo set synced, as backup for steps 2 to 5 |
 | Day before | All | One full rehearsal with a stopwatch, recorded (section 4) |
 | T minus 90 min | Nyendrak | SLA window for HOSTEL set to 1 hour (the smallest allowed: `window_hours` is a whole number of hours) and the escalation report submitted, so it is overdue during step 6 |
-| T minus 90 min to the demo | All | **Do not restart sla-tracking** (no redeploy, no `rollout restart`, no Argo CD sync of it): its timers are in memory until its database adapter lands, so a restart loses the escalation report's timer. Check with `kubectl -n jurwa get pods` that its RESTARTS stays the same |
+| Before T minus 90 min | Choki (or Nyendrak with access) | Escalation pieces on the demo cluster, done once: rebuild and push status-lifecycle, sla-tracking and reassignment (`bash scripts/push-local-registry.sh status-lifecycle sla-tracking reassignment`) and restart them (`kubectl -n jurwa rollout restart deploy/<name>`): the images use the `latest` tag, so Argo CD does not notice new code by itself. Then build and push the checker image and `kubectl apply -f deploy/knative/cronjob-fallback.yaml`. For the demo the escalation runs as this CronJob only; do not apply `deploy/argocd/application-knative.yaml`, so the two never run together |
+| T minus 90 min to the demo | All | **Do not restart sla-tracking or sla-policy** (no redeploy, no `rollout restart`, no Argo CD sync of it): its timers, and the 1-hour window in sla-policy, are in memory, so a restart loses the escalation report's timer or window. Check with `kubectl -n jurwa get pods` that its RESTARTS stays the same |
 | T minus 30 min | Choki | `kubectl -n jurwa get pods` all Running; `curl /health` through Traefik |
-| T minus 15 min | Zangmo | Sign in once with every demo account; phone and laptop on the same Wi-Fi; screen sharing tested |
+| T minus 15 min | Zangmo | Create the demo student with `POST /auth/register` if it does not exist yet; sign in once with every demo account; phone and laptop on the same Wi-Fi; screen sharing tested |
 | T minus 5 min | All | Close other apps; notifications off; browser zoom 125% |
 
 ## 4. Fallback (risk R3)
@@ -89,6 +90,8 @@ These block parts of the script. Each owner says when it is merged.
 | sla-tracking keeps timers in memory until its database adapter lands (see the T minus 90 rule) | 6 | Nyendrak | |
 | `report.list_assigned` in the authorization policy | 5 | Gayley | SCRUM-137 |
 | PWA installable (manifest, service worker) | 3 | Nyendrak | SCRUM-98 |
+| Student "My reports" page with the timeline, and the staff page ("Assigned to me", note, status); the pilot (SCRUM-113) found both missing. Being built now; if not ready, show steps 4 and 5 from the API in a terminal | 4, 5 | Nyendrak, Gayley | SCRUM-36 |
+| Web app deployed in the cluster on the same HTTPS address as `/api` | 3 | Choki (manifests), Nyendrak or Gayley (Dockerfile) | k8s: deploy the web app |
 | Gateway has no feedback, notifications, reassignment or admin (SLA policy) routes; SLA policy is set with grpcurl before the demo | 6, and the feedback step that is left out | Zangmo | after the demo, if wanted |
 
 ## 6. Rehearsal log

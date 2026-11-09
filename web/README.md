@@ -33,15 +33,51 @@ curl -X POST http://localhost:5173/api/auth/register -H "Content-Type: applicati
   -d '{"email":"pema.test@cst.edu.bt","fullName":"Pema Test","password":"pema-pass-123"}'
 ```
 
+## Container image
+
+`Dockerfile` (SCRUM-140) builds the app with `VITE_API_URL=/api` and serves it with nginx on port **8080** as a non-root user (uid 101). `nginx.conf` sends every path that is not a file to `index.html`, so a reload on `/login` or `/report/new` still works, and caches the hashed files in `/assets/` for a year. The Kubernetes Deployment and the Traefik `/` route are SCRUM-139 (Sonam Choki).
+
+```bash
+docker build -f web/Dockerfile -t jurwa-web web     # from the repo root; the context is web/
+docker run --rm -p 8088:8080 jurwa-web              # http://localhost:8088
+```
+
 ## Folders
 
 | Path | Content | Owner |
 |---|---|---|
 | `src/api/client.ts` | The API client (below) | Gayley |
 | `src/auth/` | `AuthProvider` (login, logout, session), `useAuth`, `RequireRole`, the `User` and `Role` types | Gayley |
-| `src/components/` | Shared pieces, for example `Layout` (header with the signed-in user) | whoever adds one |
+| `src/components/` | Shared pieces (below) and the `Layout` frame | Gayley; ask before changing one |
 | `src/pages/` | One file per page, so nobody edits the same file | see below |
 | `src/test/setup.ts` | Test setup (jest-dom matchers) | Gayley |
+| `src/index.css` | Design tokens: every colour, space, radius, shadow and type size | Gayley |
+
+## Design and shared components
+
+Colours come from the CST campus: forest green (`--pine-*`) for the bar and text, roof teal (`--teal-*`) for links, saffron walls (`--saffron-*`, `--action`) for the **one** main button of a screen, pillar red for Escalated. Use the variables in `src/index.css`, never a hex value, so light and dark mode both work. The report form's names (`--bg`, `--text`, `--muted`, `--border`, `--accent`, `--accent-text`, `--danger`) stay. Spacing is an 8 px grid: `--s1` (8 px) to `--s8` (64 px).
+
+Import from `src/components/`. Every piece is tested in `components.test.tsx`.
+
+| Piece | Use it for | Example |
+|---|---|---|
+| `PageHeader` | The title block of a page | `<PageHeader title="My queue" description="Reports assigned to you" aside={<span className="tag">READ-ONLY</span>} />` |
+| `Field` | Label, hint and error around one `input` or `select` (the label wraps it, so Cypress `findLabel` still works) | `<Field label="Building" hint="From the list" error={err}><select>…</select></Field>` |
+| `TextArea` | Multi-line text with a live `12 / 500` counter (counts Dzongkha letters as characters) | `<TextArea label="Description" max={500} value={d} onChange={setD} />` |
+| `Button` | `variant`: `primary` (saffron, one per screen), `secondary`, `ghost`, `danger`; `loading` disables it and shows `loadingText` | `<Button type="submit" loading={busy} loadingText="Sending...">Send report</Button>` |
+| `StatusBadge` | A report status: colour, icon and word together; Escalated is filled red | `<StatusBadge status="IN_PROGRESS" />` |
+| `Timeline` | A report's history, oldest first | `<Timeline entries={[{ status: 'OPEN', at: '2026-11-08T08:00:00Z' }, { status: 'ASSIGNED', at: '…', by: 'DSA' }]} />` |
+| `BottomSheet` | "Update status", "Reassign": slides up on a phone, a dialog on a laptop; Escape closes it | `<BottomSheet open={open} title="Update status" onClose={() => setOpen(false)}>…</BottomSheet>` |
+| `Toast` | A short confirmation after an action; remove it in `onDone` | `{msg && <Toast message="Status updated" onDone={() => setMsg(null)} />}` |
+| `Skeleton` | Grey lines while a list loads | `<Skeleton lines={4} label="Loading reports" />` |
+| `ErrorState` | A list or page that could not load, with "Try again" | `<ErrorState message={err.message} onRetry={load} />` |
+| `EmptyState` | Nothing to show yet | `<EmptyState title="Nothing in your queue">New reports appear here.</EmptyState>` |
+| `StatTile` | One big number on a dashboard | `<StatTile label="Escalated" value="3" icon="escalated" tone="escalated" />` |
+| `Icon` | The app's icons (`report`, `queue`, `open`, `resolved`, …); decorative unless given a `label` | `<Icon name="queue" />` |
+
+CSS classes for plain HTML: `card` (a white panel), `chips` with `<button className="chip" aria-pressed={on}>` (filter chips), `tag` (for READ-ONLY), `action` (a saffron link that looks like the main button), and `stack-table` for a table that turns into cards on a phone (put the column name on each cell: `<td data-label="Status">`).
+
+Phones get a bottom tab bar and laptops a top bar; the tabs come from `src/components/Layout.tsx`. When a new page is added to `App.tsx`, add its tab there too.
 
 ## Pages and routes
 

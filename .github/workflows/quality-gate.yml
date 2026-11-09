@@ -28,6 +28,9 @@ jobs:
       - name: Test the gate script itself
         run: bash scripts/tests/check-coverage_test.sh
 
+      - name: Test the web app manifests and push script (SCRUM-139)
+        run: bash scripts/tests/web-deploy_test.sh
+
       - name: Coverage gate
         run: bash scripts/check-coverage.sh
 
