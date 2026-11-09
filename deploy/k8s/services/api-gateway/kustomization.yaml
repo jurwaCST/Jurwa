@@ -26,3 +26,5 @@ configMapGenerator:
       - PHOTO_MEDIA_ADDR=photo-media:9002
       - STATUS_LIFECYCLE_ADDR=status-lifecycle:9011
       - ANALYTICS_ADDR=analytics:9020
+      - REASSIGNMENT_ADDR=reassignment:9014
+      - DEPARTMENT_DIRECTORY_ADDR=department-directory:9008

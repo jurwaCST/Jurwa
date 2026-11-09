@@ -45,6 +45,7 @@ So the methods in `CreateMethods` are retried **only on `Unavailable`** (the req
 | photo-media `UploadPhoto` | store the photo twice |
 | internal-notes `AddNote` | add the note twice |
 | status-lifecycle `ChangeStatus` | answer 409 when `expectedVersion` is set |
+| reassignment `ReassignReport` | record the reassignment twice and publish `report.reassigned` twice |
 
 When a service starts calling another create or change RPC through this package, add its full method name to `CreateMethods`. A test checks the list against the generated `_FullMethodName` constants, so a renamed RPC fails the build instead of quietly being retried.
 

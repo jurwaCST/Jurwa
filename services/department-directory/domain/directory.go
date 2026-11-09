@@ -105,12 +105,14 @@ func DefaultPositions() []Position {
 	return ps
 }
 
-// demoHolderIDs are fixed user ids for the three Category Heads, so a report can
-// be routed end to end before identity seeds real users. Not real people.
+// demoHolderIDs are the demo accounts that identity seeds (SEED_DEMO_USERS): the
+// three Category Heads, so a report can be routed end to end, and the staff
+// account, so a report can be reassigned to someone who can log in. Not real people.
 var demoHolderIDs = map[string]string{
-	"DSA": "00000000-0000-4000-8000-000000000001",
-	"DAA": "00000000-0000-4000-8000-000000000002",
-	"SSO": "00000000-0000-4000-8000-000000000003",
+	"DSA":      "00000000-0000-4000-8000-000000000001",
+	"DAA":      "00000000-0000-4000-8000-000000000002",
+	"SSO":      "00000000-0000-4000-8000-000000000003",
+	"SSO_MALE": "00000000-0000-4000-8000-000000000010",
 }
 
 // WithDemoHolders returns a copy of positions where the Category Heads have demo holders.
@@ -120,6 +122,18 @@ func WithDemoHolders(positions []Position) []Position {
 	for i := range out {
 		if id, ok := demoHolderIDs[out[i].Code]; ok {
 			out[i].HolderUserID = id
+		}
+	}
+	return out
+}
+
+// HeldPositions returns the positions that have a holder, in the same order:
+// the people a report can be reassigned to.
+func HeldPositions(positions []Position) []Position {
+	out := []Position{}
+	for _, p := range positions {
+		if p.HolderUserID != "" {
+			out = append(out, p)
 		}
 	}
 	return out

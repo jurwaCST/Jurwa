@@ -23,7 +23,7 @@ routing-rules|9006|postgres|routing_rules|
 routing-engine|9007|none||ROUTING_RULES_ADDR=routing-rules:9006 DEPARTMENT_DIRECTORY_ADDR=department-directory:9008
 department-directory|9008|postgres|department_directory|
 category-taxonomy|9009|postgres|category_taxonomy|
-api-gateway|9010|redis||IDENTITY_ADDR=identity:9016 AUTHORIZATION_ADDR=authorization:9017 CATEGORY_TAXONOMY_ADDR=category-taxonomy:9009 LOCATION_TAXONOMY_ADDR=location-taxonomy:9004 REPORT_SUBMISSION_ADDR=report-submission:9001 INTERNAL_NOTES_ADDR=internal-notes:9005 REPORT_HISTORY_ADDR=report-history:9003 PHOTO_MEDIA_ADDR=photo-media:9002 STATUS_LIFECYCLE_ADDR=status-lifecycle:9011 ANALYTICS_ADDR=analytics:9020
+api-gateway|9010|redis||IDENTITY_ADDR=identity:9016 AUTHORIZATION_ADDR=authorization:9017 CATEGORY_TAXONOMY_ADDR=category-taxonomy:9009 LOCATION_TAXONOMY_ADDR=location-taxonomy:9004 REPORT_SUBMISSION_ADDR=report-submission:9001 INTERNAL_NOTES_ADDR=internal-notes:9005 REPORT_HISTORY_ADDR=report-history:9003 PHOTO_MEDIA_ADDR=photo-media:9002 STATUS_LIFECYCLE_ADDR=status-lifecycle:9011 ANALYTICS_ADDR=analytics:9020 REASSIGNMENT_ADDR=reassignment:9014 DEPARTMENT_DIRECTORY_ADDR=department-directory:9008
 status-lifecycle|9011|postgres|status_lifecycle|
 sla-tracking|9012|redis||SLA_POLICY_ADDR=sla-policy:9013
 sla-policy|9013|postgres|sla_policy|

@@ -24,10 +24,12 @@ import (
 	analyticsv1 "github.com/jurwaCST/Jurwa/proto/gen/analytics/v1"
 	authorizationv1 "github.com/jurwaCST/Jurwa/proto/gen/authorization/v1"
 	categorytaxonomyv1 "github.com/jurwaCST/Jurwa/proto/gen/category-taxonomy/v1"
+	departmentdirectoryv1 "github.com/jurwaCST/Jurwa/proto/gen/department-directory/v1"
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
 	internalnotesv1 "github.com/jurwaCST/Jurwa/proto/gen/internal-notes/v1"
 	locationtaxonomyv1 "github.com/jurwaCST/Jurwa/proto/gen/location-taxonomy/v1"
 	photomediav1 "github.com/jurwaCST/Jurwa/proto/gen/photo-media/v1"
+	reassignmentv1 "github.com/jurwaCST/Jurwa/proto/gen/reassignment/v1"
 	reporthistoryv1 "github.com/jurwaCST/Jurwa/proto/gen/report-history/v1"
 	reportsubmissionv1 "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1"
 	statuslifecyclev1 "github.com/jurwaCST/Jurwa/proto/gen/status-lifecycle/v1"
@@ -64,16 +66,18 @@ func main() {
 	// One connection per service, each with its own timeout, retry and circuit breaker.
 	conns := map[string]*grpc.ClientConn{}
 	for name, addr := range map[string]string{
-		"identity":          envOr("IDENTITY_ADDR", "localhost:9016"),
-		"authorization":     envOr("AUTHORIZATION_ADDR", authzclient.DefaultAddr),
-		"category-taxonomy": envOr("CATEGORY_TAXONOMY_ADDR", "localhost:9009"),
-		"location-taxonomy": envOr("LOCATION_TAXONOMY_ADDR", "localhost:9004"),
-		"report-submission": envOr("REPORT_SUBMISSION_ADDR", "localhost:9001"),
-		"internal-notes":    envOr("INTERNAL_NOTES_ADDR", "localhost:9005"),
-		"report-history":    envOr("REPORT_HISTORY_ADDR", "localhost:9003"),
-		"photo-media":       envOr("PHOTO_MEDIA_ADDR", "localhost:9002"),
-		"status-lifecycle":  envOr("STATUS_LIFECYCLE_ADDR", "localhost:9011"),
-		"analytics":         envOr("ANALYTICS_ADDR", "localhost:9020"),
+		"identity":             envOr("IDENTITY_ADDR", "localhost:9016"),
+		"authorization":        envOr("AUTHORIZATION_ADDR", authzclient.DefaultAddr),
+		"category-taxonomy":    envOr("CATEGORY_TAXONOMY_ADDR", "localhost:9009"),
+		"location-taxonomy":    envOr("LOCATION_TAXONOMY_ADDR", "localhost:9004"),
+		"report-submission":    envOr("REPORT_SUBMISSION_ADDR", "localhost:9001"),
+		"internal-notes":       envOr("INTERNAL_NOTES_ADDR", "localhost:9005"),
+		"report-history":       envOr("REPORT_HISTORY_ADDR", "localhost:9003"),
+		"photo-media":          envOr("PHOTO_MEDIA_ADDR", "localhost:9002"),
+		"status-lifecycle":     envOr("STATUS_LIFECYCLE_ADDR", "localhost:9011"),
+		"analytics":            envOr("ANALYTICS_ADDR", "localhost:9020"),
+		"reassignment":         envOr("REASSIGNMENT_ADDR", "localhost:9014"),
+		"department-directory": envOr("DEPARTMENT_DIRECTORY_ADDR", "localhost:9008"),
 	} {
 		var extra []grpc.DialOption
 		if name == "photo-media" {
@@ -100,6 +104,8 @@ func main() {
 		Photos:     grpcclients.Photos{C: photomediav1.NewPhotoMediaServiceClient(conns["photo-media"])},
 		Status:     grpcclients.Status{C: statuslifecyclev1.NewStatusLifecycleServiceClient(conns["status-lifecycle"])},
 		Analytics:  grpcclients.Analytics{C: analyticsv1.NewAnalyticsServiceClient(conns["analytics"])},
+		Reassign:   grpcclients.Reassignment{C: reassignmentv1.NewReassignmentServiceClient(conns["reassignment"])},
+		Directory:  grpcclients.Directory{C: departmentdirectoryv1.NewDepartmentDirectoryServiceClient(conns["department-directory"])},
 		Limiter:    domain.NewLimiter(rateLimit, time.Now),
 	})
 	httpSrv := &http.Server{
