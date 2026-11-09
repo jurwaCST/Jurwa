@@ -1,0 +1,12 @@
+# SCRUM-138 sign-up page, tests first (expected to fail), 2026-11-09 09:49
+$ npx vitest run src/App.test.tsx
+     × the sign-in page links to student sign-up 18ms
+     × creates a student account, signs in and goes home 4ms
+     × a password under 8 characters is refused before calling the server 2ms
+     × shows the server error when the email is already registered 2ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/App.test.tsx > login > the sign-in page links to student sign-up
+ FAIL  src/App.test.tsx > register > creates a student account, signs in and goes home
+ FAIL  src/App.test.tsx > register > a password under 8 characters is refused before calling the server
+ FAIL  src/App.test.tsx > register > shows the server error when the email is already registered
+      Tests  4 failed | 17 passed (21)
