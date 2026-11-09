@@ -1,0 +1,4 @@
+# SCRUM-141 shared components and 403/404 pages, all web tests, 2026-11-09 11:12
+$ npx vitest run
+ Test Files  4 passed (4)
+      Tests  67 passed (67)
