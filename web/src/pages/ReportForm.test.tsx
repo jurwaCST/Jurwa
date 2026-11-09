@@ -342,3 +342,43 @@ describe('polish: clearer messages and screens', () => {
     expect(screen.getByLabelText('Description')).toHaveValue('')
   })
 })
+
+describe('pilot feedback and icons', () => {
+  it('explains the wing step under the wing field', async () => {
+    const user = userEvent.setup()
+    renderForm()
+    await user.selectOptions(await screen.findByLabelText('Category'), 'HOSTEL')
+    await user.selectOptions(await screen.findByLabelText('Building'), 'Hostel A')
+    expect(screen.getByLabelText('Wing')).toHaveAccessibleDescription(
+      'The part of the building the problem is in. Not sure? Choose the nearest wing.',
+    )
+  })
+
+  it('copies the report number so the student does not have to remember it', async () => {
+    post.mockResolvedValueOnce({ report: { id: '3f2a9c1b-7d4e-4b8a-9c2d-1e5f6a7b8c9d' } })
+    const user = userEvent.setup()
+    renderForm()
+    await fillValid(user)
+    await user.click(screen.getByRole('button', { name: 'Send report' }))
+    await screen.findByRole('status')
+
+    await user.click(screen.getByRole('button', { name: 'Copy report number' }))
+    expect(await navigator.clipboard.readText()).toBe('3f2a9c1b-7d4e-4b8a-9c2d-1e5f6a7b8c9d')
+    expect(screen.getByRole('button', { name: 'Copied' })).toBeInTheDocument()
+  })
+
+  it('uses drawn icons that screen readers skip, not text symbols', async () => {
+    post.mockResolvedValueOnce({ report: { id: 'r-300' } })
+    const user = userEvent.setup()
+    const { container } = renderForm()
+    await screen.findByLabelText('Category')
+    for (const heading of screen.getAllByRole('heading', { level: 2 })) {
+      expect(heading.querySelector('svg[aria-hidden="true"]')).not.toBeNull()
+    }
+    await fillValid(user)
+    await user.click(screen.getByRole('button', { name: 'Send report' }))
+    await screen.findByRole('status')
+    expect(container.querySelector('.report-done svg[aria-hidden="true"]')).not.toBeNull()
+    expect(container.textContent).not.toMatch(/[✓✔✅📷📍]/u)
+  })
+})
