@@ -43,7 +43,7 @@ Waits use `cy.intercept(...).as('login')` and `cy.wait('@login')`, never a fixed
 
 - `web/cypress/fixtures/users.json`: the demo account emails from the identity seed (SCRUM-126) and the student password. Test accounts only, never real ones. The student is new on every run (`student-<time>@e2e.jurwa.example`).
 - `web/cypress/fixtures/photo.png`: a real 8 x 8 PNG of 74 bytes, for the photo step.
-- The demo accounts' password is not in the repo: pass it as `CYPRESS_DEMO_PASSWORD` when a test needs a demo account.
+- The demo accounts' password is not in the repo: pass it as `CYPRESS_demoPassword` (this exact case) when a test needs a demo account.
 
 ## Run it
 
@@ -57,13 +57,13 @@ Three Git Bash windows, from the repo root. Docker is not needed (everything run
    ```
 
    Wait for `Ready: gateway on http://localhost:8080`. A port is taken? Move it, for example `GATEWAY_HTTP_PORT=18080 GATEWAY_GRPC_PORT=19010 AUTHORIZATION_PORT=19017 CATEGORY_PORT=19009 bash web/cypress/start-stack.sh`. Stop it with Ctrl+C in that window: closing the window or killing bash leaves the services running. To find one still holding a port: `netstat -ano | findstr :9010`, then `taskkill /F /PID <pid>`.
-2. The web app (with `VITE_API_URL=/api` in `web/.env.local`):
+2. The web app, **built** (with `VITE_API_URL=/api` in `web/.env.local`):
 
    ```bash
-   cd web && npm run dev
+   cd web && npm run build && npx vite preview --port 4173 --strictPort
    ```
 
-   With another gateway port: `GATEWAY_URL=http://localhost:18080 npm run dev`.
+   With another gateway port: `GATEWAY_URL=http://localhost:18080 npx vite preview --port 4173 --strictPort`, and run the tests with `CYPRESS_baseUrl=http://localhost:4173`. Test the built app, not `npm run dev`: under the load of Cypress, Edge and nine services, the dev server sometimes still showed a blank page when a test looked, so tests failed at random (9 November 2026). The built app is also what is deployed.
 3. The tests:
 
    ```bash

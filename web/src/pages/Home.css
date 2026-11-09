@@ -104,6 +104,7 @@
 }
 
 .tile {
+  position: relative;
   display: grid;
   grid-template-columns: auto 1fr;
   grid-template-areas:
@@ -127,6 +128,24 @@
   box-shadow: var(--shadow-2);
 }
 
+/* The focus ring goes around the whole tile, not only the title. */
+.tile:focus-within {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.tile-label:focus-visible {
+  outline: none;
+}
+
+/* The title's link stretches over the tile, so the whole tile is clickable. */
+.tile-label::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
 .tile-icon {
   grid-area: icon;
   display: inline-grid;
@@ -142,6 +161,8 @@
   grid-area: label;
   font-size: var(--text-lg);
   font-weight: 800;
+  color: inherit;
+  text-decoration: none;
 }
 
 .tile-hint {

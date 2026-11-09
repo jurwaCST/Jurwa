@@ -53,3 +53,25 @@ $ CYPRESS_baseUrl=http://localhost:5175 CYPRESS_apiUrl=http://localhost:18080 np
 # Two warnings before the run, both harmless:
 # - allowCypressEnv: Cypress.env() will be replaced in a future version (docs/testing/e2e-tests.md, Known gaps).
 # - EBUSY on an old Edge profile lockfile from an earlier stuck run: "will not affect or change the exit code".
+
+# ---------------------------------------------------------------------------
+# Re-run on the new campus design (SCRUM-138, 141), 2026-11-09 12:28, against the
+# built app (npm run build, then vite preview on :4173). Same run as a11y.txt.
+# Video: cypress-run.mp4 (replaced with this run).
+
+  report flow
+    √ a student signs in through the UI (1572ms)
+    √ a wrong password shows an error and stays on the sign-in page (1418ms)
+    √ a student submits a Hostel report and can read it back as OPEN (417ms)
+    √ a description of 501 characters is refused by the server (312ms)
+    √ a student uploads a photo, attaches it to a report and can view it (432ms)
+    √ a photo over 5 MB is refused with the size message (542ms)
+    √ another student cannot view the photo (735ms)
+    √ another student cannot read the report (633ms)
+
+  8 passing (6s)
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped
+  │ ✔  a11y.cy.ts                               00:14       12       12        -        -        - │
+  │ ✔  report-flow.cy.ts                        00:06        8        8        -        -        - │
+    ✔  All specs passed!                        00:20       20       20        -        -        -

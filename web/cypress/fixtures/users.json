@@ -1,5 +1,6 @@
 {
   "_note": "Test accounts only, never real ones. The demo accounts come from the identity seed (SEED_DEMO_USERS, SCRUM-126). The student is registered fresh on every run.",
+  "admin": "admin.demo@jurwa.example",
   "categoryHeadDSA": "dsa.demo@jurwa.example",
   "staff": "staff.demo@jurwa.example",
   "president": "president.demo@jurwa.example",

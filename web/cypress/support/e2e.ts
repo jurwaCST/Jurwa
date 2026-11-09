@@ -1,4 +1,7 @@
-// Shared commands for the end-to-end tests (SCRUM-108).
+// Shared commands for the end-to-end tests (SCRUM-108) and the accessibility
+// checks (SCRUM-110).
+
+import 'cypress-axe'
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -12,6 +15,8 @@ declare global {
       findLabel(text: string): Chainable<JQuery<HTMLElement>>
       /** Uploads a photo the way the web app does (multipart through /api). */
       uploadPhoto(token: string, bytes: Uint8Array, type: string, name: string): Chainable<UploadResult>
+      /** Signs in through the login page, the way a person does. */
+      uiLogin(email: string, password: string): Chainable<void>
     }
   }
   interface UploadResult {
@@ -63,4 +68,12 @@ Cypress.Commands.add('uploadPhoto', (token: string, bytes: Uint8Array, type: str
   })
 })
 
-export {}
+Cypress.Commands.add('uiLogin', (email: string, password: string) => {
+  cy.intercept('POST', '/api/auth/login').as('uiLogin')
+  cy.visit('/login')
+  cy.findLabel('Email').type(email)
+  cy.findLabel('Password').type(password, { log: false })
+  cy.contains('button', 'Sign in').click()
+  cy.wait('@uiLogin').its('response.statusCode').should('eq', 200)
+  cy.location('pathname').should('not.eq', '/login')
+})
