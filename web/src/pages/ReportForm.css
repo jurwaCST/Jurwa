@@ -1,45 +1,424 @@
-/* Report form (SCRUM-35). One column, large touch targets, for phones first. */
+/* Report form (SCRUM-35). Owner: Nyendrak.
+   Uses only Gayley's tokens from src/index.css (colours, --s* spacing,
+   --radius*, --text-*) and her shared pieces (Field, Button, .card, .icon,
+   .badge), so it follows her campus design in light and dark.
+   Phones first; 48rem is the same breakpoint as her layout shell. */
 
-.report-form select,
-.report-form textarea,
-.report-form input[type='file'] {
-  font: inherit;
-  width: 100%;
-  min-height: 2.75rem;
-  padding: 0.5rem;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--bg);
-  color: var(--text);
+.report-page {
+  --accent-soft: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  --danger-soft: color-mix(in srgb, var(--danger) 10%, var(--surface));
 }
 
-.report-form textarea {
-  resize: vertical;
-}
-
-.report-form button[type='submit'] {
-  min-height: 2.75rem;
-}
-
-.report-form .counter {
-  margin: -0.5rem 0 0;
-  text-align: right;
-  font-size: 0.875rem;
-}
-
-.photo-preview {
+/* Form and the "What happens next" card: one column on phones,
+   side by side on laptops. */
+.report-layout {
   display: grid;
+  gap: var(--s3);
+  align-items: start;
+}
+
+@media (min-width: 48rem) {
+  .report-layout {
+    grid-template-columns: minmax(0, 1fr) 18rem;
+  }
+
+  .report-next {
+    position: sticky;
+    top: 6rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .report-layout {
+    grid-template-columns: minmax(0, 44rem) 20rem;
+  }
+}
+
+.report-form {
+  display: grid;
+  gap: var(--s3);
+}
+
+.report-section {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.report-section + .report-section {
+  padding-top: var(--s3);
+  border-top: 1px solid var(--border);
+}
+
+/* Step heading: the icon in a round badge, then the question. */
+.report-step {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  font-size: var(--text-lg);
+}
+
+.report-step-badge {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* Building, wing and area: stacked on phones, in a row when there is room. */
+.report-place {
+  display: grid;
+  gap: 0.75rem;
+}
+
+@media (min-width: 36rem) {
+  .report-place {
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    align-items: start;
+  }
+}
+
+.report-place:empty {
+  display: none;
+}
+
+/* Category tiles: radio buttons drawn as cards. Two across on a phone,
+   one row of three when there is room. */
+.report-label {
+  margin: 0;
+  font-weight: 700;
+}
+
+.report-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+  gap: 0.75rem;
+}
+
+.report-tile {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: var(--s1);
+  min-height: 7rem;
+  padding: var(--s2) var(--s1);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.report-tile:hover {
+  border-color: var(--accent);
+}
+
+.report-tile.is-chosen {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.report-tile:has(input:focus-visible) {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.report-tile-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-pill);
+  background: var(--panel);
+  color: var(--accent);
+}
+
+.report-tile.is-chosen .report-tile-icon {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.report-tile-name {
+  font-weight: 700;
+}
+
+.report-tiles[aria-invalid='true'] .report-tile {
+  border-color: var(--danger);
+}
+
+/* Problems from the server. */
+.report-problem {
+  display: flex;
   gap: 0.5rem;
-  justify-items: start;
+  align-items: flex-start;
+  margin: 0;
+  padding: 0.65rem 0.85rem;
+  border-left: 4px solid var(--danger);
+  border-radius: var(--radius-sm);
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-weight: 700;
 }
 
-.photo-preview img {
+.report-problem .icon {
+  flex: none;
+  margin-top: 0.15rem;
+}
+
+.report-problem {
+  margin-bottom: var(--s2);
+}
+
+.report-problem a {
+  color: inherit;
+}
+
+/* Photo: a dashed box around the file picker. */
+.report-photo-drop {
+  justify-items: center;
+  gap: var(--s1);
+  padding: var(--s3) var(--s2);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+  text-align: center;
+  cursor: pointer;
+}
+
+.report-photo-drop:hover,
+.report-photo-drop:focus-within,
+.report-photo-drop.is-dragging {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.report-photo-drop-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--accent);
+}
+
+.report-photo-drop input[type='file'] {
+  min-height: 0;
   max-width: 100%;
-  max-height: 12rem;
-  border-radius: 6px;
-  border: 1px solid var(--border);
+  padding: 0;
+  border: 0;
+  background: none;
 }
 
-.report-sent {
-  font-weight: 600;
+.report-photo-drop input[type='file']::file-selector-button {
+  font: inherit;
+  font-weight: 700;
+  min-height: 2.75rem;
+  margin-right: 0.75rem;
+  padding: 0.5rem 1rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--accent-text);
+  cursor: pointer;
+}
+
+.report-photo-preview {
+  display: flex;
+  gap: var(--s2);
+  align-items: center;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.report-photo-preview img {
+  flex: none;
+  width: 6rem;
+  height: 6rem;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+
+.report-photo-name {
+  margin: 0 0 0.25rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+/* "Back to home" is a link drawn like Gayley's secondary button. */
+.report-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.report-remove {
+  color: var(--danger);
+}
+
+.report-secondary:hover {
+  border-color: var(--accent);
+}
+
+/* Submit bar: stays at the bottom of the screen while the form scrolls,
+   above the tab bar on a phone. It spans the card from edge to edge. */
+.report-submit-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0 calc(-1 * var(--s3)) calc(-1 * var(--s3));
+  padding: var(--s2) var(--s3);
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  backdrop-filter: blur(6px);
+}
+
+.report-progress {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.report-submit-bar .btn {
+  font-size: var(--text-lg);
+}
+
+/* What happens next. */
+.report-next h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--text-lg);
+}
+
+.report-next ol {
+  display: grid;
+  gap: var(--s2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.report-next li {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.report-next li p {
+  margin: 0.15rem 0 0;
+  font-size: var(--text-sm);
+}
+
+.report-next-icon {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-pill);
+  background: var(--panel);
+  color: var(--accent);
+}
+
+/* Success screen. */
+.report-done {
+  display: grid;
+  gap: var(--s2);
+  justify-items: center;
+  max-width: var(--form);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.report-done p {
+  margin: 0;
+}
+
+.report-done-icon {
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--status-resolved) 14%, var(--surface));
+  color: var(--status-resolved);
+}
+
+.report-done-text {
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+/* inline-block, so the full stop after the number stays next to it. */
+.report-number {
+  display: inline-block;
+  max-width: 100%;
+  margin-top: var(--s1);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  font-size: var(--text-md);
+  overflow-wrap: anywhere;
+}
+
+.report-actions {
+  display: grid;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+@media (min-width: 36rem) {
+  .report-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+/* Phones: less padding in the cards, the bar sits on the tab bar and the
+   button takes the full width. */
+@media (max-width: 47.99rem) {
+  .report-page .card {
+    padding: var(--s2);
+  }
+
+  .report-submit-bar {
+    bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom));
+    margin: 0 calc(-1 * var(--s2)) calc(-1 * var(--s2));
+    padding: 0.75rem var(--s2);
+    border-radius: 0;
+  }
+
+  .report-submit-bar .btn {
+    flex: 1 1 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .report-tile {
+    transition: none;
+  }
 }
