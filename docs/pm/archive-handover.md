@@ -9,7 +9,7 @@ Owner: Gayley Choden. For whoever picks up Jurwa after Sprint 3.
 | Source code | https://github.com/jurwaCST/Jurwa |
 | Final version | Git tag `v1.0.0` and the GitHub Release made from it (the source zip is attached automatically). **Waiting for** the tag, made after the last merge |
 | Jira project | https://jurwa-cst.atlassian.net, project SCRUM. CSV export: **Waiting for** the export, kept in the team's shared drive, not in Git |
-| Demo video | **Waiting for** the recorded rehearsal (`docs/pm/demo-script.md` section 4), kept in the team's shared drive |
+| Demo video | Team Drive, folder Final_Project_Group6 > "Demo rehearsal recording": https://drive.google.com/drive/folders/1orsT4XKETlzrTWPo3OBTCUdQNrLUFF3H (shared with the team; Sonam Choki uploads the recording after the rehearsal on 10 November) |
 | Project documents | `docs/pm/` (charter, requirements, schedule and EVM, risks, issues, quality plan, demo script, this closure), `docs/sprint-reviews/`, `docs/testing/`, `docs/design/`, `docs/ops/` |
 | Evidence | `docs/evidence/<member>/` |
 

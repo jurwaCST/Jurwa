@@ -9,7 +9,7 @@ Every number below has a source file in the repository, named next to it. Parts 
 | # | Objective | Result | Evidence |
 |---|---|---|---|
 | 1 | 20 microservices that route a report to the correct Category Head with 100% accuracy on the test rule-set | **Met.** 20 services in `services/`. Every category and location routes correctly (Hostel to DSA, Academic Block to DAA, Others to SSO), and the description never changes the route | `tests/spec/routing_rules_test.go`; `docs/testing/test-plan.md` S-08, S-09 |
-| 2 | An installable PWA in which a student submits a report with a photo in under two minutes, verified by usability testing | **Two-minute goal met; not installable yet.** Pilot with 5 students: all submitted a report with a photo in under two minutes, average **62 s**, slowest **90 s**, nobody needed help. The form works end to end (Cypress 8 of 8) and is accessible (axe-core 0 violations on 12 page states, Lighthouse accessibility 100, performance 97). The app is not installable: the manifest and service worker (SCRUM-98) are not merged | `docs/testing/pilot-usability-report.md`, `docs/evidence/gayley/sprint3/cypress-run.txt`, `docs/testing/accessibility.md` |
+| 2 | An installable PWA in which a student submits a report with a photo in under two minutes, verified by usability testing | **Two-minute goal met; not installable yet.** Pilot with 5 students: all submitted a report with a photo in under two minutes, average **62 s**, slowest **90 s**, nobody needed help. The form works end to end (Cypress 8 of 8) and is accessible (axe-core 0 violations on 12 page states, Lighthouse accessibility 100, performance 97). The app is not installable: the manifest and service worker (SCRUM-98) moved to Sprint 4, so in the demo the app runs in the phone's browser, as the demo script allows | `docs/testing/pilot-usability-report.md`, `docs/evidence/gayley/sprint3/cypress-run.txt`, `docs/testing/accessibility.md` |
 | 3 | Automatic SLA escalation by a scheduled serverless function, shown in the final demo | **Met in the cluster; live demo to come.** The sla-escalation-checker runs as a Knative Service started by a PingSource every 2 minutes and scales to zero between runs (SCRUM-104); the CronJob fallback is kept for the demo laptop. The escalation Saga and its compensation pass their tests (SG-01 to SG-05). **Waiting for** the demo: whether a real escalation is shown live | `docs/evidence/nyendrak/sprint3/knative.txt`, `deploy/knative/`, `tests/saga/` |
 | 4 | A test pyramid tracked in SonarQube, at least 70% coverage on routing, SLA and status-flow code | **Met.** 10 of 10 critical packages at 98.2% or more; 696 Go test functions, 67 web tests, 20 browser tests (8 end-to-end and 12 accessibility, on the final design), 9 gopter properties, JMeter p95 252 ms with 0 errors. SonarQube: coverage 61.7%, Security 3, Reliability 4, Maintainability 5 issues, duplications 7.8%, no issue in a Go service | `docs/testing/test-plan.md` section 5, `docs/testing/sonarqube.md` |
 | 5 | Containers on Kubernetes (k3d) through GitOps (GitHub Actions and Argo CD), shown in a live demo | **Met for the pipeline.** CI builds and tests every pull request; Argo CD syncs the cluster from `main` and heals a change made by hand (api-gateway scaled to 0, back to 1 in 2 seconds). The web app runs in the cluster too, behind Traefik on `/` next to the API on `/api` (SCRUM-139, SCRUM-140). **Waiting for** the live demo | `.github/workflows/`, `deploy/argocd/`, `docs/evidence/sonam-zangmo/sprint3/argocd.txt`, `docs/evidence/sonam-choki/sprint3/web-deploy-cluster.txt` |
@@ -27,9 +27,9 @@ Every number below has a source file in the repository, named next to it. Parts 
 
 Holidays and weekends are therefore not counted in SLA windows (the holiday-calendar service was one of the five removed).
 
-**Added in Sprint 3 beyond the plan:** a student sign-up page (SCRUM-138), the campus design with CST photos, and shared web components for the remaining pages (SCRUM-141). The President dashboard (SCRUM-99, a Stretch card) was built and is in review.
+**Added in Sprint 3 beyond the plan:** a student sign-up page (SCRUM-138), the campus design with CST photos, and shared web components for the remaining pages (SCRUM-141). The President dashboard (SCRUM-99, a Stretch card) was built and merged.
 
-**Moved to Sprint 4 (not built):** the staff ticket view (SCRUM-36), the admin dashboard (SCRUM-37), the installable PWA (SCRUM-98), "My reports" and notifications pages, the other database adapters, Jaeger tracing and the godog runner for the BDD scenarios. The routes behind the staff and admin pages exist and are tested.
+**Moved to Sprint 4 (not built):** the staff ticket view (SCRUM-36), the admin dashboard (SCRUM-37: the gateway has no admin routes for routing rules and SLA hours yet), the installable PWA (SCRUM-98), "My reports" and notifications pages, the other database adapters, Jaeger tracing and the godog runner for the BDD scenarios. The routes behind the staff and admin pages exist and are tested.
 
 ## 3. Schedule and cost (EVM)
 
@@ -37,7 +37,7 @@ Holidays and weekends are therefore not counted in SLA windows (the holiday-cale
 |---|---|---|---|---|---|---|
 | 1 (22 to 27 Oct) | 93.3 h | 138 h | 96 h | 1.44 | 1.48 | `docs/pm/evm/week1.md` |
 | 2 (28 Oct to 3 Nov) | 93.3 h | 135 h | 129 h | 1.05 | 1.45 | `docs/pm/evm/week2.md` |
-| 3 (4 to 8 Nov) | **Waiting for** the Sprint 3 EVM log (Nyendrak) | | | | | `docs/pm/evm/week3.md` |
+| 3 (4 to 8 Nov, extended to the rehearsal on 10 Nov) | **Waiting for** the Sprint 3 EVM log (Nyendrak, by Tuesday morning, after all hours are logged) | | | | | `docs/pm/evm/week3.md` |
 | Cumulative after Sprint 2 | 186.7 h | 273 h | 225 h | 1.21 | 1.46 | `docs/pm/evm/week2.md` |
 
 Read honestly:
