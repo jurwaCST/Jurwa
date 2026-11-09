@@ -266,14 +266,14 @@ All 50 users come from one laptop, so the rate limit was raised for L-01; on cam
 
 ### 5.6 End-to-end (Cypress)
 
-8 of 8 pass in Edge 157, 4 seconds (`cypress-run.txt`, video `cypress-run.mp4`). Not in CI: it needs the whole stack.
+8 of 8 pass in Edge 157 (`cypress-run.txt`, video `cypress-run.mp4`): first on 7 November on the first design, and again on 9 November on the new campus design, against the built app. Not in CI: it needs the whole stack.
 
 ### 5.7 Accessibility (axe-core, Lighthouse)
 
 | Check | Result | Evidence |
 |---|---|---|
-| axe-core, 12 page states, WCAG 2.1 A and AA | 12 of 12 pass, 0 violations | `docs/evidence/gayley/sprint3/a11y.txt`, `a11y-run.mp4` |
-| Lighthouse accessibility, `/login` | **100** (13 of 13 scored checks pass) | `lighthouse-login.report.html`, `.json` |
+| axe-core, 12 page states, WCAG 2.1 A and AA | 12 of 12 pass, 0 violations (re-run on the new design after fixing D-16) | `docs/evidence/gayley/sprint3/a11y.txt`, `a11y-run.mp4` |
+| Lighthouse accessibility, `/login` | **100** on both designs; Performance **97** on the new design | `lighthouse-login.report.html`, `lighthouse-login-new-design.report.html` |
 | Keyboard pass, report form | 6 of 6 pass | `docs/testing/accessibility.md` section 3 |
 | Screen reader | Not run | section 7 |
 
@@ -300,6 +300,7 @@ Defects found in Sprints 2 and 3.
 | D-13 | Stopping the end-to-end stack by killing bash left the services running and holding ports | Ports taken on the next run | Gayley: documented, Ctrl+C stops all | SCRUM-108 |
 | D-14 | The first location-taxonomy slice was not test-first | Review | Sonam Choki: reverted and redone | issue I9 |
 | D-15 | The photo error message on the report form has no `role="alert"`, so a screen reader does not read it out (the other form errors are read) | Code check during the accessibility tests (axe-core does not flag it) | Open, Nyendrak | SCRUM-35, SCRUM-110 |
+| D-16 | On the new design, the home tile link was named "Report an issue" but also showed its hint, so its name did not contain all its visible text (axe `label-content-name-mismatch`, serious; voice-control users say what they see) | The accessibility test re-run on the new design | Gayley: only the title is the link, the hint is its description | SCRUM-110 |
 
 ## 7. Known gaps and risks
 

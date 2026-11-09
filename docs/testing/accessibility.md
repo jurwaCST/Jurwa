@@ -14,7 +14,7 @@ The axe checks use the rule sets `wcag2a`, `wcag2aa`, `wcag21a` and `wcag21aa` (
 
 ## 1. axe-core: every page
 
-Run on 8 November 2026 (`docs/evidence/gayley/sprint3/a11y.txt`, video `a11y-run.mp4`):
+First run on 8 November 2026 on the first design. **Re-run on 9 November 2026 on the new campus design** (SCRUM-138, SCRUM-141), against the built app (`npm run build`, then `vite preview`), with the same 12 of 12 result (`docs/evidence/gayley/sprint3/a11y.txt`, video `a11y-run.mp4`):
 
 | Page | Signed in as | Violations |
 |---|---|---|
@@ -35,11 +35,16 @@ Run on 8 November 2026 (`docs/evidence/gayley/sprint3/a11y.txt`, video `a11y-run
 
 `/staff`, `/admin` and `/president` are still placeholder pages (a heading and one line: SCRUM-36 and SCRUM-37 were moved to Sprint 4, SCRUM-99 is Stretch). Their result only shows the shared layout passes; the checks must be run again when the real pages are built. The real content checked today is the sign-in page, the home page and the report form. The report form was checked before Nyendrak's styling update (`SCRUM-35-form-polish`, not merged), so it is run again after that merge.
 
+**Found by the re-run and fixed (defect D-16):** on the new design, the student's home tile was a link named "Report an issue" that also showed its hint "Takes about two minutes". axe-core rule `label-content-name-mismatch` (serious): the visible text must be part of the accessible name, so someone using voice control can say what they see. Only the title is the link now, the hint is its description, and the whole tile stays clickable.
+
+On the dev server (`npm run dev`) some runs failed at random with a blank page, because Vite was still loading the page under the load of Cypress, Edge and nine services. The built app has no such delay, so the tests run against `vite preview`.
+
 ## 2. Lighthouse
 
 | Page | Accessibility score | Scored checks | Evidence |
 |---|---|---|---|
 | `/login` | **100** | 13 of 13 pass | `docs/evidence/gayley/sprint3/lighthouse-login.report.html` and `.json` |
+| `/login`, new design (9 Nov 2026, built app) | **100**, Performance **97** | all scored checks pass | `lighthouse-login-new-design.report.html` and `.json` |
 
 Target was 90 or more. Lighthouse also lists 10 checks it cannot do automatically (for example tab order and focus); the keyboard pass below covers them.
 

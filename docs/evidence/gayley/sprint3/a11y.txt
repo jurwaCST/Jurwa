@@ -34,3 +34,38 @@ $ CYPRESS_baseUrl=http://localhost:5173 CYPRESS_apiUrl=http://localhost:18080 CY
 # An earlier run the night before failed once in the student "before each" hook: the page was blank
 # while the Vite dev server reloaded after its first-time dependency optimization. Not a page problem;
 # the re-run above passed.
+
+# ---------------------------------------------------------------------------
+# Re-run on the new campus design (SCRUM-138, 141), 2026-11-09 12:28, against the
+# BUILT app (npm run build, then vite preview on :4173), not the dev server.
+# The first re-run on the dev server found one real violation, fixed before this run:
+#   [/ student] label-content-name-mismatch (serious): Elements must have their
+#   visible text as part of their accessible name. element: .tile
+#   (the home tile link was named "Report an issue" but also showed its hint;
+#   defect D-16, fixed in commit "SCRUM-110 fix: home tile link name ...").
+# Dev-server runs also failed at random with a blank page (Vite still loading
+# under load); the built app has no such delay.
+
+$ CYPRESS_baseUrl=http://localhost:4173 CYPRESS_apiUrl=http://localhost:18080 CYPRESS_demoPassword=<not shown> npx cypress run --browser edge
+
+  accessibility (axe-core, WCAG 2.1 A and AA)
+    √ sign-in page (597ms)
+    √ sign-in page showing a wrong password error (1336ms)
+    √ home page, signed out (218ms)
+    √ page not found (195ms)
+    as a student
+      √ home page (1660ms)
+      √ report form (1660ms)
+      √ report form with a category and building chosen (1862ms)
+      √ report form showing its error messages (1648ms)
+      √ a page the student may not open (403) (1512ms)
+    as staff and admins (demo accounts, CYPRESS_demoPassword)
+      √ Category Head view (1129ms)
+      √ System Administrator page (1171ms)
+      √ College President dashboard (1239ms)
+
+  12 passing (14s)
+
+# Lighthouse 13.5.0 on the new design, http://localhost:4173/login (built app):
+#   Accessibility 100 (no failed scored audit), Performance 97
+#   Reports: lighthouse-login-new-design.report.html and .json
