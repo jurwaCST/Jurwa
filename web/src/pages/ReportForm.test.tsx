@@ -60,9 +60,16 @@ function renderForm() {
   )
 }
 
+type User = ReturnType<typeof userEvent.setup>
+
+// pickCategory taps the category tile with this name.
+async function pickCategory(user: User, name: string) {
+  await user.click(await screen.findByRole('radio', { name }))
+}
+
 // fillValid picks Hostel A, Wing 1, Bathroom 1 and types a description.
-async function fillValid(user: ReturnType<typeof userEvent.setup>) {
-  await user.selectOptions(await screen.findByLabelText('Category'), 'HOSTEL')
+async function fillValid(user: User) {
+  await pickCategory(user, 'Hostel')
   await user.selectOptions(await screen.findByLabelText('Building'), 'Hostel A')
   await user.selectOptions(screen.getByLabelText('Wing'), 'Wing 1')
   await user.selectOptions(screen.getByLabelText('Area'), 'Bathroom 1')
@@ -87,19 +94,22 @@ afterEach(() => {
 })
 
 describe('SCRUM-65 category and location dropdowns', () => {
-  it('shows the active categories from the API in their order', async () => {
+  it('shows the active categories from the API in their order, as tiles', async () => {
     renderForm()
-    const select = await screen.findByLabelText('Category')
-    await waitFor(() => expect(within(select).getAllByRole('option')).toHaveLength(4))
-    const labels = within(select).getAllByRole('option').map((o) => o.textContent)
-    expect(labels).toEqual(['Choose a category', 'Hostel', 'Academic Block', 'Others'])
+    const group = await screen.findByRole('radiogroup', { name: 'Category' })
+    await waitFor(() => expect(within(group).getAllByRole('radio')).toHaveLength(3))
+    const names = within(group)
+      .getAllByRole('radio')
+      .map((r) => r.closest('label')?.textContent)
+    expect(names).toEqual(['Hostel', 'Academic Block', 'Others'])
     expect(get).toHaveBeenCalledWith('/categories')
   })
 
   it('loads the locations of the chosen category and narrows building, wing and area', async () => {
     const user = userEvent.setup()
     renderForm()
-    await user.selectOptions(await screen.findByLabelText('Category'), 'HOSTEL')
+    await pickCategory(user, 'Hostel')
+    expect(screen.getByRole('radio', { name: 'Hostel' })).toBeChecked()
     expect(get).toHaveBeenCalledWith('/categories/HOSTEL/locations')
 
     const building = await screen.findByLabelText('Building')
@@ -123,7 +133,7 @@ describe('SCRUM-65 category and location dropdowns', () => {
   it('has no wing step when the locations have no wing (Others)', async () => {
     const user = userEvent.setup()
     renderForm()
-    await user.selectOptions(await screen.findByLabelText('Category'), 'OTHERS')
+    await pickCategory(user, 'Others')
     await user.selectOptions(await screen.findByLabelText('Building'), 'Campus')
     expect(screen.queryByLabelText('Wing')).not.toBeInTheDocument()
     expect(within(screen.getByLabelText('Area')).getAllByRole('option')).toHaveLength(3)
@@ -132,16 +142,18 @@ describe('SCRUM-65 category and location dropdowns', () => {
   it('needs a category and a full location before sending', async () => {
     const user = userEvent.setup()
     renderForm()
-    await screen.findByLabelText('Category')
+    await screen.findByRole('radio', { name: 'Hostel' })
     await user.type(screen.getByLabelText('Description'), 'Broken window')
     await user.click(screen.getByRole('button', { name: 'Send report' }))
     expect(await screen.findByText('Choose a category.')).toBeInTheDocument()
     expect(post).not.toHaveBeenCalled()
 
-    await user.selectOptions(screen.getByLabelText('Category'), 'HOSTEL')
+    await pickCategory(user, 'Hostel')
     await user.selectOptions(await screen.findByLabelText('Building'), 'Hostel A')
     await user.click(screen.getByRole('button', { name: 'Send report' }))
     expect(await screen.findByText('Choose the full location: building, wing and area.')).toBeInTheDocument()
+    // The message sits under the first step still missing: here the wing.
+    expect(screen.getByLabelText('Wing')).toHaveAttribute('aria-invalid', 'true')
     expect(post).not.toHaveBeenCalled()
   })
 
@@ -321,9 +333,9 @@ describe('polish: clearer messages and screens', () => {
   it('marks the field that needs attention', async () => {
     const user = userEvent.setup()
     renderForm()
-    await screen.findByLabelText('Category')
+    await screen.findByRole('radio', { name: 'Hostel' })
     await user.click(screen.getByRole('button', { name: 'Send report' }))
-    const category = screen.getByLabelText('Category')
+    const category = screen.getByRole('radiogroup', { name: 'Category' })
     expect(category).toHaveAttribute('aria-invalid', 'true')
     expect(category).toHaveAccessibleDescription('Choose a category.')
   })
@@ -347,7 +359,7 @@ describe('pilot feedback and icons', () => {
   it('explains the wing step under the wing field', async () => {
     const user = userEvent.setup()
     renderForm()
-    await user.selectOptions(await screen.findByLabelText('Category'), 'HOSTEL')
+    await pickCategory(user, 'Hostel')
     await user.selectOptions(await screen.findByLabelText('Building'), 'Hostel A')
     expect(screen.getByLabelText('Wing')).toHaveAccessibleDescription(
       'The part of the building the problem is in. Not sure? Choose the nearest wing.',
@@ -371,7 +383,7 @@ describe('pilot feedback and icons', () => {
     post.mockResolvedValueOnce({ report: { id: 'r-300' } })
     const user = userEvent.setup()
     const { container } = renderForm()
-    await screen.findByLabelText('Category')
+    await screen.findByRole('radio', { name: 'Hostel' })
     for (const heading of screen.getAllByRole('heading', { level: 2 })) {
       expect(heading.querySelector('svg[aria-hidden="true"]')).not.toBeNull()
     }
@@ -380,5 +392,48 @@ describe('pilot feedback and icons', () => {
     await screen.findByRole('status')
     expect(container.querySelector('.report-done svg[aria-hidden="true"]')).not.toBeNull()
     expect(container.textContent).not.toMatch(/[✓✔✅📷📍]/u)
+  })
+})
+
+describe('design items: tiles, drag and drop, submit bar', () => {
+  it('gives every category tile an icon and lets the arrow keys move between them', async () => {
+    const user = userEvent.setup()
+    renderForm()
+    const hostel = await screen.findByRole('radio', { name: 'Hostel' })
+    for (const radio of screen.getAllByRole('radio')) {
+      expect(radio.closest('label')?.querySelector('svg[aria-hidden="true"]')).not.toBeNull()
+    }
+    await user.click(hostel)
+    await user.keyboard('{ArrowDown}')
+    expect(screen.getByRole('radio', { name: 'Academic Block' })).toBeChecked()
+  })
+
+  it('takes a photo dropped on the photo area', async () => {
+    renderForm()
+    const zone = (await screen.findByLabelText('Photo (optional)')).closest('label') as HTMLElement
+    fireEvent.dragOver(zone, { dataTransfer: { files: [], types: ['Files'] } })
+    expect(zone).toHaveClass('is-dragging')
+    fireEvent.drop(zone, { dataTransfer: { files: [pngFile('drop.png', 3072)], types: ['Files'] } })
+    expect(screen.getByAltText('Photo preview')).toBeInTheDocument()
+    expect(screen.getByText('drop.png, 3 KB')).toBeInTheDocument()
+  })
+
+  it('checks a dropped photo like a chosen one', async () => {
+    renderForm()
+    const zone = (await screen.findByLabelText('Photo (optional)')).closest('label') as HTMLElement
+    fireEvent.drop(zone, { dataTransfer: { files: [pngFile('notes.pdf', 1024, 'application/pdf')], types: ['Files'] } })
+    expect(screen.getByText('The photo must be a JPG or PNG image.')).toBeInTheDocument()
+    expect(screen.queryByAltText('Photo preview')).not.toBeInTheDocument()
+  })
+
+  it('keeps the send button in a bar that says what is still needed', async () => {
+    const user = userEvent.setup()
+    renderForm()
+    const send = await screen.findByRole('button', { name: 'Send report' })
+    const bar = send.closest('.report-submit-bar') as HTMLElement
+    expect(bar).not.toBeNull()
+    expect(within(bar).getByText('0 of 3 steps done')).toBeInTheDocument()
+    await fillValid(user)
+    expect(within(bar).getByText('Ready to send')).toBeInTheDocument()
   })
 })
