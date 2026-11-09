@@ -25,6 +25,7 @@ const (
 	DepartmentDirectoryService_ListDepartments_FullMethodName = "/jurwa.departmentdirectory.v1.DepartmentDirectoryService/ListDepartments"
 	DepartmentDirectoryService_GetHoD_FullMethodName          = "/jurwa.departmentdirectory.v1.DepartmentDirectoryService/GetHoD"
 	DepartmentDirectoryService_GetStaff_FullMethodName        = "/jurwa.departmentdirectory.v1.DepartmentDirectoryService/GetStaff"
+	DepartmentDirectoryService_ListPositions_FullMethodName   = "/jurwa.departmentdirectory.v1.DepartmentDirectoryService/ListPositions"
 )
 
 // DepartmentDirectoryServiceClient is the client API for DepartmentDirectoryService service.
@@ -39,6 +40,9 @@ type DepartmentDirectoryServiceClient interface {
 	// One position and its holder, for example "DSA". Used by routing-engine.
 	// Errors: NOT_FOUND when the position code is unknown.
 	GetStaff(ctx context.Context, in *GetStaffRequest, opts ...grpc.CallOption) (*GetStaffResponse, error)
+	// Every position ordered by code. With held_only, only the positions that
+	// have a holder: the people a report can be reassigned to.
+	ListPositions(ctx context.Context, in *ListPositionsRequest, opts ...grpc.CallOption) (*ListPositionsResponse, error)
 }
 
 type departmentDirectoryServiceClient struct {
@@ -79,6 +83,16 @@ func (c *departmentDirectoryServiceClient) GetStaff(ctx context.Context, in *Get
 	return out, nil
 }
 
+func (c *departmentDirectoryServiceClient) ListPositions(ctx context.Context, in *ListPositionsRequest, opts ...grpc.CallOption) (*ListPositionsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListPositionsResponse)
+	err := c.cc.Invoke(ctx, DepartmentDirectoryService_ListPositions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DepartmentDirectoryServiceServer is the server API for DepartmentDirectoryService service.
 // All implementations must embed UnimplementedDepartmentDirectoryServiceServer
 // for forward compatibility.
@@ -91,6 +105,9 @@ type DepartmentDirectoryServiceServer interface {
 	// One position and its holder, for example "DSA". Used by routing-engine.
 	// Errors: NOT_FOUND when the position code is unknown.
 	GetStaff(context.Context, *GetStaffRequest) (*GetStaffResponse, error)
+	// Every position ordered by code. With held_only, only the positions that
+	// have a holder: the people a report can be reassigned to.
+	ListPositions(context.Context, *ListPositionsRequest) (*ListPositionsResponse, error)
 	mustEmbedUnimplementedDepartmentDirectoryServiceServer()
 }
 
@@ -109,6 +126,9 @@ func (UnimplementedDepartmentDirectoryServiceServer) GetHoD(context.Context, *Ge
 }
 func (UnimplementedDepartmentDirectoryServiceServer) GetStaff(context.Context, *GetStaffRequest) (*GetStaffResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetStaff not implemented")
+}
+func (UnimplementedDepartmentDirectoryServiceServer) ListPositions(context.Context, *ListPositionsRequest) (*ListPositionsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListPositions not implemented")
 }
 func (UnimplementedDepartmentDirectoryServiceServer) mustEmbedUnimplementedDepartmentDirectoryServiceServer() {
 }
@@ -186,6 +206,24 @@ func _DepartmentDirectoryService_GetStaff_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DepartmentDirectoryService_ListPositions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListPositionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DepartmentDirectoryServiceServer).ListPositions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DepartmentDirectoryService_ListPositions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DepartmentDirectoryServiceServer).ListPositions(ctx, req.(*ListPositionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // DepartmentDirectoryService_ServiceDesc is the grpc.ServiceDesc for DepartmentDirectoryService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -204,6 +242,10 @@ var DepartmentDirectoryService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetStaff",
 			Handler:    _DepartmentDirectoryService_GetStaff_Handler,
+		},
+		{
+			MethodName: "ListPositions",
+			Handler:    _DepartmentDirectoryService_ListPositions_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
