@@ -1,0 +1,192 @@
+﻿
+ RUN  v5.1.0 C:/Users/Acer/Desktop/Jurwa/web
+
+ ✓ src/api/client.test.ts > base URL > defaults to the gateway on localhost:8080 15ms
+ ✓ src/api/client.test.ts > base URL > uses VITE_API_URL when it is set, without a double slash 2ms
+ ✓ src/api/client.test.ts > token > sends no Authorization header before setToken 2ms
+ ✓ src/api/client.test.ts > token > sends Authorization: Bearer <token> after setToken 5ms
+ ✓ src/api/client.test.ts > token > stops sending it after setToken(null) 2ms
+ ✓ src/api/client.test.ts > methods > get returns the parsed JSON body 1ms
+ ✓ src/api/client.test.ts > methods > post sends the body as JSON 1ms
+ ✓ src/api/client.test.ts > methods > put sends the body as JSON 1ms
+ ✓ src/api/client.test.ts > methods > upload sends the file as multipart form data under the given field 4ms
+ ✓ src/api/client.test.ts > methods > returns undefined for 204 No Content 3ms
+ ✓ src/api/client.test.ts > errors > turns a 401 into an ApiError with status 401 2ms
+ ✓ src/api/client.test.ts > errors > uses the "error" field of a JSON error body as the message 3ms
+ ✓ src/api/client.test.ts > errors > falls back to a generic message when the body is not JSON 1ms
+ ✓ src/api/client.test.ts > errors > turns a network failure into an ApiError with status 0 1ms
+ ✓ src/components/components.test.tsx > Field > labels its control and links the hint and the error to it 146ms
+ ✓ src/components/components.test.tsx > Field > without an error the control is valid and nothing is announced 14ms
+ ✓ src/components/components.test.tsx > TextArea > counts characters against the limit 22ms
+ ✓ src/components/components.test.tsx > TextArea > marks the count as over the limit and the field invalid 16ms
+ ✓ src/components/components.test.tsx > TextArea > counts Dzongkha letters as characters, not bytes 8ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-65 category and location dropdowns > shows the active categories from the API in their order, as tiles 244ms
+ ✓ src/pages/AdminDashboard.test.tsx > SCRUM-37 admin dashboard: counts > shows a tile per status with its count 267ms
+ ✓ src/pages/AdminDashboard.test.tsx > SCRUM-37 admin dashboard: counts > lists every category with its counts, a missing count being 0 67ms
+ ✓ src/components/components.test.tsx > TextArea > passes each change up 97ms
+ ✓ src/components/components.test.tsx > Button > while loading it is busy, disabled and says so 40ms
+ ✓ src/components/components.test.tsx > Button > applies the variant 8ms
+ ✓ src/components/components.test.tsx > Timeline > lists the status changes in the order given, with the status word and time 27ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 assigned reports > lists the reports assigned to me with their place and status 280ms
+ ✓ src/pages/AdminDashboard.test.tsx > SCRUM-37 admin dashboard: counts > points out what needs attention: escalated and not yet assigned 35ms
+ ✓ src/pages/AdminDashboard.test.tsx > SCRUM-37 admin dashboard: counts > says when nothing needs attention 41ms
+ ✓ src/components/components.test.tsx > Timeline > says so when there is nothing yet 4ms
+ ✓ src/components/components.test.tsx > BottomSheet > is a labelled dialog that closes with Escape and with its close button 71ms
+ ✓ src/components/components.test.tsx > BottomSheet > renders nothing while closed 2ms
+ ✓ src/components/components.test.tsx > BottomSheet > moves focus into the sheet when it opens 12ms
+ ✓ src/components/components.test.tsx > Toast > announces the message politely and goes away by itself 12ms
+ ✓ src/components/components.test.tsx > ErrorState > says what went wrong and retries on request 37ms
+ ✓ src/components/components.test.tsx > Skeleton > is hidden from screen readers and tells them the area is loading 8ms
+ ✓ src/pages/PresidentDashboard.test.tsx > President dashboard > shows the counts, the resolution rate and the average time from analytics 314ms
+ ✓ src/App.test.tsx > routes > home shows the app name, what it is for and a sign in link 302ms
+ ✓ src/App.test.tsx > routes > an unknown route shows a not found page 24ms
+ ✓ src/App.test.tsx > routes > /login shows the login form 43ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 assigned reports > counts the reports per status on the chips and filters by one 155ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 assigned reports > says so when nothing is assigned 30ms
+ ✓ src/pages/AdminDashboard.test.tsx > SCRUM-37 admin dashboard: counts > reloads the counts for a period 111ms
+node.exe : stderr | src/App.test.tsx > role guards > shows the report form to a student
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | src/Ap...rm to a student:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+An update to ReportForm inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/pages/AdminDashboard.test.tsx > SCRUM-37 admin dashboard: counts > offers to try again when the counts do not load 107ms
+ ✓ src/pages/AdminDashboard.test.tsx > SCRUM-37 admin dashboard: counts > tells the admin that rules and time limits are not editable here yet 27ms
+stderr | src/App.test.tsx > role guards > /staff is open to CATEGORY_HEAD
+An update to StaffView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/App.test.tsx > role guards > sends a visitor who is not signed in to /login 33ms
+ ✓ src/App.test.tsx > role guards > shows the report form to a student 66ms
+ ✓ src/App.test.tsx > role guards > refuses the report form to staff with a 403 page 16ms
+ ✓ src/pages/PresidentDashboard.test.tsx > President dashboard > shows every category with its counts per status 78ms
+ ✓ src/pages/PresidentDashboard.test.tsx > President dashboard > is read-only: no form, no field, and the only buttons are the period chips 54ms
+stderr | src/App.test.tsx > role guards > /staff is open to STAFF
+An update to StaffView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 assigned reports > offers to try again when the list does not load 95ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 assigned reports > loads the next page when there are more reports 66ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-65 category and location dropdowns > loads the locations of the chosen category and narrows building, wing and area 390ms
+stderr | src/App.test.tsx > role guards > /admin is open to SYSTEM_ADMIN
+An update to AdminDashboard inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+stderr | src/App.test.tsx > role guards > /president is open to PRESIDENT
+An update to PresidentDashboard inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/App.test.tsx > role guards > /staff is open to CATEGORY_HEAD 26ms
+ ✓ src/App.test.tsx > role guards > /staff is open to STAFF 14ms
+ ✓ src/App.test.tsx > role guards > /admin is open to SYSTEM_ADMIN 16ms
+ ✓ src/App.test.tsx > role guards > /president is open to PRESIDENT 14ms
+ ✓ src/App.test.tsx > role guards > /staff is refused to STUDENT 8ms
+ ✓ src/App.test.tsx > role guards > /admin is refused to CATEGORY_HEAD 8ms
+ ✓ src/App.test.tsx > role guards > /president is refused to SYSTEM_ADMIN 8ms
+ ✓ src/App.test.tsx > role guards > treats an expired session as signed out 10ms
+ ✓ src/pages/PresidentDashboard.test.tsx > President dashboard > asks analytics for the chosen period 95ms
+ ✓ src/pages/PresidentDashboard.test.tsx > President dashboard > shows an error with a way to try again when analytics cannot be reached 80ms
+ ✓ src/pages/PresidentDashboard.test.tsx > President dashboard > is only for the College President: a student gets the 403 page 23ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 one report: details, history and notes > opens a report on the Details tab with its description 104ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-65 category and location dropdowns > has no wing step when the locations have no wing (Others) 181ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 one report: details, history and notes > moves between the tabs with the arrow keys 105ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 one report: details, history and notes > shows the history of status changes, oldest first 127ms
+ ✓ src/App.test.tsx > login > signs in through the gateway and shows the links for the role 497ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-65 category and location dropdowns > needs a category and a full location before sending 530ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-65 category and location dropdowns > shows a message when the categories cannot be loaded 29ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-66 description and photo field > shows a live counter and stops at 500 characters 159ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 one report: details, history and notes > lists the notes and adds one 536ms
+ ✓ src/App.test.tsx > login > shows the gateway error when the password is wrong 360ms
+ ✓ src/App.test.tsx > login > the sign-in page links to student sign-up 12ms
+ ✓ src/App.test.tsx > login > signing out goes back to the signed-out home page 67ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 one report: details, history and notes > goes back to the list 123ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 update status > offers only the next allowed status and sends it with the version 482ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-66 description and photo field > needs a description that is not only spaces 745ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-66 description and photo field > refuses a photo that is not JPG or PNG 48ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 update status > keeps every letter typed in the sheet 250ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-66 description and photo field > refuses a photo over 5 MB and accepts exactly 5 MB 111ms
+ ✓ src/App.test.tsx > register > creates a student account, signs in and goes home 701ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-66 description and photo field > shows a preview and can remove the photo 109ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 update status > says when someone else changed the report first, and shows the new status 266ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 update status > needs a status to be chosen 234ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 update status > has nothing to update on a resolved report 97ms
+ ✓ src/App.test.tsx > register > a password under 8 characters is refused before calling the server 625ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-67 submit to report-submission > sends the report and shows the report id 545ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 reassign > offers the positions that have someone in them, except my own 137ms
+ ✓ src/App.test.tsx > register > shows the server error when the email is already registered 680ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 reassign > sends the chosen holder and the reason, then the report leaves my list 562ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-67 submit to report-submission > uploads the photo first and sends its photoId with the report 620ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 reassign > needs a person and a reason 475ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-67 submit to report-submission > shows the reason for a 400 and keeps the form 526ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 reassign > explains a 403 and a 409 558ms
+ ✓ src/pages/StaffView.test.tsx > SCRUM-36 reassign > has no reassign on a resolved report 47ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-67 submit to report-submission > asks to try again when a service is unavailable or the server cannot be reached 683ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-67 submit to report-submission > does not send the report when the photo upload fails 687ms
+ ✓ src/pages/ReportForm.test.tsx > SCRUM-67 submit to report-submission > disables the button while sending, so a report is sent only once 653ms
+ ✓ src/pages/ReportForm.test.tsx > polish: clearer messages and screens > asks the student to sign in again when the sign-in has expired while loading 33ms
+ ✓ src/pages/ReportForm.test.tsx > polish: clearer messages and screens > asks the student to sign in again when the sign-in expires before sending 610ms
+ ✓ src/pages/ReportForm.test.tsx > polish: clearer messages and screens > shows the chosen photo with its name and size 111ms
+ ✓ src/pages/ReportForm.test.tsx > polish: clearer messages and screens > marks the field that needs attention 116ms
+ ✓ src/pages/ReportForm.test.tsx > polish: clearer messages and screens > can start another report from the success screen 745ms
+ ✓ src/pages/ReportForm.test.tsx > pilot feedback and icons > explains the wing step under the wing field 178ms
+ ✓ src/pages/ReportForm.test.tsx > pilot feedback and icons > copies the report number so the student does not have to remember it 643ms
+ ✓ src/pages/ReportForm.test.tsx > pilot feedback and icons > uses drawn icons that screen readers skip, not text symbols 654ms
+ ✓ src/pages/ReportForm.test.tsx > design items: tiles, drag and drop, submit bar > gives every category tile an icon and lets the arrow keys move between them 148ms
+ ✓ src/pages/ReportForm.test.tsx > design items: tiles, drag and drop, submit bar > takes a photo dropped on the photo area 89ms
+ ✓ src/pages/ReportForm.test.tsx > design items: tiles, drag and drop, submit bar > checks a dropped photo like a chosen one 33ms
+ ✓ src/pages/ReportForm.test.tsx > design items: tiles, drag and drop, submit bar > keeps the send button in a bar that says what is still needed 599ms
+
+ Test Files  7 passed (7)
+      Tests  112 passed (112)
+   Start at  10:55:28
+   Duration  14.14s (tests 44%, environment 36%, setup 10%, import 9%, transform 1%)
+

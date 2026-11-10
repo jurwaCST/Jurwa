@@ -33,7 +33,7 @@ First run on 8 November 2026 on the first design. **Re-run on 9 November 2026 on
 
 **12 of 12 pass, 0 violations.** The pages are signed in through the real login page, so each one is checked as its user sees it.
 
-`/staff`, `/admin` and `/president` are still placeholder pages (a heading and one line: SCRUM-36 and SCRUM-37 were moved to Sprint 4, SCRUM-99 is Stretch). Their result only shows the shared layout passes; the checks must be run again when the real pages are built. The real content checked today is the sign-in page, the home page and the report form. The report form was checked before Nyendrak's styling update (`SCRUM-35-form-polish`, not merged), so it is run again after that merge.
+`/staff`, `/admin` and `/president` were placeholder pages in this run (a heading and one line). Their result only shows the shared layout passes. The real pages were merged later (SCRUM-99 on 9 November, SCRUM-36 and SCRUM-37 on 10 November), so the same tests are run again on them before the demo. The real content checked today is the sign-in page, the home page and the report form. The report form was checked before Nyendrak's styling update (`SCRUM-35-form-polish`, not merged), so it is run again after that merge.
 
 **Found by the re-run and fixed (defect D-16):** on the new design, the student's home tile was a link named "Report an issue" that also showed its hint "Takes about two minutes". axe-core rule `label-content-name-mismatch` (serious): the visible text must be part of the accessible name, so someone using voice control can say what they see. Only the title is the link now, the hint is its description, and the whole tile stays clickable.
 
