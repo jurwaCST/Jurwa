@@ -1,6 +1,6 @@
 # Sprint 3 review and retrospective
 
-Sprint 3: 3 to 8 November 2026, with work until 10 November. Scrum Master: Gayley Choden.
+Sprint 3: 4 to 10 November 2026. Scrum Master: Gayley Choden.
 Sources: Jira project SCRUM (read on 10 November 2026, after all hours were logged), the Sprint 3 EVM log `docs/pm/evm/week3.md` (Nyendrak, #123), merged pull requests on `main`, and each member's written retro.
 
 ## 1. Sprint goal
@@ -82,9 +82,6 @@ Also merged during Sprint 3, but not among the 44 Sprint 3 cards in `week3.md`: 
 | Knative fallback doc: delete the PingSource too | Nyendrak | Found by Sonam Choki while testing |
 | Accessibility re-run on the staff and admin pages; exploratory session; screen reader check | Gayley | The pages were merged on the last day |
 | D-08: report-submission saves before it publishes the event | Not assigned | Open defect, `docs/testing/test-plan.md` section 6 |
-
-Jira has no Sprint 4 yet; it has to be created before these cards can move.
-
 ## 4. Hours and EVM (from `week3.md`)
 
 | Member | Cards Done | Estimate of Done cards | Hours logged |
@@ -194,4 +191,4 @@ No review meeting was held; each member sent a written retro. Highlights:
 
 ## 7. Sprint 4
 
-Sprint 4 is the last sprint. To create in Jira first, then move the cards in section 3 into it. Goal (to confirm at planning): the installable PWA, the carried-over cards, the rehearsal with a real SLA escalation, the final demo, and the closure report (SCRUM-85).
+Sprint 4: 11 to 17 November 2026, the last sprint. Move the cards in section 3 into it in Jira. Goal (to confirm at planning): the installable PWA, the carried-over cards, the rehearsal with a real SLA escalation, the final demo, and the closure report (SCRUM-85).
