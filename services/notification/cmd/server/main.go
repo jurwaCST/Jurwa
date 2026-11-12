@@ -72,6 +72,12 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
+	// Messages to students from report events (SCRUM-155).
+	if err := startConsumers(ctx, app, serviceName, os.Getenv("DATABASE_URL") == ""); err != nil {
+		slog.Error("cannot start event consumers", "error", err)
+		os.Exit(1)
+	}
+
 	go func() {
 		<-ctx.Done()
 		slog.Info("shutting down")

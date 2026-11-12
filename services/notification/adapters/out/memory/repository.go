@@ -40,6 +40,26 @@ func (r *Repository) Save(_ context.Context, n domain.Notification) error {
 	return nil
 }
 
+// Create adds n only when its id is new and says whether it did.
+func (r *Repository) Create(_ context.Context, n domain.Notification) (bool, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if _, ok := r.data[n.ID]; ok {
+		return false, nil
+	}
+	r.next++
+	r.data[n.ID] = entry{n: n, seq: r.next}
+	return true, nil
+}
+
+// Exists says whether a notification with this id is stored.
+func (r *Repository) Exists(_ context.Context, id string) (bool, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	_, ok := r.data[id]
+	return ok, nil
+}
+
 // Get returns one notification by id, whatever its status. Used by tests to
 // check the outbox; it is not part of the port.
 func (r *Repository) Get(id string) (domain.Notification, bool) {

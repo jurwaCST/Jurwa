@@ -1,0 +1,10 @@
+--- PASS: TestRepositoryContract (2.44s)
+    --- PASS: TestRepositoryContract/every_field_is_kept (0.04s)
+    --- PASS: TestRepositoryContract/only_sent_messages_of_that_user,_newest_first (0.01s)
+    --- PASS: TestRepositoryContract/pages (0.02s)
+    --- PASS: TestRepositoryContract/unread_only (0.01s)
+    --- PASS: TestRepositoryContract/create_adds_a_new_id_and_leaves_an_existing_one_alone (0.01s)
+    --- PASS: TestRepositoryContract/saving_the_same_id_again_replaces_it_and_keeps_its_place (0.01s)
+--- PASS: TestDataSurvivesARestart (2.10s)
+--- PASS: TestSchemaMatchesTheDesignFile (0.00s)
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/out/postgres	5.141s
