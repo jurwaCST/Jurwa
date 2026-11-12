@@ -17,6 +17,8 @@
   padding: 0 0.4rem;
   border-radius: var(--radius-pill);
   background: var(--panel);
+  /* Its own colour: a selected chip's white text is unreadable on the panel. */
+  color: var(--text);
   font-size: var(--text-sm);
   font-variant-numeric: tabular-nums;
 }
