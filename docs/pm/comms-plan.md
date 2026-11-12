@@ -29,7 +29,7 @@ No weekly written progress report is sent to the tutors. They follow progress th
 
 ## 3. Meeting rhythm (5-day sprints)
 
-Sprints are 5 days long: Sprint 1 22 to 27 October, Sprint 2 28 October to 2 November, Sprint 3 3 to 8 November.
+Sprints are 5 days long: Sprint 1 22 to 27 October, Sprint 2 28 October to 3 November, Sprint 3 4 to 10 November.
 
 | Event | When | Who | Output |
 |---|---|---|---|

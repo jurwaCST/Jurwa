@@ -1,4 +1,4 @@
-# EVM log: Sprint 3 (3 to 8 November 2026, with work until the rehearsal on 10 November)
+# EVM log: Sprint 3 (4 to 10 November 2026)
 
 Card: SCRUM-82. Author: Nyendrak Yoezer Zangmo. Baseline: `docs/pm/schedule-evm.md`.
 Planned hours, logged hours and statuses were read from Jira on 10 November 2026 (46 cards in Sprint 3), and again after the rehearsal-day updates. All values are person-hours.
