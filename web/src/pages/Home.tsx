@@ -39,7 +39,7 @@ function Route() {
       </ol>
       <p className="route-escalation">
         <strong>Nobody acting on it?</strong> Every category has a time limit. When it passes, the report is escalated
-        automatically to the next person up.
+        to the Category Head automatically.
       </p>
     </section>
   )
@@ -65,7 +65,7 @@ const categories = [
   {
     name: 'Others',
     head: 'SSO',
-    covers: 'Campus-wide issues such as Wi-Fi, roads and grounds',
+    covers: 'Campus places such as the library, mess, gym and sports grounds',
     photo: '/campus/aerial.jpg',
     alt: 'The CST campus on its hillside from above, with the football ground and winding roads',
   },

@@ -1,0 +1,13 @@
+# SCRUM-151 first scan, before any change (12 Nov 2026). gitleaks 8.30.1, values redacted.
+
+$ gitleaks git . --log-opts="--all" --redact --report-format json --report-path /tmp/gitleaks-history.json
+273 commits scanned, ~5 MB. leaks found: 2
+
+$ gitleaks dir . --redact --report-format json --report-path /tmp/gitleaks-dir.json
+~9 MB scanned. leaks found: 2
+
+Findings (history report):
+- curl-auth-header | docs/evidence/sonam-zangmo/scrum-38-curl.txt:36 | commit 29688f9f 2026-11-02 | curl -i http://localhost:8080/categories -H 'Authorization: Bearer REDACTED'
+- generic-api-key | services/identity/domain/token_test.go:81 | commit da0a5f17 2026-10-27 | noneToken := "REDACTED"
+
+Exit code of both scans: 1 (findings). The working-tree findings are the same two files and lines.

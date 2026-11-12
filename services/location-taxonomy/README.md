@@ -12,11 +12,19 @@ Each location is one row (category, building, wing, area), like the `locations` 
 
 | Category | Shape | Example |
 |---|---|---|
-| `HOSTEL` | building, wing, area | Hostel A / Wing 1 / Bathroom 1 |
-| `ACADEMIC_BLOCK` | building, wing, area | Academic Block 2 / Ground Floor / Lab 3 |
-| `OTHERS` | flat list of areas under building `Campus`, never a wing | Campus / Wi-Fi |
+| `HOSTEL` | building, wing (the floor), area | HC / Floor 1 / Left wing bathroom |
+| `ACADEMIC_BLOCK` | building and area, no wing | Academic Block / LH1 |
+| `OTHERS` | flat list of areas under building `Campus`, never a wing | Campus / Library |
 
-**Sample data.** The design documents name no real CST buildings, so `adapters/out/memory/sample.go` holds a small sample set: two hostels, two academic blocks and the campus-wide areas (Wi-Fi, Estate, Canteen). Replace it with the real names when the team has them.
+**The location list** (`adapters/out/memory/sample.go`) holds the real CST places from `docs/design/real-locations.md` (SCRUM-146, loaded in SCRUM-150): 552 places.
+
+| Category | What | Places |
+|---|---|---|
+| `HOSTEL` | HA, HB, HC, HD, HE, HF, NK, RKA, RKB. Wing is the floor (`Floor 1`...); each floor has its rooms (`Room 101`...) and `Left/Right wing hallway`, `Left/Right wing bathroom` | 525 |
+| `ACADEMIC_BLOCK` | Building `Academic Block`, no wing: CR1-5, IT1-5, Lab1-5, LH1-5 | 20 |
+| `OTHERS` | Building `Campus`: Library, Mess, Football ground, Basketball court (indoor), Basketball court (outdoor), Volleyball court, Gym | 7 |
+
+The list is built in code from the floor plans (rooms per floor), so a new room is one change to the `hostels` table there. Each place gets a fixed name-based id (UUID version 5 of category and location), the same after every restart. The first sample rows (Hostel A, Academic Block 1, Wi-Fi, Estate, Canteen...) are kept switched off with their old ids, so old reports that name them still make sense.
 
 ## RPCs
 
@@ -34,7 +42,7 @@ Rules (in `domain/location.go`, tested in `domain/location_test.go`):
 | Category | Required: `HOSTEL`, `ACADEMIC_BLOCK` or `OTHERS` |
 | Building | Required |
 | Wing and area | Optional, but each one given must belong to the building, and the area to the wing |
-| Case and spaces | Ignored, so `" hostel a "` matches `"Hostel A"` |
+| Case and spaces | Ignored, so `" hc "` matches `"HC"` |
 | Inactive rows | Kept in the list but never listed or matched |
 | Reasons | `unknown building`, `unknown wing for this building`, `unknown area for this building` |
 
@@ -45,7 +53,7 @@ domain/location.go               Category, Location, Entry, the hierarchy and va
 application/service.go           ListLocations and ValidateLocation use cases
 ports/ports.go                   LocationRepository interface
 adapters/in/grpc/handler.go      gRPC handler: protobuf <-> domain, errors -> gRPC codes
-adapters/out/memory/             in-memory repository and the sample list (sample.go)
+adapters/out/memory/             in-memory repository and the location list (sample.go)
 cmd/server/main.go               wires everything and starts the server
 ```
 
@@ -72,7 +80,7 @@ grpcurl -plaintext localhost:9004 grpc.health.v1.Health/Check
 grpcurl -plaintext -d '{"category":"HOSTEL"}' \
   localhost:9004 jurwa.locationtaxonomy.v1.LocationTaxonomyService/ListLocations
 
-grpcurl -plaintext -d '{"category":"HOSTEL","location":{"building":"Hostel A","wing":"Wing 1","area":"Bathroom 1"}}' \
+grpcurl -plaintext -d '{"category":"HOSTEL","location":{"building":"HC","wing":"Floor 1","area":"Room 101"}}' \
   localhost:9004 jurwa.locationtaxonomy.v1.LocationTaxonomyService/ValidateLocation
 ```
 

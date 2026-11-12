@@ -20,7 +20,7 @@ Routing uses only category and location, never the description.
 | Category | Routed to (Category Head) | Can reassign to |
 |---|---|---|
 | Hostel | DSA (Dean of Student Affairs) | SSOs (male and female), Block Councillor, Maintenance Councillor, Deputy Chief Councillor (Mess), Chief Councillor |
-| Academic Block | DAA (Dean of Academic Affairs) | One of the 5 departmental HoDs |
+| Academic Block | DAA (Dean of Academic Affairs) | One of the 6 departmental HoDs (5 HoDs; Mechanical's Programme Leader acts as HoD) |
 | Others (campus-wide) | SSO (Student Service Officer) | Relevant estate or administrative staff |
 
 ## 3. Status flow
@@ -61,7 +61,7 @@ Open, then Assigned, then In Progress, then Resolved. Escalated is set automatic
 | Id | Requirement | Priority |
 |---|---|---|
 | FR-18 | A Category Head sees a queue of reports assigned to them, with status badges, and filters it by status. | Must |
-| FR-19 | A Category Head reassigns a report to a staff user. The DAA can reassign to one of the 5 departmental HoDs. | Must |
+| FR-19 | A Category Head reassigns a report to a staff user. The DAA can reassign to one of the 6 departmental HoDs (5 HoDs; Mechanical's Programme Leader acts as HoD). | Must |
 | FR-20 | A Category Head moves a report to In Progress or Resolved. Invalid transitions are rejected. | Must |
 | FR-21 | A Category Head adds internal notes to a report. Internal notes are not visible to the student. | Should |
 
