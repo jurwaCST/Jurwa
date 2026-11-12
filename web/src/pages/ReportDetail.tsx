@@ -61,7 +61,7 @@ export default function ReportDetail() {
   const me = user?.id ?? ''
   // What came back for which attempt; anything else is loading.
   const [loaded, setLoaded] = useState<
-    { key: string; report: Report; status: Status } | { key: string; notFound: true } | { key: string; error: string } | null
+    { key: string; report: Report; status: Status | null } | { key: string; notFound: true } | { key: string; error: string } | null
   >(null)
   const [history, setHistory] = useState<{ key: string; entries?: HistoryEntry[]; error?: string } | null>(null)
   const [attempt, setAttempt] = useState(0)
@@ -71,11 +71,16 @@ export default function ReportDetail() {
 
   useEffect(() => {
     let alive = true
+    // The status comes from another service; when it does not answer, the
+    // report is still shown, without its badge.
     Promise.all([
       api.get<{ report: Report }>(`/reports/${reportId}`),
-      api.get<{ status: { status: Status } }>(`/reports/${reportId}/status`),
+      api
+        .get<{ status: { status: Status } }>(`/reports/${reportId}/status`)
+        .then((s) => s.status.status)
+        .catch(() => null),
     ])
-      .then(([r, s]) => alive && setLoaded({ key, report: r.report, status: s.status.status }))
+      .then(([r, status]) => alive && setLoaded({ key, report: r.report, status }))
       .catch((err) => {
         if (!alive) return
         if (err instanceof ApiError && (err.status === 403 || err.status === 404)) setLoaded({ key, notFound: true })
@@ -153,7 +158,7 @@ export default function ReportDetail() {
             {report.createdAt && <>, sent {when.format(new Date(report.createdAt))}</>}
           </p>
         </div>
-        <StatusBadge status={status} />
+        {status && <StatusBadge status={status} />}
       </div>
 
       <div className="rd-layout">
