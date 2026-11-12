@@ -37,7 +37,10 @@ export default function Register() {
     try {
       await api.post('/auth/register', { email, fullName: fullName.trim(), password })
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not create the account. Try again.')
+      // The gateway's own answers (400 bad email, 409 already registered) are
+      // sentences for people; anything else gets a plain message.
+      const known = err instanceof ApiError && (err.status === 400 || err.status === 409)
+      setError(known ? err.message : 'Could not create the account. Try again.')
       setBusy(false)
       return
     }
