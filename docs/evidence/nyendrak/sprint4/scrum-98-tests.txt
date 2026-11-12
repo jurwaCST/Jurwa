@@ -1,16 +1,18 @@
- ✓ src/pwa/pwa.test.ts > SCRUM-98 manifest > has what Chrome needs to install the app 5ms
- ✓ src/pwa/pwa.test.ts > SCRUM-98 manifest > points only at icons that exist in public/ 3ms
- ✓ src/pwa/pwa.test.ts > SCRUM-98 index.html > links the manifest, the theme colour and the home-screen icon 0ms
- ✓ src/pwa/pwa.test.ts > SCRUM-98 service worker > keeps the app shell when it installs 2ms
- ✓ src/pwa/pwa.test.ts > SCRUM-98 service worker > never answers or keeps an API call 1ms
- ✓ src/pwa/pwa.test.ts > SCRUM-98 service worker > opens a page from the network, and from the saved shell when offline 1ms
- ✓ src/pwa/pwa.test.ts > SCRUM-98 service worker > keeps built files the first time and then serves them without the network 0ms
- ✓ src/pwa/pwa.test.ts > SCRUM-98 service worker > does not keep a failed built file 0ms
- ✓ src/pwa/pwa.test.ts > SCRUM-98 service worker > removes the caches of older versions when it activates 1ms
- ✓ src/pwa/pwa.test.ts > SCRUM-98 registration > registers /sw.js in the built app only 0ms
- ✓ src/pwa/pwa.test.ts > SCRUM-98 registration > never breaks the app when the browser has no service workers or refuses 0ms
- ✓ src/pwa/OfflineBanner.test.tsx > SCRUM-98 offline banner > shows nothing while online 17ms
- ✓ src/pwa/OfflineBanner.test.tsx > SCRUM-98 offline banner > says so when the connection drops, and goes away when it is back 37ms
- ✓ src/pwa/OfflineBanner.test.tsx > SCRUM-98 offline banner > shows at once when the app opens without a connection 2ms
+﻿ ✓ src/pwa/pwa.test.ts > SCRUM-98 manifest > has what Chrome needs to install the app 14ms
+ ✓ src/pwa/pwa.test.ts > SCRUM-98 manifest > points only at icons that exist in public/ 5ms
+ ✓ src/pwa/pwa.test.ts > SCRUM-98 index.html > links the manifest, the theme colour and the home-screen icon 2ms
+ ✓ src/pwa/pwa.test.ts > SCRUM-98 service worker > keeps the app shell when it installs 10ms
+ ✓ src/pwa/pwa.test.ts > SCRUM-98 service worker > never answers or keeps an API call 5ms
+ ✓ src/pwa/pwa.test.ts > SCRUM-98 service worker > leaves private data alone, whatever its address 5ms
+ ✓ src/pwa/pwa.test.ts > SCRUM-98 service worker > opens a page from the network, and from the saved shell when offline 4ms
+ ✓ src/pwa/pwa.test.ts > SCRUM-98 service worker > keeps built files the first time and then serves them without the network 3ms
+ ✓ src/pwa/pwa.test.ts > SCRUM-98 service worker > does not keep a failed built file 2ms
+ ✓ src/pwa/pwa.test.ts > SCRUM-98 service worker > removes the caches of older versions when it activates 4ms
+ ✓ src/pwa/pwa.test.ts > SCRUM-98 registration > registers /sw.js in the built app only 3ms
+ ✓ src/pwa/pwa.test.ts > SCRUM-98 registration > never breaks the app when the browser has no service workers or refuses 2ms
+ ✓ src/pwa/OfflineBanner.test.tsx > SCRUM-98 offline banner > shows nothing while online 48ms
+ ✓ src/pwa/OfflineBanner.test.tsx > SCRUM-98 offline banner > says so when the connection drops, and goes away when it is back 120ms
+ ✓ src/pwa/OfflineBanner.test.tsx > SCRUM-98 offline banner > shows at once when the app opens without a connection 13ms
  Test Files  2 passed (2)
-      Tests  14 passed (14)
+      Tests  15 passed (15)
+   Duration  9.14s (environment 73%, setup 18%, transform 3%, import 3%, tests 2%, worker 1%)

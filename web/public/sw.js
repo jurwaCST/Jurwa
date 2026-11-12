@@ -1,13 +1,16 @@
 // Jurwa service worker (SCRUM-98). Owner: Nyendrak.
 // Makes the app installable and lets its shell open offline (NFR-07).
-// Written by hand, no library. Rules:
-// - API calls (/api/...) are never answered or kept here: they always go to
-//   the network, so a report, a status or a sign-in is never stale.
-// - Pages: network first; offline, the saved index.html (the app's router
-//   then shows the page).
-// - Built files in /assets/ have a hash in their name: kept the first time
-//   they load, then served from the cache.
-// - Other files (icons, manifest): network first, the saved copy offline.
+// Written by hand, no library. Only the app's own files are ever answered or
+// kept here, never data: reports, photos, notes and notifications are private
+// to each user, and on a shared phone or lab PC the next person must not see
+// them (Gayley's review). Rules:
+// - API calls (/api/...) and any other address that is not an app file are
+//   left to the browser: always the network, never kept.
+// - Pages (navigations): network first; offline, the saved index.html, which
+//   is the empty app shell (the app's router then shows the page).
+// - Built files in /assets/ (JS, CSS, fonts) have a hash in their name: kept
+//   the first time they load, then served from the cache.
+// - The shell files (icons, manifest): network first, the saved copy offline.
 // Change CACHE_VERSION when the shell list changes; older caches are deleted.
 
 const CACHE_VERSION = 'jurwa-shell-v1'
@@ -61,5 +64,8 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  event.respondWith(fetch(request).catch(() => caches.match(request)))
+  if (SHELL.includes(url.pathname)) {
+    event.respondWith(fetch(request).catch(() => caches.match(request)))
+  }
+  // Anything else is not an app file: not answered here, never kept.
 })

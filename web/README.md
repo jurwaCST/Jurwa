@@ -47,7 +47,7 @@ docker run --rm -p 8088:8080 jurwa-web              # http://localhost:8088
 The app is a PWA (SCRUM-98, NFR-07): `public/manifest.webmanifest` (name, pine theme colour, icons made from `cst-logo.jpg`) and a hand-written service worker in `public/sw.js`, registered by `src/pwa/register.ts` in the built app only (never in `npm run dev`).
 
 - **Install:** on a phone, open the HTTPS address and use "Add to home screen" (Android Chrome also offers "Install app"). On a laptop, Chrome shows an install icon in the address bar.
-- **Offline:** pages open from the saved app shell, and a banner says "You are offline. Showing saved pages." (`src/pwa/OfflineBanner.tsx`). API calls (`/api/...`) are never cached, so reports and statuses are never stale; without a connection they fail as usual.
+- **Offline:** pages open from the saved app shell, and a banner says "You are offline. Showing saved pages." (`src/pwa/OfflineBanner.tsx`). Only the app's own files (HTML, JS, CSS, icons) are kept. API calls (`/api/...`) and any other address are never answered or kept by the service worker: reports, photos and notifications are private to each user, so on a shared phone or lab PC the next person never sees them. Without a connection those calls fail as usual.
 - **Updating:** change `CACHE_VERSION` in `sw.js` when the list of shell files changes; older caches are deleted when the new worker starts. nginx never caches `sw.js`, so browsers see a new version on the next visit.
 - **Check:** `npm run build && npm run preview`, then Chrome DevTools, Application tab: Manifest (no errors, "Installable") and Service workers (activated and running).
 
