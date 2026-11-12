@@ -164,6 +164,26 @@ describe('SCRUM-143 report detail', () => {
     expect(screen.queryByRole('heading', { name: 'Report not found' })).not.toBeInTheDocument()
   })
 
+  // SCRUM-145: feedback is only for a resolved report.
+  it('asks how the fix was once the report is resolved', async () => {
+    stubGet({
+      [`/reports/${ID}/status`]: { status: { reportId: ID, status: 'RESOLVED', version: 4 } },
+      [`/reports/${ID}/feedback`]: new ApiError(404, 'this report has no feedback'),
+    })
+    renderAt()
+
+    expect(await screen.findByRole('radiogroup', { name: /how was the fix/i })).toBeInTheDocument()
+  })
+
+  it('does not ask for feedback before the report is resolved', async () => {
+    stubGet()
+    renderAt()
+
+    expect(await screen.findByText('The drain is clogged.')).toBeInTheDocument()
+    expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument()
+    expect(get).not.toHaveBeenCalledWith(`/reports/${ID}/feedback`)
+  })
+
   it('offers to try again when the service is busy', async () => {
     const user = userEvent.setup()
     let calls = 0
