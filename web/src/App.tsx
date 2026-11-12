@@ -6,8 +6,10 @@ import AdminDashboard from './pages/AdminDashboard'
 import Home from './pages/Home'
 import Login from './pages/Login'
 import NotFound from './pages/NotFound'
+import MyReports from './pages/MyReports'
 import PresidentDashboard from './pages/PresidentDashboard'
 import Register from './pages/Register'
+import ReportDetail from './pages/ReportDetail'
 import ReportForm from './pages/ReportForm'
 import StaffView from './pages/StaffView'
 
@@ -28,6 +30,22 @@ export default function App() {
             element={
               <RequireRole roles={['STUDENT']}>
                 <ReportForm />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="reports"
+            element={
+              <RequireRole roles={['STUDENT']}>
+                <MyReports />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="reports/:reportId"
+            element={
+              <RequireRole roles={['STUDENT']}>
+                <ReportDetail />
               </RequireRole>
             }
           />

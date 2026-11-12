@@ -26,8 +26,8 @@ function baseUrl(): string {
   return configured.replace(/\/+$/, '')
 }
 
-async function request<T>(method: string, path: string, body?: BodyInit, contentType?: string): Promise<T> {
-  const headers = new Headers({ Accept: 'application/json' })
+async function request<T>(method: string, path: string, body?: BodyInit, contentType?: string, raw = false): Promise<T> {
+  const headers = new Headers({ Accept: raw ? '*/*' : 'application/json' })
   if (contentType) headers.set('Content-Type', contentType)
   if (token) headers.set('Authorization', `Bearer ${token}`)
 
@@ -43,6 +43,9 @@ async function request<T>(method: string, path: string, body?: BodyInit, content
   }
   if (res.status === 204) {
     return undefined as T
+  }
+  if (raw) {
+    return (await res.blob()) as T
   }
   return (await res.json()) as T
 }
@@ -69,6 +72,10 @@ export const api = {
   },
   put<T>(path: string, body: unknown): Promise<T> {
     return request<T>('PUT', path, JSON.stringify(body), 'application/json')
+  },
+  /** blob gets a file the gateway sends as it is, such as GET /photos/{photoId}. */
+  blob(path: string): Promise<Blob> {
+    return request<Blob>('GET', path, undefined, undefined, true)
   },
   /** upload sends one file as multipart/form-data. The browser sets the boundary header. */
   upload<T>(path: string, file: File, field: string): Promise<T> {

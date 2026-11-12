@@ -86,6 +86,8 @@ Phones get a bottom tab bar and laptops a top bar; the tabs come from `src/compo
 | `/` | `Home.tsx` | everyone (links by role) | Gayley |
 | `/login` | `Login.tsx` | everyone | Gayley |
 | `/report/new` | `ReportForm.tsx` | Student | Nyendrak, SCRUM-35 |
+| `/reports` | `MyReports.tsx` | Student (own reports, `GET /me/reports`) | Gayley, SCRUM-143 |
+| `/reports/:reportId` | `ReportDetail.tsx` | Student (own report: details, photo, timeline) | Gayley, SCRUM-143 |
 | `/staff` | `StaffView.tsx` | Category Head, Staff | Nyendrak, SCRUM-36 |
 | `/admin` | `AdminDashboard.tsx` | System Administrator | Nyendrak, SCRUM-37 |
 | `/president` | `PresidentDashboard.tsx` | College President | Gayley, SCRUM-99 |

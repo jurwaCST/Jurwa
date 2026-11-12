@@ -13,7 +13,10 @@ interface Tab {
 
 // Tabs per role. Only pages that exist are listed (routes in App.tsx).
 const tabsByRole: Record<Role, Tab[]> = {
-  STUDENT: [{ to: '/report/new', label: 'Report', icon: 'report' }],
+  STUDENT: [
+    { to: '/report/new', label: 'Report', icon: 'report' },
+    { to: '/reports', label: 'My reports', icon: 'queue' },
+  ],
   CATEGORY_HEAD: [{ to: '/staff', label: 'Queue', icon: 'queue' }],
   STAFF: [{ to: '/staff', label: 'Queue', icon: 'queue' }],
   SYSTEM_ADMIN: [{ to: '/admin', label: 'Overview', icon: 'admin' }],
