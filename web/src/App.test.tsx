@@ -44,6 +44,14 @@ describe('routes', () => {
     expect(screen.getByRole('link', { name: 'Sign in' })).toBeInTheDocument()
   })
 
+  // SCRUM-146: an escalated report goes back to its Category Head
+  // (docs/design/escalation-saga.md), not to someone higher up.
+  it('home says an escalated report goes to the Category Head', () => {
+    renderAt('/')
+    expect(screen.getByText(/the report is escalated to the Category Head automatically/)).toBeInTheDocument()
+    expect(screen.queryByText(/next person up/)).not.toBeInTheDocument()
+  })
+
   it('an unknown route shows a not found page', () => {
     renderAt('/no-such-page')
     expect(screen.getByRole('heading', { name: 'Page not found' })).toBeInTheDocument()
