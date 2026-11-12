@@ -1,0 +1,12 @@
+/* Offline banner (SCRUM-98). A thin saffron strip at the top of the page,
+   above the top bar, using Gayley's tokens. It scrolls away with the page,
+   so it never covers the sticky top bar. */
+.offline-banner {
+  max-width: none;
+  margin: 0;
+  padding: 0.5rem var(--s2);
+  background: var(--action);
+  color: var(--action-text);
+  font-weight: 700;
+  text-align: center;
+}
