@@ -23,8 +23,10 @@ import (
 
 	analyticsv1 "github.com/jurwaCST/Jurwa/proto/gen/analytics/v1"
 	commonv1 "github.com/jurwaCST/Jurwa/proto/gen/common/v1"
+	feedbackv1 "github.com/jurwaCST/Jurwa/proto/gen/feedback/v1"
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
 	internalnotesv1 "github.com/jurwaCST/Jurwa/proto/gen/internal-notes/v1"
+	notificationv1 "github.com/jurwaCST/Jurwa/proto/gen/notification/v1"
 	photomediav1 "github.com/jurwaCST/Jurwa/proto/gen/photo-media/v1"
 	reassignmentv1 "github.com/jurwaCST/Jurwa/proto/gen/reassignment/v1"
 	reportsubmissionv1 "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1"
@@ -48,19 +50,21 @@ const errPhotoTooLarge = "invalid photo: photo is larger than 5 MB"
 
 // Deps are the ports and helpers the routes use.
 type Deps struct {
-	Auth       *application.Auth
-	Identity   ports.Identity
-	Categories ports.Categories
-	Locations  ports.Locations
-	Reports    ports.Reports
-	Notes      ports.Notes
-	History    ports.History
-	Photos     ports.Photos
-	Status     ports.Status
-	Analytics  ports.Analytics
-	Reassign   ports.Reassignment
-	Directory  ports.Directory
-	Limiter    *domain.Limiter
+	Auth          *application.Auth
+	Identity      ports.Identity
+	Categories    ports.Categories
+	Locations     ports.Locations
+	Reports       ports.Reports
+	Notes         ports.Notes
+	History       ports.History
+	Photos        ports.Photos
+	Status        ports.Status
+	Analytics     ports.Analytics
+	Reassign      ports.Reassignment
+	Directory     ports.Directory
+	Notifications ports.Notifications
+	Feedback      ports.Feedback
+	Limiter       *domain.Limiter
 }
 
 type router struct{ Deps }
@@ -94,6 +98,9 @@ func NewRouter(d Deps) http.Handler {
 	mux.Handle("GET /reports/{reportId}/timeline", r.protected(domain.ActionReportTimelineRead, r.timeline))
 	mux.Handle("POST /reports/{reportId}/reassign", r.protected(domain.ActionReportReassign, r.reassign))
 	mux.Handle("GET /positions", r.protected(domain.ActionReportReassign, r.positions))
+	mux.Handle("GET /me/notifications", r.protected(domain.ActionNotificationList, r.myNotifications))
+	mux.Handle("POST /reports/{reportId}/feedback", r.protected(domain.ActionReportFeedbackSubmit, r.submitFeedback))
+	mux.Handle("GET /reports/{reportId}/feedback", r.protected(domain.ActionReportFeedbackRead, r.getFeedback))
 
 	return r.rateLimit(mux)
 }
@@ -348,6 +355,60 @@ func (r router) reassign(w http.ResponseWriter, req *http.Request) {
 // PWA sends a position's holderUserId as toUserId.
 func (r router) positions(w http.ResponseWriter, req *http.Request) {
 	resp, err := r.Directory.ListHeldPositions(req.Context())
+	reply(w, http.StatusOK, resp, err)
+}
+
+// myNotifications is the signed-in user's inbox, newest first. Optional
+// ?unreadOnly=true, ?pageSize= and ?pageToken=.
+func (r router) myNotifications(w http.ResponseWriter, req *http.Request) {
+	pageSize, ok := readPageSize(w, req)
+	if !ok {
+		return
+	}
+	unreadOnly := false
+	if v := req.URL.Query().Get("unreadOnly"); v != "" {
+		b, err := strconv.ParseBool(v)
+		if err != nil {
+			writeJSONError(w, http.StatusBadRequest, "unreadOnly must be true or false")
+			return
+		}
+		unreadOnly = b
+	}
+	resp, err := r.Notifications.ListNotifications(req.Context(), &notificationv1.ListNotificationsRequest{
+		RecipientUserId: principal(req).UserID, // from the JWT, never the query (rule 2)
+		UnreadOnly:      unreadOnly,
+		PageSize:        pageSize,
+		PageToken:       req.URL.Query().Get("pageToken"),
+	})
+	reply(w, http.StatusOK, resp, err)
+}
+
+// submitFeedback rates a resolved report. feedback checks the rating, that the
+// report is RESOLVED (422) and that it has no feedback yet (409); it does not
+// check the reporter, so the gateway checks that the report is the student's own.
+func (r router) submitFeedback(w http.ResponseWriter, req *http.Request) {
+	in := &feedbackv1.SubmitFeedbackRequest{}
+	if !readJSON(w, req, in) {
+		return
+	}
+	in.ReportId = req.PathValue("reportId")  // from the path, never the body
+	in.StudentUserId = principal(req).UserID // from the JWT, never the body (rule 2)
+	if err := r.checkOwnReport(req, in.GetReportId()); err != nil {
+		writeError(w, err)
+		return
+	}
+	resp, err := r.Feedback.SubmitFeedback(req.Context(), in)
+	reply(w, http.StatusCreated, resp, err)
+}
+
+// getFeedback applies "Student (own)" like timeline.
+func (r router) getFeedback(w http.ResponseWriter, req *http.Request) {
+	reportID := req.PathValue("reportId")
+	if err := r.checkOwnReport(req, reportID); err != nil {
+		writeError(w, err)
+		return
+	}
+	resp, err := r.Feedback.GetFeedback(req.Context(), reportID)
 	reply(w, http.StatusOK, resp, err)
 }
 

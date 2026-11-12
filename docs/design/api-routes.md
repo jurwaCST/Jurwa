@@ -34,7 +34,7 @@ The React PWA calls only the api-gateway over HTTP (port 8080, JSON). The gatewa
 | `GET /reports/{reportId}/assignments` | reassignment | ListReassignments | Category Head, Staff, System Administrator |
 | `POST /reports/{reportId}/notes` | internal-notes | AddNote | Category Head, Staff |
 | `GET /reports/{reportId}/notes` | internal-notes | ListNotes | Category Head, Staff, System Administrator |
-| `POST /reports/{reportId}/feedback` | feedback | SubmitFeedback | Student (own report, after RESOLVED) |
+| `POST /reports/{reportId}/feedback` | feedback | SubmitFeedback | Student (own report, checked by the gateway; after RESOLVED). Not retried after a timeout |
 | `GET /reports/{reportId}/feedback` | feedback | GetFeedback | Student (own), Category Head, System Administrator |
 | `GET /reports/{reportId}/audit` | audit-log | ListByReport | System Administrator |
 | `GET /me/notifications` | notification | ListNotifications | any signed-in user |

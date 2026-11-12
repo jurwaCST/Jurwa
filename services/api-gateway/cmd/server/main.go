@@ -25,9 +25,11 @@ import (
 	authorizationv1 "github.com/jurwaCST/Jurwa/proto/gen/authorization/v1"
 	categorytaxonomyv1 "github.com/jurwaCST/Jurwa/proto/gen/category-taxonomy/v1"
 	departmentdirectoryv1 "github.com/jurwaCST/Jurwa/proto/gen/department-directory/v1"
+	feedbackv1 "github.com/jurwaCST/Jurwa/proto/gen/feedback/v1"
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
 	internalnotesv1 "github.com/jurwaCST/Jurwa/proto/gen/internal-notes/v1"
 	locationtaxonomyv1 "github.com/jurwaCST/Jurwa/proto/gen/location-taxonomy/v1"
+	notificationv1 "github.com/jurwaCST/Jurwa/proto/gen/notification/v1"
 	photomediav1 "github.com/jurwaCST/Jurwa/proto/gen/photo-media/v1"
 	reassignmentv1 "github.com/jurwaCST/Jurwa/proto/gen/reassignment/v1"
 	reporthistoryv1 "github.com/jurwaCST/Jurwa/proto/gen/report-history/v1"
@@ -78,6 +80,8 @@ func main() {
 		"analytics":            envOr("ANALYTICS_ADDR", "localhost:9020"),
 		"reassignment":         envOr("REASSIGNMENT_ADDR", "localhost:9014"),
 		"department-directory": envOr("DEPARTMENT_DIRECTORY_ADDR", "localhost:9008"),
+		"notification":         envOr("NOTIFICATION_ADDR", "localhost:9018"),
+		"feedback":             envOr("FEEDBACK_ADDR", "localhost:9019"),
 	} {
 		var extra []grpc.DialOption
 		if name == "photo-media" {
@@ -94,19 +98,21 @@ func main() {
 
 	identity := grpcclients.Identity{C: identityv1.NewIdentityServiceClient(conns["identity"])}
 	router := httpadapter.NewRouter(httpadapter.Deps{
-		Auth:       application.NewAuth(identity, authzclient.New(authorizationv1.NewAuthorizationServiceClient(conns["authorization"]))),
-		Identity:   identity,
-		Categories: grpcclients.Categories{C: categorytaxonomyv1.NewCategoryTaxonomyServiceClient(conns["category-taxonomy"])},
-		Locations:  grpcclients.Locations{C: locationtaxonomyv1.NewLocationTaxonomyServiceClient(conns["location-taxonomy"])},
-		Reports:    grpcclients.Reports{C: reportsubmissionv1.NewReportSubmissionServiceClient(conns["report-submission"])},
-		Notes:      grpcclients.Notes{C: internalnotesv1.NewInternalNotesServiceClient(conns["internal-notes"])},
-		History:    grpcclients.History{C: reporthistoryv1.NewReportHistoryServiceClient(conns["report-history"])},
-		Photos:     grpcclients.Photos{C: photomediav1.NewPhotoMediaServiceClient(conns["photo-media"])},
-		Status:     grpcclients.Status{C: statuslifecyclev1.NewStatusLifecycleServiceClient(conns["status-lifecycle"])},
-		Analytics:  grpcclients.Analytics{C: analyticsv1.NewAnalyticsServiceClient(conns["analytics"])},
-		Reassign:   grpcclients.Reassignment{C: reassignmentv1.NewReassignmentServiceClient(conns["reassignment"])},
-		Directory:  grpcclients.Directory{C: departmentdirectoryv1.NewDepartmentDirectoryServiceClient(conns["department-directory"])},
-		Limiter:    domain.NewLimiter(rateLimit, time.Now),
+		Auth:          application.NewAuth(identity, authzclient.New(authorizationv1.NewAuthorizationServiceClient(conns["authorization"]))),
+		Identity:      identity,
+		Categories:    grpcclients.Categories{C: categorytaxonomyv1.NewCategoryTaxonomyServiceClient(conns["category-taxonomy"])},
+		Locations:     grpcclients.Locations{C: locationtaxonomyv1.NewLocationTaxonomyServiceClient(conns["location-taxonomy"])},
+		Reports:       grpcclients.Reports{C: reportsubmissionv1.NewReportSubmissionServiceClient(conns["report-submission"])},
+		Notes:         grpcclients.Notes{C: internalnotesv1.NewInternalNotesServiceClient(conns["internal-notes"])},
+		History:       grpcclients.History{C: reporthistoryv1.NewReportHistoryServiceClient(conns["report-history"])},
+		Photos:        grpcclients.Photos{C: photomediav1.NewPhotoMediaServiceClient(conns["photo-media"])},
+		Status:        grpcclients.Status{C: statuslifecyclev1.NewStatusLifecycleServiceClient(conns["status-lifecycle"])},
+		Analytics:     grpcclients.Analytics{C: analyticsv1.NewAnalyticsServiceClient(conns["analytics"])},
+		Reassign:      grpcclients.Reassignment{C: reassignmentv1.NewReassignmentServiceClient(conns["reassignment"])},
+		Directory:     grpcclients.Directory{C: departmentdirectoryv1.NewDepartmentDirectoryServiceClient(conns["department-directory"])},
+		Notifications: grpcclients.Notifications{C: notificationv1.NewNotificationServiceClient(conns["notification"])},
+		Feedback:      grpcclients.Feedback{C: feedbackv1.NewFeedbackServiceClient(conns["feedback"])},
+		Limiter:       domain.NewLimiter(rateLimit, time.Now),
 	})
 	httpSrv := &http.Server{
 		Addr:              ":" + httpPort,
