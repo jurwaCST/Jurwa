@@ -156,6 +156,14 @@ describe('SCRUM-143 report detail', () => {
     expect(screen.queryByText(/report not found: r1/)).not.toBeInTheDocument()
   })
 
+  it('still shows the report when only its status does not load', async () => {
+    stubGet({ [`/reports/${ID}/status`]: new ApiError(404, 'unknown report') })
+    renderAt()
+
+    expect(await screen.findByText('The drain is clogged.')).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Report not found' })).not.toBeInTheDocument()
+  })
+
   it('offers to try again when the service is busy', async () => {
     const user = userEvent.setup()
     let calls = 0

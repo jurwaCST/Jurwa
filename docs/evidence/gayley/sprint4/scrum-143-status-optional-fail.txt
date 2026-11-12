@@ -1,0 +1,157 @@
+
+ RUN  v5.1.0 C:/Users/Acer/Desktop/Jurwa/web
+
+ ❯ src/pages/ReportDetail.test.tsx (8 tests | 1 failed | 7 skipped) 1043ms
+   ❯ SCRUM-143 report detail (8)
+     × still shows the report when only its status does not load 1040ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/pages/ReportDetail.test.tsx > SCRUM-143 report detail > still shows the report when only its status does not load
+TestingLibraryElementError: Unable to find an element with the text: The drain is clogged.. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"empty"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"empty-art"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33maria-hidden[39m=[32m"true"[39m
+          [33mclass[39m=[32m"art"[39m
+          [33mfocusable[39m=[32m"false"[39m
+          [33mviewBox[39m=[32m"0 0 260 180"[39m
+        [36m>[39m
+          [36m<ellipse[39m
+            [33mcx[39m=[32m"130"[39m
+            [33mcy[39m=[32m"160"[39m
+            [33mfill[39m=[32m"currentColor"[39m
+            [33mopacity[39m=[32m"0.07"[39m
+            [33mrx[39m=[32m"110"[39m
+            [33mry[39m=[32m"10"[39m
+          [36m/>[39m
+          [36m<rect[39m
+            [33mfill[39m=[32m"var(--pine-800)"[39m
+            [33mheight[39m=[32m"100"[39m
+            [33mrx[39m=[32m"3"[39m
+            [33mwidth[39m=[32m"10"[39m
+            [33mx[39m=[32m"124"[39m
+            [33my[39m=[32m"60"[39m
+          [36m/>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M64 52h78l14 14-14 14H64Z"[39m
+            [33mfill[39m=[32m"var(--saffron-500)"[39m
+          [36m/>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M196 96h-74l-14 14 14 14h74Z"[39m
+            [33mfill[39m=[32m"var(--teal-500)"[39m
+          [36m/>[39m
+          [36m<circle[39m
+            [33mcx[39m=[32m"129"[39m
+            [33mcy[39m=[32m"56"[39m
+            [33mfill[39m=[32m"var(--pine-800)"[39m
+            [33mr[39m=[32m"7"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+      [36m</div>[39m
+      [36m<h2>[39m
+        [0mReport not found[0m
+      [36m</h2>[39m
+      [36m<p>[39m
+        [0mThis report does not exist, or it is not one of yours.[0m
+      [36m</p>[39m
+      [36m<a[39m
+        [33mclass[39m=[32m"action"[39m
+        [33mdata-discover[39m=[32m"true"[39m
+        [33mhref[39m=[32m"/reports"[39m
+      [36m>[39m
+        [0mBack to My reports[0m
+      [36m</a>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"empty"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"empty-art"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33maria-hidden[39m=[32m"true"[39m
+          [33mclass[39m=[32m"art"[39m
+          [33mfocusable[39m=[32m"false"[39m
+          [33mviewBox[39m=[32m"0 0 260 180"[39m
+        [36m>[39m
+          [36m<ellipse[39m
+            [33mcx[39m=[32m"130"[39m
+            [33mcy[39m=[32m"160"[39m
+            [33mfill[39m=[32m"currentColor"[39m
+            [33mopacity[39m=[32m"0.07"[39m
+            [33mrx[39m=[32m"110"[39m
+            [33mry[39m=[32m"10"[39m
+          [36m/>[39m
+          [36m<rect[39m
+            [33mfill[39m=[32m"var(--pine-800)"[39m
+            [33mheight[39m=[32m"100"[39m
+            [33mrx[39m=[32m"3"[39m
+            [33mwidth[39m=[32m"10"[39m
+            [33mx[39m=[32m"124"[39m
+            [33my[39m=[32m"60"[39m
+          [36m/>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M64 52h78l14 14-14 14H64Z"[39m
+            [33mfill[39m=[32m"var(--saffron-500)"[39m
+          [36m/>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M196 96h-74l-14 14 14 14h74Z"[39m
+            [33mfill[39m=[32m"var(--teal-500)"[39m
+          [36m/>[39m
+          [36m<circle[39m
+            [33mcx[39m=[32m"129"[39m
+            [33mcy[39m=[32m"56"[39m
+            [33mfill[39m=[32m"var(--pine-800)"[39m
+            [33mr[39m=[32m"7"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+      [36m</div>[39m
+      [36m<h2>[39m
+        [0mReport not found[0m
+      [36m</h2>[39m
+      [36m<p>[39m
+        [0mThis report does not exist, or it is not one of yours.[0m
+      [36m</p>[39m
+      [36m<a[39m
+        [33mclass[39m=[32m"action"[39m
+        [33mdata-discover[39m=[32m"true"[39m
+        [33mhref[39m=[32m"/reports"[39m
+      [36m>[39m
+        [0mBack to My reports[0m
+      [36m</a>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/pages/ReportDetail.test.tsx:163:25
+    161|     renderAt()
+    162|
+    163|     expect(await screen.findByText('The drain is clogged.')).toBeInThe…
+       |                         ^
+    164|     expect(screen.queryByRole('heading', { name: 'Report not found' })…
+    165|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 7 skipped (8)
+   Start at  14:10:37
+   Duration  2.81s (environment 41%, tests 39%, import 9%, setup 8%, transform 3%)
+
