@@ -122,6 +122,38 @@ func Run(t *testing.T, newRepo func(t *testing.T) ports.NotificationRepository) 
 		assert.Equal(t, []string{ID(2)}, ids(list))
 	})
 
+	// SCRUM-155: a message made from an event is added with Create. The same
+	// event read twice must give one message, and must not undo a "read".
+	t.Run("create adds a new id and leaves an existing one alone", func(t *testing.T) {
+		r := newRepo(t)
+		first := note(1, alice, 1)
+		readAt := start.Add(time.Hour)
+		first.ReadAt = &readAt
+
+		has, err := r.Exists(ctx, ID(1))
+		require.NoError(t, err)
+		assert.False(t, has)
+
+		created, err := r.Create(ctx, first)
+		require.NoError(t, err)
+		assert.True(t, created)
+
+		again := note(1, alice, 2)
+		again.Subject = "Something else"
+		created, err = r.Create(ctx, again)
+		require.NoError(t, err)
+		assert.False(t, created, "the second create of an id adds nothing")
+
+		has, err = r.Exists(ctx, ID(1))
+		require.NoError(t, err)
+		assert.True(t, has)
+
+		list, _, err := r.ListByRecipient(ctx, alice, false, 0, 10)
+		require.NoError(t, err)
+		require.Len(t, list, 1)
+		assertSame(t, first, list[0])
+	})
+
 	t.Run("saving the same id again replaces it and keeps its place", func(t *testing.T) {
 		r := newRepo(t)
 		first := note(1, alice, 1)

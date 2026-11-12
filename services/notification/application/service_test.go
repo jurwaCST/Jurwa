@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -34,6 +35,10 @@ func (f *fakeSender) Send(context.Context, domain.Notification) error {
 type failingRepo struct{}
 
 func (failingRepo) Save(context.Context, domain.Notification) error { return errors.New("db down") }
+func (failingRepo) Create(context.Context, domain.Notification) (bool, error) {
+	return false, errors.New("db down")
+}
+func (failingRepo) Exists(context.Context, string) (bool, error) { return false, errors.New("db down") }
 func (failingRepo) ListByRecipient(context.Context, string, bool, int, int) ([]domain.Notification, bool, error) {
 	return nil, false, errors.New("db down")
 }
@@ -210,4 +215,86 @@ func TestNewServiceDefaults(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotEmpty(t, n.ID, "a real UUID is generated")
 	assert.False(t, n.CreatedAt.IsZero())
+}
+
+// SCRUM-155: messages made from events. The id comes from the event id, so
+// the same event read twice gives one message.
+
+const eventA = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+
+func TestSendForEventTwiceGivesOneMessage(t *testing.T) {
+	sender := &fakeSender{}
+	svc, _ := newTestService(sender)
+	ctx := context.Background()
+
+	first, sent, err := svc.SendForEvent(ctx, eventA, validInput())
+	require.NoError(t, err)
+	assert.True(t, sent)
+	_, err = uuid.Parse(first.ID)
+	require.NoError(t, err, "the id is a UUID, as the database needs")
+
+	_, sent, err = svc.SendForEvent(ctx, eventA, validInput())
+	require.NoError(t, err)
+	assert.False(t, sent, "a repeated event is skipped")
+	assert.Equal(t, 1, sender.calls, "the student is told once")
+
+	list, _, err := svc.List(ctx, alice, false, 0, "")
+	require.NoError(t, err)
+	require.Len(t, list, 1)
+	assert.Equal(t, first.ID, list[0].ID)
+}
+
+func TestSendForEventSameIDAfterARestart(t *testing.T) {
+	a, _ := newTestService(&fakeSender{})
+	b, _ := newTestService(&fakeSender{})
+	ctx := context.Background()
+
+	n1, _, err := a.SendForEvent(ctx, eventA, validInput())
+	require.NoError(t, err)
+	n2, _, err := b.SendForEvent(ctx, eventA, validInput())
+	require.NoError(t, err)
+	assert.Equal(t, n1.ID, n2.ID, "the id depends only on the event, not on the running service")
+
+	n3, _, err := a.SendForEvent(ctx, "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb", validInput())
+	require.NoError(t, err)
+	assert.NotEqual(t, n1.ID, n3.ID, "another event gives another message")
+}
+
+func TestSendForEventSenderFailureStoresNothingSoARetrySends(t *testing.T) {
+	sender := &fakeSender{err: errors.New("down")}
+	svc, _ := newTestService(sender)
+	ctx := context.Background()
+
+	_, _, err := svc.SendForEvent(ctx, eventA, validInput())
+	assert.ErrorIs(t, err, ErrUnavailable)
+
+	sender.err = nil
+	_, sent, err := svc.SendForEvent(ctx, eventA, validInput())
+	require.NoError(t, err)
+	assert.True(t, sent, "the retry of the event sends the message")
+
+	list, _, err := svc.List(ctx, alice, false, 0, "")
+	require.NoError(t, err)
+	assert.Len(t, list, 1)
+}
+
+func TestSendForEventRules(t *testing.T) {
+	sender := &fakeSender{}
+	svc, _ := newTestService(sender)
+	ctx := context.Background()
+
+	_, _, err := svc.SendForEvent(ctx, "", validInput())
+	assert.ErrorIs(t, err, ErrMissingEventID)
+
+	in := validInput()
+	in.Body = ""
+	_, _, err = svc.SendForEvent(ctx, eventA, in)
+	assert.ErrorIs(t, err, domain.ErrInvalidBody)
+	assert.Equal(t, 0, sender.calls)
+}
+
+func TestSendForEventStoreError(t *testing.T) {
+	svc := NewService(failingRepo{}, &fakeSender{})
+	_, _, err := svc.SendForEvent(context.Background(), eventA, validInput())
+	require.Error(t, err)
 }
