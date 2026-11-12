@@ -73,14 +73,15 @@ export default function ReportDetail() {
     let alive = true
     // The status comes from another service; when it does not answer, the
     // report is still shown, without its badge.
+    // GET /reports/{id} sends the report itself (POST /reports wraps it in { report }).
     Promise.all([
-      api.get<{ report: Report }>(`/reports/${reportId}`),
+      api.get<Report>(`/reports/${reportId}`),
       api
         .get<{ status: { status: Status } }>(`/reports/${reportId}/status`)
         .then((s) => s.status.status)
         .catch(() => null),
     ])
-      .then(([r, status]) => alive && setLoaded({ key, report: r.report, status }))
+      .then(([r, status]) => alive && setLoaded({ key, report: r, status }))
       .catch((err) => {
         if (!alive) return
         if (err instanceof ApiError && (err.status === 403 || err.status === 404)) setLoaded({ key, notFound: true })
