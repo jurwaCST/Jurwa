@@ -1,0 +1,38 @@
+﻿
+ RUN  v5.1.0 C:/Users/Acer/Desktop/Jurwa/web
+
+ ❯ src/App.test.tsx (26 tests | 1 failed | 25 skipped) 702ms
+   ❯ register (4)
+     × shows a kind message, not the raw error, when something unexpected answers 700ms
+node.exe : 
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/App.test.tsx > register > shows a kind message, not the raw error, when something unexpected answers
+Error: expect(element).toHaveTextContent()
+
+Expected element to have text content:
+  Could not create the account. Try again.
+Received:
+  Request failed (403)
+ ❯ src/App.test.tsx:254:19
+    252|
+    253|     const alert = await screen.findByRole('alert')
+    254|     expect(alert).toHaveTextContent('Could not create the account. Try…
+       |                   ^
+    255|     expect(alert).not.toHaveTextContent('Request failed')
+    256|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 25 skipped (26)
+   Start at  13:41:19
+   Duration  2.27s (environment 44%, tests 33%, import 9%, setup 8%, transform 5%)
+

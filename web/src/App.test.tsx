@@ -242,4 +242,16 @@ describe('register', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent('email is already registered')
   })
+
+  // Something other than the gateway answered (a proxy page, another app on the
+  // port): never show "Request failed (403)".
+  it('shows a kind message, not the raw error, when something unexpected answers', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('<html>forbidden</html>', { status: 403 })))
+
+    await fillIn()
+
+    const alert = await screen.findByRole('alert')
+    expect(alert).toHaveTextContent('Could not create the account. Try again.')
+    expect(alert).not.toHaveTextContent('Request failed')
+  })
 })
