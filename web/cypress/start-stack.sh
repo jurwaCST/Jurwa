@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Starts what the Cypress tests need (SCRUM-108): api-gateway and thirteen services,
+# Starts what the Cypress tests need (SCRUM-108): api-gateway and fourteen services,
 # in memory, with the demo accounts seeded. Git Bash, from the repo root:
 #
 #   export SEED_DEMO_PASSWORD='<any 8+ characters, never commit it>'
@@ -26,7 +26,7 @@ ext="$(go env GOEXE)" # ".exe" on Windows
 logs="web/cypress/logs"
 mkdir -p "$logs"
 echo "Building into $bin ..."
-for s in api-gateway identity authorization category-taxonomy location-taxonomy report-submission internal-notes photo-media report-history analytics routing-rules department-directory routing-engine status-lifecycle; do
+for s in api-gateway identity authorization category-taxonomy location-taxonomy report-submission internal-notes photo-media report-history analytics routing-rules department-directory routing-engine status-lifecycle feedback; do
   go build -o "$bin/$s$ext" "./services/$s/cmd/server"
 done
 
@@ -56,6 +56,7 @@ start routing-rules
 start department-directory
 start routing-engine # routes a new report to its Category Head (needs REDIS_URL)
 start status-lifecycle # the status shown on a report (needs REDIS_URL for new reports)
+start feedback # stars on a resolved report; asks status-lifecycle whether it is RESOLVED
 sleep 2
 start api-gateway HTTP_PORT="$GATEWAY_HTTP_PORT" PORT="$GATEWAY_GRPC_PORT" \
   IDENTITY_ADDR="localhost:$IDENTITY_PORT" \

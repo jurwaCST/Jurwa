@@ -122,3 +122,60 @@
   border-radius: var(--radius);
   background: var(--panel);
 }
+
+/* ---- Feedback stars (SCRUM-145) ---- */
+
+.fb-card {
+  margin-top: var(--s3);
+}
+
+.fb-stars {
+  display: inline-flex;
+  gap: 0.15rem;
+}
+
+/* An empty star is outlined in the text colour; a chosen one is filled saffron.
+   The words next to the stars say the rating too, so colour is not the only cue. */
+.fb-star {
+  display: inline-grid;
+  place-items: center;
+  color: var(--text);
+}
+
+.fb-star.on svg {
+  fill: var(--saffron-500);
+}
+
+/* Each star is a 44px target with the radio hidden inside it. */
+.fb-pick .fb-star {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+
+.fb-pick .fb-star:has(input:focus-visible) {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.fb-choice {
+  margin: 0;
+}
+
+.fb-saved {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: start;
+}
+
+.fb-saved p {
+  margin: 0;
+}
+
+.fb-comment {
+  margin: 0;
+  padding: 0.5rem 0.9rem;
+  border-left: 3px solid var(--border);
+  white-space: pre-wrap;
+}

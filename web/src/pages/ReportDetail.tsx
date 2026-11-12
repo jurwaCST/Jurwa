@@ -13,6 +13,7 @@ import Skeleton from '../components/Skeleton'
 import StatusBadge from '../components/StatusBadge'
 import Timeline, { type TimelineEntry } from '../components/Timeline'
 import { LostArt } from '../components/Art'
+import Feedback from './Feedback'
 import type { Status } from '../components/labels'
 import { categoryNames, messageFor, place, reportNumber, type Location } from './reportText'
 import './MyReports.css'
@@ -180,6 +181,9 @@ export default function ReportDetail() {
           )}
         </section>
       </div>
+
+      {/* SCRUM-145: only a resolved report can be rated. */}
+      {status === 'RESOLVED' && <Feedback reportId={reportId} />}
     </div>
   )
 }

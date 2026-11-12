@@ -17,6 +17,7 @@ const paths = {
   escalated: 'M12 3 2.5 20h19L12 3ZM12 10v4M12 17.5h.01',
   readonly: 'M2.5 12S6 5 12 5s9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z',
   back: 'M15 18l-6-6 6-6',
+  star: 'M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.3-4.1 5.9-.9L12 3.5Z',
 } as const
 
 export type IconName = keyof typeof paths
