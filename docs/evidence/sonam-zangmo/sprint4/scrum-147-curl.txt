@@ -1,0 +1,206 @@
+# SCRUM-147 live check of GET /me/notifications, POST and GET /reports/{reportId}/feedback, 2026-11-12 10:23 and 10:24.
+# Local binaries from this branch with REDIS_URL (Redis 7 from dev/docker-compose.yml): identity (SEED_DEMO_USERS=true; the demo password and JWT_SECRET are throwaway values, not shown), authorization, location-taxonomy, report-submission, routing-engine, routing-rules, department-directory, report-history, status-lifecycle, feedback, notification, api-gateway on :8080. Tokens are never printed.
+# Flow: report-submission publishes report.submitted, routing-engine routes it to the DSA, status-lifecycle sets ASSIGNED; the DSA moves R1 to RESOLVED through the gateway; feedback asks status-lifecycle whether the report is RESOLVED.
+# notification has no event consumer, so the in-app notification is sent with grpcurl SendNotification.
+#
+# Run 2 (10:24, all connections warm): the result. Run 1 (10:23, right after starting 12 services) is kept below it:
+# its first call from the gateway to notification and the first calls from feedback to status-lifecycle took over 2 s
+# to connect and returned 504; called directly a minute later, the same calls took about 10 ms. The rating-5 call that
+# timed out was not stored and not retried (SubmitFeedback is in CreateMethods), so the next submit got 201, not 409.
+
+######## Run 2 ########
+
+$ Student Pema (b68a20a9-ac72-4a31-bbcf-ad1f15948278) submits two HOSTEL reports
+R1 89533b76-a375-47b2-aa7f-56032148bdea
+R2 c8826785-8732-4d65-88a0-c2f4ea10a926
+
+$ dsa.demo moves R1 to IN_PROGRESS then RESOLVED (POST /reports/{id}/status); R2 stays ASSIGNED
+89533b76-a375-47b2-aa7f-56032148bdea ASSIGNED -> IN_PROGRESS
+89533b76-a375-47b2-aa7f-56032148bdea IN_PROGRESS -> RESOLVED
+
+$ notification has no event consumer yet, so one in-app notification is sent with grpcurl SendNotification (as notification's callers do)
+sent c5d40807-62e7-4e76-b06c-438ec4a807ad status.changed
+
+$ GET /me/notifications as Pema; the ?recipientUserId= in the query is ignored
+{"notifications":[{"id":"c5d40807-62e7-4e76-b06c-438ec4a807ad","recipientUserId":"b68a20a9-ac72-4a31-bbcf-ad1f15948278","channel":"IN_APP","eventType":"status.changed","reportId":"89533b76-a375-47b2-aa7f-56032148bdea","subject":"Your report is resolved","body":"Heater replaced. Please rate the fix.","deliveryStatus":"SENT","createdAt":"2026-11-12T04:24:13.206565Z","sentAt":"2026-11-12T04:24:13.208133Z"},{"id":"c0f1d9cf-45b1-43be-b5bb-a3242a777eff","recipientUserId":"b68a20a9-ac72-4a31-bbcf-ad1f15948278","channel":"IN_APP","eventType":"status.changed","reportId":"4f891548-a13c-43ad-a1c3-2a31fad1b3e9","subject":"Your report is resolved","body":"Heater replaced. Please rate the fix.","deliveryStatus":"SENT","createdAt":"2026-11-12T04:23:13.201169Z","sentAt":"2026-11-12T04:23:13.201351Z"}],"nextPageToken":""}
+HTTP 200
+
+$ GET /me/notifications?unreadOnly=true&pageSize=5 as Pema
+2 notification(s)
+HTTP200
+
+$ GET /me/notifications as dsa.demo (nothing for the DSA)
+{"notifications":[],"nextPageToken":""}
+HTTP 200
+
+$ GET /me/notifications?unreadOnly=maybe as Pema
+{"error":"unreadOnly must be true or false"}
+
+HTTP 400
+
+$ GET /reports/R1/feedback as Pema before any feedback
+{"error":"this report has no feedback"}
+
+HTTP 404
+
+$ POST /reports/R1/feedback as Pema with rating 6
+{"error":"rating must be 1 to 5"}
+
+HTTP 400
+
+$ POST /reports/R1/feedback as Pema with rating 0
+{"error":"rating must be 1 to 5"}
+
+HTTP 400
+
+$ POST /reports/R2/feedback as Pema (R2 is not RESOLVED)
+{"error":"feedback is allowed only after the report is RESOLVED"}
+
+HTTP 422
+
+$ POST /reports/R1/feedback as Kinley (another student's report)
+{"error":"not allowed"}
+
+HTTP 403
+
+$ POST /reports/R1/feedback as staff.demo
+{"error":"not allowed"}
+
+HTTP 403
+
+$ POST /reports/R1/feedback as Pema, rating 5; the body's studentUserId and reportId are ignored
+{"feedback":{"id":"47a2b31d-ca02-4c7c-be64-6e0042c226c1","reportId":"89533b76-a375-47b2-aa7f-56032148bdea","studentUserId":"b68a20a9-ac72-4a31-bbcf-ad1f15948278","rating":5,"comment":"Hot water back the same day, thank you","createdAt":"2026-11-12T04:24:13.302642Z"}}
+HTTP 201
+
+$ POST /reports/R1/feedback as Pema again (second feedback)
+{"error":"this report already has feedback"}
+
+HTTP 409
+
+$ GET /reports/R1/feedback as Pema
+{"feedback":{"id":"47a2b31d-ca02-4c7c-be64-6e0042c226c1","reportId":"89533b76-a375-47b2-aa7f-56032148bdea","studentUserId":"b68a20a9-ac72-4a31-bbcf-ad1f15948278","rating":5,"comment":"Hot water back the same day, thank you","createdAt":"2026-11-12T04:24:13.302642Z"}}
+HTTP 200
+
+$ GET /reports/R1/feedback as dsa.demo (Category Head)
+{"feedback":{"id":"47a2b31d-ca02-4c7c-be64-6e0042c226c1","reportId":"89533b76-a375-47b2-aa7f-56032148bdea","studentUserId":"b68a20a9-ac72-4a31-bbcf-ad1f15948278","rating":5,"comment":"Hot water back the same day, thank you","createdAt":"2026-11-12T04:24:13.302642Z"}}
+HTTP 200
+
+$ GET /reports/R1/feedback as admin.demo
+HTTP 200
+
+$ GET /reports/R1/feedback as Kinley
+{"error":"not allowed"}
+
+HTTP 403
+
+$ GET /reports/R1/feedback as staff.demo
+{"error":"not allowed"}
+
+HTTP 403
+
+$ GET /me/notifications and GET /reports/R1/feedback with no token
+{"error":"missing bearer token"}
+
+HTTP 401
+{"error":"missing bearer token"}
+
+HTTP 401
+
+######## Run 1 (cold start) ########
+
+$ Student Pema (b68a20a9-ac72-4a31-bbcf-ad1f15948278) submits two HOSTEL reports
+R1 4f891548-a13c-43ad-a1c3-2a31fad1b3e9
+R2 ac5ba4f7-ff8c-4415-9772-8d5656e98c8e
+
+$ dsa.demo moves R1 to IN_PROGRESS then RESOLVED (POST /reports/{id}/status); R2 stays ASSIGNED
+4f891548-a13c-43ad-a1c3-2a31fad1b3e9 ASSIGNED -> IN_PROGRESS
+4f891548-a13c-43ad-a1c3-2a31fad1b3e9 IN_PROGRESS -> RESOLVED
+
+$ notification has no event consumer yet, so one in-app notification is sent with grpcurl SendNotification (as notification's callers do)
+sent c0f1d9cf-45b1-43be-b5bb-a3242a777eff status.changed
+
+$ GET /me/notifications as Pema; the ?recipientUserId= in the query is ignored
+{"error":"service temporarily unavailable, try again"}
+
+HTTP 504
+
+$ GET /me/notifications?unreadOnly=true&pageSize=5 as Pema
+1 notification(s)
+HTTP200
+
+$ GET /me/notifications as dsa.demo (nothing for the DSA)
+{"notifications":[],"nextPageToken":""}
+HTTP 200
+
+$ GET /me/notifications?unreadOnly=maybe as Pema
+{"error":"unreadOnly must be true or false"}
+
+HTTP 400
+
+$ GET /reports/R1/feedback as Pema before any feedback
+{"error":"this report has no feedback"}
+
+HTTP 404
+
+$ POST /reports/R1/feedback as Pema with rating 6
+{"error":"rating must be 1 to 5"}
+
+HTTP 400
+
+$ POST /reports/R1/feedback as Pema with rating 0
+{"error":"rating must be 1 to 5"}
+
+HTTP 400
+
+$ POST /reports/R2/feedback as Pema (R2 is not RESOLVED)
+{"error":"service temporarily unavailable, try again"}
+
+HTTP 504
+
+$ POST /reports/R1/feedback as Kinley (another student's report)
+{"error":"not allowed"}
+
+HTTP 403
+
+$ POST /reports/R1/feedback as staff.demo
+{"error":"not allowed"}
+
+HTTP 403
+
+$ POST /reports/R1/feedback as Pema, rating 5; the body's studentUserId and reportId are ignored
+{"error":"service temporarily unavailable, try again"}
+
+HTTP 504
+
+$ POST /reports/R1/feedback as Pema again (second feedback)
+{"feedback":{"id":"b0af11ea-78a3-4a8c-8475-d1d58fd2d01c","reportId":"4f891548-a13c-43ad-a1c3-2a31fad1b3e9","studentUserId":"b68a20a9-ac72-4a31-bbcf-ad1f15948278","rating":3,"comment":"","createdAt":"2026-11-12T04:23:27.830927Z"}}
+HTTP 201
+
+$ GET /reports/R1/feedback as Pema
+{"feedback":{"id":"b0af11ea-78a3-4a8c-8475-d1d58fd2d01c","reportId":"4f891548-a13c-43ad-a1c3-2a31fad1b3e9","studentUserId":"b68a20a9-ac72-4a31-bbcf-ad1f15948278","rating":3,"comment":"","createdAt":"2026-11-12T04:23:27.830927Z"}}
+HTTP 200
+
+$ GET /reports/R1/feedback as dsa.demo (Category Head)
+{"feedback":{"id":"b0af11ea-78a3-4a8c-8475-d1d58fd2d01c","reportId":"4f891548-a13c-43ad-a1c3-2a31fad1b3e9","studentUserId":"b68a20a9-ac72-4a31-bbcf-ad1f15948278","rating":3,"comment":"","createdAt":"2026-11-12T04:23:27.830927Z"}}
+HTTP 200
+
+$ GET /reports/R1/feedback as admin.demo
+HTTP 200
+
+$ GET /reports/R1/feedback as Kinley
+{"error":"not allowed"}
+
+HTTP 403
+
+$ GET /reports/R1/feedback as staff.demo
+{"error":"not allowed"}
+
+HTTP 403
+
+$ GET /me/notifications and GET /reports/R1/feedback with no token
+{"error":"missing bearer token"}
+
+HTTP 401
+{"error":"missing bearer token"}
+
+HTTP 401

@@ -36,6 +36,9 @@ Every gRPC client goes through `pkg/resilience` (2 s timeout, up to 3 attempts f
 | `GET /reports/{reportId}/status` | status-lifecycle GetStatus | Student (own, checked with report-submission), Category Head, Staff, System Administrator |
 | `POST /reports/{reportId}/reassign` | reassignment ReassignReport (body `{"toUserId": "...", "reason": "..."}`) | Category Head, Staff (current assignee, checked by reassignment); the actor id comes from the JWT |
 | `GET /positions` | department-directory ListPositions (only positions someone holds) | Category Head, Staff |
+| `GET /me/notifications` | notification ListNotifications (`?unreadOnly=true`, `?pageSize=` 1 to 100, `?pageToken=`) | any signed-in user; the recipient id comes from the JWT |
+| `POST /reports/{reportId}/feedback` | feedback SubmitFeedback (body `{"rating": 1 to 5, "comment": "..."}`, returns 201) | Student (own, checked with report-submission); the student id comes from the JWT |
+| `GET /reports/{reportId}/feedback` | feedback GetFeedback | Student (own, checked with report-submission), Category Head, System Administrator |
 | `GET /dashboard/summary` | analytics GetSummary (optional `?from=` and `?to=`, RFC 3339) | System Administrator, College President |
 | `GET /dashboard/categories` | analytics GetCategoryBreakdown (same `?from=` and `?to=`) | System Administrator, College President |
 | `POST /photos` | photo-media UploadPhoto (returns 201 `{"photoId": "..."}`) | Student; the uploader id comes from the JWT |
@@ -52,6 +55,12 @@ The report id comes from the path and the actor id from the JWT; both are ignore
 The PWA fills its picker from `GET /positions`: each entry has `code`, `title`, `kind` (CATEGORY_HEAD, HOD, STAFF, COUNCILLOR) and `holderUserId`, and it sends the chosen `holderUserId` as `toUserId` to `POST /reports/{reportId}/reassign`. The report id comes from the path and the actor id from the JWT; both are ignored in the body. The caller's role goes to reassignment as the metadata `x-user-role`, and reassignment decides: a Category Head may reassign any report, a Staff member only one assigned to them (403 otherwise). Other answers: 400 for a missing `toUserId` or a blank `reason`, 404 for a report that was never routed, 409 when someone reassigned it first. `GET /positions` uses the `report.reassign` permission, so whoever may reassign may see whom to. The new assignee sees the report in `GET /me/assigned-reports` once report-history reads `report.reassigned` (about a second).
 
 ReassignReport is in `pkg/resilience` `CreateMethods`: after a timeout it is not retried, so one click never records two reassignments.
+
+## Feedback
+
+The report id comes from the path and the student id from the JWT; both are ignored in the body. feedback does not check who the reporter is, so the gateway checks that the report is the student's own with report-submission first (403 otherwise, nothing reaches feedback). feedback answers 400 for a rating outside 1 to 5 or a comment over 500 characters, 422 when the report is not RESOLVED, 409 when the report already has feedback, and `GET` gives 404 when there is none yet. SubmitFeedback is in `pkg/resilience` `CreateMethods`: after a timeout it is not retried, so a slow first attempt cannot turn into a 409.
+
+The notification service has no "mark as read" RPC, so the gateway has no route for it.
 
 ## Dashboard
 
@@ -108,6 +117,8 @@ Error bodies are `{"error": "<message>"}`.
 | `ANALYTICS_ADDR` | `localhost:9020` | analytics |
 | `REASSIGNMENT_ADDR` | `localhost:9014` | reassignment |
 | `DEPARTMENT_DIRECTORY_ADDR` | `localhost:9008` | department-directory |
+| `NOTIFICATION_ADDR` | `localhost:9018` | notification |
+| `FEEDBACK_ADDR` | `localhost:9019` | feedback |
 
 ## Run
 
