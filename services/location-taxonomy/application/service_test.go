@@ -29,9 +29,9 @@ func TestListLocationsReturnsOnlyActiveRowsOfThatCategory(t *testing.T) {
 		category domain.Category
 		wantLen  int
 	}{
-		{name: "hostel", category: domain.CategoryHostel, wantLen: 5},
-		{name: "academic block", category: domain.CategoryAcademicBlock, wantLen: 4},
-		{name: "others leaves out the switched-off row", category: domain.CategoryOthers, wantLen: 3},
+		{name: "hostel", category: domain.CategoryHostel, wantLen: 525},
+		{name: "academic block", category: domain.CategoryAcademicBlock, wantLen: 20},
+		{name: "others leaves out the switched-off sample rows", category: domain.CategoryOthers, wantLen: 7},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -64,11 +64,13 @@ func TestValidateLocation(t *testing.T) {
 		wantValid  bool
 		wantReason string
 	}{
-		{name: "real hostel location", category: domain.CategoryHostel, location: domain.Location{Building: "Hostel A", Wing: "Wing 1", Area: "Bathroom 1"}, wantValid: true},
-		{name: "real block location", category: domain.CategoryAcademicBlock, location: domain.Location{Building: "Academic Block 2", Wing: "Ground Floor", Area: "Lab 3"}, wantValid: true},
-		{name: "campus-wide area", category: domain.CategoryOthers, location: domain.Location{Building: domain.CampusBuilding, Area: "Wi-Fi"}, wantValid: true},
-		{name: "building of another category", category: domain.CategoryHostel, location: domain.Location{Building: "Academic Block 1"}, wantReason: domain.ReasonUnknownBuilding},
-		{name: "wing of another building", category: domain.CategoryHostel, location: domain.Location{Building: "Hostel B", Wing: "Wing 1"}, wantReason: domain.ReasonUnknownWing},
+		{name: "real hostel location", category: domain.CategoryHostel, location: domain.Location{Building: "HC", Wing: "Floor 1", Area: "Left wing bathroom"}, wantValid: true},
+		{name: "real block location", category: domain.CategoryAcademicBlock, location: domain.Location{Building: "Academic Block", Area: "LH1"}, wantValid: true},
+		{name: "campus-wide area", category: domain.CategoryOthers, location: domain.Location{Building: domain.CampusBuilding, Area: "Library"}, wantValid: true},
+		{name: "switched-off sample area", category: domain.CategoryOthers, location: domain.Location{Building: domain.CampusBuilding, Area: "Wi-Fi"}, wantReason: domain.ReasonUnknownArea},
+		{name: "switched-off sample building", category: domain.CategoryHostel, location: domain.Location{Building: "Hostel A", Wing: "Wing 1", Area: "Bathroom 1"}, wantReason: domain.ReasonUnknownBuilding},
+		{name: "building of another category", category: domain.CategoryHostel, location: domain.Location{Building: "Academic Block"}, wantReason: domain.ReasonUnknownBuilding},
+		{name: "floor the building does not have", category: domain.CategoryHostel, location: domain.Location{Building: "HE", Wing: "Floor 3"}, wantReason: domain.ReasonUnknownWing},
 		{name: "missing category", category: "", location: domain.Location{Building: "Hostel A"}, wantErr: domain.ErrMissingCategory},
 		{name: "empty building", category: domain.CategoryHostel, location: domain.Location{}, wantErr: domain.ErrMissingBuilding},
 	}
