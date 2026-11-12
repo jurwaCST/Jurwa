@@ -28,10 +28,10 @@ const categories = {
 const locations: Record<string, unknown> = {
   HOSTEL: {
     locations: [
-      { id: 'h1', category: 'HOSTEL', location: { building: 'Hostel A', wing: 'Wing 1', area: 'Bathroom 1' } },
-      { id: 'h2', category: 'HOSTEL', location: { building: 'Hostel A', wing: 'Wing 1', area: 'Corridor' } },
-      { id: 'h3', category: 'HOSTEL', location: { building: 'Hostel A', wing: 'Wing 2', area: 'Bathroom 2' } },
-      { id: 'h4', category: 'HOSTEL', location: { building: 'Hostel B', wing: 'Wing 1', area: 'Kitchen' } },
+      { id: 'h1', category: 'HOSTEL', location: { building: 'Hostel A', wing: 'Floor 1', area: 'Bathroom 1' } },
+      { id: 'h2', category: 'HOSTEL', location: { building: 'Hostel A', wing: 'Floor 1', area: 'Corridor' } },
+      { id: 'h3', category: 'HOSTEL', location: { building: 'Hostel A', wing: 'Floor 2', area: 'Bathroom 2' } },
+      { id: 'h4', category: 'HOSTEL', location: { building: 'Hostel B', wing: 'Floor 1', area: 'Kitchen' } },
     ],
   },
   OTHERS: {
@@ -67,11 +67,11 @@ async function pickCategory(user: User, name: string) {
   await user.click(await screen.findByRole('radio', { name }))
 }
 
-// fillValid picks Hostel A, Wing 1, Bathroom 1 and types a description.
+// fillValid picks Hostel A, Floor 1, Bathroom 1 and types a description.
 async function fillValid(user: User) {
   await pickCategory(user, 'Hostel')
   await user.selectOptions(await screen.findByLabelText('Building'), 'Hostel A')
-  await user.selectOptions(screen.getByLabelText('Wing'), 'Wing 1')
+  await user.selectOptions(screen.getByLabelText('Floor'), 'Floor 1')
   await user.selectOptions(screen.getByLabelText('Area'), 'Bathroom 1')
   await user.type(screen.getByLabelText('Description'), 'Tap is leaking')
 }
@@ -105,7 +105,7 @@ describe('SCRUM-65 category and location dropdowns', () => {
     expect(get).toHaveBeenCalledWith('/categories')
   })
 
-  it('loads the locations of the chosen category and narrows building, wing and area', async () => {
+  it('loads the locations of the chosen category and narrows building, floor and area', async () => {
     const user = userEvent.setup()
     renderForm()
     await pickCategory(user, 'Hostel')
@@ -119,9 +119,9 @@ describe('SCRUM-65 category and location dropdowns', () => {
       'Hostel B',
     ])
     await user.selectOptions(building, 'Hostel A')
-    const wing = screen.getByLabelText('Wing')
-    expect(within(wing).getAllByRole('option').map((o) => o.textContent)).toEqual(['Choose a wing', 'Wing 1', 'Wing 2'])
-    await user.selectOptions(wing, 'Wing 1')
+    const wing = screen.getByLabelText('Floor')
+    expect(within(wing).getAllByRole('option').map((o) => o.textContent)).toEqual(['Choose a floor', 'Floor 1', 'Floor 2'])
+    await user.selectOptions(wing, 'Floor 1')
     const area = screen.getByLabelText('Area')
     expect(within(area).getAllByRole('option').map((o) => o.textContent)).toEqual([
       'Choose an area',
@@ -130,12 +130,12 @@ describe('SCRUM-65 category and location dropdowns', () => {
     ])
   })
 
-  it('has no wing step when the locations have no wing (Others)', async () => {
+  it('has no floor step when the locations have no floor (Others)', async () => {
     const user = userEvent.setup()
     renderForm()
     await pickCategory(user, 'Others')
     await user.selectOptions(await screen.findByLabelText('Building'), 'Campus')
-    expect(screen.queryByLabelText('Wing')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Floor')).not.toBeInTheDocument()
     expect(within(screen.getByLabelText('Area')).getAllByRole('option')).toHaveLength(3)
   })
 
@@ -151,9 +151,9 @@ describe('SCRUM-65 category and location dropdowns', () => {
     await pickCategory(user, 'Hostel')
     await user.selectOptions(await screen.findByLabelText('Building'), 'Hostel A')
     await user.click(screen.getByRole('button', { name: 'Send report' }))
-    expect(await screen.findByText('Choose the full location: building, wing and area.')).toBeInTheDocument()
-    // The message sits under the first step still missing: here the wing.
-    expect(screen.getByLabelText('Wing')).toHaveAttribute('aria-invalid', 'true')
+    expect(await screen.findByText('Choose the full location: building, floor and area.')).toBeInTheDocument()
+    // The message sits under the first step still missing: here the floor.
+    expect(screen.getByLabelText('Floor')).toHaveAttribute('aria-invalid', 'true')
     expect(post).not.toHaveBeenCalled()
   })
 
@@ -232,7 +232,7 @@ describe('SCRUM-67 submit to report-submission', () => {
     expect(upload).not.toHaveBeenCalled()
     expect(post).toHaveBeenCalledWith('/reports', {
       category: 'HOSTEL',
-      location: { building: 'Hostel A', wing: 'Wing 1', area: 'Bathroom 1' },
+      location: { building: 'Hostel A', wing: 'Floor 1', area: 'Bathroom 1' },
       description: 'Tap is leaking',
     })
   })
@@ -356,13 +356,13 @@ describe('polish: clearer messages and screens', () => {
 })
 
 describe('pilot feedback and icons', () => {
-  it('explains the wing step under the wing field', async () => {
+  it('explains the floor step under the floor field', async () => {
     const user = userEvent.setup()
     renderForm()
     await pickCategory(user, 'Hostel')
     await user.selectOptions(await screen.findByLabelText('Building'), 'Hostel A')
-    expect(screen.getByLabelText('Wing')).toHaveAccessibleDescription(
-      'The part of the building the problem is in. Not sure? Choose the nearest wing.',
+    expect(screen.getByLabelText('Floor')).toHaveAccessibleDescription(
+      'The floor the problem is on. Room 101 is on Floor 1, Room 201 on Floor 2.',
     )
   })
 
