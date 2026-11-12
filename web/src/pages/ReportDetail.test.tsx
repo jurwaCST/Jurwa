@@ -26,16 +26,16 @@ const blob = vi.mocked(api.blob)
 const ID = 'r1'
 
 // Shapes as the gateway sends them (report-submission, status-lifecycle, report-history).
+// GET /reports/{id} sends the report itself, not wrapped in { report }.
 const report = {
-  report: {
-    id: ID,
-    reporterId: ME,
-    category: 'HOSTEL',
-    location: { building: 'HC', wing: 'Floor 1', area: 'Left wing bathroom' },
-    description: 'The drain is clogged.',
-    photoId: 'p1',
-    createdAt: '2026-11-12T04:20:00Z',
-  },
+  id: ID,
+  reporterId: ME,
+  category: 'HOSTEL',
+  location: { building: 'HC', wing: 'Floor 1', area: 'Left wing bathroom' },
+  description: 'The drain is clogged.',
+  photoId: 'p1',
+  status: 'OPEN',
+  createdAt: '2026-11-12T04:20:00Z',
 }
 const timeline = {
   entries: [
@@ -132,7 +132,7 @@ describe('SCRUM-143 report detail', () => {
   })
 
   it('says there is no photo when none was added', async () => {
-    stubGet({ [`/reports/${ID}`]: { report: { ...report.report, photoId: undefined } } })
+    stubGet({ [`/reports/${ID}`]: { ...report, photoId: undefined } })
     renderAt()
 
     expect(await screen.findByText('No photo added.')).toBeInTheDocument()
