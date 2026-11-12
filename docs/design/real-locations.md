@@ -19,7 +19,7 @@ From `services/category-taxonomy/domain/category.go` on 12 November 2026:
 From `docs/testing/pilot-usability-report.md`, problems 1, 2 and 5:
 
 1. **Use the names students already use:** "HA", "CR1", "LH1", not "Hostel A" or "Lecture Hall 1" (P2, P3).
-2. **Wings only where students use them.** "Wing 1 / Wing 2" and "East / West Wing" confused students (P1, P4). Hostels use the floor ("Floor 1", "Floor 2") in the wing field, as the hostel floor plans do; academic rooms have no wing.
+2. **Wings only where students use them.** "Wing 1 / Wing 2" and "East / West Wing" confused students (P1, P4). Hostels use the floor ("Floor 1", "Floor 2") in the wing field, as the hostel floor plans do. Each floor is split at the middle entrance into a left wing and a right wing, which students know, so the hallway and bathroom areas name their wing. Academic rooms have no wing.
 3. **No canteens.** Canteens cannot be reported in Jurwa. This replaces the pilot's request to name the 3 canteens (P5).
 4. **Others are places, not services.** "Wi-Fi" and "Estate" were unclear as places (P5), so they are removed. A Wi-Fi problem is reported at the place where it happens.
 
@@ -30,38 +30,49 @@ What the service accepts (`services/location-taxonomy/domain/location.go`):
 
 ## 3. The list
 
-**Hostel** (9 buildings). From the hostel floor plans (screenshots of each hostel's first floor, and HE's second floor). Rooms are numbered by floor: the first digit is the floor. There is no laundry room.
+**Hostel** (9 buildings). From the hostel floor plans (screenshots from the hostel booking system). Rooms are numbered by floor: the first digit is the floor, and every upper floor repeats floor 1 with its own first digit (confirmed by Gayley Choden). There is no laundry room.
 
-For every hostel, each floor gets one row per room and one row per restroom area:
+Every floor of every hostel has the same area choices:
 
 - Wing = the floor: `Floor 1`, `Floor 2`, ...
-- Area = the room number (`101`) or the restroom area named on the plan (`Restroom`, or `Bathroom` and `Toilet`).
+- Area = one of:
 
-| Building | Floors | Rooms on each floor | Restroom areas on each floor | Rooms per floor |
-|---|---|---|---|---|
-| HA | 3 | x01 to x13 | Restroom | 13 |
-| HB | 3 | x01 to x13 | Restroom | 13 |
-| HC | 3 | x01 to x13 (floor 1: 101 to 113) | Restroom | 13 |
-| HD | 3 | x01 to x13 | Restroom | 13 |
-| HE | 2 | Floor 2: 201 to 233. Floor 1: **waiting for** the plan | **Waiting for** the plan | 33 on floor 2 |
-| HF | 3 | x01 to x24 (floor 1: 101 to 124) | Restroom | 24 |
-| NK | 4 | x01 to x08, Kx01, Kx02 (floor 1: 101 to 108, K101, K102) | Restroom | 10 |
-| RKA | 4 | x01 to x12 (floor 1: 101 to 112) | Bathroom, Toilet | 12 |
-| RKB | 4 | x13 to x24 (floor 1: 113 to 124) | Bathroom, Toilet | 12 |
+| Area | What is reported there (examples for the description) |
+|---|---|
+| `Room 101` (one per room) | Light or switch not working, broken door or lock, window, bed, cupboard, plug point |
+| `Left wing hallway` | Hallway light, broken window, water leak, dirty or wet floor |
+| `Right wing hallway` | The same, in the right wing |
+| `Left wing bathroom` | Clogged drain or toilet, no water, leaking tap or pipe, broken shower, light |
+| `Right wing bathroom` | The same, in the right wing |
 
-"x" is the floor number, so HC floor 2 is 201 to 213 and RKB floor 3 is 313 to 324. HA, HB and HD have the same layout as HC.
+The student writes what is wrong in the description (for example "light not working", "drain clogged"); the area only says where.
 
-**To check:** only floor 1 was seen for most hostels (floor 2 for HE). Floors 2 and up are taken to repeat floor 1 with their own first digit. NK's K rooms on the upper floors (K201, K301, ...) follow the same rule, but this is not confirmed. Some floors have two restrooms on the plan (HC, HF, NK); they are one `Restroom` area, and the student says which in the description.
+| Building | Floors | Rooms on each floor | Rooms per floor |
+|---|---|---|---|
+| HA | 3 | x01 to x13 | 13 |
+| HB | 3 | x01 to x13 | 13 |
+| HC | 3 | x01 to x13 | 13 |
+| HD | 3 | x01 to x13 | 13 |
+| HE | 2 | Floor 1: 101 to 112. Floor 2: 201 to 233 | 12 and 33 |
+| HF | 3 | x01 to x24 | 24 |
+| NK | 4 | x01 to x08, Kx01, Kx02 | 10 |
+| RKA | 4 | x01 to x12 | 12 |
+| RKB | 4 | x13 to x24 | 12 |
+
+"x" is the floor number, so HC floor 2 is 201 to 213, NK floor 3 is 301 to 308, K301 and K302, and RKB floor 3 is 313 to 324. HA, HB and HD have the same layout as HC.
 
 Example rows (HC, floor 1):
 
 | Category | Building | Wing | Area |
 |---|---|---|---|
-| Hostel | HC | Floor 1 | 101 |
-| Hostel | HC | Floor 1 | 102 |
+| Hostel | HC | Floor 1 | Room 101 |
+| Hostel | HC | Floor 1 | Room 102 |
 | Hostel | HC | Floor 1 | ... |
-| Hostel | HC | Floor 1 | 113 |
-| Hostel | HC | Floor 1 | Restroom |
+| Hostel | HC | Floor 1 | Room 113 |
+| Hostel | HC | Floor 1 | Left wing hallway |
+| Hostel | HC | Floor 1 | Right wing hallway |
+| Hostel | HC | Floor 1 | Left wing bathroom |
+| Hostel | HC | Floor 1 | Right wing bathroom |
 
 **Academic Block** (20 rooms, in one building named after the category, no wing):
 
@@ -105,5 +116,5 @@ Example rows (HC, floor 1):
 | What | Who | Date |
 |---|---|---|
 | Hostel, Academic Block and Others names; no canteens; Gym | Gayley Choden | 12 November 2026 |
-| Hostel floors, room numbers and restrooms | Hostel floor plans: first floor of HC, HF, NK, RKA, RKB, second floor of HE (screenshots from Gayley Choden; HA, HB and HD are the same as HC) | 12 November 2026 |
+| Hostel floors, room numbers and restrooms | Hostel floor plans: first floor of HC, HE, HF, NK, RKA, RKB and second floor of HE (screenshots from Gayley Choden; HA, HB and HD are the same as HC). Upper floors repeat floor 1; left and right wing split at the middle entrance; hallway and bathroom areas | 12 November 2026 |
 | Categories and heads | `category-taxonomy` code | 12 November 2026 |
