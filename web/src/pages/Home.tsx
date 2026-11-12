@@ -39,7 +39,7 @@ function Route() {
       </ol>
       <p className="route-escalation">
         <strong>Nobody acting on it?</strong> Every category has a time limit. When it passes, the report is escalated
-        automatically to the next person up.
+        to the Category Head automatically.
       </p>
     </section>
   )
