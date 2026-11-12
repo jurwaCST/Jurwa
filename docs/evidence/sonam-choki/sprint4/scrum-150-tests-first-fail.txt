@@ -1,0 +1,848 @@
+--- FAIL: TestListLocationsOthersIsFlat (0.00s)
+    handler_test.go:55: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/in/grpc/handler_test.go:55
+        	Error:      	"[id:\"3da5b988-e449-425a-91e2-9b986801ae94\"  category:OTHERS  location:{building:\"Campus\"  area:\"Wi-Fi\"} id:\"5ba787d7-b197-4772-bc88-67232b77cfe4\"  category:OTHERS  location:{building:\"Campus\"  area:\"Estate\"} id:\"5ff22d8f-fd94-45c5-9aca-b8fa900ab827\"  category:OTHERS  location:{building:\"Campus\"  area:\"Canteen\"}]" should have 7 item(s), but has 3
+        	Test:       	TestListLocationsOthersIsFlat
+        	Messages:   	the switched-off sample rows (Wi-Fi, Estate, Canteen, Old Workshop) are left out
+--- FAIL: TestValidateLocation (0.00s)
+    --- FAIL: TestValidateLocation/real_building,_floor_and_room (0.00s)
+        handler_test.go:98: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/in/grpc/handler_test.go:98
+            	Error:      	Not equal: 
+            	            	expected: true
+            	            	actual  : false
+            	Test:       	TestValidateLocation/real_building,_floor_and_room
+        handler_test.go:99: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/in/grpc/handler_test.go:99
+            	Error:      	Not equal: 
+            	            	expected: ""
+            	            	actual  : "unknown building"
+            	            	
+            	            	Diff:
+            	            	--- Expected
+            	            	+++ Actual
+            	            	@@ -1 +1 @@
+            	            	-
+            	            	+unknown building
+            	Test:       	TestValidateLocation/real_building,_floor_and_room
+    --- FAIL: TestValidateLocation/campus-wide_area (0.00s)
+        handler_test.go:98: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/in/grpc/handler_test.go:98
+            	Error:      	Not equal: 
+            	            	expected: true
+            	            	actual  : false
+            	Test:       	TestValidateLocation/campus-wide_area
+        handler_test.go:99: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/in/grpc/handler_test.go:99
+            	Error:      	Not equal: 
+            	            	expected: ""
+            	            	actual  : "unknown area for this building"
+            	            	
+            	            	Diff:
+            	            	--- Expected
+            	            	+++ Actual
+            	            	@@ -1 +1 @@
+            	            	-
+            	            	+unknown area for this building
+            	Test:       	TestValidateLocation/campus-wide_area
+    --- FAIL: TestValidateLocation/floor_the_building_does_not_have (0.00s)
+        handler_test.go:99: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/in/grpc/handler_test.go:99
+            	Error:      	Not equal: 
+            	            	expected: "unknown wing for this building"
+            	            	actual  : "unknown building"
+            	            	
+            	            	Diff:
+            	            	--- Expected
+            	            	+++ Actual
+            	            	@@ -1 +1 @@
+            	            	-unknown wing for this building
+            	            	+unknown building
+            	Test:       	TestValidateLocation/floor_the_building_does_not_have
+    --- FAIL: TestValidateLocation/unknown_area (0.00s)
+        handler_test.go:99: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/in/grpc/handler_test.go:99
+            	Error:      	Not equal: 
+            	            	expected: "unknown area for this building"
+            	            	actual  : "unknown building"
+            	            	
+            	            	Diff:
+            	            	--- Expected
+            	            	+++ Actual
+            	            	@@ -1 +1 @@
+            	            	-unknown area for this building
+            	            	+unknown building
+            	Test:       	TestValidateLocation/unknown_area
+FAIL
+FAIL	github.com/jurwaCST/Jurwa/services/location-taxonomy/adapters/in/grpc	0.735s
+?   	github.com/jurwaCST/Jurwa/services/location-taxonomy/adapters/out	[no test files]
+--- FAIL: TestRealLocationCounts (0.00s)
+    real_locations_test.go:61: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:61
+        	Error:      	"[{668753c7-2008-46e2-9691-fdd4f9d58106 HOSTEL {Hostel A Wing 1 Bathroom 1} true} {8eb717f8-f5f6-489d-a4cd-361c0c034e51 HOSTEL {Hostel A Wing 1 Room 101} true} {69062735-57e0-40d5-9d9b-bef089d902cb HOSTEL {Hostel A Wing 2 Common Room} true} {0803a9df-c7da-4366-983d-30b5eb834c11 HOSTEL {Hostel B Wing 2 Bathroom 2} true} {7e21adbe-8aae-4704-a99d-c928b2235461 HOSTEL {Hostel B Ground Floor Laundry} true}]" should have 525 item(s), but has 5
+        	Test:       	TestRealLocationCounts
+        	Messages:   	9 hostels: rooms plus 4 hallway and bathroom areas per floor
+    real_locations_test.go:62: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:62
+        	Error:      	"[{1bf3061b-a6a4-41c2-9880-9b810062d4e2 ACADEMIC_BLOCK {Academic Block 1 East Wing Lecture Hall 1} true} {e1191761-a50d-4016-ae5b-10e4da7187bd ACADEMIC_BLOCK {Academic Block 1 West Wing Lab 1} true} {35c4a8b4-55fb-4403-b790-8233927f2723 ACADEMIC_BLOCK {Academic Block 2 Ground Floor Lab 3} true} {e8c1a92b-182f-49eb-986c-7bcd78ed48bb ACADEMIC_BLOCK {Academic Block 2 First Floor Classroom 204} true}]" should have 20 item(s), but has 4
+        	Test:       	TestRealLocationCounts
+        	Messages:   	CR1-5, IT1-5, Lab1-5, LH1-5
+    real_locations_test.go:63: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:63
+        	Error:      	"[{3da5b988-e449-425a-91e2-9b986801ae94 OTHERS {Campus  Wi-Fi} true} {5ba787d7-b197-4772-bc88-67232b77cfe4 OTHERS {Campus  Estate} true} {5ff22d8f-fd94-45c5-9aca-b8fa900ab827 OTHERS {Campus  Canteen} true}]" should have 7 item(s), but has 3
+        	Test:       	TestRealLocationCounts
+        	Messages:   	7 campus places
+--- FAIL: TestHostelBuildingsAndFloors (0.00s)
+    real_locations_test.go:76: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:76
+        	Error:      	"map[Hostel A:map[Wing 1:true Wing 2:true] Hostel B:map[Ground Floor:true Wing 2:true]]" should have 9 item(s), but has 2
+        	Test:       	TestHostelBuildingsAndFloors
+        	Messages:   	exactly the 9 hostels
+    real_locations_test.go:78: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:78
+        	Error:      	map[string]map[string]bool{"Hostel A":map[string]bool{"Wing 1":true, "Wing 2":true}, "Hostel B":map[string]bool{"Ground Floor":true, "Wing 2":true}} does not contain "HB"
+        	Test:       	TestHostelBuildingsAndFloors
+--- FAIL: TestHostelRoomsPerFloor (0.00s)
+    --- FAIL: TestHostelRoomsPerFloor/HA_Floor_1 (0.00s)
+        real_locations_test.go:104: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:104
+            	Error:      	Not equal: 
+            	            	expected: []string{"Left wing bathroom", "Left wing hallway", "Right wing bathroom", "Right wing hallway", "Room 101", "Room 102", "Room 103", "Room 104", "Room 105", "Room 106", "Room 107", "Room 108", "Room 109", "Room 110", "Room 111", "Room 112", "Room 113"}
+            	            	actual  : []string(nil)
+            	            	
+            	            	Diff:
+            	            	--- Expected
+            	            	+++ Actual
+            	            	@@ -1,20 +1,2 @@
+            	            	-([]string) (len=17) {
+            	            	- (string) (len=18) "Left wing bathroom",
+            	            	- (string) (len=17) "Left wing hallway",
+            	            	- (string) (len=19) "Right wing bathroom",
+            	            	- (string) (len=18) "Right wing hallway",
+            	            	- (string) (len=8) "Room 101",
+            	            	- (string) (len=8) "Room 102",
+            	            	- (string) (len=8) "Room 103",
+            	            	- (string) (len=8) "Room 104",
+            	            	- (string) (len=8) "Room 105",
+            	            	- (string) (len=8) "Room 106",
+            	            	- (string) (len=8) "Room 107",
+            	            	- (string) (len=8) "Room 108",
+            	            	- (string) (len=8) "Room 109",
+            	            	- (string) (len=8) "Room 110",
+            	            	- (string) (len=8) "Room 111",
+            	            	- (string) (len=8) "Room 112",
+            	            	- (string) (len=8) "Room 113"
+            	            	-}
+            	            	+([]string) <nil>
+            	            	 
+            	Test:       	TestHostelRoomsPerFloor/HA_Floor_1
+    --- FAIL: TestHostelRoomsPerFloor/HC_Floor_2 (0.00s)
+        real_locations_test.go:104: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:104
+            	Error:      	Not equal: 
+            	            	expected: []string{"Left wing bathroom", "Left wing hallway", "Right wing bathroom", "Right wing hallway", "Room 201", "Room 202", "Room 203", "Room 204", "Room 205", "Room 206", "Room 207", "Room 208", "Room 209", "Room 210", "Room 211", "Room 212", "Room 213"}
+            	            	actual  : []string(nil)
+            	            	
+            	            	Diff:
+            	            	--- Expected
+            	            	+++ Actual
+            	            	@@ -1,20 +1,2 @@
+            	            	-([]string) (len=17) {
+            	            	- (string) (len=18) "Left wing bathroom",
+            	            	- (string) (len=17) "Left wing hallway",
+            	            	- (string) (len=19) "Right wing bathroom",
+            	            	- (string) (len=18) "Right wing hallway",
+            	            	- (string) (len=8) "Room 201",
+            	            	- (string) (len=8) "Room 202",
+            	            	- (string) (len=8) "Room 203",
+            	            	- (string) (len=8) "Room 204",
+            	            	- (string) (len=8) "Room 205",
+            	            	- (string) (len=8) "Room 206",
+            	            	- (string) (len=8) "Room 207",
+            	            	- (string) (len=8) "Room 208",
+            	            	- (string) (len=8) "Room 209",
+            	            	- (string) (len=8) "Room 210",
+            	            	- (string) (len=8) "Room 211",
+            	            	- (string) (len=8) "Room 212",
+            	            	- (string) (len=8) "Room 213"
+            	            	-}
+            	            	+([]string) <nil>
+            	            	 
+            	Test:       	TestHostelRoomsPerFloor/HC_Floor_2
+    --- FAIL: TestHostelRoomsPerFloor/HD_Floor_3 (0.00s)
+        real_locations_test.go:104: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:104
+            	Error:      	Not equal: 
+            	            	expected: []string{"Left wing bathroom", "Left wing hallway", "Right wing bathroom", "Right wing hallway", "Room 301", "Room 302", "Room 303", "Room 304", "Room 305", "Room 306", "Room 307", "Room 308", "Room 309", "Room 310", "Room 311", "Room 312", "Room 313"}
+            	            	actual  : []string(nil)
+            	            	
+            	            	Diff:
+            	            	--- Expected
+            	            	+++ Actual
+            	            	@@ -1,20 +1,2 @@
+            	            	-([]string) (len=17) {
+            	            	- (string) (len=18) "Left wing bathroom",
+            	            	- (string) (len=17) "Left wing hallway",
+            	            	- (string) (len=19) "Right wing bathroom",
+            	            	- (string) (len=18) "Right wing hallway",
+            	            	- (string) (len=8) "Room 301",
+            	            	- (string) (len=8) "Room 302",
+            	            	- (string) (len=8) "Room 303",
+            	            	- (string) (len=8) "Room 304",
+            	            	- (string) (len=8) "Room 305",
+            	            	- (string) (len=8) "Room 306",
+            	            	- (string) (len=8) "Room 307",
+            	            	- (string) (len=8) "Room 308",
+            	            	- (string) (len=8) "Room 309",
+            	            	- (string) (len=8) "Room 310",
+            	            	- (string) (len=8) "Room 311",
+            	            	- (string) (len=8) "Room 312",
+            	            	- (string) (len=8) "Room 313"
+            	            	-}
+            	            	+([]string) <nil>
+            	            	 
+            	Test:       	TestHostelRoomsPerFloor/HD_Floor_3
+    --- FAIL: TestHostelRoomsPerFloor/HE_Floor_1 (0.00s)
+        real_locations_test.go:104: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:104
+            	Error:      	Not equal: 
+            	            	expected: []string{"Left wing bathroom", "Left wing hallway", "Right wing bathroom", "Right wing hallway", "Room 101", "Room 102", "Room 103", "Room 104", "Room 105", "Room 106", "Room 107", "Room 108", "Room 109", "Room 110", "Room 111", "Room 112"}
+            	            	actual  : []string(nil)
+            	            	
+            	            	Diff:
+            	            	--- Expected
+            	            	+++ Actual
+            	            	@@ -1,19 +1,2 @@
+            	            	-([]string) (len=16) {
+            	            	- (string) (len=18) "Left wing bathroom",
+            	            	- (string) (len=17) "Left wing hallway",
+            	            	- (string) (len=19) "Right wing bathroom",
+            	            	- (string) (len=18) "Right wing hallway",
+            	            	- (string) (len=8) "Room 101",
+            	            	- (string) (len=8) "Room 102",
+            	            	- (string) (len=8) "Room 103",
+            	            	- (string) (len=8) "Room 104",
+            	            	- (string) (len=8) "Room 105",
+            	            	- (string) (len=8) "Room 106",
+            	            	- (string) (len=8) "Room 107",
+            	            	- (string) (len=8) "Room 108",
+            	            	- (string) (len=8) "Room 109",
+            	            	- (string) (len=8) "Room 110",
+            	            	- (string) (len=8) "Room 111",
+            	            	- (string) (len=8) "Room 112"
+            	            	-}
+            	            	+([]string) <nil>
+            	            	 
+            	Test:       	TestHostelRoomsPerFloor/HE_Floor_1
+    --- FAIL: TestHostelRoomsPerFloor/HE_Floor_2 (0.00s)
+        real_locations_test.go:104: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:104
+            	Error:      	Not equal: 
+            	            	expected: []string{"Left wing bathroom", "Left wing hallway", "Right wing bathroom", "Right wing hallway", "Room 201", "Room 202", "Room 203", "Room 204", "Room 205", "Room 206", "Room 207", "Room 208", "Room 209", "Room 210", "Room 211", "Room 212", "Room 213", "Room 214", "Room 215", "Room 216", "Room 217", "Room 218", "Room 219", "Room 220", "Room 221", "Room 222", "Room 223", "Room 224", "Room 225", "Room 226", "Room 227", "Room 228", "Room 229", "Room 230", "Room 231", "Room 232", "Room 233"}
+            	            	actual  : []string(nil)
+            	            	
+            	            	Diff:
+            	            	--- Expected
+            	            	+++ Actual
+            	            	@@ -1,40 +1,2 @@
+            	            	-([]string) (len=37) {
+            	            	- (string) (len=18) "Left wing bathroom",
+            	            	- (string) (len=17) "Left wing hallway",
+            	            	- (string) (len=19) "Right wing bathroom",
+            	            	- (string) (len=18) "Right wing hallway",
+            	            	- (string) (len=8) "Room 201",
+            	            	- (string) (len=8) "Room 202",
+            	            	- (string) (len=8) "Room 203",
+            	            	- (string) (len=8) "Room 204",
+            	            	- (string) (len=8) "Room 205",
+            	            	- (string) (len=8) "Room 206",
+            	            	- (string) (len=8) "Room 207",
+            	            	- (string) (len=8) "Room 208",
+            	            	- (string) (len=8) "Room 209",
+            	            	- (string) (len=8) "Room 210",
+            	            	- (string) (len=8) "Room 211",
+            	            	- (string) (len=8) "Room 212",
+            	            	- (string) (len=8) "Room 213",
+            	            	- (string) (len=8) "Room 214",
+            	            	- (string) (len=8) "Room 215",
+            	            	- (string) (len=8) "Room 216",
+            	            	- (string) (len=8) "Room 217",
+            	            	- (string) (len=8) "Room 218",
+            	            	- (string) (len=8) "Room 219",
+            	            	- (string) (len=8) "Room 220",
+            	            	- (string) (len=8) "Room 221",
+            	            	- (string) (len=8) "Room 222",
+            	            	- (string) (len=8) "Room 223",
+            	            	- (string) (len=8) "Room 224",
+            	            	- (string) (len=8) "Room 225",
+            	            	- (string) (len=8) "Room 226",
+            	            	- (string) (len=8) "Room 227",
+            	            	- (string) (len=8) "Room 228",
+            	            	- (string) (len=8) "Room 229",
+            	            	- (string) (len=8) "Room 230",
+            	            	- (string) (len=8) "Room 231",
+            	            	- (string) (len=8) "Room 232",
+            	            	- (string) (len=8) "Room 233"
+            	            	-}
+            	            	+([]string) <nil>
+            	            	 
+            	Test:       	TestHostelRoomsPerFloor/HE_Floor_2
+    --- FAIL: TestHostelRoomsPerFloor/HF_Floor_3 (0.00s)
+        real_locations_test.go:104: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:104
+            	Error:      	Not equal: 
+            	            	expected: []string{"Left wing bathroom", "Left wing hallway", "Right wing bathroom", "Right wing hallway", "Room 301", "Room 302", "Room 303", "Room 304", "Room 305", "Room 306", "Room 307", "Room 308", "Room 309", "Room 310", "Room 311", "Room 312", "Room 313", "Room 314", "Room 315", "Room 316", "Room 317", "Room 318", "Room 319", "Room 320", "Room 321", "Room 322", "Room 323", "Room 324"}
+            	            	actual  : []string(nil)
+            	            	
+            	            	Diff:
+            	            	--- Expected
+            	            	+++ Actual
+            	            	@@ -1,31 +1,2 @@
+            	            	-([]string) (len=28) {
+            	            	- (string) (len=18) "Left wing bathroom",
+            	            	- (string) (len=17) "Left wing hallway",
+            	            	- (string) (len=19) "Right wing bathroom",
+            	            	- (string) (len=18) "Right wing hallway",
+            	            	- (string) (len=8) "Room 301",
+            	            	- (string) (len=8) "Room 302",
+            	            	- (string) (len=8) "Room 303",
+            	            	- (string) (len=8) "Room 304",
+            	            	- (string) (len=8) "Room 305",
+            	            	- (string) (len=8) "Room 306",
+            	            	- (string) (len=8) "Room 307",
+            	            	- (string) (len=8) "Room 308",
+            	            	- (string) (len=8) "Room 309",
+            	            	- (string) (len=8) "Room 310",
+            	            	- (string) (len=8) "Room 311",
+            	            	- (string) (len=8) "Room 312",
+            	            	- (string) (len=8) "Room 313",
+            	            	- (string) (len=8) "Room 314",
+            	            	- (string) (len=8) "Room 315",
+            	            	- (string) (len=8) "Room 316",
+            	            	- (string) (len=8) "Room 317",
+            	            	- (string) (len=8) "Room 318",
+            	            	- (string) (len=8) "Room 319",
+            	            	- (string) (len=8) "Room 320",
+            	            	- (string) (len=8) "Room 321",
+            	            	- (string) (len=8) "Room 322",
+            	            	- (string) (len=8) "Room 323",
+            	            	- (string) (len=8) "Room 324"
+            	            	-}
+            	            	+([]string) <nil>
+            	            	 
+            	Test:       	TestHostelRoomsPerFloor/HF_Floor_3
+    --- FAIL: TestHostelRoomsPerFloor/NK_Floor_3 (0.00s)
+        real_locations_test.go:104: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:104
+            	Error:      	Not equal: 
+            	            	expected: []string{"Left wing bathroom", "Left wing hallway", "Right wing bathroom", "Right wing hallway", "Room 301", "Room 302", "Room 303", "Room 304", "Room 305", "Room 306", "Room 307", "Room 308", "Room K301", "Room K302"}
+            	            	actual  : []string(nil)
+            	            	
+            	            	Diff:
+            	            	--- Expected
+            	            	+++ Actual
+            	            	@@ -1,17 +1,2 @@
+            	            	-([]string) (len=14) {
+            	            	- (string) (len=18) "Left wing bathroom",
+            	            	- (string) (len=17) "Left wing hallway",
+            	            	- (string) (len=19) "Right wing bathroom",
+            	            	- (string) (len=18) "Right wing hallway",
+            	            	- (string) (len=8) "Room 301",
+            	            	- (string) (len=8) "Room 302",
+            	            	- (string) (len=8) "Room 303",
+            	            	- (string) (len=8) "Room 304",
+            	            	- (string) (len=8) "Room 305",
+            	            	- (string) (len=8) "Room 306",
+            	            	- (string) (len=8) "Room 307",
+            	            	- (string) (len=8) "Room 308",
+            	            	- (string) (len=9) "Room K301",
+            	            	- (string) (len=9) "Room K302"
+            	            	-}
+            	            	+([]string) <nil>
+            	            	 
+            	Test:       	TestHostelRoomsPerFloor/NK_Floor_3
+    --- FAIL: TestHostelRoomsPerFloor/RKA_Floor_1 (0.00s)
+        real_locations_test.go:104: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:104
+            	Error:      	Not equal: 
+            	            	expected: []string{"Left wing bathroom", "Left wing hallway", "Right wing bathroom", "Right wing hallway", "Room 101", "Room 102", "Room 103", "Room 104", "Room 105", "Room 106", "Room 107", "Room 108", "Room 109", "Room 110", "Room 111", "Room 112"}
+            	            	actual  : []string(nil)
+            	            	
+            	            	Diff:
+            	            	--- Expected
+            	            	+++ Actual
+            	            	@@ -1,19 +1,2 @@
+            	            	-([]string) (len=16) {
+            	            	- (string) (len=18) "Left wing bathroom",
+            	            	- (string) (len=17) "Left wing hallway",
+            	            	- (string) (len=19) "Right wing bathroom",
+            	            	- (string) (len=18) "Right wing hallway",
+            	            	- (string) (len=8) "Room 101",
+            	            	- (string) (len=8) "Room 102",
+            	            	- (string) (len=8) "Room 103",
+            	            	- (string) (len=8) "Room 104",
+            	            	- (string) (len=8) "Room 105",
+            	            	- (string) (len=8) "Room 106",
+            	            	- (string) (len=8) "Room 107",
+            	            	- (string) (len=8) "Room 108",
+            	            	- (string) (len=8) "Room 109",
+            	            	- (string) (len=8) "Room 110",
+            	            	- (string) (len=8) "Room 111",
+            	            	- (string) (len=8) "Room 112"
+            	            	-}
+            	            	+([]string) <nil>
+            	            	 
+            	Test:       	TestHostelRoomsPerFloor/RKA_Floor_1
+    --- FAIL: TestHostelRoomsPerFloor/RKB_Floor_3 (0.00s)
+        real_locations_test.go:104: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:104
+            	Error:      	Not equal: 
+            	            	expected: []string{"Left wing bathroom", "Left wing hallway", "Right wing bathroom", "Right wing hallway", "Room 313", "Room 314", "Room 315", "Room 316", "Room 317", "Room 318", "Room 319", "Room 320", "Room 321", "Room 322", "Room 323", "Room 324"}
+            	            	actual  : []string(nil)
+            	            	
+            	            	Diff:
+            	            	--- Expected
+            	            	+++ Actual
+            	            	@@ -1,19 +1,2 @@
+            	            	-([]string) (len=16) {
+            	            	- (string) (len=18) "Left wing bathroom",
+            	            	- (string) (len=17) "Left wing hallway",
+            	            	- (string) (len=19) "Right wing bathroom",
+            	            	- (string) (len=18) "Right wing hallway",
+            	            	- (string) (len=8) "Room 313",
+            	            	- (string) (len=8) "Room 314",
+            	            	- (string) (len=8) "Room 315",
+            	            	- (string) (len=8) "Room 316",
+            	            	- (string) (len=8) "Room 317",
+            	            	- (string) (len=8) "Room 318",
+            	            	- (string) (len=8) "Room 319",
+            	            	- (string) (len=8) "Room 320",
+            	            	- (string) (len=8) "Room 321",
+            	            	- (string) (len=8) "Room 322",
+            	            	- (string) (len=8) "Room 323",
+            	            	- (string) (len=8) "Room 324"
+            	            	-}
+            	            	+([]string) <nil>
+            	            	 
+            	Test:       	TestHostelRoomsPerFloor/RKB_Floor_3
+    --- FAIL: TestHostelRoomsPerFloor/RKB_Floor_4 (0.00s)
+        real_locations_test.go:104: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:104
+            	Error:      	Not equal: 
+            	            	expected: []string{"Left wing bathroom", "Left wing hallway", "Right wing bathroom", "Right wing hallway", "Room 413", "Room 414", "Room 415", "Room 416", "Room 417", "Room 418", "Room 419", "Room 420", "Room 421", "Room 422", "Room 423", "Room 424"}
+            	            	actual  : []string(nil)
+            	            	
+            	            	Diff:
+            	            	--- Expected
+            	            	+++ Actual
+            	            	@@ -1,19 +1,2 @@
+            	            	-([]string) (len=16) {
+            	            	- (string) (len=18) "Left wing bathroom",
+            	            	- (string) (len=17) "Left wing hallway",
+            	            	- (string) (len=19) "Right wing bathroom",
+            	            	- (string) (len=18) "Right wing hallway",
+            	            	- (string) (len=8) "Room 413",
+            	            	- (string) (len=8) "Room 414",
+            	            	- (string) (len=8) "Room 415",
+            	            	- (string) (len=8) "Room 416",
+            	            	- (string) (len=8) "Room 417",
+            	            	- (string) (len=8) "Room 418",
+            	            	- (string) (len=8) "Room 419",
+            	            	- (string) (len=8) "Room 420",
+            	            	- (string) (len=8) "Room 421",
+            	            	- (string) (len=8) "Room 422",
+            	            	- (string) (len=8) "Room 423",
+            	            	- (string) (len=8) "Room 424"
+            	            	-}
+            	            	+([]string) <nil>
+            	            	 
+            	Test:       	TestHostelRoomsPerFloor/RKB_Floor_4
+--- FAIL: TestAcademicBlockIsOneBuildingWithoutWings (0.00s)
+    real_locations_test.go:112: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:112
+        	Error:      	Not equal: 
+        	            	expected: "Academic Block"
+        	            	actual  : "Academic Block 1"
+        	            	
+        	            	Diff:
+        	            	--- Expected
+        	            	+++ Actual
+        	            	@@ -1 +1 @@
+        	            	-Academic Block
+        	            	+Academic Block 1
+        	Test:       	TestAcademicBlockIsOneBuildingWithoutWings
+    real_locations_test.go:113: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:113
+        	Error:      	Should be empty, but was East Wing
+        	Test:       	TestAcademicBlockIsOneBuildingWithoutWings
+        	Messages:   	academic rooms have no wing
+    real_locations_test.go:112: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:112
+        	Error:      	Not equal: 
+        	            	expected: "Academic Block"
+        	            	actual  : "Academic Block 1"
+        	            	
+        	            	Diff:
+        	            	--- Expected
+        	            	+++ Actual
+        	            	@@ -1 +1 @@
+        	            	-Academic Block
+        	            	+Academic Block 1
+        	Test:       	TestAcademicBlockIsOneBuildingWithoutWings
+    real_locations_test.go:113: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:113
+        	Error:      	Should be empty, but was West Wing
+        	Test:       	TestAcademicBlockIsOneBuildingWithoutWings
+        	Messages:   	academic rooms have no wing
+    real_locations_test.go:112: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:112
+        	Error:      	Not equal: 
+        	            	expected: "Academic Block"
+        	            	actual  : "Academic Block 2"
+        	            	
+        	            	Diff:
+        	            	--- Expected
+        	            	+++ Actual
+        	            	@@ -1 +1 @@
+        	            	-Academic Block
+        	            	+Academic Block 2
+        	Test:       	TestAcademicBlockIsOneBuildingWithoutWings
+    real_locations_test.go:113: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:113
+        	Error:      	Should be empty, but was Ground Floor
+        	Test:       	TestAcademicBlockIsOneBuildingWithoutWings
+        	Messages:   	academic rooms have no wing
+    real_locations_test.go:112: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:112
+        	Error:      	Not equal: 
+        	            	expected: "Academic Block"
+        	            	actual  : "Academic Block 2"
+        	            	
+        	            	Diff:
+        	            	--- Expected
+        	            	+++ Actual
+        	            	@@ -1 +1 @@
+        	            	-Academic Block
+        	            	+Academic Block 2
+        	Test:       	TestAcademicBlockIsOneBuildingWithoutWings
+    real_locations_test.go:113: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:113
+        	Error:      	Should be empty, but was First Floor
+        	Test:       	TestAcademicBlockIsOneBuildingWithoutWings
+        	Messages:   	academic rooms have no wing
+    real_locations_test.go:122: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:122
+        	Error:      	elements differ
+        	            	
+        	            	extra elements in list A:
+        	            	([]interface {}) (len=20) {
+        	            	 (string) (len=3) "CR1",
+        	            	 (string) (len=3) "CR2",
+        	            	 (string) (len=3) "CR3",
+        	            	 (string) (len=3) "CR4",
+        	            	 (string) (len=3) "CR5",
+        	            	 (string) (len=3) "IT1",
+        	            	 (string) (len=3) "IT2",
+        	            	 (string) (len=3) "IT3",
+        	            	 (string) (len=3) "IT4",
+        	            	 (string) (len=3) "IT5",
+        	            	 (string) (len=4) "Lab1",
+        	            	 (string) (len=4) "Lab2",
+        	            	 (string) (len=4) "Lab3",
+        	            	 (string) (len=4) "Lab4",
+        	            	 (string) (len=4) "Lab5",
+        	            	 (string) (len=3) "LH1",
+        	            	 (string) (len=3) "LH2",
+        	            	 (string) (len=3) "LH3",
+        	            	 (string) (len=3) "LH4",
+        	            	 (string) (len=3) "LH5"
+        	            	}
+        	            	
+        	            	
+        	            	extra elements in list B:
+        	            	([]interface {}) (len=4) {
+        	            	 (string) (len=14) "Lecture Hall 1",
+        	            	 (string) (len=5) "Lab 1",
+        	            	 (string) (len=5) "Lab 3",
+        	            	 (string) (len=13) "Classroom 204"
+        	            	}
+        	            	
+        	            	
+        	            	listA:
+        	            	([]string) (len=20) {
+        	            	 (string) (len=3) "CR1",
+        	            	 (string) (len=3) "CR2",
+        	            	 (string) (len=3) "CR3",
+        	            	 (string) (len=3) "CR4",
+        	            	 (string) (len=3) "CR5",
+        	            	 (string) (len=3) "IT1",
+        	            	 (string) (len=3) "IT2",
+        	            	 (string) (len=3) "IT3",
+        	            	 (string) (len=3) "IT4",
+        	            	 (string) (len=3) "IT5",
+        	            	 (string) (len=4) "Lab1",
+        	            	 (string) (len=4) "Lab2",
+        	            	 (string) (len=4) "Lab3",
+        	            	 (string) (len=4) "Lab4",
+        	            	 (string) (len=4) "Lab5",
+        	            	 (string) (len=3) "LH1",
+        	            	 (string) (len=3) "LH2",
+        	            	 (string) (len=3) "LH3",
+        	            	 (string) (len=3) "LH4",
+        	            	 (string) (len=3) "LH5"
+        	            	}
+        	            	
+        	            	
+        	            	listB:
+        	            	([]string) (len=4) {
+        	            	 (string) (len=14) "Lecture Hall 1",
+        	            	 (string) (len=5) "Lab 1",
+        	            	 (string) (len=5) "Lab 3",
+        	            	 (string) (len=13) "Classroom 204"
+        	            	}
+        	Test:       	TestAcademicBlockIsOneBuildingWithoutWings
+--- FAIL: TestOthersAreTheSevenCampusPlaces (0.00s)
+    real_locations_test.go:132: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:132
+        	Error:      	elements differ
+        	            	
+        	            	extra elements in list A:
+        	            	([]interface {}) (len=7) {
+        	            	 (string) (len=7) "Library",
+        	            	 (string) (len=4) "Mess",
+        	            	 (string) (len=15) "Football ground",
+        	            	 (string) (len=25) "Basketball court (indoor)",
+        	            	 (string) (len=26) "Basketball court (outdoor)",
+        	            	 (string) (len=16) "Volleyball court",
+        	            	 (string) (len=3) "Gym"
+        	            	}
+        	            	
+        	            	
+        	            	extra elements in list B:
+        	            	([]interface {}) (len=3) {
+        	            	 (string) (len=5) "Wi-Fi",
+        	            	 (string) (len=6) "Estate",
+        	            	 (string) (len=7) "Canteen"
+        	            	}
+        	            	
+        	            	
+        	            	listA:
+        	            	([]string) (len=7) {
+        	            	 (string) (len=7) "Library",
+        	            	 (string) (len=4) "Mess",
+        	            	 (string) (len=15) "Football ground",
+        	            	 (string) (len=25) "Basketball court (indoor)",
+        	            	 (string) (len=26) "Basketball court (outdoor)",
+        	            	 (string) (len=16) "Volleyball court",
+        	            	 (string) (len=3) "Gym"
+        	            	}
+        	            	
+        	            	
+        	            	listB:
+        	            	([]string) (len=3) {
+        	            	 (string) (len=5) "Wi-Fi",
+        	            	 (string) (len=6) "Estate",
+        	            	 (string) (len=7) "Canteen"
+        	            	}
+        	Test:       	TestOthersAreTheSevenCampusPlaces
+        	Messages:   	no canteens, Wi-Fi or Estate (pilot problems 2 and 5)
+--- FAIL: TestOldSampleRowsAreKeptSwitchedOff (0.00s)
+    real_locations_test.go:164: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:164
+        	Error:      	Should be false
+        	Test:       	TestOldSampleRowsAreKeptSwitchedOff
+        	Messages:   	old row 8eb717f8-f5f6-489d-a4cd-361c0c034e51 is switched off
+    real_locations_test.go:164: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:164
+        	Error:      	Should be false
+        	Test:       	TestOldSampleRowsAreKeptSwitchedOff
+        	Messages:   	old row 0803a9df-c7da-4366-983d-30b5eb834c11 is switched off
+    real_locations_test.go:164: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:164
+        	Error:      	Should be false
+        	Test:       	TestOldSampleRowsAreKeptSwitchedOff
+        	Messages:   	old row 7e21adbe-8aae-4704-a99d-c928b2235461 is switched off
+    real_locations_test.go:164: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:164
+        	Error:      	Should be false
+        	Test:       	TestOldSampleRowsAreKeptSwitchedOff
+        	Messages:   	old row 1bf3061b-a6a4-41c2-9880-9b810062d4e2 is switched off
+    real_locations_test.go:164: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:164
+        	Error:      	Should be false
+        	Test:       	TestOldSampleRowsAreKeptSwitchedOff
+        	Messages:   	old row e8c1a92b-182f-49eb-986c-7bcd78ed48bb is switched off
+    real_locations_test.go:164: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:164
+        	Error:      	Should be false
+        	Test:       	TestOldSampleRowsAreKeptSwitchedOff
+        	Messages:   	old row 3da5b988-e449-425a-91e2-9b986801ae94 is switched off
+    real_locations_test.go:164: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:164
+        	Error:      	Should be false
+        	Test:       	TestOldSampleRowsAreKeptSwitchedOff
+        	Messages:   	old row 5ba787d7-b197-4772-bc88-67232b77cfe4 is switched off
+    real_locations_test.go:164: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:164
+        	Error:      	Should be false
+        	Test:       	TestOldSampleRowsAreKeptSwitchedOff
+        	Messages:   	old row 668753c7-2008-46e2-9691-fdd4f9d58106 is switched off
+    real_locations_test.go:164: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:164
+        	Error:      	Should be false
+        	Test:       	TestOldSampleRowsAreKeptSwitchedOff
+        	Messages:   	old row 69062735-57e0-40d5-9d9b-bef089d902cb is switched off
+    real_locations_test.go:164: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:164
+        	Error:      	Should be false
+        	Test:       	TestOldSampleRowsAreKeptSwitchedOff
+        	Messages:   	old row e1191761-a50d-4016-ae5b-10e4da7187bd is switched off
+    real_locations_test.go:164: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:164
+        	Error:      	Should be false
+        	Test:       	TestOldSampleRowsAreKeptSwitchedOff
+        	Messages:   	old row 35c4a8b4-55fb-4403-b790-8233927f2723 is switched off
+    real_locations_test.go:164: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/adapters/out/memory/real_locations_test.go:164
+        	Error:      	Should be false
+        	Test:       	TestOldSampleRowsAreKeptSwitchedOff
+        	Messages:   	old row 5ff22d8f-fd94-45c5-9aca-b8fa900ab827 is switched off
+FAIL
+FAIL	github.com/jurwaCST/Jurwa/services/location-taxonomy/adapters/out/memory	2.198s
+--- FAIL: TestListLocationsReturnsOnlyActiveRowsOfThatCategory (0.00s)
+    --- FAIL: TestListLocationsReturnsOnlyActiveRowsOfThatCategory/hostel (0.00s)
+        service_test.go:41: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/application/service_test.go:41
+            	Error:      	"[{668753c7-2008-46e2-9691-fdd4f9d58106 HOSTEL {Hostel A Wing 1 Bathroom 1} true} {8eb717f8-f5f6-489d-a4cd-361c0c034e51 HOSTEL {Hostel A Wing 1 Room 101} true} {69062735-57e0-40d5-9d9b-bef089d902cb HOSTEL {Hostel A Wing 2 Common Room} true} {0803a9df-c7da-4366-983d-30b5eb834c11 HOSTEL {Hostel B Wing 2 Bathroom 2} true} {7e21adbe-8aae-4704-a99d-c928b2235461 HOSTEL {Hostel B Ground Floor Laundry} true}]" should have 525 item(s), but has 5
+            	Test:       	TestListLocationsReturnsOnlyActiveRowsOfThatCategory/hostel
+    --- FAIL: TestListLocationsReturnsOnlyActiveRowsOfThatCategory/academic_block (0.00s)
+        service_test.go:41: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/application/service_test.go:41
+            	Error:      	"[{1bf3061b-a6a4-41c2-9880-9b810062d4e2 ACADEMIC_BLOCK {Academic Block 1 East Wing Lecture Hall 1} true} {e1191761-a50d-4016-ae5b-10e4da7187bd ACADEMIC_BLOCK {Academic Block 1 West Wing Lab 1} true} {35c4a8b4-55fb-4403-b790-8233927f2723 ACADEMIC_BLOCK {Academic Block 2 Ground Floor Lab 3} true} {e8c1a92b-182f-49eb-986c-7bcd78ed48bb ACADEMIC_BLOCK {Academic Block 2 First Floor Classroom 204} true}]" should have 20 item(s), but has 4
+            	Test:       	TestListLocationsReturnsOnlyActiveRowsOfThatCategory/academic_block
+    --- FAIL: TestListLocationsReturnsOnlyActiveRowsOfThatCategory/others_leaves_out_the_switched-off_sample_rows (0.00s)
+        service_test.go:41: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/application/service_test.go:41
+            	Error:      	"[{3da5b988-e449-425a-91e2-9b986801ae94 OTHERS {Campus  Wi-Fi} true} {5ba787d7-b197-4772-bc88-67232b77cfe4 OTHERS {Campus  Estate} true} {5ff22d8f-fd94-45c5-9aca-b8fa900ab827 OTHERS {Campus  Canteen} true}]" should have 7 item(s), but has 3
+            	Test:       	TestListLocationsReturnsOnlyActiveRowsOfThatCategory/others_leaves_out_the_switched-off_sample_rows
+--- FAIL: TestValidateLocation (0.00s)
+    --- FAIL: TestValidateLocation/real_hostel_location (0.00s)
+        service_test.go:86: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/application/service_test.go:86
+            	Error:      	Not equal: 
+            	            	expected: true
+            	            	actual  : false
+            	Test:       	TestValidateLocation/real_hostel_location
+        service_test.go:87: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/application/service_test.go:87
+            	Error:      	Not equal: 
+            	            	expected: ""
+            	            	actual  : "unknown building"
+            	            	
+            	            	Diff:
+            	            	--- Expected
+            	            	+++ Actual
+            	            	@@ -1 +1 @@
+            	            	-
+            	            	+unknown building
+            	Test:       	TestValidateLocation/real_hostel_location
+    --- FAIL: TestValidateLocation/real_block_location (0.00s)
+        service_test.go:86: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/application/service_test.go:86
+            	Error:      	Not equal: 
+            	            	expected: true
+            	            	actual  : false
+            	Test:       	TestValidateLocation/real_block_location
+        service_test.go:87: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/application/service_test.go:87
+            	Error:      	Not equal: 
+            	            	expected: ""
+            	            	actual  : "unknown building"
+            	            	
+            	            	Diff:
+            	            	--- Expected
+            	            	+++ Actual
+            	            	@@ -1 +1 @@
+            	            	-
+            	            	+unknown building
+            	Test:       	TestValidateLocation/real_block_location
+    --- FAIL: TestValidateLocation/campus-wide_area (0.00s)
+        service_test.go:86: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/application/service_test.go:86
+            	Error:      	Not equal: 
+            	            	expected: true
+            	            	actual  : false
+            	Test:       	TestValidateLocation/campus-wide_area
+        service_test.go:87: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/application/service_test.go:87
+            	Error:      	Not equal: 
+            	            	expected: ""
+            	            	actual  : "unknown area for this building"
+            	            	
+            	            	Diff:
+            	            	--- Expected
+            	            	+++ Actual
+            	            	@@ -1 +1 @@
+            	            	-
+            	            	+unknown area for this building
+            	Test:       	TestValidateLocation/campus-wide_area
+    --- FAIL: TestValidateLocation/switched-off_sample_area (0.00s)
+        service_test.go:86: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/application/service_test.go:86
+            	Error:      	Not equal: 
+            	            	expected: false
+            	            	actual  : true
+            	Test:       	TestValidateLocation/switched-off_sample_area
+        service_test.go:87: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/application/service_test.go:87
+            	Error:      	Not equal: 
+            	            	expected: "unknown area for this building"
+            	            	actual  : ""
+            	            	
+            	            	Diff:
+            	            	--- Expected
+            	            	+++ Actual
+            	            	@@ -1 +1 @@
+            	            	-unknown area for this building
+            	            	+
+            	Test:       	TestValidateLocation/switched-off_sample_area
+    --- FAIL: TestValidateLocation/switched-off_sample_building (0.00s)
+        service_test.go:86: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/application/service_test.go:86
+            	Error:      	Not equal: 
+            	            	expected: false
+            	            	actual  : true
+            	Test:       	TestValidateLocation/switched-off_sample_building
+        service_test.go:87: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/application/service_test.go:87
+            	Error:      	Not equal: 
+            	            	expected: "unknown building"
+            	            	actual  : ""
+            	            	
+            	            	Diff:
+            	            	--- Expected
+            	            	+++ Actual
+            	            	@@ -1 +1 @@
+            	            	-unknown building
+            	            	+
+            	Test:       	TestValidateLocation/switched-off_sample_building
+    --- FAIL: TestValidateLocation/floor_the_building_does_not_have (0.00s)
+        service_test.go:87: 
+            	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/location-taxonomy/application/service_test.go:87
+            	Error:      	Not equal: 
+            	            	expected: "unknown wing for this building"
+            	            	actual  : "unknown building"
+            	            	
+            	            	Diff:
+            	            	--- Expected
+            	            	+++ Actual
+            	            	@@ -1 +1 @@
+            	            	-unknown wing for this building
+            	            	+unknown building
+            	Test:       	TestValidateLocation/floor_the_building_does_not_have
+FAIL
+FAIL	github.com/jurwaCST/Jurwa/services/location-taxonomy/application	1.245s
+ok  	github.com/jurwaCST/Jurwa/services/location-taxonomy/cmd/server	2.734s
+ok  	github.com/jurwaCST/Jurwa/services/location-taxonomy/domain	3.298s
+?   	github.com/jurwaCST/Jurwa/services/location-taxonomy/ports	[no test files]
+FAIL

@@ -48,7 +48,7 @@ func DefaultCategories() []Info {
 	return []Info{
 		{Category: Hostel, Name: "Hostel", Description: "Rooms, bathrooms, water and electricity in the hostels", SortOrder: 1, Active: true, HeadPosition: "DSA"},
 		{Category: AcademicBlock, Name: "Academic Block", Description: "Classrooms, labs and equipment in the academic blocks", SortOrder: 2, Active: true, HeadPosition: "DAA"},
-		{Category: Others, Name: "Others", Description: "Campus-wide issues such as Wi-Fi, roads and grounds", SortOrder: 3, Active: true, HeadPosition: "SSO"},
+		{Category: Others, Name: "Others", Description: "Campus places such as the library, mess, gym and sports grounds", SortOrder: 3, Active: true, HeadPosition: "SSO"},
 	}
 }
 

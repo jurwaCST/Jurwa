@@ -1,0 +1,19 @@
+# SCRUM-150 Others description: after the change
+$ go test -count=1 -v -run "TestOthersDescriptionNamesPlaces|TestSeedHasTheDefaultDescriptions|TestSchemaReplacesOnlyTheOldOthersText|TestSchemaMatchesTheDesignFile" ./services/category-taxonomy/...
+ok  	github.com/jurwaCST/Jurwa/services/category-taxonomy/adapters/in/grpc	1.234s [no tests to run]
+ok  	github.com/jurwaCST/Jurwa/services/category-taxonomy/adapters/out/memory	0.321s [no tests to run]
+--- PASS: TestSchemaMatchesTheDesignFile (0.00s)
+--- PASS: TestSeedHasTheDefaultDescriptions (0.00s)
+--- PASS: TestSchemaReplacesOnlyTheOldOthersText (0.00s)
+ok  	github.com/jurwaCST/Jurwa/services/category-taxonomy/adapters/out/postgres	0.579s
+ok  	github.com/jurwaCST/Jurwa/services/category-taxonomy/application	0.860s [no tests to run]
+ok  	github.com/jurwaCST/Jurwa/services/category-taxonomy/cmd/server	1.823s [no tests to run]
+--- PASS: TestOthersDescriptionNamesPlaces (0.00s)
+ok  	github.com/jurwaCST/Jurwa/services/category-taxonomy/domain	1.452s
+
+$ go test -tags integration -count=1 ./services/category-taxonomy/adapters/out/postgres/   (real PostgreSQL in a container: schema with the UPDATE applied)
+ok  	github.com/jurwaCST/Jurwa/services/category-taxonomy/adapters/out/postgres	3.952s
+
+$ cd web && npx vitest run
+ Test Files  8 passed (8)
+      Tests  113 passed (113)
