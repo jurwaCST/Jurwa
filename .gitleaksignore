@@ -1,0 +1,11 @@
+# Findings reviewed in SCRUM-151 (12 Nov 2026) and accepted as test values,
+# not secrets. Evidence: docs/evidence/sonam-choki/sprint4/scrum-151-gitleaks.txt
+# Add a line here only after a review; a real secret is rotated and removed instead.
+
+# Made-up string sent on purpose to show that an invalid token gets 401 (not a JWT).
+29688f9f62a048094affd8e8016e3a42375153c0:docs/evidence/sonam-zangmo/scrum-38-curl.txt:curl-auth-header:36
+docs/evidence/sonam-zangmo/scrum-38-curl.txt:curl-auth-header:36
+
+# Unsigned "alg: none" token built inside the test, to check identity rejects it.
+da0a5f17875268d2145f65b235b16c1d72a0c29a:services/identity/domain/token_test.go:generic-api-key:81
+services/identity/domain/token_test.go:generic-api-key:81
