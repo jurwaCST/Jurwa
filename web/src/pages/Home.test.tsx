@@ -19,7 +19,7 @@ describe('home page categories', () => {
         <App />
       </MemoryRouter>,
     )
-    expect(screen.getByText('Campus places such as the library, mess, gym and sports grounds')).toBeInTheDocument()
+    expect(screen.getByText('Campus places such as the library, mess, gym and sports grounds.')).toBeInTheDocument()
     expect(screen.queryByText(/Wi-Fi, roads and grounds/)).not.toBeInTheDocument()
   })
 })
