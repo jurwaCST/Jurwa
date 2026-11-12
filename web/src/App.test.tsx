@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -80,6 +80,7 @@ describe('role guards', () => {
     ['/staff', 'STAFF', 'Staff view'],
     ['/admin', 'SYSTEM_ADMIN', 'Admin dashboard'],
     ['/president', 'PRESIDENT', 'President dashboard'],
+    ['/reports', 'STUDENT', 'My reports'],
   ])('%s is open to %s', (path, role, heading) => {
     signInAs(role)
     renderAt(path)
@@ -90,10 +91,20 @@ describe('role guards', () => {
     ['/staff', 'STUDENT'],
     ['/admin', 'CATEGORY_HEAD'],
     ['/president', 'SYSTEM_ADMIN'],
+    ['/reports', 'STAFF'],
+    ['/reports/r1', 'CATEGORY_HEAD'],
   ])('%s is refused to %s', (path, role) => {
     signInAs(role)
     renderAt(path)
     expect(screen.getByRole('heading', { name: 'Not allowed' })).toBeInTheDocument()
+  })
+
+  it('gives a student a My reports tab', () => {
+    signInAs('STUDENT')
+    renderAt('/')
+    for (const nav of screen.getAllByRole('navigation', { name: 'Main' })) {
+      expect(within(nav).getByRole('link', { name: 'My reports' })).toHaveAttribute('href', '/reports')
+    }
   })
 
   it('treats an expired session as signed out', () => {
