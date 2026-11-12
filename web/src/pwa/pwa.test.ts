@@ -132,6 +132,29 @@ describe('SCRUM-98 service worker', () => {
     }
   })
 
+  // Gayley (SCRUM-98 review): reports, photos and notifications are private
+  // to each student; on a shared phone or lab PC the next person must never
+  // see them. Only the app's own files may be answered or kept.
+  it('leaves private data alone, whatever its address', async () => {
+    const w = loadWorker()
+    await w.lifecycle('install')
+    const privatePaths = [
+      '/api/me/reports',
+      '/api/reports/r1/timeline',
+      '/api/photos/p1',
+      '/me/reports',
+      '/me/notifications',
+      '/reports/r1',
+      '/photos/p1',
+    ]
+    for (const path of privatePaths) {
+      expect(await w.request(path)).toBeUndefined()
+    }
+    expect(w.fetch).not.toHaveBeenCalled()
+    const kept = [...w.stores.values()].flatMap((cache) => [...cache.keys()])
+    expect(kept.every((k) => k === '/' || k === '/index.html' || k.startsWith('/assets/') || /^\/[\w.-]+\.(png|svg|webmanifest)$/.test(k))).toBe(true)
+  })
+
   it('opens a page from the network, and from the saved shell when offline', async () => {
     const w = loadWorker()
     await w.lifecycle('install')
