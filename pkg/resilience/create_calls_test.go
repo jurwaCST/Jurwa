@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	feedbackv1 "github.com/jurwaCST/Jurwa/proto/gen/feedback/v1"
 	identityv1 "github.com/jurwaCST/Jurwa/proto/gen/identity/v1"
 	internalnotesv1 "github.com/jurwaCST/Jurwa/proto/gen/internal-notes/v1"
 	photomediav1 "github.com/jurwaCST/Jurwa/proto/gen/photo-media/v1"
@@ -61,6 +62,7 @@ func TestDefaultConfigListsTheCreateCalls(t *testing.T) {
 		internalnotesv1.InternalNotesService_AddNote_FullMethodName,
 		statuslifecyclev1.StatusLifecycleService_ChangeStatus_FullMethodName,
 		reassignmentv1.ReassignmentService_ReassignReport_FullMethodName,
+		feedbackv1.FeedbackService_SubmitFeedback_FullMethodName,
 	}
 	cfg := DefaultConfig()
 	for _, m := range want {

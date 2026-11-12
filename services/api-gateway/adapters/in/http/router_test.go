@@ -121,6 +121,12 @@ func (fakeAuthz) CheckPermission(_ context.Context, role, action, _ string) (boo
 		return role == domain.RoleSystemAdmin || role == "PRESIDENT", nil
 	case domain.ActionReportReassign:
 		return role == domain.RoleCategoryHead || role == domain.RoleStaff, nil
+	case domain.ActionNotificationList: // same rules as the authorization policy
+		return true, nil
+	case domain.ActionReportFeedbackSubmit:
+		return role == domain.RoleStudent, nil
+	case domain.ActionReportFeedbackRead:
+		return role == domain.RoleStudent || role == domain.RoleCategoryHead || role == domain.RoleSystemAdmin, nil
 	}
 	return true, nil
 }
@@ -189,26 +195,32 @@ type env struct {
 
 	reassign  *fakeReassignment
 	directory *fakeDirectory
+
+	notifications *fakeNotifications
+	feedback      *fakeFeedback
 }
 
 func newEnv() *env {
 	now := time.Date(2026, 11, 2, 9, 0, 0, 0, time.UTC)
 	e := &env{cats: &fakeCategories{}, locs: &fakeLocations{}, reports: &fakeReports{}, ident: &fakeIdentity{}, notes: &fakeNotes{}, history: &fakeHistory{}, photos: &fakePhotos{}, status: &fakeStatus{}, stats: &fakeAnalytics{}, clock: &now,
-		reassign: &fakeReassignment{}, directory: &fakeDirectory{}}
+		reassign: &fakeReassignment{}, directory: &fakeDirectory{},
+		notifications: &fakeNotifications{}, feedback: &fakeFeedback{}}
 	e.h = NewRouter(Deps{
-		Auth:       application.NewAuth(e.ident, fakeAuthz{}),
-		Identity:   e.ident,
-		Categories: e.cats,
-		Locations:  e.locs,
-		Reports:    e.reports,
-		Notes:      e.notes,
-		History:    e.history,
-		Photos:     e.photos,
-		Status:     e.status,
-		Analytics:  e.stats,
-		Reassign:   e.reassign,
-		Directory:  e.directory,
-		Limiter:    domain.NewLimiter(20, func() time.Time { return *e.clock }),
+		Auth:          application.NewAuth(e.ident, fakeAuthz{}),
+		Identity:      e.ident,
+		Categories:    e.cats,
+		Locations:     e.locs,
+		Reports:       e.reports,
+		Notes:         e.notes,
+		History:       e.history,
+		Photos:        e.photos,
+		Status:        e.status,
+		Analytics:     e.stats,
+		Reassign:      e.reassign,
+		Directory:     e.directory,
+		Notifications: e.notifications,
+		Feedback:      e.feedback,
+		Limiter:       domain.NewLimiter(20, func() time.Time { return *e.clock }),
 	})
 	return e
 }

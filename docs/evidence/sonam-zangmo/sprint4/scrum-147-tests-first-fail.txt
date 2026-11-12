@@ -1,0 +1,28 @@
+# github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients [github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients.test]
+services/api-gateway/adapters/out/grpcclients/feedback_test.go:32:7: undefined: Feedback
+services/api-gateway/adapters/out/grpcclients/notifications_test.go:27:15: undefined: Notifications
+# github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http [github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http.test]
+services/api-gateway/adapters/in/http/router_test.go:124:14: undefined: domain.ActionNotificationList
+services/api-gateway/adapters/in/http/router_test.go:126:14: undefined: domain.ActionReportFeedbackSubmit
+services/api-gateway/adapters/in/http/router_test.go:128:14: undefined: domain.ActionReportFeedbackRead
+services/api-gateway/adapters/in/http/router_test.go:221:3: unknown field Notifications in struct literal of type Deps
+services/api-gateway/adapters/in/http/router_test.go:222:3: unknown field Feedback in struct literal of type Deps
+FAIL	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient	(cached)
+FAIL	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/application	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/cmd/server	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/domain	(cached)
+--- FAIL: TestDefaultConfigListsTheCreateCalls (0.00s)
+    create_calls_test.go:69: 
+        	Error Trace:	/Users/sonamzangmo/Downloads/Jurwa/pkg/resilience/create_calls_test.go:69
+        	Error:      	Should be true
+        	Test:       	TestDefaultConfigListsTheCreateCalls
+        	Messages:   	/jurwa.feedback.v1.FeedbackService/SubmitFeedback
+    create_calls_test.go:71: 
+        	Error Trace:	/Users/sonamzangmo/Downloads/Jurwa/pkg/resilience/create_calls_test.go:71
+        	Error:      	"map[/jurwa.identity.v1.IdentityService/Register:true /jurwa.internalnotes.v1.InternalNotesService/AddNote:true /jurwa.photomedia.v1.PhotoMediaService/UploadPhoto:true /jurwa.reassignment.v1.ReassignmentService/ReassignReport:true /jurwa.reportsubmission.v1.ReportSubmissionService/SubmitReport:true /jurwa.statuslifecycle.v1.StatusLifecycleService/ChangeStatus:true]" should have 7 item(s), but has 6
+        	Test:       	TestDefaultConfigListsTheCreateCalls
+FAIL
+FAIL	github.com/jurwaCST/Jurwa/pkg/resilience	2.096s
+FAIL
