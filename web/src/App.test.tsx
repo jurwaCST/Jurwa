@@ -1,10 +1,11 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
 import { SESSION_KEY } from './auth/AuthContext'
 import { setToken } from './api/client'
+import { markSeen } from './notifications/seen'
 
 // renderAt shows the app at one URL, as if the user typed it in the address bar.
 function renderAt(path: string) {
@@ -34,6 +35,7 @@ beforeEach(() => {
 afterEach(() => {
   setToken(null)
   vi.unstubAllGlobals()
+  localStorage.clear()
 })
 
 describe('routes', () => {
@@ -89,6 +91,7 @@ describe('role guards', () => {
     ['/admin', 'SYSTEM_ADMIN', 'Admin dashboard'],
     ['/president', 'PRESIDENT', 'President dashboard'],
     ['/reports', 'STUDENT', 'My reports'],
+    ['/notifications', 'STUDENT', 'Notifications'],
   ])('%s is open to %s', (path, role, heading) => {
     signInAs(role)
     renderAt(path)
@@ -101,6 +104,7 @@ describe('role guards', () => {
     ['/president', 'SYSTEM_ADMIN'],
     ['/reports', 'STAFF'],
     ['/reports/r1', 'CATEGORY_HEAD'],
+    ['/notifications', 'STAFF'],
   ])('%s is refused to %s', (path, role) => {
     signInAs(role)
     renderAt(path)
@@ -261,5 +265,63 @@ describe('register', () => {
     const alert = await screen.findByRole('alert')
     expect(alert).toHaveTextContent('Could not create the account. Try again.')
     expect(alert).not.toHaveTextContent('Request failed')
+  })
+})
+
+// SCRUM-144: the bell in the header. There is no "mark as read" route, so the
+// browser remembers the newest message the student has seen (per student).
+describe('notifications bell', () => {
+  const newest = {
+    id: 'n1',
+    eventType: 'status.changed',
+    reportId: 'r1',
+    subject: 'Your report is resolved',
+    body: 'HC, Floor 1: it is marked as fixed.',
+    createdAt: '2026-11-12T08:00:00Z',
+  }
+  const answer = (list: unknown[]) =>
+    vi.fn().mockImplementation(async () =>
+      new Response(JSON.stringify({ notifications: list, nextPageToken: '' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    )
+
+  it('shows a student a bell with a dot when there is a new message', async () => {
+    const fetchMock = answer([newest])
+    vi.stubGlobal('fetch', fetchMock)
+    signInAs('STUDENT')
+    renderAt('/')
+
+    expect(await screen.findByRole('link', { name: 'Notifications, new' })).toHaveAttribute('href', '/notifications')
+    expect((fetchMock.mock.calls[0] as [string])[0]).toMatch(/\/me\/notifications\?pageSize=1$/)
+  })
+
+  it('shows no dot when the newest message was already seen', async () => {
+    const fetchMock = answer([newest])
+    vi.stubGlobal('fetch', fetchMock)
+    signInAs('STUDENT')
+    markSeen('u1', newest.createdAt)
+    renderAt('/')
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled())
+    expect(await screen.findByRole('link', { name: 'Notifications' })).toHaveAttribute('href', '/notifications')
+    expect(screen.queryByRole('link', { name: 'Notifications, new' })).not.toBeInTheDocument()
+  })
+
+  it('shows no dot when there are no messages', async () => {
+    const fetchMock = answer([])
+    vi.stubGlobal('fetch', fetchMock)
+    signInAs('STUDENT')
+    renderAt('/')
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled())
+    expect(await screen.findByRole('link', { name: 'Notifications' })).toBeInTheDocument()
+  })
+
+  it('gives staff no bell', () => {
+    signInAs('STAFF')
+    renderAt('/')
+    expect(screen.queryByRole('link', { name: /^Notifications/ })).not.toBeInTheDocument()
   })
 })
