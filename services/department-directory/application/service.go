@@ -16,7 +16,7 @@ func NewService(repo ports.DirectoryRepository) *Service {
 	return &Service{repo: repo}
 }
 
-// ListDepartments returns the 5 academic departments.
+// ListDepartments returns the 6 academic departments.
 func (s *Service) ListDepartments(ctx context.Context) ([]domain.Department, error) {
 	return s.repo.ListDepartments(ctx)
 }

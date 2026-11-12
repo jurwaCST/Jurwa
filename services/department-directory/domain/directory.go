@@ -22,7 +22,8 @@ var (
 	ErrNotFound        = errors.New("not found")
 )
 
-// Department is one of the 5 academic departments, each with one HoD.
+// Department is one of the 6 academic departments, each with one HoD position
+// (Mechanical's is held by the acting Programme Leader).
 type Department struct {
 	Code string
 	Name string
