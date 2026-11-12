@@ -32,7 +32,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DepartmentDirectoryServiceClient interface {
-	// The 5 academic departments.
+	// The 6 academic departments.
 	ListDepartments(ctx context.Context, in *ListDepartmentsRequest, opts ...grpc.CallOption) (*ListDepartmentsResponse, error)
 	// The Head of Department position for one department.
 	// Errors: NOT_FOUND when the department or its HoD position is unknown.
@@ -97,7 +97,7 @@ func (c *departmentDirectoryServiceClient) ListPositions(ctx context.Context, in
 // All implementations must embed UnimplementedDepartmentDirectoryServiceServer
 // for forward compatibility.
 type DepartmentDirectoryServiceServer interface {
-	// The 5 academic departments.
+	// The 6 academic departments.
 	ListDepartments(context.Context, *ListDepartmentsRequest) (*ListDepartmentsResponse, error)
 	// The Head of Department position for one department.
 	// Errors: NOT_FOUND when the department or its HoD position is unknown.
