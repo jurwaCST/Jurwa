@@ -179,3 +179,41 @@
   border-left: 3px solid var(--border);
   white-space: pre-wrap;
 }
+
+/* ---- Notifications (SCRUM-144) ---- */
+
+.nt-day + .nt-day {
+  margin-top: var(--s3);
+}
+
+.nt-day h2 {
+  margin-bottom: 0.6rem;
+  font-size: var(--text-lg);
+}
+
+.nt-list {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0 0 var(--s2);
+  padding: 0;
+  list-style: none;
+}
+
+.nt-item {
+  display: grid;
+  gap: 0.25rem;
+  padding: var(--s2);
+}
+
+.nt-subject {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.nt-body {
+  margin: 0;
+}
+
+.nt-time {
+  font-size: var(--text-sm);
+}

@@ -10,6 +10,7 @@ import MyReports from './pages/MyReports'
 import PresidentDashboard from './pages/PresidentDashboard'
 import Register from './pages/Register'
 import ReportDetail from './pages/ReportDetail'
+import Notifications from './pages/Notifications'
 import ReportForm from './pages/ReportForm'
 import StaffView from './pages/StaffView'
 
@@ -46,6 +47,14 @@ export default function App() {
             element={
               <RequireRole roles={['STUDENT']}>
                 <ReportDetail />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="notifications"
+            element={
+              <RequireRole roles={['STUDENT']}>
+                <Notifications />
               </RequireRole>
             }
           />

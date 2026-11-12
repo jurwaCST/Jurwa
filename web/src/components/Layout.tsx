@@ -3,6 +3,7 @@ import type { Role } from '../auth/types'
 import { useAuth } from '../auth/useAuth'
 import Icon, { type IconName } from './Icon'
 import { roleNames } from './labels'
+import NotificationBell from './NotificationBell'
 import './components.css'
 
 interface Tab {
@@ -88,6 +89,7 @@ export default function Layout() {
           )}
           {user && (
             <div className="profile">
+              {user.roles.includes('STUDENT') && <NotificationBell userId={user.id} />}
               <span className="avatar" aria-hidden="true">
                 {initials(user.fullName)}
               </span>
