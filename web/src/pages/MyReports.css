@@ -1,0 +1,219 @@
+/* My reports and the report page (SCRUM-143). Owner: Gayley.
+   Tokens from src/index.css and the shared classes (.chip, .tone-*, .badge,
+   .card, .timeline), so both pages follow the campus design in light and dark. */
+
+/* ---- The list ---- */
+
+.myr-chips {
+  margin-bottom: var(--s2);
+}
+
+.myr-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.6rem;
+  height: 1.6rem;
+  margin-left: 0.35rem;
+  padding: 0 0.4rem;
+  border-radius: var(--radius-pill);
+  background: var(--panel);
+  /* Its own colour: a selected chip's white text is unreadable on the panel. */
+  color: var(--text);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.myr-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+  gap: 0.75rem;
+  margin: 0 0 var(--s3);
+  padding: 0;
+  list-style: none;
+}
+
+/* A card edged in its status colour. Only the place is the link; its ::after
+   covers the card, so the whole card opens the report. */
+.myr-card {
+  position: relative;
+  display: grid;
+  gap: 0.35rem;
+  justify-items: start;
+  padding: var(--s2);
+  border: var(--card-border);
+  border-left: 6px solid var(--tone);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+  transition: box-shadow 0.15s ease;
+}
+
+.myr-card:hover {
+  box-shadow: var(--shadow-2);
+}
+
+.myr-card:focus-within {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.myr-place {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.myr-place:focus-visible {
+  outline: none;
+}
+
+.myr-place::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.myr-meta {
+  font-size: var(--text-sm);
+}
+
+/* "#89533B76": a number to quote when asking about a report. */
+.myr-number {
+  margin-right: 0.5rem;
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* ---- One report ---- */
+
+.rd-back {
+  margin-bottom: var(--s2);
+}
+
+.rd-head {
+  align-items: flex-start;
+}
+
+.rd-layout {
+  display: grid;
+  gap: var(--s3);
+  align-items: start;
+}
+
+@media (min-width: 56rem) {
+  .rd-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+.rd-description {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.rd-photo {
+  display: block;
+  width: 100%;
+  max-height: 24rem;
+  object-fit: contain;
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+/* ---- Feedback stars (SCRUM-145) ---- */
+
+.fb-card {
+  margin-top: var(--s3);
+}
+
+.fb-stars {
+  display: inline-flex;
+  gap: 0.15rem;
+}
+
+/* An empty star is outlined in the text colour; a chosen one is filled saffron.
+   The words next to the stars say the rating too, so colour is not the only cue. */
+.fb-star {
+  display: inline-grid;
+  place-items: center;
+  color: var(--text);
+}
+
+.fb-star.on svg {
+  fill: var(--saffron-500);
+}
+
+/* Each star is a 44px target with the radio hidden inside it. */
+.fb-pick .fb-star {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+
+.fb-pick .fb-star:has(input:focus-visible) {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.fb-choice {
+  margin: 0;
+}
+
+.fb-saved {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: start;
+}
+
+.fb-saved p {
+  margin: 0;
+}
+
+.fb-comment {
+  margin: 0;
+  padding: 0.5rem 0.9rem;
+  border-left: 3px solid var(--border);
+  white-space: pre-wrap;
+}
+
+/* ---- Notifications (SCRUM-144) ---- */
+
+.nt-day + .nt-day {
+  margin-top: var(--s3);
+}
+
+.nt-day h2 {
+  margin-bottom: 0.6rem;
+  font-size: var(--text-lg);
+}
+
+.nt-list {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0 0 var(--s2);
+  padding: 0;
+  list-style: none;
+}
+
+.nt-item {
+  display: grid;
+  gap: 0.25rem;
+  padding: var(--s2);
+}
+
+.nt-subject {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.nt-body {
+  margin: 0;
+}
+
+.nt-time {
+  font-size: var(--text-sm);
+}

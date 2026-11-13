@@ -1,0 +1,565 @@
+
+ RUN  v5.1.0 C:/Users/Acer/Desktop/Jurwa/web
+
+ ❯ src/pages/Feedback.test.tsx (0 test)
+ ❯ src/pages/ReportDetail.test.tsx (10 tests | 1 failed) 1314ms
+   ❯ SCRUM-143 report detail (10)
+     × asks how the fix was once the report is resolved 1011ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/pages/Feedback.test.tsx [ src/pages/Feedback.test.tsx ]
+Error: Failed to resolve import "./Feedback" from "src/pages/Feedback.test.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/Acer/Desktop/Jurwa/web/src/pages/Feedback.test.tsx:5:0
+  15 |  const __vi_import_1__ = await import("@testing-library/user-event");
+  16 |  const __vi_import_2__ = await import("../api/client");
+  17 |  const __vi_import_3__ = await import("./Feedback");
+     |                                       ^
+  18 |  const __vi_import_4__ = await import("react/jsx-dev-runtime");
+  19 |  
+ ❯ TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/node.js:8861:39
+ ❯ TransformPluginContext.error node_modules/vite/dist/node/chunks/node.js:8858:14
+ ❯ resolveId node_modules/vite/dist/node/chunks/node.js:26533:18
+ ❯ node_modules/vite/dist/node/chunks/node.js:26632:23
+ ❯ TransformPluginContext.transform node_modules/vite/dist/node/chunks/node.js:26605:4
+ ❯ EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/node.js:8632:14
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/node.js:20108:26
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/pages/ReportDetail.test.tsx > SCRUM-143 report detail > asks how the fix was once the report is resolved
+TestingLibraryElementError: Unable to find role="radiogroup" and name `/how was the fix/i`
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"rd-page"[39m
+    [36m>[39m
+      [36m<a[39m
+        [33mclass[39m=[32m"btn btn-ghost rd-back"[39m
+        [33mdata-discover[39m=[32m"true"[39m
+        [33mhref[39m=[32m"/reports"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33maria-hidden[39m=[32m"true"[39m
+          [33mclass[39m=[32m"icon"[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mfocusable[39m=[32m"false"[39m
+          [33mheight[39m=[32m"20"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-linecap[39m=[32m"round"[39m
+          [33mstroke-linejoin[39m=[32m"round"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"20"[39m
+        [36m>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M15 18l-6-6 6-6"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [0mMy reports[0m
+      [36m</a>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"page-header rd-head"[39m
+      [36m>[39m
+        [36m<div>[39m
+          [36m<h1>[39m
+            [0mHC, Floor 1, Left wing bathroom[0m
+          [36m</h1>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"muted"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"myr-number"[39m
+            [36m>[39m
+              [0m#R1[0m
+            [36m</span>[39m
+            [0mHostel[0m
+            [0m, sent [0m
+            [0m12 Nov 2026, 10:20[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<span[39m
+          [33mclass[39m=[32m"badge badge-resolved"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"icon"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mfocusable[39m=[32m"false"[39m
+            [33mheight[39m=[32m"16"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"16"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM8 12.5l2.7 2.7L16 10"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+          [0mResolved[0m
+        [36m</span>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"rd-layout"[39m
+      [36m>[39m
+        [36m<section[39m
+          [33maria-labelledby[39m=[32m"rd-what"[39m
+          [33mclass[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mid[39m=[32m"rd-what"[39m
+          [36m>[39m
+            [0mWhat you reported[0m
+          [36m</h2>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"rd-description"[39m
+          [36m>[39m
+            [0mThe drain is clogged.[0m
+          [36m</p>[39m
+          [36m<img[39m
+            [33malt[39m=[32m"The photo you added"[39m
+            [33mclass[39m=[32m"rd-photo"[39m
+            [33msrc[39m=[32m"blob:photo-1"[39m
+          [36m/>[39m
+        [36m</section>[39m
+        [36m<section[39m
+          [33maria-labelledby[39m=[32m"rd-history"[39m
+          [33mclass[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mid[39m=[32m"rd-history"[39m
+          [36m>[39m
+            [0mWhat happened[0m
+          [36m</h2>[39m
+          [36m<ol[39m
+            [33mclass[39m=[32m"timeline"[39m
+          [36m>[39m
+            [36m<li[39m
+              [33mclass[39m=[32m"timeline-item tone-open"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"timeline-dot"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"icon"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mfocusable[39m=[32m"false"[39m
+                  [33mheight[39m=[32m"16"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"2"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"16"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+              [36m</span>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"timeline-body"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mOpen[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"muted"[39m
+                [36m>[39m
+                  [0m by [0m
+                  [0myou[0m
+                [36m</span>[39m
+                [36m<time[39m
+                  [33mclass[39m=[32m"timeline-time"[39m
+                  [33mdatetime[39m=[32m"2026-11-12T04:20:00Z"[39m
+                [36m>[39m
+                  [0m12 Nov 2026, 10:20[0m
+                [36m</time>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"timeline-note"[39m
+                [36m>[39m
+                  [0mReport submitted[0m
+                [36m</p>[39m
+              [36m</div>[39m
+            [36m</li>[39m
+            [36m<li[39m
+              [33mclass[39m=[32m"timeline-item tone-assigned"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"timeline-dot"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"icon"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mfocusable[39m=[32m"false"[39m
+                  [33mheight[39m=[32m"16"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"2"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"16"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M15 19a5 5 0 0 0-10 0M10 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM17 8l2 2 4-4"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+              [36m</span>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"timeline-body"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mAssigned[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"muted"[39m
+                [36m>[39m
+                  [0m by [0m
+                  [0mthe system[0m
+                [36m</span>[39m
+                [36m<time[39m
+                  [33mclass[39m=[32m"timeline-time"[39m
+                  [33mdatetime[39m=[32m"2026-11-12T04:20:02Z"[39m
+                [36m>[39m
+                  [0m12 Nov 2026, 10:20[0m
+                [36m</time>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"timeline-note"[39m
+                [36m>[39m
+                  [0mAssigned to the DSA[0m
+                [36m</p>[39m
+              [36m</div>[39m
+            [36m</li>[39m
+            [36m<li[39m
+              [33mclass[39m=[32m"timeline-item tone-progress"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"timeline-dot"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"icon"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mfocusable[39m=[32m"false"[39m
+                  [33mheight[39m=[32m"16"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"2"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"16"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M12 21a9 9 0 1 0 0-18M12 7v5l3 2"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+              [36m</span>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"timeline-body"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mIn progress[0m
+                [36m</strong>[39m
+                [36m<time[39m
+                  [33mclass[39m=[32m"timeline-time"[39m
+                  [33mdatetime[39m=[32m"2026-11-12T05:00:00Z"[39m
+                [36m>[39m
+                  [0m12 Nov 2026, 11:00[0m
+                [36m</time>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"timeline-note"[39m
+                [36m>[39m
+                  [0mPlumber on the way[0m
+                [36m</p>[39m
+              [36m</div>[39m
+            [36m</li>[39m
+          [36m</ol>[39m
+        [36m</section>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"rd-page"[39m
+    [36m>[39m
+      [36m<a[39m
+        [33mclass[39m=[32m"btn btn-ghost rd-back"[39m
+        [33mdata-discover[39m=[32m"true"[39m
+        [33mhref[39m=[32m"/reports"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33maria-hidden[39m=[32m"true"[39m
+          [33mclass[39m=[32m"icon"[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mfocusable[39m=[32m"false"[39m
+          [33mheight[39m=[32m"20"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-linecap[39m=[32m"round"[39m
+          [33mstroke-linejoin[39m=[32m"round"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"20"[39m
+        [36m>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M15 18l-6-6 6-6"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [0mMy reports[0m
+      [36m</a>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"page-header rd-head"[39m
+      [36m>[39m
+        [36m<div>[39m
+          [36m<h1>[39m
+            [0mHC, Floor 1, Left wing bathroom[0m
+          [36m</h1>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"muted"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"myr-number"[39m
+            [36m>[39m
+              [0m#R1[0m
+            [36m</span>[39m
+            [0mHostel[0m
+            [0m, sent [0m
+            [0m12 Nov 2026, 10:20[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<span[39m
+          [33mclass[39m=[32m"badge badge-resolved"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"icon"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mfocusable[39m=[32m"false"[39m
+            [33mheight[39m=[32m"16"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"16"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM8 12.5l2.7 2.7L16 10"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+          [0mResolved[0m
+        [36m</span>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"rd-layout"[39m
+      [36m>[39m
+        [36m<section[39m
+          [33maria-labelledby[39m=[32m"rd-what"[39m
+          [33mclass[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mid[39m=[32m"rd-what"[39m
+          [36m>[39m
+            [0mWhat you reported[0m
+          [36m</h2>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"rd-description"[39m
+          [36m>[39m
+            [0mThe drain is clogged.[0m
+          [36m</p>[39m
+          [36m<img[39m
+            [33malt[39m=[32m"The photo you added"[39m
+            [33mclass[39m=[32m"rd-photo"[39m
+            [33msrc[39m=[32m"blob:photo-1"[39m
+          [36m/>[39m
+        [36m</section>[39m
+        [36m<section[39m
+          [33maria-labelledby[39m=[32m"rd-history"[39m
+          [33mclass[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mid[39m=[32m"rd-history"[39m
+          [36m>[39m
+            [0mWhat happened[0m
+          [36m</h2>[39m
+          [36m<ol[39m
+            [33mclass[39m=[32m"timeline"[39m
+          [36m>[39m
+            [36m<li[39m
+              [33mclass[39m=[32m"timeline-item tone-open"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"timeline-dot"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"icon"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mfocusable[39m=[32m"false"[39m
+                  [33mheight[39m=[32m"16"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"2"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"16"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+              [36m</span>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"timeline-body"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mOpen[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"muted"[39m
+                [36m>[39m
+                  [0m by [0m
+                  [0myou[0m
+                [36m</span>[39m
+                [36m<time[39m
+                  [33mclass[39m=[32m"timeline-time"[39m
+                  [33mdatetime[39m=[32m"2026-11-12T04:20:00Z"[39m
+                [36m>[39m
+                  [0m12 Nov 2026, 10:20[0m
+                [36m</time>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"timeline-note"[39m
+                [36m>[39m
+                  [0mReport submitted[0m
+                [36m</p>[39m
+              [36m</div>[39m
+            [36m</li>[39m
+            [36m<li[39m
+              [33mclass[39m=[32m"timeline-item tone-assigned"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"timeline-dot"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"icon"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mfocusable[39m=[32m"false"[39m
+                  [33mheight[39m=[32m"16"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"2"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"16"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M15 19a5 5 0 0 0-10 0M10 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM17 8l2 2 4-4"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+              [36m</span>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"timeline-body"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mAssigned[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"muted"[39m
+                [36m>[39m
+                  [0m by [0m
+                  [0mthe system[0m
+                [36m</span>[39m
+                [36m<time[39m
+                  [33mclass[39m=[32m"timeline-time"[39m
+                  [33mdatetime[39m=[32m"2026-11-12T04:20:02Z"[39m
+                [36m>[39m
+                  [0m12 Nov 2026, 10:20[0m
+                [36m</time>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"timeline-note"[39m
+                [36m>[39m
+                  [0mAssigned to the DSA[0m
+                [36m</p>[39m
+              [36m</div>[39m
+            [36m</li>[39m
+            [36m<li[39m
+              [33mclass[39m=[32m"timeline-item tone-progress"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"timeline-dot"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"icon"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mfocusable[39m=[32m"false"[39m
+                  [33mheight[39m=[32m"16"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"2"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"16"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M12 21a9 9 0 1 0 0-18M12 7v5l3 2"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+              [36m</span>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"timeline-body"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mIn progress[0m
+                [36m</strong>[39m
+                [36m<time[39m
+                  [33mclass[39m=[32m"timeline-time"[39m
+                  [33mdatetime[39m=[32m"2026-11-12T05:00:00Z"[39m
+                [36m>[39m
+                  [0m12 Nov 2026, 11:00[0m
+                [36m</time>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"timeline-note"[39m
+                [36m>[39m
+                  [0mPlumber on the way[0m
+                [36m</p>[39m
+              [36m</div>[39m
+            [36m</li>[39m
+          [36m</ol>[39m
+        [36m</section>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/pages/ReportDetail.test.tsx:175:25
+    173|     renderAt()
+    174|
+    175|     expect(await screen.findByRole('radiogroup', { name: /how was the …
+       |                         ^
+    176|   })
+    177|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  1 failed | 9 passed (10)
+   Start at  16:36:47
+   Duration  3.45s (environment 53%, tests 27%, setup 12%, import 5%, transform 3%, worker 1%)
+

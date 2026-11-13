@@ -3,6 +3,7 @@ import type { Role } from '../auth/types'
 import { useAuth } from '../auth/useAuth'
 import Icon, { type IconName } from './Icon'
 import { roleNames } from './labels'
+import NotificationBell from './NotificationBell'
 import './components.css'
 
 interface Tab {
@@ -13,7 +14,10 @@ interface Tab {
 
 // Tabs per role. Only pages that exist are listed (routes in App.tsx).
 const tabsByRole: Record<Role, Tab[]> = {
-  STUDENT: [{ to: '/report/new', label: 'Report', icon: 'report' }],
+  STUDENT: [
+    { to: '/report/new', label: 'Report', icon: 'report' },
+    { to: '/reports', label: 'My reports', icon: 'queue' },
+  ],
   CATEGORY_HEAD: [{ to: '/staff', label: 'Queue', icon: 'queue' }],
   STAFF: [{ to: '/staff', label: 'Queue', icon: 'queue' }],
   SYSTEM_ADMIN: [{ to: '/admin', label: 'Overview', icon: 'admin' }],
@@ -85,6 +89,7 @@ export default function Layout() {
           )}
           {user && (
             <div className="profile">
+              {user.roles.includes('STUDENT') && <NotificationBell userId={user.id} />}
               <span className="avatar" aria-hidden="true">
                 {initials(user.fullName)}
               </span>

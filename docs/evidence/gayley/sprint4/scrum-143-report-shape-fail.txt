@@ -1,0 +1,357 @@
+
+ RUN  v5.1.0 C:/Users/Acer/Desktop/Jurwa/web
+
+stderr | src/pages/ReportDetail.test.tsx > SCRUM-143 report detail > shows the place, the current status and what was reported
+An error occurred in the <ReportDetail> component.
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
+
+
+stderr | src/pages/ReportDetail.test.tsx > SCRUM-143 report detail > shows the timeline in order, oldest first
+An error occurred in the <ReportDetail> component.
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
+
+
+stderr | src/pages/ReportDetail.test.tsx > SCRUM-143 report detail > shows the photo when there is one
+An error occurred in the <ReportDetail> component.
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
+
+
+stderr | src/pages/ReportDetail.test.tsx > SCRUM-143 report detail > says there is no photo when none was added
+An error occurred in the <ReportDetail> component.
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
+
+
+stderr | src/pages/ReportDetail.test.tsx > SCRUM-143 report detail > still shows the report when only its status does not load
+An error occurred in the <ReportDetail> component.
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
+
+
+stderr | src/pages/ReportDetail.test.tsx > SCRUM-143 report detail > offers to try again when the service is busy
+An error occurred in the <ReportDetail> component.
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
+
+
+ ❯ src/pages/ReportDetail.test.tsx (8 tests | 6 failed) 6326ms
+   ❯ SCRUM-143 report detail (8)
+     × shows the place, the current status and what was reported 1027ms
+     × shows the timeline in order, oldest first 1028ms
+     × shows the photo when there is one 1021ms
+     × says there is no photo when none was added 1012ms
+     × still shows the report when only its status does not load 1013ms
+     × offers to try again when the service is busy 1097ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/pages/ReportDetail.test.tsx > SCRUM-143 report detail > shows the place, the current status and what was reported
+TestingLibraryElementError: Unable to find role="heading" and name "HC, Floor 1, Left wing bathroom"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div />[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div />[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/pages/ReportDetail.test.tsx:104:25
+    102|     renderAt()
+    103|
+    104|     expect(await screen.findByRole('heading', { level: 1, name: 'HC, F…
+       |                         ^
+    105|     expect(screen.getAllByText('In progress').length).toBeGreaterThan(…
+    106|     expect(screen.getByText('The drain is clogged.')).toBeInTheDocumen…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  src/pages/ReportDetail.test.tsx > SCRUM-143 report detail > shows the timeline in order, oldest first
+TestingLibraryElementError: Unable to find role="region" and name "What happened"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div />[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div />[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/pages/ReportDetail.test.tsx:115:34
+    113|     renderAt()
+    114|
+    115|     const history = await screen.findByRole('region', { name: 'What ha…
+       |                                  ^
+    116|     const items = await within(history).findAllByRole('listitem')
+    117|     expect(items.map((li) => li.textContent)).toEqual([
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  src/pages/ReportDetail.test.tsx > SCRUM-143 report detail > shows the photo when there is one
+TestingLibraryElementError: Unable to find role="img" and name "The photo you added"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div />[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div />[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/pages/ReportDetail.test.tsx:129:30
+    127|     renderAt()
+    128|
+    129|     const img = await screen.findByRole('img', { name: 'The photo you …
+       |                              ^
+    130|     expect(img).toHaveAttribute('src', 'blob:photo-1')
+    131|     expect(blob).toHaveBeenCalledWith('/photos/p1')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  src/pages/ReportDetail.test.tsx > SCRUM-143 report detail > says there is no photo when none was added
+TestingLibraryElementError: Unable to find an element with the text: No photo added.. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div />[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div />[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/pages/ReportDetail.test.tsx:138:25
+    136|     renderAt()
+    137|
+    138|     expect(await screen.findByText('No photo added.')).toBeInTheDocume…
+       |                         ^
+    139|     expect(blob).not.toHaveBeenCalled()
+    140|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  src/pages/ReportDetail.test.tsx > SCRUM-143 report detail > still shows the report when only its status does not load
+TestingLibraryElementError: Unable to find an element with the text: The drain is clogged.. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div />[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div />[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/pages/ReportDetail.test.tsx:163:25
+    161|     renderAt()
+    162|
+    163|     expect(await screen.findByText('The drain is clogged.')).toBeInThe…
+       |                         ^
+    164|     expect(screen.queryByRole('heading', { name: 'Report not found' })…
+    165|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  src/pages/ReportDetail.test.tsx > SCRUM-143 report detail > offers to try again when the service is busy
+TestingLibraryElementError: Unable to find an element with the text: The drain is clogged.. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div />[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div />[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/pages/ReportDetail.test.tsx:180:25
+    178|     expect(await screen.findByText(/service is busy or unreachable/i))…
+    179|     await user.click(screen.getByRole('button', { name: 'Try again' }))
+    180|     expect(await screen.findByText('The drain is clogged.')).toBeInThe…
+       |                         ^
+    181|   })
+    182| })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 6 unhandled errors during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯
+TypeError: Cannot read properties of undefined (reading 'location')
+ ❯ ReportDetail src/pages/ReportDetail.tsx:154:29
+    152|       <div className="page-header rd-head">
+    153|         <div>
+    154|           <h1>{place(report.location)}</h1>
+       |                             ^
+    155|           <p className="muted">
+    156|             <span className="myr-number">{reportNumber(report.id)}</sp…
+ ❯ Object.react_stack_bottom_frame node_modules/react-dom/cjs/react-dom-client.development.js:28571:20
+ ❯ renderWithHooks node_modules/react-dom/cjs/react-dom-client.development.js:8030:22
+ ❯ updateFunctionComponent node_modules/react-dom/cjs/react-dom-client.development.js:10569:19
+ ❯ beginWork node_modules/react-dom/cjs/react-dom-client.development.js:12205:18
+ ❯ runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:1048:13
+ ❯ performUnitOfWork node_modules/react-dom/cjs/react-dom-client.development.js:19176:22
+ ❯ workLoopSync node_modules/react-dom/cjs/react-dom-client.development.js:19004:41
+ ❯ renderRootSync node_modules/react-dom/cjs/react-dom-client.development.js:18985:11
+ ❯ performWorkOnRoot node_modules/react-dom/cjs/react-dom-client.development.js:18094:35
+
+This error originated in "src/pages/ReportDetail.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The last test to run before this error was "shows the place, the current status and what was reported". This means either:
+- the error was thrown while Vitest was running this test, or
+- the error was thrown after the test completed, and this was the most recent test at that point.
+
+⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯
+TypeError: Cannot read properties of undefined (reading 'location')
+ ❯ ReportDetail src/pages/ReportDetail.tsx:154:29
+    152|       <div className="page-header rd-head">
+    153|         <div>
+    154|           <h1>{place(report.location)}</h1>
+       |                             ^
+    155|           <p className="muted">
+    156|             <span className="myr-number">{reportNumber(report.id)}</sp…
+ ❯ Object.react_stack_bottom_frame node_modules/react-dom/cjs/react-dom-client.development.js:28571:20
+ ❯ renderWithHooks node_modules/react-dom/cjs/react-dom-client.development.js:8030:22
+ ❯ updateFunctionComponent node_modules/react-dom/cjs/react-dom-client.development.js:10569:19
+ ❯ beginWork node_modules/react-dom/cjs/react-dom-client.development.js:12205:18
+ ❯ runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:1048:13
+ ❯ performUnitOfWork node_modules/react-dom/cjs/react-dom-client.development.js:19176:22
+ ❯ workLoopSync node_modules/react-dom/cjs/react-dom-client.development.js:19004:41
+ ❯ renderRootSync node_modules/react-dom/cjs/react-dom-client.development.js:18985:11
+ ❯ performWorkOnRoot node_modules/react-dom/cjs/react-dom-client.development.js:18094:35
+
+This error originated in "src/pages/ReportDetail.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The last test to run before this error was "shows the timeline in order, oldest first". This means either:
+- the error was thrown while Vitest was running this test, or
+- the error was thrown after the test completed, and this was the most recent test at that point.
+
+⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯
+TypeError: Cannot read properties of undefined (reading 'location')
+ ❯ ReportDetail src/pages/ReportDetail.tsx:154:29
+    152|       <div className="page-header rd-head">
+    153|         <div>
+    154|           <h1>{place(report.location)}</h1>
+       |                             ^
+    155|           <p className="muted">
+    156|             <span className="myr-number">{reportNumber(report.id)}</sp…
+ ❯ Object.react_stack_bottom_frame node_modules/react-dom/cjs/react-dom-client.development.js:28571:20
+ ❯ renderWithHooks node_modules/react-dom/cjs/react-dom-client.development.js:8030:22
+ ❯ updateFunctionComponent node_modules/react-dom/cjs/react-dom-client.development.js:10569:19
+ ❯ beginWork node_modules/react-dom/cjs/react-dom-client.development.js:12205:18
+ ❯ runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:1048:13
+ ❯ performUnitOfWork node_modules/react-dom/cjs/react-dom-client.development.js:19176:22
+ ❯ workLoopSync node_modules/react-dom/cjs/react-dom-client.development.js:19004:41
+ ❯ renderRootSync node_modules/react-dom/cjs/react-dom-client.development.js:18985:11
+ ❯ performWorkOnRoot node_modules/react-dom/cjs/react-dom-client.development.js:18094:35
+
+This error originated in "src/pages/ReportDetail.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The last test to run before this error was "shows the photo when there is one". This means either:
+- the error was thrown while Vitest was running this test, or
+- the error was thrown after the test completed, and this was the most recent test at that point.
+
+⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯
+TypeError: Cannot read properties of undefined (reading 'location')
+ ❯ ReportDetail src/pages/ReportDetail.tsx:154:29
+    152|       <div className="page-header rd-head">
+    153|         <div>
+    154|           <h1>{place(report.location)}</h1>
+       |                             ^
+    155|           <p className="muted">
+    156|             <span className="myr-number">{reportNumber(report.id)}</sp…
+ ❯ Object.react_stack_bottom_frame node_modules/react-dom/cjs/react-dom-client.development.js:28571:20
+ ❯ renderWithHooks node_modules/react-dom/cjs/react-dom-client.development.js:8030:22
+ ❯ updateFunctionComponent node_modules/react-dom/cjs/react-dom-client.development.js:10569:19
+ ❯ beginWork node_modules/react-dom/cjs/react-dom-client.development.js:12205:18
+ ❯ runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:1048:13
+ ❯ performUnitOfWork node_modules/react-dom/cjs/react-dom-client.development.js:19176:22
+ ❯ workLoopSync node_modules/react-dom/cjs/react-dom-client.development.js:19004:41
+ ❯ renderRootSync node_modules/react-dom/cjs/react-dom-client.development.js:18985:11
+ ❯ performWorkOnRoot node_modules/react-dom/cjs/react-dom-client.development.js:18094:35
+
+This error originated in "src/pages/ReportDetail.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The last test to run before this error was "says there is no photo when none was added". This means either:
+- the error was thrown while Vitest was running this test, or
+- the error was thrown after the test completed, and this was the most recent test at that point.
+
+⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯
+TypeError: Cannot read properties of undefined (reading 'location')
+ ❯ ReportDetail src/pages/ReportDetail.tsx:154:29
+    152|       <div className="page-header rd-head">
+    153|         <div>
+    154|           <h1>{place(report.location)}</h1>
+       |                             ^
+    155|           <p className="muted">
+    156|             <span className="myr-number">{reportNumber(report.id)}</sp…
+ ❯ Object.react_stack_bottom_frame node_modules/react-dom/cjs/react-dom-client.development.js:28571:20
+ ❯ renderWithHooks node_modules/react-dom/cjs/react-dom-client.development.js:8030:22
+ ❯ updateFunctionComponent node_modules/react-dom/cjs/react-dom-client.development.js:10569:19
+ ❯ beginWork node_modules/react-dom/cjs/react-dom-client.development.js:12205:18
+ ❯ runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:1048:13
+ ❯ performUnitOfWork node_modules/react-dom/cjs/react-dom-client.development.js:19176:22
+ ❯ workLoopSync node_modules/react-dom/cjs/react-dom-client.development.js:19004:41
+ ❯ renderRootSync node_modules/react-dom/cjs/react-dom-client.development.js:18985:11
+ ❯ performWorkOnRoot node_modules/react-dom/cjs/react-dom-client.development.js:18094:35
+
+This error originated in "src/pages/ReportDetail.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The last test to run before this error was "still shows the report when only its status does not load". This means either:
+- the error was thrown while Vitest was running this test, or
+- the error was thrown after the test completed, and this was the most recent test at that point.
+
+⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯
+TypeError: Cannot read properties of undefined (reading 'location')
+ ❯ ReportDetail src/pages/ReportDetail.tsx:154:29
+    152|       <div className="page-header rd-head">
+    153|         <div>
+    154|           <h1>{place(report.location)}</h1>
+       |                             ^
+    155|           <p className="muted">
+    156|             <span className="myr-number">{reportNumber(report.id)}</sp…
+ ❯ Object.react_stack_bottom_frame node_modules/react-dom/cjs/react-dom-client.development.js:28571:20
+ ❯ renderWithHooks node_modules/react-dom/cjs/react-dom-client.development.js:8030:22
+ ❯ updateFunctionComponent node_modules/react-dom/cjs/react-dom-client.development.js:10569:19
+ ❯ beginWork node_modules/react-dom/cjs/react-dom-client.development.js:12205:18
+ ❯ runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:1048:13
+ ❯ performUnitOfWork node_modules/react-dom/cjs/react-dom-client.development.js:19176:22
+ ❯ workLoopSync node_modules/react-dom/cjs/react-dom-client.development.js:19004:41
+ ❯ renderRootSync node_modules/react-dom/cjs/react-dom-client.development.js:18985:11
+ ❯ performWorkOnRoot node_modules/react-dom/cjs/react-dom-client.development.js:18094:35
+
+This error originated in "src/pages/ReportDetail.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The last test to run before this error was "offers to try again when the service is busy". This means either:
+- the error was thrown while Vitest was running this test, or
+- the error was thrown after the test completed, and this was the most recent test at that point.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 2 passed (8)
+     Errors  6 errors
+   Start at  15:44:56
+   Duration  8.65s (tests 75%, environment 17%, setup 4%, import 3%, transform 1%)
+
