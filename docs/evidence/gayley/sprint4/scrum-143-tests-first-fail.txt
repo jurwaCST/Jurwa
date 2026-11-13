@@ -1,0 +1,1642 @@
+﻿
+ RUN  v5.1.0 C:/Users/Acer/Desktop/Jurwa/web
+
+ ❯ src/pages/ReportDetail.test.tsx (0 test)
+ ❯ src/pages/MyReports.test.tsx (0 test)
+ ❯ src/App.test.tsx (25 tests | 4 failed) 3204ms
+   ❯ role guards (15)
+     × /reports is open to STUDENT 19ms
+     × /reports is refused to STAFF 10ms
+     × /reports/r1 is refused to CATEGORY_HEAD 10ms
+     × gives a student a My reports tab 7ms
+node.exe : 
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯ Failed Suites 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/pages/MyReports.test.tsx [ src/pages/MyReports.test.tsx ]
+Error: Failed to resolve import "./MyReports" from "src/pages/MyReports.test.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/Acer/Desktop/Jurwa/web/src/pages/MyReports.test.tsx:6:0
+  16 |  const __vi_import_2__ = await import("react-router-dom");
+  17 |  const __vi_import_3__ = await import("../api/client");
+  18 |  const __vi_import_4__ = await import("./MyReports");
+     |                                       ^
+  19 |  const __vi_import_5__ = await import("react/jsx-dev-runtime");
+  20 |  
+ ❯ TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/node.js:8861:39
+ ❯ TransformPluginContext.error node_modules/vite/dist/node/chunks/node.js:8858:14
+ ❯ resolveId node_modules/vite/dist/node/chunks/node.js:26533:18
+ ❯ node_modules/vite/dist/node/chunks/node.js:26632:23
+ ❯ TransformPluginContext.transform node_modules/vite/dist/node/chunks/node.js:26605:4
+ ❯ EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/node.js:8632:14
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/node.js:20108:26
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  src/pages/ReportDetail.test.tsx [ src/pages/ReportDetail.test.tsx ]
+Error: Failed to resolve import "./ReportDetail" from "src/pages/ReportDetail.test.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/Acer/Desktop/Jurwa/web/src/pages/ReportDetail.test.tsx:6:0
+  26 |  const __vi_import_2__ = await import("react-router-dom");
+  27 |  const __vi_import_3__ = await import("../api/client");
+  28 |  const __vi_import_4__ = await import("./ReportDetail");
+     |                                       ^
+  29 |  const __vi_import_5__ = await import("react/jsx-dev-runtime");
+  30 |  
+ ❯ TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/node.js:8861:39
+ ❯ TransformPluginContext.error node_modules/vite/dist/node/chunks/node.js:8858:14
+ ❯ resolveId node_modules/vite/dist/node/chunks/node.js:26533:18
+ ❯ node_modules/vite/dist/node/chunks/node.js:26632:23
+ ❯ TransformPluginContext.transform node_modules/vite/dist/node/chunks/node.js:26605:4
+ ❯ EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/node.js:8632:14
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/node.js:20108:26
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/App.test.tsx > role guards > /reports is open to STUDENT
+TestingLibraryElementError: Unable to find an accessible element with the role "heading" and name "My reports"
+
+Here are the accessible roles:
+
+  link:
+
+  Name "Skip to content":
+  [36m<a[39m
+    [33mclass[39m=[32m"skip-link"[39m
+    [33mhref[39m=[32m"#main"[39m
+  [36m/>[39m
+
+  Name "Jurwa College of Science and Technology":
+  [36m<a[39m
+    [33mclass[39m=[32m"brand"[39m
+    [33mdata-discover[39m=[32m"true"[39m
+    [33mhref[39m=[32m"/"[39m
+  [36m/>[39m
+
+  Name "Home":
+  [36m<a[39m
+    [33mclass[39m=[32m""[39m
+    [33mdata-discover[39m=[32m"true"[39m
+    [33mhref[39m=[32m"/"[39m
+  [36m/>[39m
+
+  Name "Report":
+  [36m<a[39m
+    [33mclass[39m=[32m""[39m
+    [33mdata-discover[39m=[32m"true"[39m
+    [33mhref[39m=[32m"/report/new"[39m
+  [36m/>[39m
+
+  Name "Go to the home page":
+  [36m<a[39m
+    [33mclass[39m=[32m"action"[39m
+    [33mdata-discover[39m=[32m"true"[39m
+    [33mhref[39m=[32m"/"[39m
+  [36m/>[39m
+
+  Name "Home":
+  [36m<a[39m
+    [33mclass[39m=[32m""[39m
+    [33mdata-discover[39m=[32m"true"[39m
+    [33mhref[39m=[32m"/"[39m
+  [36m/>[39m
+
+  Name "Report":
+  [36m<a[39m
+    [33mclass[39m=[32m""[39m
+    [33mdata-discover[39m=[32m"true"[39m
+    [33mhref[39m=[32m"/report/new"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  banner:
+
+  Name "":
+  [36m<header[39m
+    [33mclass[39m=[32m"topbar"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  presentation:
+
+  Name "":
+  [36m<img[39m
+    [33malt[39m=[32m""[39m
+    [33mclass[39m=[32m"brand-logo"[39m
+    [33mheight[39m=[32m"36"[39m
+    [33msrc[39m=[32m"/cst-logo.jpg"[39m
+    [33mwidth[39m=[32m"36"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  navigation:
+
+  Name "Main":
+  [36m<nav[39m
+    [33maria-label[39m=[32m"Main"[39m
+    [33mclass[39m=[32m"topnav"[39m
+  [36m/>[39m
+
+  Name "Main":
+  [36m<nav[39m
+    [33maria-label[39m=[32m"Main"[39m
+    [33mclass[39m=[32m"tabbar"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  list:
+
+  Name "":
+  [36m<ul />[39m
+
+  Name "":
+  [36m<ul />[39m
+
+  --------------------------------------------------
+  listitem:
+
+  Name "":
+  [36m<li />[39m
+
+  Name "":
+  [36m<li />[39m
+
+  Name "":
+  [36m<li />[39m
+
+  Name "":
+  [36m<li />[39m
+
+  --------------------------------------------------
+  button:
+
+  Name "Sign out":
+  [36m<button[39m
+    [33mclass[39m=[32m"signout"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  main:
+
+  Name "":
+  [36m<main[39m
+    [33mclass[39m=[32m"page"[39m
+    [33mid[39m=[32m"main"[39m
+    [33mtabindex[39m=[32m"-1"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  heading:
+
+  Name "Page not found":
+  [36m<h1 />[39m
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  [36m<p />[39m
+
+  Name "":
+  [36m<p />[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"muted"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  contentinfo:
+
+  Name "":
+  [36m<footer[39m
+    [33mclass[39m=[32m"footer"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  strong:
+
+  Name "":
+  [36m<strong />[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<a[39m
+      [33mclass[39m=[32m"skip-link"[39m
+      [33mhref[39m=[32m"#main"[39m
+    [36m>[39m
+      [0mSkip to content[0m
+    [36m</a>[39m
+    [36m<header[39m
+      [33mclass[39m=[32m"topbar"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"topbar-inner"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"brand"[39m
+          [33mdata-discover[39m=[32m"true"[39m
+          [33mhref[39m=[32m"/"[39m
+        [36m>[39m
+          [36m<img[39m
+            [33malt[39m=[32m""[39m
+            [33mclass[39m=[32m"brand-logo"[39m
+            [33mheight[39m=[32m"36"[39m
+            [33msrc[39m=[32m"/cst-logo.jpg"[39m
+            [33mwidth[39m=[32m"36"[39m
+          [36m/>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"brand-name"[39m
+          [36m>[39m
+            [0mJurwa[0m
+          [36m</span>[39m
+          [0m [0m
+          [36m<span[39m
+            [33mclass[39m=[32m"brand-place"[39m
+          [36m>[39m
+            [0mCollege of Science and Technology[0m
+          [36m</span>[39m
+        [36m</a>[39m
+        [36m<nav[39m
+          [33maria-label[39m=[32m"Main"[39m
+          [33mclass[39m=[32m"topnav"[39m
+        [36m>[39m
+          [36m<ul>[39m
+            [36m<li>[39m
+              [36m<a[39m
+                [33mclass[39m=[32m""[39m
+                [33mdata-discover[39m=[32m"true"[39m
+                [33mhref[39m=[32m"/"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"icon"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mfocusable[39m=[32m"false"[39m
+                  [33mheight[39m=[32m"22"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"2"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"22"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M3 11.5 12 4l9 7.5M5.5 10v9.5h5v-5h3v5h5V10"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<span>[39m
+                  [0mHome[0m
+                [36m</span>[39m
+              [36m</a>[39m
+            [36m</li>[39m
+            [36m<li>[39m
+              [36m<a[39m
+                [33mclass[39m=[32m""[39m
+                [33mdata-discover[39m=[32m"true"[39m
+                [33mhref[39m=[32m"/report/new"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"icon"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mfocusable[39m=[32m"false"[39m
+                  [33mheight[39m=[32m"22"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"2"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"22"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M12 5v14M5 12h14"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<span>[39m
+                  [0mReport[0m
+                [36m</span>[39m
+              [36m</a>[39m
+            [36m</li>[39m
+          [36m</ul>[39m
+        [36m</nav>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"profile"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"avatar"[39m
+          [36m>[39m
+            [0mTU[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"profile-text"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"profile-name"[39m
+            [36m>[39m
+              [0mSigned in as [0m
+              [0mTest User[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"profile-role"[39m
+            [36m>[39m
+              [0mStudent[0m
+            [36m</span>[39m
+          [36m</span>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"signout"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"icon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mfocusable[39m=[32m"false"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<span>[39m
+              [0mSign out[0m
+            [36m</span>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</header>[39m
+    [36m<main[39m
+      [33mclass[39m=[32m"page"[39m
+      [33mid[39m=[32m"main"[39m
+      [33mtabindex[39m=[32m"-1"[39m
+    [36m>[39m
+      [36m<section[39m
+        [33mclass[39m=[32m"empty notice-page"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"empty-art"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"art"[39m
+            [33mfocusable[39m=[32m"false"[39m
+            [33mviewBox[39m=[32m"0 0 260 180"[39m
+          [36m>[39m
+            [36m<ellipse[39m
+              [33mcx[39m=[32m"130"[39m
+              [33mcy[39m=[32m"160"[39m
+              [33mfill[39m=[32m"currentColor"[39m
+              [33mopacity[39m=[32m"0.07"[39m
+              [33mrx[39m=[32m"110"[39m
+              [33mry[39m=[32m"10"[39m
+            [36m/>[39m
+            [36m<rect[39m
+              [33mfill[39m=[32m"var(--pine-800)"[39m
+              [33mheight[39m=[32m"100"[39m
+              [33mrx[39m=[32m"3"[39m
+              [33mwidth[39m=[32m"10"[39m
+              [33mx[39m=[32m"124"[39m
+              [33my[39m=[32m"60"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M64 52h78l14 14-14 14H64Z"[39m
+              [33mfill[39m=[32m"var(--saffron-500)"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M196 96h-74l-14 14 14 14h74Z"[39m
+              [33mfill[39m=[32m"var(--teal-500)"[39m
+            [36m/>[39m
+            [36m<circle[39m
+              [33mcx[39m=[32m"129"[39m
+              [33mcy[39m=[32m"56"[39m
+              [33mfill[39m=[32m"var(--pine-800)"[39m
+              [33mr[39m=[32m"7"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</div>[39m
+        [36m<h1>[39m
+          [0mPage not found[0m
+        [36m</h1>[39m
+        [36m<p>[39m
+          [0mThis address is not a page in Jurwa. Check it, or start again from the home page.[0m
+        [36m</p>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"action"[39m
+          [33mdata-discover[39m=[32m"true"[39m
+          [33mhref[39m=[32m"/"[39m
+        [36m>[39m
+          [0mGo to the home page[0m
+        [36m</a>[39m
+      [36m</section>[39m
+    [36m</main>[39m
+    [36m<footer[39m
+      [33mclass[39m=[32m"footer"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"footer-inner"[39m
+      [36m>[39m
+        [36m<p>[39m
+          [36m<strong>[39m
+            [0mJurwa[0m
+          [36m</strong>[39m
+          [0m, campus facility reporting for the College of Science and Technology, Royal University of Bhutan.[0m
+        [36m</p>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"muted"[39m
+        [36m>[39m
+          [0mGroup 6 project for SWE302, SWE303 and WEB303.[0m
+        [36m</p>[39m
+      [36m</div>[39m
+    [36m</footer>[39m
+    [36m<nav[39m
+      [33maria-label[39m=[32m"Main"[39m
+      [33mclass[39m=[32m"tabbar"[39m
+    [36m>[39m
+      [36m<ul>[39m
+        [36m<li>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m""[39m
+            [33mdata-discover[39m=[32m"true"[39m
+            [33mhref[39m=[32m"/"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"icon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mfocusable[39m=[32m"false"[39m
+              [33mheight[39m=[32m"22"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"22"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M3 11.5 12 4l9 7.5M5.5 10v9.5h5v-5h3v5h5V10"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<span>[39m
+              [0mHome[0m
+            [36m</span>[39m
+          [36m</a>[39m
+        [36m</li>[39m
+        [36m<li>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m""[39m
+            [33mdata-discover[39m=[32m"true"[39m
+            [33mhref[39m=[32m"/report/new"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"icon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mfocusable[39m=[32m"false"[39m
+              [33mheight[39m=[32m"22"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"22"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 5v14M5 12h14"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<span>[39m
+              [0mReport[0m
+            [36m</span>[39m
+          [36m</a>[39m
+        [36m</li>[39m
+      [36m</ul>[39m
+    [36m</nav>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/App.test.tsx:87:19
+     85|     signInAs(role)
+     86|     renderAt(path)
+     87|     expect(screen.getByRole('heading', { name: heading })).toBeInTheDo…
+       |                   ^
+     88|   })
+     89|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  src/App.test.tsx > role guards > /reports is refused to STAFF
+TestingLibraryElementError: Unable to find an accessible element with the role "heading" and name "Not allowed"
+
+Here are the accessible roles:
+
+  link:
+
+  Name "Skip to content":
+  [36m<a[39m
+    [33mclass[39m=[32m"skip-link"[39m
+    [33mhref[39m=[32m"#main"[39m
+  [36m/>[39m
+
+  Name "Jurwa College of Science and Technology":
+  [36m<a[39m
+    [33mclass[39m=[32m"brand"[39m
+    [33mdata-discover[39m=[32m"true"[39m
+    [33mhref[39m=[32m"/"[39m
+  [36m/>[39m
+
+  Name "Home":
+  [36m<a[39m
+    [33mclass[39m=[32m""[39m
+    [33mdata-discover[39m=[32m"true"[39m
+    [33mhref[39m=[32m"/"[39m
+  [36m/>[39m
+
+  Name "Queue":
+  [36m<a[39m
+    [33mclass[39m=[32m""[39m
+    [33mdata-discover[39m=[32m"true"[39m
+    [33mhref[39m=[32m"/staff"[39m
+  [36m/>[39m
+
+  Name "Go to the home page":
+  [36m<a[39m
+    [33mclass[39m=[32m"action"[39m
+    [33mdata-discover[39m=[32m"true"[39m
+    [33mhref[39m=[32m"/"[39m
+  [36m/>[39m
+
+  Name "Home":
+  [36m<a[39m
+    [33mclass[39m=[32m""[39m
+    [33mdata-discover[39m=[32m"true"[39m
+    [33mhref[39m=[32m"/"[39m
+  [36m/>[39m
+
+  Name "Queue":
+  [36m<a[39m
+    [33mclass[39m=[32m""[39m
+    [33mdata-discover[39m=[32m"true"[39m
+    [33mhref[39m=[32m"/staff"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  banner:
+
+  Name "":
+  [36m<header[39m
+    [33mclass[39m=[32m"topbar"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  presentation:
+
+  Name "":
+  [36m<img[39m
+    [33malt[39m=[32m""[39m
+    [33mclass[39m=[32m"brand-logo"[39m
+    [33mheight[39m=[32m"36"[39m
+    [33msrc[39m=[32m"/cst-logo.jpg"[39m
+    [33mwidth[39m=[32m"36"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  navigation:
+
+  Name "Main":
+  [36m<nav[39m
+    [33maria-label[39m=[32m"Main"[39m
+    [33mclass[39m=[32m"topnav"[39m
+  [36m/>[39m
+
+  Name "Main":
+  [36m<nav[39m
+    [33maria-label[39m=[32m"Main"[39m
+    [33mclass[39m=[32m"tabbar"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  list:
+
+  Name "":
+  [36m<ul />[39m
+
+  Name "":
+  [36m<ul />[39m
+
+  --------------------------------------------------
+  listitem:
+
+  Name "":
+  [36m<li />[39m
+
+  Name "":
+  [36m<li />[39m
+
+  Name "":
+  [36m<li />[39m
+
+  Name "":
+  [36m<li />[39m
+
+  --------------------------------------------------
+  button:
+
+  Name "Sign out":
+  [36m<button[39m
+    [33mclass[39m=[32m"signout"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  main:
+
+  Name "":
+  [36m<main[39m
+    [33mclass[39m=[32m"page"[39m
+    [33mid[39m=[32m"main"[39m
+    [33mtabindex[39m=[32m"-1"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  heading:
+
+  Name "Page not found":
+  [36m<h1 />[39m
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  [36m<p />[39m
+
+  Name "":
+  [36m<p />[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"muted"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  contentinfo:
+
+  Name "":
+  [36m<footer[39m
+    [33mclass[39m=[32m"footer"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  strong:
+
+  Name "":
+  [36m<strong />[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<a[39m
+      [33mclass[39m=[32m"skip-link"[39m
+      [33mhref[39m=[32m"#main"[39m
+    [36m>[39m
+      [0mSkip to content[0m
+    [36m</a>[39m
+    [36m<header[39m
+      [33mclass[39m=[32m"topbar"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"topbar-inner"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"brand"[39m
+          [33mdata-discover[39m=[32m"true"[39m
+          [33mhref[39m=[32m"/"[39m
+        [36m>[39m
+          [36m<img[39m
+            [33malt[39m=[32m""[39m
+            [33mclass[39m=[32m"brand-logo"[39m
+            [33mheight[39m=[32m"36"[39m
+            [33msrc[39m=[32m"/cst-logo.jpg"[39m
+            [33mwidth[39m=[32m"36"[39m
+          [36m/>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"brand-name"[39m
+          [36m>[39m
+            [0mJurwa[0m
+          [36m</span>[39m
+          [0m [0m
+          [36m<span[39m
+            [33mclass[39m=[32m"brand-place"[39m
+          [36m>[39m
+            [0mCollege of Science and Technology[0m
+          [36m</span>[39m
+        [36m</a>[39m
+        [36m<nav[39m
+          [33maria-label[39m=[32m"Main"[39m
+          [33mclass[39m=[32m"topnav"[39m
+        [36m>[39m
+          [36m<ul>[39m
+            [36m<li>[39m
+              [36m<a[39m
+                [33mclass[39m=[32m""[39m
+                [33mdata-discover[39m=[32m"true"[39m
+                [33mhref[39m=[32m"/"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"icon"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mfocusable[39m=[32m"false"[39m
+                  [33mheight[39m=[32m"22"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"2"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"22"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M3 11.5 12 4l9 7.5M5.5 10v9.5h5v-5h3v5h5V10"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<span>[39m
+                  [0mHome[0m
+                [36m</span>[39m
+              [36m</a>[39m
+            [36m</li>[39m
+            [36m<li>[39m
+              [36m<a[39m
+                [33mclass[39m=[32m""[39m
+                [33mdata-discover[39m=[32m"true"[39m
+                [33mhref[39m=[32m"/staff"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"icon"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mfocusable[39m=[32m"false"[39m
+                  [33mheight[39m=[32m"22"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"2"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"22"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<span>[39m
+                  [0mQueue[0m
+                [36m</span>[39m
+              [36m</a>[39m
+            [36m</li>[39m
+          [36m</ul>[39m
+        [36m</nav>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"profile"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"avatar"[39m
+          [36m>[39m
+            [0mTU[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"profile-text"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"profile-name"[39m
+            [36m>[39m
+              [0mSigned in as [0m
+              [0mTest User[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"profile-role"[39m
+            [36m>[39m
+              [0mStaff[0m
+            [36m</span>[39m
+          [36m</span>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"signout"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"icon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mfocusable[39m=[32m"false"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<span>[39m
+              [0mSign out[0m
+            [36m</span>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</header>[39m
+    [36m<main[39m
+      [33mclass[39m=[32m"page"[39m
+      [33mid[39m=[32m"main"[39m
+      [33mtabindex[39m=[32m"-1"[39m
+    [36m>[39m
+      [36m<section[39m
+        [33mclass[39m=[32m"empty notice-page"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"empty-art"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"art"[39m
+            [33mfocusable[39m=[32m"false"[39m
+            [33mviewBox[39m=[32m"0 0 260 180"[39m
+          [36m>[39m
+            [36m<ellipse[39m
+              [33mcx[39m=[32m"130"[39m
+              [33mcy[39m=[32m"160"[39m
+              [33mfill[39m=[32m"currentColor"[39m
+              [33mopacity[39m=[32m"0.07"[39m
+              [33mrx[39m=[32m"110"[39m
+              [33mry[39m=[32m"10"[39m
+            [36m/>[39m
+            [36m<rect[39m
+              [33mfill[39m=[32m"var(--pine-800)"[39m
+              [33mheight[39m=[32m"100"[39m
+              [33mrx[39m=[32m"3"[39m
+              [33mwidth[39m=[32m"10"[39m
+              [33mx[39m=[32m"124"[39m
+              [33my[39m=[32m"60"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M64 52h78l14 14-14 14H64Z"[39m
+              [33mfill[39m=[32m"var(--saffron-500)"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M196 96h-74l-14 14 14 14h74Z"[39m
+              [33mfill[39m=[32m"var(--teal-500)"[39m
+            [36m/>[39m
+            [36m<circle[39m
+              [33mcx[39m=[32m"129"[39m
+              [33mcy[39m=[32m"56"[39m
+              [33mfill[39m=[32m"var(--pine-800)"[39m
+              [33mr[39m=[32m"7"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</div>[39m
+        [36m<h1>[39m
+          [0mPage not found[0m
+        [36m</h1>[39m
+        [36m<p>[39m
+          [0mThis address is not a page in Jurwa. Check it, or start again from the home page.[0m
+        [36m</p>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"action"[39m
+          [33mdata-discover[39m=[32m"true"[39m
+          [33mhref[39m=[32m"/"[39m
+        [36m>[39m
+          [0mGo to the home page[0m
+        [36m</a>[39m
+      [36m</section>[39m
+    [36m</main>[39m
+    [36m<footer[39m
+      [33mclass[39m=[32m"footer"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"footer-inner"[39m
+      [36m>[39m
+        [36m<p>[39m
+          [36m<strong>[39m
+            [0mJurwa[0m
+          [36m</strong>[39m
+          [0m, campus facility reporting for the College of Science and Technology, Royal University of Bhutan.[0m
+        [36m</p>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"muted"[39m
+        [36m>[39m
+          [0mGroup 6 project for SWE302, SWE303 and WEB303.[0m
+        [36m</p>[39m
+      [36m</div>[39m
+    [36m</footer>[39m
+    [36m<nav[39m
+      [33maria-label[39m=[32m"Main"[39m
+      [33mclass[39m=[32m"tabbar"[39m
+    [36m>[39m
+      [36m<ul>[39m
+        [36m<li>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m""[39m
+            [33mdata-discover[39m=[32m"true"[39m
+            [33mhref[39m=[32m"/"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"icon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mfocusable[39m=[32m"false"[39m
+              [33mheight[39m=[32m"22"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"22"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M3 11.5 12 4l9 7.5M5.5 10v9.5h5v-5h3v5h5V10"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<span>[39m
+              [0mHome[0m
+            [36m</span>[39m
+          [36m</a>[39m
+        [36m</li>[39m
+        [36m<li>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m""[39m
+            [33mdata-discover[39m=[32m"true"[39m
+            [33mhref[39m=[32m"/staff"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"icon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mfocusable[39m=[32m"false"[39m
+              [33mheight[39m=[32m"22"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"22"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<span>[39m
+              [0mQueue[0m
+            [36m</span>[39m
+          [36m</a>[39m
+        [36m</li>[39m
+      [36m</ul>[39m
+    [36m</nav>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/App.test.tsx:99:19
+     97|     signInAs(role)
+     98|     renderAt(path)
+     99|     expect(screen.getByRole('heading', { name: 'Not allowed' })).toBeI…
+       |                   ^
+    100|   })
+    101|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  src/App.test.tsx > role guards > /reports/r1 is refused to CATEGORY_HEAD
+TestingLibraryElementError: Unable to find an accessible element with the role "heading" and name "Not allowed"
+
+Here are the accessible roles:
+
+  link:
+
+  Name "Skip to content":
+  [36m<a[39m
+    [33mclass[39m=[32m"skip-link"[39m
+    [33mhref[39m=[32m"#main"[39m
+  [36m/>[39m
+
+  Name "Jurwa College of Science and Technology":
+  [36m<a[39m
+    [33mclass[39m=[32m"brand"[39m
+    [33mdata-discover[39m=[32m"true"[39m
+    [33mhref[39m=[32m"/"[39m
+  [36m/>[39m
+
+  Name "Home":
+  [36m<a[39m
+    [33mclass[39m=[32m""[39m
+    [33mdata-discover[39m=[32m"true"[39m
+    [33mhref[39m=[32m"/"[39m
+  [36m/>[39m
+
+  Name "Queue":
+  [36m<a[39m
+    [33mclass[39m=[32m""[39m
+    [33mdata-discover[39m=[32m"true"[39m
+    [33mhref[39m=[32m"/staff"[39m
+  [36m/>[39m
+
+  Name "Go to the home page":
+  [36m<a[39m
+    [33mclass[39m=[32m"action"[39m
+    [33mdata-discover[39m=[32m"true"[39m
+    [33mhref[39m=[32m"/"[39m
+  [36m/>[39m
+
+  Name "Home":
+  [36m<a[39m
+    [33mclass[39m=[32m""[39m
+    [33mdata-discover[39m=[32m"true"[39m
+    [33mhref[39m=[32m"/"[39m
+  [36m/>[39m
+
+  Name "Queue":
+  [36m<a[39m
+    [33mclass[39m=[32m""[39m
+    [33mdata-discover[39m=[32m"true"[39m
+    [33mhref[39m=[32m"/staff"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  banner:
+
+  Name "":
+  [36m<header[39m
+    [33mclass[39m=[32m"topbar"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  presentation:
+
+  Name "":
+  [36m<img[39m
+    [33malt[39m=[32m""[39m
+    [33mclass[39m=[32m"brand-logo"[39m
+    [33mheight[39m=[32m"36"[39m
+    [33msrc[39m=[32m"/cst-logo.jpg"[39m
+    [33mwidth[39m=[32m"36"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  navigation:
+
+  Name "Main":
+  [36m<nav[39m
+    [33maria-label[39m=[32m"Main"[39m
+    [33mclass[39m=[32m"topnav"[39m
+  [36m/>[39m
+
+  Name "Main":
+  [36m<nav[39m
+    [33maria-label[39m=[32m"Main"[39m
+    [33mclass[39m=[32m"tabbar"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  list:
+
+  Name "":
+  [36m<ul />[39m
+
+  Name "":
+  [36m<ul />[39m
+
+  --------------------------------------------------
+  listitem:
+
+  Name "":
+  [36m<li />[39m
+
+  Name "":
+  [36m<li />[39m
+
+  Name "":
+  [36m<li />[39m
+
+  Name "":
+  [36m<li />[39m
+
+  --------------------------------------------------
+  button:
+
+  Name "Sign out":
+  [36m<button[39m
+    [33mclass[39m=[32m"signout"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  main:
+
+  Name "":
+  [36m<main[39m
+    [33mclass[39m=[32m"page"[39m
+    [33mid[39m=[32m"main"[39m
+    [33mtabindex[39m=[32m"-1"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  heading:
+
+  Name "Page not found":
+  [36m<h1 />[39m
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  [36m<p />[39m
+
+  Name "":
+  [36m<p />[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"muted"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  contentinfo:
+
+  Name "":
+  [36m<footer[39m
+    [33mclass[39m=[32m"footer"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  strong:
+
+  Name "":
+  [36m<strong />[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<a[39m
+      [33mclass[39m=[32m"skip-link"[39m
+      [33mhref[39m=[32m"#main"[39m
+    [36m>[39m
+      [0mSkip to content[0m
+    [36m</a>[39m
+    [36m<header[39m
+      [33mclass[39m=[32m"topbar"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"topbar-inner"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"brand"[39m
+          [33mdata-discover[39m=[32m"true"[39m
+          [33mhref[39m=[32m"/"[39m
+        [36m>[39m
+          [36m<img[39m
+            [33malt[39m=[32m""[39m
+            [33mclass[39m=[32m"brand-logo"[39m
+            [33mheight[39m=[32m"36"[39m
+            [33msrc[39m=[32m"/cst-logo.jpg"[39m
+            [33mwidth[39m=[32m"36"[39m
+          [36m/>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"brand-name"[39m
+          [36m>[39m
+            [0mJurwa[0m
+          [36m</span>[39m
+          [0m [0m
+          [36m<span[39m
+            [33mclass[39m=[32m"brand-place"[39m
+          [36m>[39m
+            [0mCollege of Science and Technology[0m
+          [36m</span>[39m
+        [36m</a>[39m
+        [36m<nav[39m
+          [33maria-label[39m=[32m"Main"[39m
+          [33mclass[39m=[32m"topnav"[39m
+        [36m>[39m
+          [36m<ul>[39m
+            [36m<li>[39m
+              [36m<a[39m
+                [33mclass[39m=[32m""[39m
+                [33mdata-discover[39m=[32m"true"[39m
+                [33mhref[39m=[32m"/"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"icon"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mfocusable[39m=[32m"false"[39m
+                  [33mheight[39m=[32m"22"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"2"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"22"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M3 11.5 12 4l9 7.5M5.5 10v9.5h5v-5h3v5h5V10"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<span>[39m
+                  [0mHome[0m
+                [36m</span>[39m
+              [36m</a>[39m
+            [36m</li>[39m
+            [36m<li>[39m
+              [36m<a[39m
+                [33mclass[39m=[32m""[39m
+                [33mdata-discover[39m=[32m"true"[39m
+                [33mhref[39m=[32m"/staff"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"icon"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mfocusable[39m=[32m"false"[39m
+                  [33mheight[39m=[32m"22"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"2"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"22"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<span>[39m
+                  [0mQueue[0m
+                [36m</span>[39m
+              [36m</a>[39m
+            [36m</li>[39m
+          [36m</ul>[39m
+        [36m</nav>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"profile"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"avatar"[39m
+          [36m>[39m
+            [0mTU[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"profile-text"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"profile-name"[39m
+            [36m>[39m
+              [0mSigned in as [0m
+              [0mTest User[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"profile-role"[39m
+            [36m>[39m
+              [0mCategory Head[0m
+            [36m</span>[39m
+          [36m</span>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"signout"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"icon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mfocusable[39m=[32m"false"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<span>[39m
+              [0mSign out[0m
+            [36m</span>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</header>[39m
+    [36m<main[39m
+      [33mclass[39m=[32m"page"[39m
+      [33mid[39m=[32m"main"[39m
+      [33mtabindex[39m=[32m"-1"[39m
+    [36m>[39m
+      [36m<section[39m
+        [33mclass[39m=[32m"empty notice-page"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"empty-art"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"art"[39m
+            [33mfocusable[39m=[32m"false"[39m
+            [33mviewBox[39m=[32m"0 0 260 180"[39m
+          [36m>[39m
+            [36m<ellipse[39m
+              [33mcx[39m=[32m"130"[39m
+              [33mcy[39m=[32m"160"[39m
+              [33mfill[39m=[32m"currentColor"[39m
+              [33mopacity[39m=[32m"0.07"[39m
+              [33mrx[39m=[32m"110"[39m
+              [33mry[39m=[32m"10"[39m
+            [36m/>[39m
+            [36m<rect[39m
+              [33mfill[39m=[32m"var(--pine-800)"[39m
+              [33mheight[39m=[32m"100"[39m
+              [33mrx[39m=[32m"3"[39m
+              [33mwidth[39m=[32m"10"[39m
+              [33mx[39m=[32m"124"[39m
+              [33my[39m=[32m"60"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M64 52h78l14 14-14 14H64Z"[39m
+              [33mfill[39m=[32m"var(--saffron-500)"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M196 96h-74l-14 14 14 14h74Z"[39m
+              [33mfill[39m=[32m"var(--teal-500)"[39m
+            [36m/>[39m
+            [36m<circle[39m
+              [33mcx[39m=[32m"129"[39m
+              [33mcy[39m=[32m"56"[39m
+              [33mfill[39m=[32m"var(--pine-800)"[39m
+              [33mr[39m=[32m"7"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</div>[39m
+        [36m<h1>[39m
+          [0mPage not found[0m
+        [36m</h1>[39m
+        [36m<p>[39m
+          [0mThis address is not a page in Jurwa. Check it, or start again from the home page.[0m
+        [36m</p>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"action"[39m
+          [33mdata-discover[39m=[32m"true"[39m
+          [33mhref[39m=[32m"/"[39m
+        [36m>[39m
+          [0mGo to the home page[0m
+        [36m</a>[39m
+      [36m</section>[39m
+    [36m</main>[39m
+    [36m<footer[39m
+      [33mclass[39m=[32m"footer"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"footer-inner"[39m
+      [36m>[39m
+        [36m<p>[39m
+          [36m<strong>[39m
+            [0mJurwa[0m
+          [36m</strong>[39m
+          [0m, campus facility reporting for the College of Science and Technology, Royal University of Bhutan.[0m
+        [36m</p>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"muted"[39m
+        [36m>[39m
+          [0mGroup 6 project for SWE302, SWE303 and WEB303.[0m
+        [36m</p>[39m
+      [36m</div>[39m
+    [36m</footer>[39m
+    [36m<nav[39m
+      [33maria-label[39m=[32m"Main"[39m
+      [33mclass[39m=[32m"tabbar"[39m
+    [36m>[39m
+      [36m<ul>[39m
+        [36m<li>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m""[39m
+            [33mdata-discover[39m=[32m"true"[39m
+            [33mhref[39m=[32m"/"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"icon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mfocusable[39m=[32m"false"[39m
+              [33mheight[39m=[32m"22"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"22"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M3 11.5 12 4l9 7.5M5.5 10v9.5h5v-5h3v5h5V10"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<span>[39m
+              [0mHome[0m
+            [36m</span>[39m
+          [36m</a>[39m
+        [36m</li>[39m
+        [36m<li>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m""[39m
+            [33mdata-discover[39m=[32m"true"[39m
+            [33mhref[39m=[32m"/staff"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"icon"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mfocusable[39m=[32m"false"[39m
+              [33mheight[39m=[32m"22"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"22"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<span>[39m
+              [0mQueue[0m
+            [36m</span>[39m
+          [36m</a>[39m
+        [36m</li>[39m
+      [36m</ul>[39m
+    [36m</nav>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/App.test.tsx:99:19
+     97|     signInAs(role)
+     98|     renderAt(path)
+     99|     expect(screen.getByRole('heading', { name: 'Not allowed' })).toBeI…
+       |                   ^
+    100|   })
+    101|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  src/App.test.tsx > role guards > gives a student a My reports tab
+TestingLibraryElementError: Unable to find an accessible element with the role "link" and name "My reports"
+
+Here are the accessible roles:
+
+  list:
+
+  Name "":
+  [36m<ul />[39m
+
+  --------------------------------------------------
+  listitem:
+
+  Name "":
+  [36m<li />[39m
+
+  Name "":
+  [36m<li />[39m
+
+  --------------------------------------------------
+  link:
+
+  Name "Home":
+  [36m<a[39m
+    [33maria-current[39m=[32m"page"[39m
+    [33mclass[39m=[32m"active"[39m
+    [33mdata-discover[39m=[32m"true"[39m
+    [33mhref[39m=[32m"/"[39m
+  [36m/>[39m
+
+  Name "Report":
+  [36m<a[39m
+    [33mclass[39m=[32m""[39m
+    [33mdata-discover[39m=[32m"true"[39m
+    [33mhref[39m=[32m"/report/new"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<nav[39m
+  [33maria-label[39m=[32m"Main"[39m
+  [33mclass[39m=[32m"topnav"[39m
+[36m>[39m
+  [36m<ul>[39m
+    [36m<li>[39m
+      [36m<a[39m
+        [33maria-current[39m=[32m"page"[39m
+
+ Test Files  3 failed (3)
+      Tests  4 failed | 21 passed (25)
+   Start at  13:37:39
+   Duration  7.02s (environment 51%, tests 26%, setup 17%, import 3%, transform 2%, worker 1%)
+
+        [33mclass[39m=[32m"active"[39m
+        [33mdata-discover[39m=[32m"true"[39m
+        [33mhref[39m=[32m"/"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33maria-hidden[39m=[32m"true"[39m
+          [33mclass[39m=[32m"icon"[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mfocusable[39m=[32m"false"[39m
+          [33mheight[39m=[32m"22"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-linecap[39m=[32m"round"[39m
+          [33mstroke-linejoin[39m=[32m"round"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"22"[39m
+        [36m>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M3 11.5 12 4l9 7.5M5.5 10v9.5h5v-5h3v5h5V10"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [36m<span>[39m
+          [0mHome[0m
+        [36m</span>[39m
+      [36m</a>[39m
+    [36m</li>[39m
+    [36m<li>[39m
+      [36m<a[39m
+        [33mclass[39m=[32m""[39m
+        [33mdata-discover[39m=[32m"true"[39m
+        [33mhref[39m=[32m"/report/new"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33maria-hidden[39m=[32m"true"[39m
+          [33mclass[39m=[32m"icon"[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mfocusable[39m=[32m"false"[39m
+          [33mheight[39m=[32m"22"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-linecap[39m=[32m"round"[39m
+          [33mstroke-linejoin[39m=[32m"round"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"22"[39m
+        [36m>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M12 5v14M5 12h14"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [36m<span>[39m
+          [0mReport[0m
+        [36m</span>[39m
+      [36m</a>[39m
+    [36m</li>[39m
+  [36m</ul>[39m
+[36m</nav>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/App.test.tsx:106:26
+    104|     renderAt('/')
+    105|     for (const nav of screen.getAllByRole('navigation', { name: 'Main'…
+    106|       expect(within(nav).getByRole('link', { name: 'My reports' })).to…
+       |                          ^
+    107|     }
+    108|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+

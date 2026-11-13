@@ -1,0 +1,9 @@
+﻿
+ RUN  v5.1.0 C:/Users/Acer/Desktop/Jurwa/web
+
+
+ Test Files  12 passed (12)
+      Tests  153 passed (153)
+   Start at  00:08:22
+   Duration  12.12s (environment 42%, tests 42%, setup 8%, import 7%, transform 1%)
+
