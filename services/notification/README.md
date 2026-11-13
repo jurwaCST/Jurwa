@@ -34,6 +34,23 @@ Event types are the stream names in `proto/events/v1/events.proto`, plus the dig
 | `sla.lapsed` | the report was escalated |
 | `digest.daily` | the daily digest from `digest-dispatcher` |
 
+## Messages from events (SCRUM-155)
+
+When `REDIS_URL` is set, the service reads two streams in the consumer group `notification` and tells the student about their report:
+
+| Event | Message to the student |
+|---|---|
+| `report.submitted` | "We received your report" with the place |
+| `status.changed` to `IN_PROGRESS` | "Your report is in progress" |
+| `status.changed` to `RESOLVED` | "Your report is resolved" (and that they can rate the fix) |
+| `status.changed` to `ESCALATED` | "Your report was escalated" (it went to the Category Head) |
+| `status.changed` to `OPEN` or `ASSIGNED` | nothing: Assigned comes a moment after "received" |
+
+- `status.changed` does not name the student, so the report is looked up in report-submission (`GetReport`). This works after a restart and for reports sent before the service started.
+- Each message's id is made from the event id (UUID v5), and it is added with `INSERT ... ON CONFLICT (id) DO NOTHING`. The same event read twice gives one message, also after a restart, and a message already read stays read.
+- report-submission down: the handler returns the error, so the bus tries the event again (3 times) and then keeps it in `events:status.changed.dead`. It is never dropped. A report report-submission does not know is skipped, since trying again would not help.
+- With the store in memory the streams are read again from the start on every start, so messages come back after a restart.
+
 ## RPCs
 
 | RPC | What it does | Errors |
@@ -48,9 +65,11 @@ Plus `grpc.health.v1.Health/Check` and server reflection.
 | Folder | Content |
 |---|---|
 | `domain/` | `Notification`, `NewNotification` rules, `MarkSent`, `MarkFailed` (100% tested) |
-| `application/` | Use cases: `Send`, `List` |
-| `ports/` | `NotificationRepository` and `Sender` interfaces |
+| `application/` | Use cases: `Send`, `SendForEvent` (once per event), `List` |
+| `ports/` | `NotificationRepository`, `Sender` and `Reports` interfaces |
 | `adapters/in/grpc/` | gRPC handler, maps errors to gRPC codes |
+| `adapters/in/events/` | Reads `report.submitted` and `status.changed` and sends the student a message |
+| `adapters/out/reportclient/` | `Reports` over gRPC: report-submission `GetReport` |
 | `adapters/out/memory/` | In-memory outbox, used when `DATABASE_URL` is not set |
 | `adapters/out/postgres/` | PostgreSQL outbox, used when `DATABASE_URL` is set |
 | `adapters/out/repotest/` | Checks both must pass |
@@ -62,6 +81,8 @@ Plus `grpc.health.v1.Health/Check` and server reflection.
 |---|---|---|
 | `PORT` | `9018` | gRPC port |
 | `SERVICE_NAME` | `notification` | Name written in every log line |
+| `REDIS_URL` | none | For example `redis://localhost:6379`. Unset: no messages from events |
+| `REPORT_SUBMISSION_ADDR` | `localhost:9001` | report-submission, to find the student of a report |
 | `DATABASE_URL` | none | For example `postgres://jurwa:<password>@localhost:5432/notification?sslmode=disable`. Unset: in memory, lost on restart. A wrong URL stops the service instead of falling back. The password comes from the environment (a Kubernetes Secret), never from the repository |
 
 Storage: with `DATABASE_URL` the service uses PostgreSQL (database `notification`, table `notifications`). On start it runs `docs/design/schema/notification.sql` (embedded as `adapters/out/postgres/schema.sql`, a test keeps the two equal), which creates the table if needed. Both stores pass the same checks (`adapters/out/repotest`).

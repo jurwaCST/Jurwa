@@ -65,6 +65,32 @@ func (r *Repository) Save(ctx context.Context, n domain.Notification) error {
 	return nil
 }
 
+// Create adds n only when its id is new. The primary key on id makes the
+// database refuse the second row, and DO NOTHING leaves the first one as it
+// is, so a message made from an event delivered twice is stored once.
+func (r *Repository) Create(ctx context.Context, n domain.Notification) (bool, error) {
+	tag, err := r.pool.Exec(ctx, `
+		INSERT INTO notifications (id, recipient_user_id, channel, event_type, report_id, subject, body,
+		                           delivery_status, created_at, sent_at, read_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+		ON CONFLICT (id) DO NOTHING`,
+		n.ID, n.RecipientUserID, n.Channel.String(), n.EventType, nullString(n.ReportID), n.Subject, n.Body,
+		n.Status.String(), n.CreatedAt, n.SentAt, n.ReadAt)
+	if err != nil {
+		return false, fmt.Errorf("create notification: %w", err)
+	}
+	return tag.RowsAffected() == 1, nil
+}
+
+// Exists says whether a notification with this id is stored.
+func (r *Repository) Exists(ctx context.Context, id string) (bool, error) {
+	var has bool
+	if err := r.pool.QueryRow(ctx, `SELECT EXISTS (SELECT 1 FROM notifications WHERE id = $1)`, id).Scan(&has); err != nil {
+		return false, fmt.Errorf("find notification: %w", err)
+	}
+	return has, nil
+}
+
 // ListByRecipient returns one user's SENT notifications, newest first. It
 // reads one row more than limit to know whether there are more.
 func (r *Repository) ListByRecipient(ctx context.Context, userID string, unreadOnly bool, offset, limit int) ([]domain.Notification, bool, error) {
