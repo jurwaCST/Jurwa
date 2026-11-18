@@ -1,0 +1,85 @@
+SCRUM-152 follow-up, tests first: E2E-SP-04 (a sent report gives the message "We received your report") run against main from before PR #134 (commit a848418): the notification service runs but has no event consumer yet. 2026-11-19. Expected: E2E-SP-04 fails, the other 3 pass.
+
+
+Warning: The allowCypressEnv configuration option is enabled. This allows any browser code to read values from Cypress.env(). This is insecure and will be removed in a future major version.
+
+1. Replace Cypress.env() calls with cy.env() (for sensitive values) or Cypress.expose() (for public configuration)
+2. Set allowCypressEnv: false in your Cypress configuration to disable Cypress.env()
+
+Learn more: https://on.cypress.io/cypress-env-migration
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        15.21.1                                                                        │
+  │ Browser:        Electron 138 (headless)                                                        │
+  │ Node Version:   v26.13.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (student-pages.cy.ts)                                                  │
+  │ Searched:       C:\Users\dellb\Jurwa\web\cypress\e2e\student-pages.cy.ts                       │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  student-pages.cy.ts                                                             (1 of 1)
+
+
+  student pages
+    √ a report sent in the form shows in My reports and its page shows Open, then Assigned (6414ms)
+    √ the bell opens Notifications, which shows the list or the empty state (2402ms)
+    1) after a report is sent, the bell shows new and Notifications lists "We received your report"
+    √ on a resolved report the student gives four stars and sees the thank-you (5702ms)
+
+
+  3 passing (29s)
+  1 failing
+
+  1) student pages
+       after a report is sent, the bell shows new and Notifications lists "We received your report":
+     Error: no notification "We received your report" (got: none)
+      at Context.eval (http://localhost:4174/__cypress/tests?p=cypress\e2e\student-pages.cy.ts:53:29)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        4                                                                                │
+  │ Passing:      3                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        true                                                                             │
+  │ Duration:     29 seconds                                                                       │
+  │ Spec Ran:     student-pages.cy.ts                                                              │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\dellb\Jurwa\web\cypress\screenshots\student-pages.cy.ts\student pages -     (1280x720)
+     - after a report is sent, the bell shows new and Notifications lists We received               
+      your report (failed).png                                                                      
+
+
+  (Video)
+
+  -  Video output: C:\Users\dellb\Jurwa\web\cypress\videos\student-pages.cy.ts.mp4
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ✖  student-pages.cy.ts                      00:29        4        3        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ✖  1 of 1 failed (100%)                     00:29        4        3        1        -        -  
+
