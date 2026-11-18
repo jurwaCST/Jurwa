@@ -1,0 +1,28 @@
+# github.com/jurwaCST/Jurwa/services/report-history/domain [github.com/jurwaCST/Jurwa/services/report-history/domain.test]
+services/report-history/domain/status_label_test.go:20:25: undefined: StatusLabel
+services/report-history/domain/status_label_test.go:25:28: undefined: StatusLabel
+--- FAIL: TestTheFourStreamsBuildTheReadModel (0.04s)
+    consumer_test.go:110: 
+        	Error Trace:	/Users/macbookairm5chip/Desktop/Jurwa/services/report-history/adapters/in/events/consumer_test.go:110
+        	Error:      	Not equal: 
+        	            	expected: "Status changed to Assigned"
+        	            	actual  : "Status changed to ASSIGNED"
+        	            	
+        	            	Diff:
+        	            	--- Expected
+        	            	+++ Actual
+        	            	@@ -1 +1 @@
+        	            	-Status changed to Assigned
+        	            	+Status changed to ASSIGNED
+        	Test:       	TestTheFourStreamsBuildTheReadModel
+        	Messages:   	same word as the badge
+FAIL
+FAIL	github.com/jurwaCST/Jurwa/services/report-history/adapters/in/events	0.900s
+ok  	github.com/jurwaCST/Jurwa/services/report-history/adapters/in/grpc	(cached)
+?   	github.com/jurwaCST/Jurwa/services/report-history/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/report-history/adapters/out/memory	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/report-history/application	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/report-history/cmd/server	(cached)
+FAIL	github.com/jurwaCST/Jurwa/services/report-history/domain [build failed]
+?   	github.com/jurwaCST/Jurwa/services/report-history/ports	[no test files]
+FAIL

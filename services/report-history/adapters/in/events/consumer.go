@@ -132,7 +132,7 @@ func (c *Consumer) StatusChanged(ctx context.Context, payload []byte) error {
 		FromStatus: status(ev.GetFromStatus()),
 		ToStatus:   to,
 		ActorID:    ev.GetActorId(),
-		Summary:    "Status changed to " + string(to),
+		Summary:    "Status changed to " + domain.StatusLabel(to),
 	})
 }
 

@@ -1,0 +1,8 @@
+ok  	github.com/jurwaCST/Jurwa/services/report-history/adapters/in/events	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/report-history/adapters/in/grpc	(cached)
+?   	github.com/jurwaCST/Jurwa/services/report-history/adapters/out	[no test files]
+ok  	github.com/jurwaCST/Jurwa/services/report-history/adapters/out/memory	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/report-history/application	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/report-history/cmd/server	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/report-history/domain	(cached)
+?   	github.com/jurwaCST/Jurwa/services/report-history/ports	[no test files]
