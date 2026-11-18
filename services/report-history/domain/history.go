@@ -30,6 +30,25 @@ const (
 	StatusEscalated  Status = "ESCALATED"
 )
 
+// statusLabels are the words people see, the same as the status badges in the
+// web app (web/src/components/labels.ts).
+var statusLabels = map[Status]string{
+	StatusOpen:       "Open",
+	StatusAssigned:   "Assigned",
+	StatusInProgress: "In progress",
+	StatusResolved:   "Resolved",
+	StatusEscalated:  "Escalated",
+}
+
+// StatusLabel returns the word people see for a status, for example
+// "In progress" for IN_PROGRESS. An unknown status is returned as it is.
+func StatusLabel(s Status) string {
+	if l, ok := statusLabels[s]; ok {
+		return l
+	}
+	return string(s)
+}
+
 // Event types written in the timeline. They match the stream names in
 // proto/events/v1/events.proto without the "events:" prefix.
 const (
