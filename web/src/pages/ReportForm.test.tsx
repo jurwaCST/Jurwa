@@ -194,7 +194,8 @@ describe('SCRUM-66 description and photo field', () => {
     const user = userEvent.setup({ applyAccept: false })
     renderForm()
     await user.upload(await screen.findByLabelText('Photo (optional)'), pngFile('notes.pdf', 1024, 'application/pdf'))
-    expect(screen.getByText('The photo must be a JPG or PNG image.')).toBeInTheDocument()
+    // Read out as it appears, like the form's other errors (accessibility.md finding).
+    expect(screen.getByText('The photo must be a JPG or PNG image.')).toHaveAttribute('role', 'alert')
     expect(screen.queryByAltText('Photo preview')).not.toBeInTheDocument()
   })
 
@@ -203,7 +204,7 @@ describe('SCRUM-66 description and photo field', () => {
     renderForm()
     const input = await screen.findByLabelText('Photo (optional)')
     await user.upload(input, pngFile('big.png', MAX_PHOTO_BYTES + 1))
-    expect(screen.getByText('The photo must be 5 MB or smaller.')).toBeInTheDocument()
+    expect(screen.getByText('The photo must be 5 MB or smaller.')).toHaveAttribute('role', 'alert')
 
     await user.upload(input, pngFile('ok.jpg', MAX_PHOTO_BYTES, 'image/jpeg'))
     expect(screen.queryByText('The photo must be 5 MB or smaller.')).not.toBeInTheDocument()
