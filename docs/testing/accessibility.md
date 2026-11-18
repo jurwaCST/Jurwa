@@ -33,6 +33,16 @@ First run on 8 November 2026 on the first design. **Re-run on 9 November 2026 on
 
 **12 of 12 pass, 0 violations.** The pages are signed in through the real login page, so each one is checked as its user sees it.
 
+**Re-run on 18 November 2026 with the Sprint 4 pages** (SCRUM-152, Nyendrak), against the built app, `docs/evidence/nyendrak/sprint4/scrum-152-tests.txt`. The two report form checks were updated for the form as it is since SCRUM-35 (the category is a group of tiles, no longer a select; its errors use `.field-error`), and three pages were added, each signed in as a new student with one Hostel report:
+
+| Page | Signed in as | Violations |
+|---|---|---|
+| `/reports` My reports (SCRUM-143) | a student | 0 |
+| `/reports/{id}` a report with its timeline (SCRUM-143) | a student | 0 |
+| `/notifications` (SCRUM-144) | a student | 0 |
+
+**15 of 15 pass, 0 violations.** The real `/staff` (SCRUM-36) and `/admin` (SCRUM-37) pages are merged now, so their rows above check the real pages, not placeholders. The feedback stars (SCRUM-145) show only on a resolved report; they are clicked through in `student-pages.cy.ts` but not yet checked by axe.
+
 `/staff`, `/admin` and `/president` are still placeholder pages (a heading and one line: SCRUM-36 and SCRUM-37 were moved to Sprint 4, SCRUM-99 is Stretch). Their result only shows the shared layout passes; the checks must be run again when the real pages are built. The real content checked today is the sign-in page, the home page and the report form. The report form was checked before Nyendrak's styling update (`SCRUM-35-form-polish`, not merged), so it is run again after that merge.
 
 **Found by the re-run and fixed (defect D-16):** on the new design, the student's home tile was a link named "Report an issue" that also showed its hint "Takes about two minutes". axe-core rule `label-content-name-mismatch` (serious): the visible text must be part of the accessible name, so someone using voice control can say what they see. Only the title is the link now, the hint is its description, and the whole tile stays clickable.

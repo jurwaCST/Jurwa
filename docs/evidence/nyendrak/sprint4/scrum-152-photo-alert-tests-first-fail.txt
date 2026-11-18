@@ -1,0 +1,61 @@
+SCRUM-152 tests first: the report form's photo error should have role="alert" (finding in docs/testing/accessibility.md, section 3). 2026-11-18. Expected: 2 fail.
+
+
+ RUN  v5.1.0 C:/Users/dellb/Jurwa/web
+
+ ❯ src/pages/ReportForm.test.tsx (28 tests | 2 failed) 11003ms
+   ❯ SCRUM-66 description and photo field (5)
+     × refuses a photo that is not JPG or PNG 96ms
+     × refuses a photo over 5 MB and accepts exactly 5 MB 102ms
+node.exe : 
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Users\dellb\AppData\Roaming\ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/pages/ReportForm.test.tsx > SCRUM-66 description and photo field > refuses a photo that is not JPG or PNG
+Error: expect(element).toHaveAttribute("role", 
+"alert") // element.getAttribute("role") === "alert"
+
+Expected the element to have attribute:
+  role="alert"
+Received:
+  null
+ ❯ src/pages/ReportForm.test.tsx:198:71
+    196|     await user.upload(await screen.findByLabelText('Photo (optional)')…
+    197|     // Read out as it appears, like the form's other errors (accessibi…
+    198|     expect(screen.getByText('The photo must be a JPG or PNG image.')).…
+       |                                                                       ^
+    199|     expect(screen.queryByAltText('Photo preview')).not.toBeInTheDocume…
+    200|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/pages/ReportForm.test.tsx > SCRUM-66 description and photo field > refuses a photo over 5 MB and accepts 
+exactly 5 MB
+Error: expect(element).toHaveAttribute("role", 
+"alert") // element.getAttribute("role") === "alert"
+
+Expected the element to have attribute:
+  role="alert"
+Received:
+  null
+ ❯ src/pages/ReportForm.test.tsx:207:68
+    205|     const input = await screen.findByLabelText('Photo (optional)')
+    206|     await user.upload(input, pngFile('big.png', MAX_PHOTO_BYTES + 1))
+    207|     expect(screen.getByText('The photo must be 5 MB or smaller.')).toH…
+       |                                                                    ^
+    208|
+    209|     await user.upload(input, pngFile('ok.jpg', MAX_PHOTO_BYTES, 'image…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 26 passed (28)
+   Start at  22:20:15
+   Duration  24.67s (tests 46%, environment 32%, setup 12%, import 7%, transform 3%)
+
