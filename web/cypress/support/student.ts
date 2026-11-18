@@ -72,6 +72,23 @@ export function changeStatus(token: string, reportId: string, from: Status, toSt
     })
 }
 
+/**
+ * Asks the gateway until the student has a notification with this subject. The
+ * notification service makes it from an event a moment after the report is
+ * sent (SCRUM-155), so this polls like waitForStatus.
+ */
+export function waitForNotification(token: string, subject: string, tries = 20): Cypress.Chainable<null> {
+  return cy
+    .request({ url: `${api()}/me/notifications`, headers: { Authorization: `Bearer ${token}` } })
+    .then((res) => {
+      const subjects = ((res.body.notifications ?? []) as { subject: string }[]).map((n) => n.subject)
+      if (subjects.includes(subject)) return cy.wrap(null, { log: false })
+      if (tries <= 1) throw new Error(`no notification "${subject}" (got: ${subjects.join(', ') || 'none'})`)
+      cy.wait(500, { log: false })
+      return waitForNotification(token, subject, tries - 1)
+    })
+}
+
 /** The demo accounts' password, needed only to act as the Category Head. */
 export function demoPassword(): string {
   const p = Cypress.env('demoPassword') as string

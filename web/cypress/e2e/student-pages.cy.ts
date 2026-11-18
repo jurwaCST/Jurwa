@@ -3,7 +3,7 @@
 // (SCRUM-143, 144, 145). Needs the stack with Redis (routing sets Assigned) and
 // the notification service; see docs/testing/e2e-tests.md.
 
-import { changeStatus, demoPassword, sendHostelReport, waitForStatus } from '../support/student'
+import { changeStatus, demoPassword, sendHostelReport, waitForNotification, waitForStatus } from '../support/student'
 
 /** The main navigation that is on screen (top bar on a laptop, tab bar on a phone). */
 const nav = () => cy.get('nav[aria-label=Main]').filter(':visible')
@@ -78,6 +78,21 @@ describe('student pages', () => {
       expect(list || empty, 'the list or the empty state').to.equal(true)
     })
     cy.get('.nt-page [role=alert]').should('not.exist')
+  })
+
+  it('after a report is sent, the bell shows new and Notifications lists "We received your report"', () => {
+    // The notification service turns report.submitted into a message (SCRUM-155).
+    cy.apiLogin(email, password).then((token) => {
+      sendHostelReport(token, `E2E ${Date.now()}: the door of the common room is broken`)
+      waitForNotification(token, 'We received your report')
+    })
+
+    cy.visit('/')
+    cy.get('a[aria-label="Notifications, new"]').filter(':visible').click()
+    cy.location('pathname').should('eq', '/notifications')
+    cy.contains('.nt-item', 'We received your report').should('contain', 'You can follow it in My reports.')
+    // On the page itself the dot is gone.
+    cy.get('a[aria-label="Notifications"]').filter(':visible').should('exist')
   })
 
   it('on a resolved report the student gives four stars and sees the thank-you', () => {
