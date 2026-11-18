@@ -1,0 +1,165 @@
+SCRUM-152 follow-up: the whole Cypress suite against main with the notification consumer (SCRUM-155, PR #134), 2026-11-19. Stack: web/cypress/start-stack.sh (starts notification), Redis, gateway on :18080, vite preview on :4174.
+
+Run 1: 26 of 27. The first axe test timed out reading node_modules/axe-core/axe.min.js (cold start of the first spec), not a page finding; student pages 4 of 4, including the new E2E-SP-04.
+Run 2 (below, same stack, nothing changed): 27 of 27 pass.
+
+
+Warning: The allowCypressEnv configuration option is enabled. This allows any browser code to read values from Cypress.env(). This is insecure and will be removed in a future major version.
+
+1. Replace Cypress.env() calls with cy.env() (for sensitive values) or Cypress.expose() (for public configuration)
+2. Set allowCypressEnv: false in your Cypress configuration to disable Cypress.env()
+
+Learn more: https://on.cypress.io/cypress-env-migration
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        15.21.1                                                                        │
+  │ Browser:        Electron 138 (headless)                                                        │
+  │ Node Version:   v26.13.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          3 found (a11y.cy.ts, report-flow.cy.ts, student-pages.cy.ts)                   │
+  │ Searched:       cypress/e2e/**/*.cy.ts                                                         │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  a11y.cy.ts                                                                      (1 of 3)
+
+
+  accessibility (axe-core, WCAG 2.1 A and AA)
+    √ sign-in page (2648ms)
+    √ sign-in page showing a wrong password error (3780ms)
+    √ home page, signed out (1255ms)
+    √ page not found (912ms)
+    as a student
+      √ home page (3926ms)
+      √ report form (3779ms)
+      √ report form with a category and building chosen (5378ms)
+      √ report form showing its error messages (4233ms)
+      √ a page the student may not open (403) (3803ms)
+    as a student with a report
+      √ My reports (5402ms)
+      √ a report page with its timeline (5875ms)
+      √ notifications (5572ms)
+    as staff and admins (demo accounts, CYPRESS_demoPassword)
+      √ Category Head view (3135ms)
+      √ System Administrator page (3258ms)
+      √ College President dashboard (3346ms)
+
+
+  15 passing (58s)
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        15                                                                               │
+  │ Passing:      15                                                                               │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  0                                                                                │
+  │ Video:        true                                                                             │
+  │ Duration:     58 seconds                                                                       │
+  │ Spec Ran:     a11y.cy.ts                                                                       │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Video)
+
+  -  Video output: c:\Users\dellb\Jurwa\web\cypress\videos\a11y.cy.ts.mp4
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  report-flow.cy.ts                                                               (2 of 3)
+
+
+  report flow
+    √ a student signs in through the UI (4619ms)
+    √ a wrong password shows an error and stays on the sign-in page (2937ms)
+    √ a student submits a Hostel report and can read it back as OPEN (646ms)
+    √ a description of 501 characters is refused by the server (681ms)
+    √ a student uploads a photo, attaches it to a report and can view it (1242ms)
+    √ a photo over 5 MB is refused with the size message (1534ms)
+    √ another student cannot view the photo (1559ms)
+    √ another student cannot read the report (1309ms)
+
+
+  8 passing (15s)
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        8                                                                                │
+  │ Passing:      8                                                                                │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  0                                                                                │
+  │ Video:        true                                                                             │
+  │ Duration:     15 seconds                                                                       │
+  │ Spec Ran:     report-flow.cy.ts                                                                │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Video)
+
+  -  Video output: c:\Users\dellb\Jurwa\web\cypress\videos\report-flow.cy.ts.mp4
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  student-pages.cy.ts                                                             (3 of 3)
+
+
+  student pages
+    √ a report sent in the form shows in My reports and its page shows Open, then Assigned (12375ms)
+    √ the bell opens Notifications, which shows the list or the empty state (4609ms)
+    √ after a report is sent, the bell shows new and Notifications lists "We received your report" (5389ms)
+    √ on a resolved report the student gives four stars and sees the thank-you (8151ms)
+
+
+  4 passing (31s)
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        4                                                                                │
+  │ Passing:      4                                                                                │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  0                                                                                │
+  │ Video:        true                                                                             │
+  │ Duration:     31 seconds                                                                       │
+  │ Spec Ran:     student-pages.cy.ts                                                              │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Video)
+
+  -  Video output: c:\Users\dellb\Jurwa\web\cypress\videos\student-pages.cy.ts.mp4
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ✔  a11y.cy.ts                               00:58       15       15        -        -        - │
+  ├────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ ✔  report-flow.cy.ts                        00:15        8        8        -        -        - │
+  ├────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ ✔  student-pages.cy.ts                      00:31        4        4        -        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ✔  All specs passed!                        01:44       27       27        -        -        -  
+

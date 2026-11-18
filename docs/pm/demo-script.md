@@ -43,7 +43,7 @@ Demo accounts come from identity's seed (`SEED_DEMO_USERS=true`, SCRUM-126). The
 |---|---|---|---|---|
 | 2 | Zangmo | Open Argo CD (`kubectl -n argocd port-forward svc/argocd-server 8443:443`). Then `kubectl -n jurwa scale deploy/api-gateway --replicas=0` | App `jurwa` Synced and Healthy; the gateway is back to 1 within seconds | Argo CD selfHeal |
 | 3 | Nyendrak | On the phone: sign in with the prepared student account (made before the demo on the sign-up page or with `POST /auth/register`), open "Report", pick the Hostel tile, a hostel, its floor and area, write "Tap leaking", attach a photo, send | Confirmation with the report id, in under 2 minutes | `POST /photos`, `POST /reports` |
-| 4 | Choki | Same phone: "My reports", open the report | Badge Assigned; timeline "Open" (Report submitted), then "Assigned"; the bell has a new message "We received your report" once SCRUM-155 is merged | `GET /me/reports`, `GET /reports/{id}/timeline`; routing-engine `report.routed` |
+| 4 | Choki | Same phone: "My reports", open the report | Badge Assigned; timeline "Open" (Report submitted), then "Assigned"; the bell has a new message "We received your report" | `GET /me/reports`, `GET /reports/{id}/timeline`; routing-engine `report.routed` |
 | 5 | Zangmo | Laptop: sign in as `dsa.demo@jurwa.example`; "Assigned to me"; open the report; add the note "Plumber booked for 2 pm"; set status In Progress | The report is in the list; the note is saved; status IN_PROGRESS; the student's timeline updates | `GET /me/assigned-reports`, `POST /reports/{id}/notes`, `POST /reports/{id}/status` |
 | 6 | Nyendrak | Open the report prepared before the demo (section 3) | Status ESCALATED, timeline "SLA lapsed", reassigned by the Saga | sla-tracking, sla-escalation-checker, status-lifecycle, reassignment |
 | 7 | Gayley | Sign in as `admin.demo`, then `president.demo` | Counts per status and per category, including the reports from this demo | `GET /dashboard/summary`, `GET /dashboard/categories` |
@@ -86,7 +86,6 @@ These block parts of the script. Each owner says when it is merged.
 | Item | Blocks step | Owner | Card |
 |---|---|---|---|
 | sla-tracking keeps timers in memory until its database adapter lands (see the T minus 90 rule) | 6 | Nyendrak | future work |
-| Messages to the student (the bell and the notifications page show "No notifications yet" until the consumer is merged) | 4, 5 | Gayley | SCRUM-155, PR #134 approved |
 | Gateway has no admin (SLA policy) routes; the SLA policy is set with grpcurl before the demo | 6 | Zangmo | future work |
 
 Done since Sprint 3 (checked on main, 18 November 2026, SCRUM-153):
@@ -101,6 +100,7 @@ Done since Sprint 3 (checked on main, 18 November 2026, SCRUM-153):
 | Gateway routes for feedback, notifications and reassignment | SCRUM-147, SCRUM-142 |
 | Feedback stars on a resolved report (can be shown after step 5: set the report Resolved, the student rates it) | SCRUM-145 |
 | Installable app (PWA) with an offline banner, for the phone in step 3 | SCRUM-98 |
+| Messages to the student: "We received your report", then In progress and Resolved; the bell shows a dot | SCRUM-155 (PR #134, merged 19 Nov) |
 
 ## 6. Rehearsal log
 
