@@ -89,7 +89,6 @@ These block parts of the script. Each owner says when it is merged.
 | The escalation checker is not deployed. Nyendrak adds a run-once mode and a CronJob every minute in `deploy/knative/` (fallback while Knative is not done); Choki tests it on the cluster | 6 | Nyendrak, Choki | SCRUM-104 |
 | sla-tracking keeps timers in memory until its database adapter lands (see the T minus 90 rule) | 6 | Nyendrak | |
 | `report.list_assigned` in the authorization policy | 5 | Gayley | SCRUM-137 |
-| PWA installable (manifest, service worker) | 3 | Nyendrak | SCRUM-98 |
 | Student "My reports" page with the timeline, and the staff page ("Assigned to me", note, status); the pilot (SCRUM-113) found both missing. Being built now; if not ready, show steps 4 and 5 from the API in a terminal | 4, 5 | Nyendrak, Gayley | SCRUM-36 |
 | Web app deployed in the cluster on the same HTTPS address as `/api` | 3 | Choki (manifests), Nyendrak or Gayley (Dockerfile) | k8s: deploy the web app |
 | Gateway has no feedback, notifications, reassignment or admin (SLA policy) routes; SLA policy is set with grpcurl before the demo | 6, and the feedback step that is left out | Zangmo | after the demo, if wanted |
