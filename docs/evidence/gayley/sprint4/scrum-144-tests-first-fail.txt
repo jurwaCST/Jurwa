@@ -1,0 +1,54 @@
+
+ RUN  v5.1.0 C:/Users/Acer/Desktop/Jurwa/web
+
+ ❯ src/pages/Notifications.test.tsx (0 test)
+ ❯ src/App.test.tsx (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/App.test.tsx [ src/App.test.tsx ]
+Error: Failed to resolve import "./notifications/seen" from "src/App.test.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/Acer/Desktop/Jurwa/web/src/App.test.tsx:8:25
+  6  |  import { SESSION_KEY } from "./auth/AuthContext";
+  7  |  import { setToken } from "./api/client";
+  8  |  import { markSeen } from "./notifications/seen";
+     |                            ^
+  9  |  var _jsxFileName = "C:/Users/Acer/Desktop/Jurwa/web/src/App.test.tsx";
+  10 |  import { jsxDEV as _jsxDEV } from "react/jsx-dev-runtime";
+ ❯ TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/node.js:8861:39
+ ❯ TransformPluginContext.error node_modules/vite/dist/node/chunks/node.js:8858:14
+ ❯ resolveId node_modules/vite/dist/node/chunks/node.js:26533:18
+ ❯ node_modules/vite/dist/node/chunks/node.js:26632:23
+ ❯ TransformPluginContext.transform node_modules/vite/dist/node/chunks/node.js:26605:4
+ ❯ EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/node.js:8632:14
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/node.js:20108:26
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/pages/Notifications.test.tsx [ src/pages/Notifications.test.tsx ]
+Error: Failed to resolve import "../notifications/seen" from "src/pages/Notifications.test.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/Acer/Desktop/Jurwa/web/src/pages/Notifications.test.tsx:6:0
+  26 |  const __vi_import_2__ = await import("react-router-dom");
+  27 |  const __vi_import_3__ = await import("../api/client");
+  28 |  const __vi_import_4__ = await import("../notifications/seen");
+     |                                       ^
+  29 |  const __vi_import_5__ = await import("./Notifications");
+  30 |  const __vi_import_6__ = await import("react/jsx-dev-runtime");
+ ❯ TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/node.js:8861:39
+ ❯ TransformPluginContext.error node_modules/vite/dist/node/chunks/node.js:8858:14
+ ❯ resolveId node_modules/vite/dist/node/chunks/node.js:26533:18
+ ❯ node_modules/vite/dist/node/chunks/node.js:26632:23
+ ❯ TransformPluginContext.transform node_modules/vite/dist/node/chunks/node.js:26605:4
+ ❯ EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/node.js:8632:14
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/node.js:20108:26
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  no tests
+   Start at  22:56:22
+   Duration  3.43s (environment 73%, setup 26%, transform 1%)
+

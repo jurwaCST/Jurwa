@@ -326,7 +326,7 @@ export default function ReportForm() {
     if (!locationDone) {
       return setFieldError({
         field: 'location',
-        text: wings.length ? 'Choose the full location: building, wing and area.' : 'Choose the full location: building and area.',
+        text: wings.length ? 'Choose the full location: building, floor and area.' : 'Choose the full location: building and area.',
       })
     }
     const text = description.trim()
@@ -457,10 +457,11 @@ export default function ReportForm() {
               )}
 
               {building && wings.length > 0 && (
-                // Pilot (SCRUM-113): students found the wing step confusing.
+                // Pilot (SCRUM-113): students found the wing step confusing. Hostels
+                // keep the floor in the wing field (SCRUM-150), so it says Floor.
                 <Field
-                  label="Wing"
-                  hint="The part of the building the problem is in. Not sure? Choose the nearest wing."
+                  label="Floor"
+                  hint="The floor the problem is on. Room 101 is on Floor 1, Room 201 on Floor 2."
                   error={missing === 'wing' ? locationError : null}
                 >
                   <select
@@ -470,7 +471,7 @@ export default function ReportForm() {
                       setArea('')
                     }}
                   >
-                    <option value="">Choose a wing</option>
+                    <option value="">Choose a floor</option>
                     {wings.map((w) => (
                       <option key={w} value={w}>
                         {w}
