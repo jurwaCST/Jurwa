@@ -82,7 +82,8 @@ describe('accessibility (axe-core, WCAG 2.1 A and AA)', () => {
     it('report form with a category and building chosen', () => {
       cy.intercept('GET', '/api/categories/*/locations').as('locations')
       cy.visit('/report/new')
-      cy.findLabel('Category').select('Hostel')
+      // The category is a group of tiles since SCRUM-35, no longer a select.
+      cy.contains('.report-tile', 'Hostel').click()
       cy.wait('@locations')
       cy.findLabel('Building').should('be.visible')
       checkPage('/report/new with category chosen')
@@ -91,7 +92,7 @@ describe('accessibility (axe-core, WCAG 2.1 A and AA)', () => {
     it('report form showing its error messages', () => {
       cy.visit('/report/new')
       cy.contains('button', 'Send report').click()
-      cy.get('.error').should('be.visible')
+      cy.get('.field-error').should('be.visible')
       checkPage('/report/new with errors')
     })
 

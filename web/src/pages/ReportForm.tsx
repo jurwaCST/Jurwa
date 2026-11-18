@@ -543,7 +543,11 @@ export default function ReportForm() {
             <p id="photo-help" className="field-hint">
               Drag a photo here or choose one. JPG or PNG, at most 5 MB.
             </p>
-            {photoError && <p className="field-error">{photoError}</p>}
+            {photoError && (
+              <p role="alert" className="field-error">
+                {photoError}
+              </p>
+            )}
             {preview && photo && (
               <div className="report-photo-preview">
                 <img src={preview} alt="Photo preview" />
