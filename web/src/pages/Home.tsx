@@ -169,7 +169,15 @@ export default function Home() {
         </ul>
       </nav>
 
-      <Route />
+      {/* SCRUM-156: only students report, so only they see where a report goes.
+          A late report is escalated back to its Category Head, so they are told. */}
+      {user.roles.includes('CATEGORY_HEAD') && (
+        <p className="route-escalation">
+          <strong>A report waiting too long?</strong> When a report passes its time limit, it is escalated to you
+          automatically.
+        </p>
+      )}
+      {user.roles.includes('STUDENT') && <Route />}
     </>
   )
 }

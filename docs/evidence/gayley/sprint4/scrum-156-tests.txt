@@ -1,0 +1,4 @@
+﻿SCRUM-156 after the fix: all web tests, 17 Nov 2026 (npm run lint and tsc -b clean)
+ Test Files  12 passed (12)
+      Tests  158 passed (158)
+   Duration  11.14s (tests 48%, environment 36%, setup 9%, import 6%, transform 1%)
