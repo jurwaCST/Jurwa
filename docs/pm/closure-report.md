@@ -24,7 +24,7 @@ Every number below has a source file in the repository, named next to it. Parts 
 | C1 | 25 services | 20 services: export, holiday-calendar, digest, email-template and user-profile removed; digest emails are sent by the `digest-dispatcher` function | Less time (C2). Risk R4: the lowest-priority services are cut first; testing and documentation are never cut | `docs/pm/schedule-evm.md` section 5 |
 | C2 | 8 weeks | 3 five-day sprints, presentation about 9 November | The presentation date moved | `docs/pm/schedule-evm.md` section 5 |
 | C3 | 6 or 7 services per member | 5 services per member, plus one function for two members | An even load | `docs/pm/schedule-evm.md` section 5 |
-| C4 | 3 sprints | A fourth sprint, 11 to 17 November (its end moved to 20 November) | The rehearsal and presentation moved; the student pages the pilot found missing were built in it | `docs/pm/evm/week4.md` |
+| C4 | 3 sprints | A fourth sprint, 11 to 20 November (first planned to end on 17 November) | The rehearsal and presentation moved; the student pages the pilot found missing were built in it | `docs/pm/evm/week4.md` |
 
 Holidays and weekends are therefore not counted in SLA windows (the holiday-calendar service was one of the five removed).
 
@@ -59,7 +59,7 @@ Four of these cards were found during the sprint (7 h): SCRUM-154, 155, 156 and 
 | 1 (22 to 27 Oct) | 93.3 h | | 138 h | 96 h | 1.44 | | `docs/pm/evm/week1.md` |
 | 2 (28 Oct to 3 Nov) | 93.3 h | | 135 h | 129 h | 1.05 | | `docs/pm/evm/week2.md` |
 | 3 (4 to 10 Nov) | 93.3 h | 182.5 h | 182.5 h | 199 h | 0.92 | 1.00 | `docs/pm/evm/week3.md` |
-| 4 (11 to 17 Nov) | 0 h (not in the baseline) | 51.5 h | 42 h | 52.5 h | 0.80 | 0.82 | `docs/pm/evm/week4.md` |
+| 4 (11 to 20 Nov) | 0 h (not in the baseline) | 51.5 h | 42 h | 52.5 h | 0.80 | 0.82 | `docs/pm/evm/week4.md` |
 | **Cumulative** | **280 h** | | **497.5 h** | **476.5 h** | **1.04** | | `docs/pm/evm/week4.md` |
 
 Read honestly:

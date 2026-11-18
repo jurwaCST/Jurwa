@@ -191,4 +191,4 @@ No review meeting was held; each member sent a written retro. Highlights:
 
 ## 7. Sprint 4
 
-Sprint 4: 11 to 17 November 2026, the last sprint. Move the cards in section 3 into it in Jira. Goal (to confirm at planning): the installable PWA, the carried-over cards, the rehearsal with a real SLA escalation, the final demo, and the closure report (SCRUM-85).
+Sprint 4: 11 to 17 November 2026 (later extended to 20 November), the last sprint. Move the cards in section 3 into it in Jira. Goal (to confirm at planning): the installable PWA, the carried-over cards, the rehearsal with a real SLA escalation, the final demo, and the closure report (SCRUM-85).
