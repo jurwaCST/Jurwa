@@ -85,8 +85,8 @@ Delivery runs in three five-day sprints.
 | Sprint | Dates (2026) | Milestone |
 |---|---|---|
 | Sprint 1 | 22 to 27 Oct | Charter, requirements, plans, wireframes, service template, gRPC contracts, k3d cluster, CI, one thin-slice service per owner |
-| Sprint 2 | 28 Oct to 2 Nov | Core services implemented with unit tests, databases, PWA front end |
-| Sprint 3 | 3 to 8 Nov | Serverless functions, full deployment through Argo CD, full test suite, observability |
+| Sprint 2 | 28 Oct to 3 Nov | Core services implemented with unit tests, databases, PWA front end |
+| Sprint 3 | 4 to 10 Nov | Serverless functions, full deployment through Argo CD, full test suite, observability |
 | Presentation | around 9 Nov | Final presentation, live demo and closure report |
 
 ## 7. Stakeholders and roles

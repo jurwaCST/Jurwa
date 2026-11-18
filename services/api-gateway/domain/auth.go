@@ -46,6 +46,10 @@ const (
 	// ActionReportReassign also guards GET /positions: whoever may reassign
 	// may see whom to reassign to.
 	ActionReportReassign = "report.reassign"
+
+	ActionNotificationList     = "notification.list"
+	ActionReportFeedbackSubmit = "report.feedback.submit"
+	ActionReportFeedbackRead   = "report.feedback.read"
 )
 
 // Principal is the signed-in user, taken from a validated JWT.

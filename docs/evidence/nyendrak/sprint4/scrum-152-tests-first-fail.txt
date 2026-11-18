@@ -1,0 +1,107 @@
+SCRUM-152 tests first: web/cypress/e2e/student-pages.cy.ts run against the web app from main before the new student pages (commit adbcb2a, no My reports, report page or notifications), 2026-11-18.
+Stack: web/cypress/start-stack.sh plus the notification service, Redis for events, gateway on :18080. All 3 fail because the pages are missing; the form, routing to Assigned and the status changes worked.
+
+It looks like this is your first time using Cypress: 15.21.1
+
+❯  Verifying Cypress can run C:\Users\dellb\AppData\Local\Cypress\Cache\15.21.1\Cypress
+✔  Verified Cypress!       C:\Users\dellb\AppData\Local\Cypress\Cache\15.21.1\Cypress
+
+Opening Cypress...
+
+Warning: The allowCypressEnv configuration option is enabled. This allows any browser code to read values from Cypress.env(). This is insecure and will be removed in a future major version.
+
+1. Replace Cypress.env() calls with cy.env() (for sensitive values) or Cypress.expose() (for public configuration)
+2. Set allowCypressEnv: false in your Cypress configuration to disable Cypress.env()
+
+Learn more: https://on.cypress.io/cypress-env-migration
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        15.21.1                                                                        │
+  │ Browser:        Electron 138 (headless)                                                        │
+  │ Node Version:   v26.13.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (student-pages.cy.ts)                                                  │
+  │ Searched:       C:\Users\dellb\Jurwa\web\cypress\e2e\student-pages.cy.ts                       │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  student-pages.cy.ts                                                             (1 of 1)
+
+
+  student pages
+    1) a report sent in the form shows in My reports and its page shows Open, then Assigned
+    2) the bell opens Notifications, which shows the list or the empty state
+    3) on a resolved report the student gives four stars and sees the thank-you
+
+
+  0 passing (30s)
+  3 failing
+
+  1) student pages
+       a report sent in the form shows in My reports and its page shows Open, then Assigned:
+     AssertionError: Timed out retrying after 4000ms: Expected to find content: 'My reports' within the element: <nav.topnav> and with the selector: 'a' but never did.
+      at Context.eval (http://localhost:4175/__cypress/tests?p=cypress\e2e\student-pages.cy.ts:88:15)
+
+  2) student pages
+       the bell opens Notifications, which shows the list or the empty state:
+     AssertionError: Timed out retrying after 4000ms: Expected to find element: `a[aria-label^="Notifications"]`, but never found it.
+      at Context.eval (http://localhost:4175/__cypress/tests?p=cypress\e2e\student-pages.cy.ts:103:10)
+
+  3) student pages
+       on a resolved report the student gives four stars and sees the thank-you:
+     AssertionError: Timed out retrying after 4000ms: Expected to find content: 'What happened' within the selector: 'section' but never did.
+      at Context.eval (http://localhost:4175/__cypress/tests?p=cypress\e2e\student-pages.cy.ts:124:51)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        3                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      3                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  3                                                                                │
+  │ Video:        true                                                                             │
+  │ Duration:     29 seconds                                                                       │
+  │ Spec Ran:     student-pages.cy.ts                                                              │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\dellb\Jurwa\web\cypress\screenshots\student-pages.cy.ts\student pages -     (1280x720)
+     - a report sent in the form shows in My reports and its page shows Open, then As               
+     signed (failed).png                                                                            
+  -  C:\Users\dellb\Jurwa\web\cypress\screenshots\student-pages.cy.ts\student pages -     (1280x720)
+     - the bell opens Notifications, which shows the list or the empty state (failed)               
+     .png                                                                                           
+  -  C:\Users\dellb\Jurwa\web\cypress\screenshots\student-pages.cy.ts\student pages -     (1280x720)
+     - on a resolved report the student gives four stars and sees the thank-you (fail               
+     ed).png                                                                                        
+
+
+  (Video)
+
+  -  Video output: C:\Users\dellb\Jurwa\web\cypress\videos\student-pages.cy.ts.mp4
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ✖  student-pages.cy.ts                      00:29        3        -        3        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ✖  1 of 1 failed (100%)                     00:29        3        -        3        -        -  
+

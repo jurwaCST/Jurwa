@@ -52,7 +52,7 @@ func TestListLocationsOthersIsFlat(t *testing.T) {
 	resp, err := newTestHandler().ListLocations(context.Background(), &locationtaxonomyv1.ListLocationsRequest{Category: commonv1.Category_OTHERS})
 
 	require.NoError(t, err)
-	require.Len(t, resp.GetLocations(), 3, "the switched-off Old Workshop is left out")
+	require.Len(t, resp.GetLocations(), 7, "the switched-off sample rows (Wi-Fi, Estate, Canteen, Old Workshop) are left out")
 	for _, e := range resp.GetLocations() {
 		assert.Equal(t, domain.CampusBuilding, e.GetLocation().GetBuilding())
 		assert.Empty(t, e.GetLocation().GetWing(), "campus-wide locations have no wing")
@@ -84,11 +84,11 @@ func TestValidateLocation(t *testing.T) {
 		wantValid  bool
 		wantReason string
 	}{
-		{name: "real building, wing and area", category: commonv1.Category_HOSTEL, location: &commonv1.Location{Building: "Hostel A", Wing: "Wing 1", Area: "Bathroom 1"}, wantValid: true},
-		{name: "campus-wide area", category: commonv1.Category_OTHERS, location: &commonv1.Location{Building: "Campus", Area: "Wi-Fi"}, wantValid: true},
+		{name: "real building, floor and room", category: commonv1.Category_HOSTEL, location: &commonv1.Location{Building: "HC", Wing: "Floor 1", Area: "Room 101"}, wantValid: true},
+		{name: "campus-wide area", category: commonv1.Category_OTHERS, location: &commonv1.Location{Building: "Campus", Area: "Library"}, wantValid: true},
 		{name: "unknown building", category: commonv1.Category_HOSTEL, location: &commonv1.Location{Building: "Hostel Z"}, wantReason: domain.ReasonUnknownBuilding},
-		{name: "wing of another building", category: commonv1.Category_HOSTEL, location: &commonv1.Location{Building: "Hostel B", Wing: "Wing 1"}, wantReason: domain.ReasonUnknownWing},
-		{name: "unknown area", category: commonv1.Category_HOSTEL, location: &commonv1.Location{Building: "Hostel A", Wing: "Wing 1", Area: "Roof"}, wantReason: domain.ReasonUnknownArea},
+		{name: "floor the building does not have", category: commonv1.Category_HOSTEL, location: &commonv1.Location{Building: "HE", Wing: "Floor 3"}, wantReason: domain.ReasonUnknownWing},
+		{name: "unknown area", category: commonv1.Category_HOSTEL, location: &commonv1.Location{Building: "HC", Wing: "Floor 1", Area: "Roof"}, wantReason: domain.ReasonUnknownArea},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

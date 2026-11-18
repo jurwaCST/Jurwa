@@ -4,6 +4,7 @@
 // so it can be sent to the page's owner. See docs/testing/accessibility.md.
 
 import type { Result } from 'axe-core'
+import { sendHostelReport } from '../support/student'
 
 const WCAG = { runOnly: { type: 'tag' as const, values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] } }
 
@@ -81,7 +82,8 @@ describe('accessibility (axe-core, WCAG 2.1 A and AA)', () => {
     it('report form with a category and building chosen', () => {
       cy.intercept('GET', '/api/categories/*/locations').as('locations')
       cy.visit('/report/new')
-      cy.findLabel('Category').select('Hostel')
+      // The category is a group of tiles since SCRUM-35, no longer a select.
+      cy.contains('.report-tile', 'Hostel').click()
       cy.wait('@locations')
       cy.findLabel('Building').should('be.visible')
       checkPage('/report/new with category chosen')
@@ -90,13 +92,51 @@ describe('accessibility (axe-core, WCAG 2.1 A and AA)', () => {
     it('report form showing its error messages', () => {
       cy.visit('/report/new')
       cy.contains('button', 'Send report').click()
-      cy.get('.error').should('be.visible')
+      cy.get('.field-error').should('be.visible')
       checkPage('/report/new with errors')
     })
 
     it('a page the student may not open (403)', () => {
       cy.visit('/staff')
       checkPage('403')
+    })
+  })
+
+  // The student pages from Sprint 4 (SCRUM-143, 144, 145), added by SCRUM-152.
+  describe('as a student with a report', () => {
+    let reportId: string
+
+    beforeEach(() => {
+      cy.fixture('users.json').then((users) => {
+        cy.registerStudent().then((email) => {
+          cy.apiLogin(email, users.studentPassword).then((token) =>
+            sendHostelReport(token, 'E2E accessibility check: the tap is leaking').then((id) => {
+              reportId = id
+            }),
+          )
+          cy.uiLogin(email, users.studentPassword)
+        })
+      })
+    })
+
+    it('My reports', () => {
+      cy.visit('/reports')
+      cy.get('.myr-card').should('have.length', 1)
+      checkPage('/reports')
+    })
+
+    it('a report page with its timeline', () => {
+      cy.visit(`/reports/${reportId}`)
+      cy.contains('h2', 'What happened').should('be.visible')
+      cy.get('[aria-busy=true], .skeleton').should('not.exist')
+      checkPage('/reports/{id}')
+    })
+
+    it('notifications', () => {
+      cy.visit('/notifications')
+      cy.contains('h1', 'Notifications').should('be.visible')
+      cy.get('[aria-busy=true], .skeleton').should('not.exist')
+      checkPage('/notifications')
     })
   })
 

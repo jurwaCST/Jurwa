@@ -1,0 +1,39 @@
+--- PASS: TestListLocationsKeepsCategory (0.00s)
+--- PASS: TestListLocationsOthersIsFlat (0.00s)
+--- PASS: TestListLocationsInvalidCategory (0.00s)
+--- PASS: TestValidateLocation (0.00s)
+--- PASS: TestValidateLocationInvalidArgument (0.00s)
+--- PASS: TestInternalErrorsAreHidden (0.00s)
+--- PASS: TestCategoryToProtoUnknownIsUnspecified (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/location-taxonomy/adapters/in/grpc	0.493s
+--- PASS: TestRealLocationCounts (0.00s)
+--- PASS: TestHostelBuildingsAndFloors (0.00s)
+--- PASS: TestHostelRoomsPerFloor (0.00s)
+--- PASS: TestAcademicBlockIsOneBuildingWithoutWings (0.00s)
+--- PASS: TestOthersAreTheSevenCampusPlaces (0.00s)
+--- PASS: TestOldSampleRowsAreKeptSwitchedOff (0.00s)
+--- PASS: TestRealLocationIDsAreStableAndUnique (0.00s)
+--- PASS: TestListByCategoryReturnsOnlyThatCategory (0.00s)
+--- PASS: TestListByCategoryWithNoRowsIsEmpty (0.00s)
+--- PASS: TestListByCategoryReturnsACopy (0.00s)
+--- PASS: TestSampleEntriesFollowTheRules (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/location-taxonomy/adapters/out/memory	1.113s
+--- PASS: TestListLocationsReturnsOnlyActiveRowsOfThatCategory (0.00s)
+--- PASS: TestListLocationsRejectsBadCategory (0.00s)
+--- PASS: TestValidateLocation (0.00s)
+--- PASS: TestStorageErrorIsNotInvalidInput (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/location-taxonomy/application	1.415s
+--- PASS: TestEnvOr (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/location-taxonomy/cmd/server	0.271s
+--- PASS: TestNewEntry (0.00s)
+--- PASS: TestValidateCategory (0.00s)
+--- PASS: TestCheckLocation (0.00s)
+--- PASS: TestCheckLocationWithNoEntries (0.00s)
+--- PASS: TestActiveOnly (0.00s)
+--- PASS: TestIsUUID (0.00s)
+PASS
+ok  	github.com/jurwaCST/Jurwa/services/location-taxonomy/domain	2.062s

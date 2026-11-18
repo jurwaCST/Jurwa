@@ -20,7 +20,7 @@ The store is filled from the event bus by `adapters/in/events` (consumer group `
 |---|---|---|
 | `events:report.submitted` | `RecordSubmitted` | Creates the summary (status `OPEN`) and the first timeline entry |
 | `events:report.routed` | `RecordEvent` | Entry "Routed to <position>", assignee = `category_head_id` |
-| `events:status.changed` | `RecordEvent` | Entry "Status changed to <status>", summary status |
+| `events:status.changed` | `RecordEvent` | Entry "Status changed to <status word>" (the badge word, e.g. "In progress"), summary status |
 | `events:report.reassigned` | `RecordEvent` | Entry "Reassigned: <reason>", assignee = `to_user_id` |
 
 Each timeline entry's id is the event's `meta.event_id`, so an event delivered twice is recorded once. An event that arrives before its `report.submitted` (another stream) waits up to 5 seconds for it, then fails and is retried by the bus (after 3 attempts it goes to `<stream>.dead`). `events:escalation.compensated` is not read yet.

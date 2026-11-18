@@ -28,3 +28,5 @@ configMapGenerator:
       - ANALYTICS_ADDR=analytics:9020
       - REASSIGNMENT_ADDR=reassignment:9014
       - DEPARTMENT_DIRECTORY_ADDR=department-directory:9008
+      - NOTIFICATION_ADDR=notification:9018
+      - FEEDBACK_ADDR=feedback:9019

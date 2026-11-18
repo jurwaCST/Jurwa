@@ -11,10 +11,10 @@ The full story from the guide, and what runs today:
 | # | Step | How | Today |
 |---|---|---|---|
 | 1 | A student signs in | UI: `/login`, types email and password | **Runs** |
-| 2 | The student submits a Hostel report with a photo and sees the confirmation | UI: `/report/new` | **Partly runs**: the photo is uploaded through the `/api` proxy (`POST /photos`, SCRUM-120) and attached to a report submitted with `cy.request`. The form step waits for SCRUM-35 (Nyendrak) |
-| 3 | The report is routed to DSA (Hostel rule) | `cy.request` as the DSA Category Head: list assigned reports | **Gap**: the gateway has no route that lists assigned reports yet |
-| 4 | The Category Head sets the status In Progress, then Resolved | `cy.request` to the gateway status route | **Gap**: no status route in the gateway yet (Zangmo's stretch step) |
-| 5 | The student sees Resolved on the report timeline | UI | **Gap**: the route `GET /reports/{id}/timeline` is merged (SCRUM-119), but report-history does not read `events:report.submitted` yet, so a new report answers 404 "report not found". There is no timeline page yet either |
+| 2 | The student submits a Hostel report with a photo and sees the confirmation | UI: `/report/new` | **Runs** (SCRUM-152): the form is filled and sent in `student-pages.cy.ts` (category tile, the first real place, a description) and shows "Report sent" with the number. The photo is still attached with `cy.request` in `report-flow.cy.ts` |
+| 3 | The report is routed to DSA (Hostel rule) | `cy.request`: the report's status | **Runs** (SCRUM-152): routing-engine sends `report.routed` and the status becomes Assigned; the test waits for it (needs Redis) |
+| 4 | The Category Head sets the status In Progress, then Resolved | `cy.request` as `dsa.demo` to `POST /reports/{id}/status` | **Runs** (SCRUM-152), in the feedback test |
+| 5 | The student sees Resolved on the report timeline | UI: `/reports/{id}` | **Runs** (SCRUM-152): the timeline shows Open then Assigned, and Resolved in the feedback test |
 
 When a gap closes, the step is added to `web/cypress/e2e/report-flow.cy.ts` and this table changes to "Runs".
 
@@ -35,7 +35,21 @@ Each test registers a new student first (`cy.registerStudent()`), so it never de
 
 Photos are uploaded with the browser's own `fetch` and `FormData` through the `/api` proxy (`cy.uploadPhoto`), so the request is the same multipart body the form will send.
 
-Still to add once the form exists (guide step 5): the 501 character description and the over 5 MB photo refused **in the form**, with the message on the page.
+Still to add (guide step 5): the 501 character description and the over 5 MB photo refused **in the form**, with the message on the page. The form exists now (SCRUM-35); these two are not written yet.
+
+## The student pages (`web/cypress/e2e/student-pages.cy.ts`, SCRUM-152)
+
+Card: SCRUM-152. Owner: Nyendrak. The pages are Gayley's: My reports and the report page (SCRUM-143), notifications and the bell (SCRUM-144), feedback stars (SCRUM-145), with the gateway routes from SCRUM-147. Each test registers and signs in a new student. Helpers that set up a report and move it along are in `web/cypress/support/student.ts`.
+
+| ID | Test | Steps | Expected result | Result (18 Nov 2026) |
+|---|---|---|---|---|
+| E2E-SP-01 | a report sent in the form shows in My reports and its page shows Open, then Assigned | Sign in; Report tab; choose the Hostel tile, the first building, floor and area; type a description; Send report; wait until the status is Assigned; My reports tab; open the card | "Report sent" with the report number; My reports has one card with the badge Assigned; the report page shows the description, and "What happened" shows Open, then Assigned | Pass |
+| E2E-SP-02 | the bell opens Notifications, which shows the list or the empty state | Sign in; click the bell | The address is `/notifications`, the heading is Notifications, `GET /me/notifications` answers 200, and the page shows the list or "No notifications yet", never an error | Pass |
+| E2E-SP-03 | on a resolved report the student gives four stars and sees the thank-you | Send a Hostel report (`cy.request`); as `dsa.demo`, wait for Assigned, then set In Progress and Resolved; open the report page; click the 4th star; type a comment; Send feedback | "What happened" shows Resolved; the choice reads "4 stars out of 5"; `POST /reports/{id}/feedback` answers 200 or 201; the page says "You rated this 4 out of 5 stars." | Pass |
+
+Evidence: `docs/evidence/nyendrak/sprint4/scrum-152-tests-first-fail.txt` (the tests run first against main from before the pages, commit `adbcb2a`: 3 of 3 fail because the pages are missing, while the form, routing and status changes already work) and `scrum-152-tests.txt` (the whole suite after: **26 of 26 pass**, report flow 8, accessibility 15, student pages 3). Screenshots of each page at phone (390 px) and laptop (1366 px) width, light and dark: `scrum-152-<page>-<size>-<mode>.png`.
+
+The routing step happens over the event bus a moment after the report is sent, so `waitForStatus` asks for the status up to 20 times, half a second apart, instead of one fixed wait.
 
 Waits use `cy.intercept(...).as('login')` and `cy.wait('@login')`, never a fixed `cy.wait(2000)`.
 
@@ -86,5 +100,8 @@ CI would need the whole stack (gateway, eight services, the web dev server) in t
 
 ## Known gaps
 
-- Steps 2 to 5 of the story wait for the report form (SCRUM-35), a route listing assigned reports (`ListReportsByAssignee`, Choki, then `GET /me/assigned-reports`, Zangmo), the status routes (Zangmo) and report-history reading events (for the timeline). See the table above.
+- The student pages tests need Redis (routing, status) and the notification service. `start-stack.sh` does not start `notification` yet; until it does, start it next to the stack (`go run ./services/notification/cmd/server`, port 9018), or E2E-SP-02 fails with an error on the page.
+- Notifications: nothing creates a notification for a student yet (the notification service reads no events), so E2E-SP-02 only ever sees the empty state. When notifications are sent, the test already accepts the list.
+- Feedback (SCRUM-145) is clicked through in E2E-SP-03 but not yet checked by axe.
+- (Closed by SCRUM-152) Steps 2 to 5 of the story waited for the report form (SCRUM-35), a route listing assigned reports (`ListReportsByAssignee`, Choki, then `GET /me/assigned-reports`, Zangmo), the status routes (Zangmo) and report-history reading events (for the timeline). See the table above.
 - Cypress warns that `Cypress.env()` will be replaced by `cy.env()` and `Cypress.expose()` in a future version. It still works in 15.21; change it when upgrading.

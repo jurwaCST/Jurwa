@@ -2,7 +2,7 @@
 
 ## What it does
 
-Knows the 5 academic departments and every position a report can be routed or reassigned to, and who holds each one:
+Knows the 6 academic departments (5 Heads of Department; Mechanical's Programme Leader acts as HoD) and every position a report can be routed or reassigned to, and who holds each one:
 
 | Kind | Positions |
 |---|---|

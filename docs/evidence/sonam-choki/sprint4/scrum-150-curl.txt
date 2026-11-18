@@ -1,0 +1,36 @@
+# SCRUM-150 live check, 2026-11-12T08:10Z, k3d cluster, branch SCRUM-150-real-locations (commit d46114b)
+# Signed in as dsa.demo; the token is not shown. Responses summarised with python3.
+
+$ curl -sk https://jurwa.localtest.me/api/categories/HOSTEL/locations -H 'Authorization: Bearer <token>'
+525 locations
+  HA | floors: Floor 1, Floor 2, Floor 3 | 51 places
+  HB | floors: Floor 1, Floor 2, Floor 3 | 51 places
+  HC | floors: Floor 1, Floor 2, Floor 3 | 51 places
+  HD | floors: Floor 1, Floor 2, Floor 3 | 51 places
+  HE | floors: Floor 1, Floor 2 | 53 places
+  HF | floors: Floor 1, Floor 2, Floor 3 | 84 places
+  NK | floors: Floor 1, Floor 2, Floor 3, Floor 4 | 56 places
+  RKA | floors: Floor 1, Floor 2, Floor 3, Floor 4 | 64 places
+  RKB | floors: Floor 1, Floor 2, Floor 3, Floor 4 | 64 places
+  e.g. 6c217675-d85b-5899-a76f-036a506b6219 {'building': 'HA', 'wing': 'Floor 1', 'area': 'Room 101'}
+  e.g. 7bcd27d7-544e-5b5b-91a8-d48403b908bf {'building': 'HA', 'wing': 'Floor 1', 'area': 'Room 102'}
+  e.g. 72160517-ccbb-5b03-a8f1-2187174f20c1 {'building': 'RKB', 'wing': 'Floor 4', 'area': 'Right wing bathroom'}
+
+$ curl -sk https://jurwa.localtest.me/api/categories/ACADEMIC_BLOCK/locations -H 'Authorization: Bearer <token>'
+20 locations
+  Academic Block | floors: - | 20 places
+  e.g. db43d1f5-518c-538a-9777-3be2034118d3 {'building': 'Academic Block', 'wing': '', 'area': 'CR1'}
+  e.g. c85c6533-f310-599b-ab3c-577ec02eccb7 {'building': 'Academic Block', 'wing': '', 'area': 'CR2'}
+  e.g. 9c381a6b-e51e-54db-a99e-f477d35b6422 {'building': 'Academic Block', 'wing': '', 'area': 'LH5'}
+
+$ curl -sk https://jurwa.localtest.me/api/categories/OTHERS/locations -H 'Authorization: Bearer <token>'
+7 locations
+  Campus | floors: - | 7 places
+  e.g. 44646214-46d8-5aea-aace-3ba9e89f95b9 {'building': 'Campus', 'wing': '', 'area': 'Library'}
+  e.g. 5223e63e-a873-516e-9029-853e9985d757 {'building': 'Campus', 'wing': '', 'area': 'Mess'}
+  e.g. 0c40e1d7-05cb-583d-b4d2-5c6f3428c4dc {'building': 'Campus', 'wing': '', 'area': 'Gym'}
+
+$ curl -sk https://jurwa.localtest.me/api/categories -H 'Authorization: Bearer <token>'   (Others description)
+  HOSTEL | Rooms, bathrooms, water and electricity in the hostels
+  ACADEMIC_BLOCK | Classrooms, labs and equipment in the academic blocks
+  OTHERS | Campus places such as the library, mess, gym and sports grounds

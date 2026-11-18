@@ -39,7 +39,7 @@ function Route() {
       </ol>
       <p className="route-escalation">
         <strong>Nobody acting on it?</strong> Every category has a time limit. When it passes, the report is escalated
-        automatically to the next person up.
+        to the Category Head automatically.
       </p>
     </section>
   )
@@ -65,7 +65,7 @@ const categories = [
   {
     name: 'Others',
     head: 'SSO',
-    covers: 'Campus-wide issues such as Wi-Fi, roads and grounds',
+    covers: 'Campus places such as the library, mess, gym and sports grounds',
     photo: '/campus/aerial.jpg',
     alt: 'The CST campus on its hillside from above, with the football ground and winding roads',
   },
@@ -169,7 +169,15 @@ export default function Home() {
         </ul>
       </nav>
 
-      <Route />
+      {/* SCRUM-156: only students report, so only they see where a report goes.
+          A late report is escalated back to its Category Head, so they are told. */}
+      {user.roles.includes('CATEGORY_HEAD') && (
+        <p className="route-escalation">
+          <strong>A report waiting too long?</strong> When a report passes its time limit, it is escalated to you
+          automatically.
+        </p>
+      )}
+      {user.roles.includes('STUDENT') && <Route />}
     </>
   )
 }

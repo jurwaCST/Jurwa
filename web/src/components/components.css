@@ -151,6 +151,35 @@
   font-size: var(--text-sm);
 }
 
+/* The bell for students (SCRUM-144): a 44px round link like Sign out, with a
+   saffron dot for new messages. The link's name says "new" too, so the dot
+   is not the only cue. */
+.bell {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.1);
+  color: #ffffff;
+}
+
+.bell[aria-current='page'] {
+  box-shadow: inset 0 -3px 0 var(--saffron-500);
+}
+
+.bell-dot {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.5rem;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: var(--saffron-500);
+  box-shadow: 0 0 0 2px var(--pine-800);
+}
+
 /* ---- Page area and footer ---- */
 
 .page {

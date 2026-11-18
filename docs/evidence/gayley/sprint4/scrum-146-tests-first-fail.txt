@@ -1,0 +1,391 @@
+﻿
+ RUN  v5.1.0 C:/Users/Acer/Desktop/Jurwa/web
+
+ ❯ src/App.test.tsx (22 tests | 1 failed | 21 skipped) 43ms
+   ❯ routes (4)
+     × home says an escalated report goes to the Category Head 41ms
+node.exe : 
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/App.test.tsx > routes > home says an escalated report goes to the Category Head
+TestingLibraryElementError: Unable to find an element with the text: /the report is escalated to the Category Head 
+automatically/. This could be because the text is broken up by multiple elements. In this case, you can provide a 
+function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<a[39m
+      [33mclass[39m=[32m"skip-link"[39m
+      [33mhref[39m=[32m"#main"[39m
+    [36m>[39m
+      [0mSkip to content[0m
+    [36m</a>[39m
+    [36m<header[39m
+      [33mclass[39m=[32m"topbar"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"topbar-inner"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"brand"[39m
+          [33mdata-discover[39m=[32m"true"[39m
+          [33mhref[39m=[32m"/"[39m
+        [36m>[39m
+          [36m<img[39m
+            [33malt[39m=[32m""[39m
+            [33mclass[39m=[32m"brand-logo"[39m
+            [33mheight[39m=[32m"36"[39m
+            [33msrc[39m=[32m"/cst-logo.jpg"[39m
+            [33mwidth[39m=[32m"36"[39m
+          [36m/>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"brand-name"[39m
+          [36m>[39m
+            [0mJurwa[0m
+          [36m</span>[39m
+          [0m [0m
+          [36m<span[39m
+            [33mclass[39m=[32m"brand-place"[39m
+          [36m>[39m
+            [0mCollege of Science and Technology[0m
+          [36m</span>[39m
+        [36m</a>[39m
+      [36m</div>[39m
+    [36m</header>[39m
+    [36m<main[39m
+      [33mclass[39m=[32m"page"[39m
+      [33mid[39m=[32m"main"[39m
+      [33mtabindex[39m=[32m"-1"[39m
+    [36m>[39m
+      [36m<section[39m
+        [33mclass[39m=[32m"hero"[39m
+      [36m>[39m
+        [36m<img[39m
+          [33malt[39m=[32m"The CST hall in Rinchending, with CST spelled out in solar panels on its teal roof"[39m
+          [33mclass[39m=[32m"hero-photo"[39m
+          [33mfetchpriority[39m=[32m"high"[39m
+          [33msrc[39m=[32m"/campus/cst-roof.jpg"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"hero-text"[39m
+        [36m>[39m
+          [36m<h1>[39m
+            [0mSee something broken on campus?[0m
+          [36m</h1>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"hero-lead"[39m
+          [36m>[39m
+            [0mA leaking tap, a dead light, a broken window. Report it in under two minutes, and Jurwa sends it to 
+the person who can fix it.[0m
+          [36m</p>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"hero-actions"[39m
+          [36m>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"action"[39m
+              [33mdata-discover[39m=[32m"true"[39m
+              [33mhref[39m=[32m"/login"[39m
+            [36m>[39m
+              [0mSign in[0m
+            [36m</a>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"hero-link"[39m
+              [33mdata-discover[39m=[32m"true"[39m
+              [33mhref[39m=[32m"/register"[39m
+            [36m>[39m
+              [0mCreate a student account[0m
+            [36m</a>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"places-title"[39m
+        [33mclass[39m=[32m"places"[39m
+      [36m>[39m
+        [36m<h2[39m
+          [33mid[39m=[32m"places-title"[39m
+        [36m>[39m
+          [0mWho fixes what[0m
+        [36m</h2>[39m
+        [36m<ul>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"place"[39m
+          [36m>[39m
+            [36m<img[39m
+              [33malt[39m=[32m"Red-roofed hostel blocks on the CST campus"[39m
+              [33mloading[39m=[32m"lazy"[39m
+              [33msrc[39m=[32m"/campus/hostels.jpg"[39m
+            [36m/>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"place-text"[39m
+            [36m>[39m
+              [36m<h3>[39m
+                [0mHostel[0m
+              [36m</h3>[39m
+              [36m<p>[39m
+                [0mRooms, bathrooms, water and electricity in the hostels[0m
+                [0m.[0m
+              [36m</p>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"place-head"[39m
+              [36m>[39m
+                [0mGoes to the [0m
+                [36m<strong>[39m
+                  [0mDSA[0m
+                [36m</strong>[39m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"place"[39m
+          [36m>[39m
+            [36m<img[39m
+              [33malt[39m=[32m"The yellow and red academic block beside the lamp-lined road"[39m
+              [33mloading[39m=[32m"lazy"[39m
+              [33msrc[39m=[32m"/campus/academic-block.jpg"[39m
+            [36m/>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"place-text"[39m
+            [36m>[39m
+              [36m<h3>[39m
+                [0mAcademic Block[0m
+              [36m</h3>[39m
+              [36m<p>[39m
+                [0mClassrooms, labs and equipment in the academic blocks[0m
+                [0m.[0m
+              [36m</p>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"place-head"[39m
+              [36m>[39m
+                [0mGoes to the [0m
+                [36m<strong>[39m
+                  [0mDAA[0m
+                [36m</strong>[39m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"place"[39m
+          [36m>[39m
+            [36m<img[39m
+              [33malt[39m=[32m"The CST campus on its hillside from above, with the football ground and winding 
+roads"[39m
+              [33mloading[39m=[32m"lazy"[39m
+              [33msrc[39m=[32m"/campus/aerial.jpg"[39m
+            [36m/>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"place-text"[39m
+            [36m>[39m
+              [36m<h3>[39m
+                [0mOthers[0m
+              [36m</h3>[39m
+              [36m<p>[39m
+                [0mCampus-wide issues such as Wi-Fi, roads and grounds[0m
+                [0m.[0m
+              [36m</p>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"place-head"[39m
+              [36m>[39m
+                [0mGoes to the [0m
+                [36m<strong>[39m
+                  [0mSSO[0m
+                [36m</strong>[39m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</li>[39m
+        [36m</ul>[39m
+      [36m</section>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"route-title"[39m
+        [33mclass[39m=[32m"route"[39m
+      [36m>[39m
+        [36m<h2[39m
+          [33mid[39m=[32m"route-title"[39m
+        [36m>[39m
+          [0mWhere your report goes[0m
+        [36m</h2>[39m
+        [36m<ol>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"stop stop-open"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"stop-dot"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"icon"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mfocusable[39m=[32m"false"[39m
+                [33mheight[39m=[32m"20"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"20"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</span>[39m
+            [36m<strong>[39m
+              [0mOpen[0m
+            [36m</strong>[39m
+            [36m<p>[39m
+              [0mYou choose the category and the place, describe it and add a photo if you have one.[0m
+            [36m</p>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"stop stop-assigned"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"stop-dot"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"icon"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mfocusable[39m=[32m"false"[39m
+                [33mheight[39m=[32m"20"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"20"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M15 19a5 5 0 0 0-10 0M10 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM17 8l2 2 4-4"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</span>[39m
+            [36m<strong>[39m
+              [0mAssigned[0m
+            [36m</strong>[39m
+            [36m<p>[39m
+              [0mIt goes straight to the head for its category, by category and place only.[0m
+            [36m</p>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"stop stop-progress"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"stop-dot"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"icon"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mfocusable[39m=[32m"false"[39m
+                [33mheight[39m=[32m"20"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"20"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M12 21a9 9 0 1 0 0-18M12 7v5l3 2"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</span>[39m
+            [36m<strong>[39m
+              [0mIn progress[0m
+            [36m</strong>[39m
+            [36m<p>[39m
+              [0mThe Category Head or their staff take it on.[0m
+            [36m</p>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"stop stop-resolved"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"stop-dot"[39m
+            [36m>[39m
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 21 skipped (22)
+   Start at  10:25:37
+   Duration  4.01s (environment 59%, setup 20%, import 14%, transform 6%, tests 1%)
+
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"icon"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mfocusable[39m=[32m"false"[39m
+                [33mheight[39m=[32m"20"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"20"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM8 12.5l2.7 2.7L16 10"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</span>[39m
+            [36m<strong>[39m
+              [0mResolved[0m
+            [36m</strong>[39m
+            [36m<p>[39m
+              [0mIt is fixed and marked resolved.[0m
+            [36m</p>[39m
+          [36m</li>[39m
+        [36m</ol>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"route-escalation"[39m
+        [36m>[39m
+          [36m<strong>[39m
+            [0mNobody acting on it?[0m
+          [36m</strong>[39m
+          [0m Every category has a time limit. When it passes, the report is escalated automatically to the next 
+person up.[0m
+        [36m</p>[39m
+      [36m</section>[39m
+    [36m</main>[39m
+    [36m<footer[39m
+      [33mclass[39m=[32m"footer"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"footer-inner"[39m
+      [36m>[39m
+        [36m<p>[39m
+          [36m<strong>[39m
+            [0mJurwa[0m
+          [36m</strong>[39m
+          [0m, campus facility reporting for the College of Science and Technology, Royal University of Bhutan.[0m
+        [36m</p>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"muted"[39m
+        [36m>[39m
+          [0mGroup 6 project for SWE302, SWE303 and WEB303.[0m
+        [36m</p>[39m
+      [36m</div>[39m
+    [36m</footer>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/App.test.tsx:51:19
+     49|   it('home says an escalated report goes to the Category Head', () => {
+     50|     renderAt('/')
+     51|     expect(screen.getByText(/the report is escalated to the Category H…
+       |                   ^
+     52|     expect(screen.queryByText(/next person up/)).not.toBeInTheDocument…
+     53|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

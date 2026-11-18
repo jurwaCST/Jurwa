@@ -1,0 +1,17 @@
+﻿SCRUM-156 tests first, before the fix (web/src/pages/Home.test.tsx), 17 Nov 2026
+ ❯ src/pages/Home.test.tsx (6 tests | 4 failed) 115ms
+     × tells a Category Head that late reports come to them, without the student route 15ms
+     × gives STAFF only their page 10ms
+     × gives SYSTEM_ADMIN only their page 9ms
+     × gives PRESIDENT only their page 8ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/pages/Home.test.tsx > SCRUM-156 signed-in home by role > tells a Category Head that late reports come to 
+TestingLibraryElementError: Unable to find an element with the text: /passes its time limit, it is escalated to you 
+ FAIL  src/pages/Home.test.tsx > SCRUM-156 signed-in home by role > gives STAFF only their page
+ FAIL  src/pages/Home.test.tsx > SCRUM-156 signed-in home by role > gives SYSTEM_ADMIN only their page
+ FAIL  src/pages/Home.test.tsx > SCRUM-156 signed-in home by role > gives PRESIDENT only their page
+Error: expect(element).not.toBeInTheDocument()
+expected document not to contain element, found <h2
+ Test Files  1 failed (1)
+      Tests  4 failed | 2 passed (6)
+   Duration  1.42s (environment 64%, setup 13%, tests 9%, import 7%, transform 6%, worker 1%)

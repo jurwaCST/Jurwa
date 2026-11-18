@@ -1,0 +1,26 @@
+# SCRUM-150 tests first: Others description (Go)
+ok  	github.com/jurwaCST/Jurwa/services/category-taxonomy/adapters/in/grpc	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/category-taxonomy/adapters/out/memory	(cached)
+--- FAIL: TestSchemaReplacesOnlyTheOldOthersText (0.00s)
+        	Error:      	"-- Service: category-taxonomy (owner: Sonam Zangmo)\n-- Database: category_taxonomy (PostgreSQL 16). Only this service connects to it.\n\nCREATE TABLE IF NOT EXISTS categories (\n    code          TEXT        PRIMARY KEY,\n    name          TEXT        NOT NULL,\n    description   TEXT        NOT NULL DEFAULT '',\n    sort_order    INTEGER     NOT NULL DEFAULT 0,\n    is_active     BOOLEAN     NOT NULL DEFAULT TRUE,\n    head_position TEXT        NOT NULL DEFAULT '',   -- department-directory position code: DSA, DAA or SSO\n    updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()\n);\n\n-- Added in Sprint 3 (SCRUM-124); safe on a table created from the earlier file.\nALTER TABLE categories ADD COLUMN IF NOT EXISTS head_position TEXT NOT NULL DEFAULT '';\n\n-- The three agreed categories (decisions 1 and 2), the same values as\n-- services/category-taxonomy/domain DefaultCategories.\nINSERT INTO categories (code, name, description, sort_order, head_position) VALUES\n    ('HOSTEL',         'Hostel',         'Rooms, bathrooms, water and electricity in the hostels', 1, 'DSA'),\n    ('ACADEMIC_BLOCK', 'Academic Block', 'Classrooms, labs and equipment in the academic blocks',  2, 'DAA'),\n    ('OTHERS',         'Others',         'Campus-wide issues such as Wi-Fi, roads and grounds',    3, 'SSO')\nON CONFLICT (code) DO NOTHING;\n" does not contain "UPDATE categories SET description = 'Campus-wide issues such as Wi-Fi, roads and grounds'"
+        	Error:      	"-- Service: category-taxonomy (owner: Sonam Zangmo)\n-- Database: category_taxonomy (PostgreSQL 16). Only this service connects to it.\n\nCREATE TABLE IF NOT EXISTS categories (\n    code          TEXT        PRIMARY KEY,\n    name          TEXT        NOT NULL,\n    description   TEXT        NOT NULL DEFAULT '',\n    sort_order    INTEGER     NOT NULL DEFAULT 0,\n    is_active     BOOLEAN     NOT NULL DEFAULT TRUE,\n    head_position TEXT        NOT NULL DEFAULT '',   -- department-directory position code: DSA, DAA or SSO\n    updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()\n);\n\n-- Added in Sprint 3 (SCRUM-124); safe on a table created from the earlier file.\nALTER TABLE categories ADD COLUMN IF NOT EXISTS head_position TEXT NOT NULL DEFAULT '';\n\n-- The three agreed categories (decisions 1 and 2), the same values as\n-- services/category-taxonomy/domain DefaultCategories.\nINSERT INTO categories (code, name, description, sort_order, head_position) VALUES\n    ('HOSTEL',         'Hostel',         'Rooms, bathrooms, water and electricity in the hostels', 1, 'DSA'),\n    ('ACADEMIC_BLOCK', 'Academic Block', 'Classrooms, labs and equipment in the academic blocks',  2, 'DAA'),\n    ('OTHERS',         'Others',         'Campus-wide issues such as Wi-Fi, roads and grounds',    3, 'SSO')\nON CONFLICT (code) DO NOTHING;\n" does not contain "WHERE code = 'OTHERS' AND description = 'Campus-wide issues such as Wi-Fi, roads and grounds'"
+        	Error:      	"874" is not less than "-1"
+FAIL
+FAIL	github.com/jurwaCST/Jurwa/services/category-taxonomy/adapters/out/postgres	1.248s
+ok  	github.com/jurwaCST/Jurwa/services/category-taxonomy/application	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/category-taxonomy/cmd/server	(cached)
+--- FAIL: TestOthersDescriptionNamesPlaces (0.00s)
+        	Error:      	Not equal: 
+        	            	expected: "Campus places such as the library, mess, gym and sports grounds"
+        	            	actual  : "Campus-wide issues such as Wi-Fi, roads and grounds"
+        	Error:      	"Campus-wide issues such as Wi-Fi, roads and grounds" should not contain "Wi-Fi"
+FAIL
+FAIL	github.com/jurwaCST/Jurwa/services/category-taxonomy/domain	0.733s
+FAIL
+
+# SCRUM-150 tests first: Others description (web)
+     × describes Others as campus places, without Wi-Fi 17ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/pages/Home.test.tsx > home page categories > describes Others as campus places, without Wi-Fi
+TestingLibraryElementError: Unable to find an element with the text: Campus places such as the library, mess, gym and sports grounds. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+      Tests  1 failed (1)

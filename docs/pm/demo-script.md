@@ -42,8 +42,8 @@ Demo accounts come from identity's seed (`SEED_DEMO_USERS=true`, SCRUM-126). The
 | # | Who clicks | What to do | What the audience must see | Route or service |
 |---|---|---|---|---|
 | 2 | Zangmo | Open Argo CD (`kubectl -n argocd port-forward svc/argocd-server 8443:443`). Then `kubectl -n jurwa scale deploy/api-gateway --replicas=0` | App `jurwa` Synced and Healthy; the gateway is back to 1 within seconds | Argo CD selfHeal |
-| 3 | Nyendrak | On the phone: sign in with the prepared student account (the PWA has no sign-up page; the account is made with `POST /auth/register` before the demo, like the pilot accounts), open "New report", pick Hostel, Hostel B, write "Tap leaking", attach a photo, submit | Confirmation with the report id, in under 2 minutes | `POST /photos`, `POST /reports` |
-| 4 | Choki | Same phone: "My reports", open the report | Status ASSIGNED to DSA; timeline with "Report submitted" and "Routed to DSA" | `GET /me/reports`, `GET /reports/{id}/timeline`; routing-engine `report.routed` |
+| 3 | Nyendrak | On the phone: sign in with the prepared student account (made before the demo on the sign-up page or with `POST /auth/register`), open "Report", pick the Hostel tile, a hostel, its floor and area, write "Tap leaking", attach a photo, send | Confirmation with the report id, in under 2 minutes | `POST /photos`, `POST /reports` |
+| 4 | Choki | Same phone: "My reports", open the report | Badge Assigned; timeline "Open" (Report submitted), then "Assigned"; the bell has a new message "We received your report" once SCRUM-155 is merged | `GET /me/reports`, `GET /reports/{id}/timeline`; routing-engine `report.routed` |
 | 5 | Zangmo | Laptop: sign in as `dsa.demo@jurwa.example`; "Assigned to me"; open the report; add the note "Plumber booked for 2 pm"; set status In Progress | The report is in the list; the note is saved; status IN_PROGRESS; the student's timeline updates | `GET /me/assigned-reports`, `POST /reports/{id}/notes`, `POST /reports/{id}/status` |
 | 6 | Nyendrak | Open the report prepared before the demo (section 3) | Status ESCALATED, timeline "SLA lapsed", reassigned by the Saga | sla-tracking, sla-escalation-checker, status-lifecycle, reassignment |
 | 7 | Gayley | Sign in as `admin.demo`, then `president.demo` | Counts per status and per category, including the reports from this demo | `GET /dashboard/summary`, `GET /dashboard/categories` |
@@ -85,14 +85,22 @@ These block parts of the script. Each owner says when it is merged.
 
 | Item | Blocks step | Owner | Card |
 |---|---|---|---|
-| Nothing calls sla-tracking `StartTimer`, so no report gets an SLA timer in a real run. Nyendrak is adding the consumers: report.submitted registers OPEN in status-lifecycle; report.routed sets ASSIGNED, records the first assignee in reassignment and starts the timer; status.changed to RESOLVED stops it | 6 | Nyendrak | in progress |
-| The escalation checker is not deployed. Nyendrak adds a run-once mode and a CronJob every minute in `deploy/knative/` (fallback while Knative is not done); Choki tests it on the cluster | 6 | Nyendrak, Choki | SCRUM-104 |
-| sla-tracking keeps timers in memory until its database adapter lands (see the T minus 90 rule) | 6 | Nyendrak | |
-| `report.list_assigned` in the authorization policy | 5 | Gayley | SCRUM-137 |
-| PWA installable (manifest, service worker) | 3 | Nyendrak | SCRUM-98 |
-| Student "My reports" page with the timeline, and the staff page ("Assigned to me", note, status); the pilot (SCRUM-113) found both missing. Being built now; if not ready, show steps 4 and 5 from the API in a terminal | 4, 5 | Nyendrak, Gayley | SCRUM-36 |
-| Web app deployed in the cluster on the same HTTPS address as `/api` | 3 | Choki (manifests), Nyendrak or Gayley (Dockerfile) | k8s: deploy the web app |
-| Gateway has no feedback, notifications, reassignment or admin (SLA policy) routes; SLA policy is set with grpcurl before the demo | 6, and the feedback step that is left out | Zangmo | after the demo, if wanted |
+| sla-tracking keeps timers in memory until its database adapter lands (see the T minus 90 rule) | 6 | Nyendrak | future work |
+| Messages to the student (the bell and the notifications page show "No notifications yet" until the consumer is merged) | 4, 5 | Gayley | SCRUM-155, PR #134 approved |
+| Gateway has no admin (SLA policy) routes; the SLA policy is set with grpcurl before the demo | 6 | Zangmo | future work |
+
+Done since Sprint 3 (checked on main, 18 November 2026, SCRUM-153):
+
+| Item | Done by |
+|---|---|
+| Consumers that start the SLA timer (report.submitted, report.routed, status.changed) | sla-tracking, status-lifecycle and reassignment consumers |
+| Escalation checker deployed (CronJob fallback, and Knative PingSource on Choki's cluster) | SCRUM-104 |
+| `report.list_assigned` in the authorization policy | SCRUM-137 |
+| Student "My reports" with the timeline, and the staff page ("Assigned to me", note, status, reassign) | SCRUM-143, SCRUM-36 |
+| Web app deployed in the cluster on the same HTTPS address as `/api` | SCRUM-139 |
+| Gateway routes for feedback, notifications and reassignment | SCRUM-147, SCRUM-142 |
+| Feedback stars on a resolved report (can be shown after step 5: set the report Resolved, the student rates it) | SCRUM-145 |
+| Installable app (PWA) with an offline banner, for the phone in step 3 | SCRUM-98 |
 
 ## 6. Rehearsal log
 

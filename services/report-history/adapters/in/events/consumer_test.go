@@ -107,7 +107,7 @@ func TestTheFourStreamsBuildTheReadModel(t *testing.T) {
 	assert.Equal(t, []string{domain.EventReportSubmitted, domain.EventReportRouted, domain.EventStatusChanged, domain.EventReportReassigned},
 		[]string{tl[0].EventType, tl[1].EventType, tl[2].EventType, tl[3].EventType})
 	assert.Equal(t, "Routed to DSA", tl[1].Summary)
-	assert.Equal(t, "Status changed to ASSIGNED", tl[2].Summary)
+	assert.Equal(t, "Status changed to Assigned", tl[2].Summary, "same word as the badge")
 	assert.Equal(t, "Reassigned: Lab equipment", tl[3].Summary)
 	assert.Equal(t, eventID(2), tl[1].ID, "the event id is the entry id")
 

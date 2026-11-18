@@ -42,6 +42,15 @@ docker build -f web/Dockerfile -t jurwa-web web     # from the repo root; the co
 docker run --rm -p 8088:8080 jurwa-web              # http://localhost:8088
 ```
 
+## Install as an app
+
+The app is a PWA (SCRUM-98, NFR-07): `public/manifest.webmanifest` (name, pine theme colour, icons made from `cst-logo.jpg`) and a hand-written service worker in `public/sw.js`, registered by `src/pwa/register.ts` in the built app only (never in `npm run dev`).
+
+- **Install:** on a phone, open the HTTPS address and use "Add to home screen" (Android Chrome also offers "Install app"). On a laptop, Chrome shows an install icon in the address bar.
+- **Offline:** pages open from the saved app shell, and a banner says "You are offline. Showing saved pages." (`src/pwa/OfflineBanner.tsx`). Only the app's own files (HTML, JS, CSS, icons) are kept. API calls (`/api/...`) and any other address are never answered or kept by the service worker: reports, photos and notifications are private to each user, so on a shared phone or lab PC the next person never sees them. Without a connection those calls fail as usual.
+- **Updating:** change `CACHE_VERSION` in `sw.js` when the list of shell files changes; older caches are deleted when the new worker starts. nginx never caches `sw.js`, so browsers see a new version on the next visit.
+- **Check:** `npm run build && npm run preview`, then Chrome DevTools, Application tab: Manifest (no errors, "Installable") and Service workers (activated and running).
+
 ## Folders
 
 | Path | Content | Owner |
@@ -86,6 +95,9 @@ Phones get a bottom tab bar and laptops a top bar; the tabs come from `src/compo
 | `/` | `Home.tsx` | everyone (links by role) | Gayley |
 | `/login` | `Login.tsx` | everyone | Gayley |
 | `/report/new` | `ReportForm.tsx` | Student | Nyendrak, SCRUM-35 |
+| `/reports` | `MyReports.tsx` | Student (own reports, `GET /me/reports`) | Gayley, SCRUM-143 |
+| `/reports/:reportId` | `ReportDetail.tsx` | Student (own report: details, photo, timeline) | Gayley, SCRUM-143 |
+| `/notifications` | `Notifications.tsx` | Student (own messages by day, `GET /me/notifications`; the header bell shows a dot for new ones) | Gayley, SCRUM-144 |
 | `/staff` | `StaffView.tsx` | Category Head, Staff | Nyendrak, SCRUM-36 |
 | `/admin` | `AdminDashboard.tsx` | System Administrator | Nyendrak, SCRUM-37 |
 | `/president` | `PresidentDashboard.tsx` | College President | Gayley, SCRUM-99 |

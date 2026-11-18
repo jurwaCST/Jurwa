@@ -23,7 +23,7 @@ Required fields are marked with a red `*`. The Submit button stays disabled unti
 
 **2a. My queue.** A list of the reports assigned to the signed-in Category Head (DAA in the example). Each card shows the report id, a status badge, category, location, age and a short description. Filter chips narrow the list by status: All, Open, Assigned, In Progress, Resolved, Escalated (FR-18). Each card has **Reassign** and **Update status** actions (FR-19, FR-20). Escalated reports have a filled badge so they stand out.
 
-**2b. Reassign.** Picks the person to reassign to, loaded from the department directory. The DAA sees the 5 departmental HoDs; the DSA and SSO see their own staff lists. An optional internal note is never shown to the student (FR-21).
+**2b. Reassign.** Picks the person to reassign to, loaded from the department directory. The DAA sees the 6 departmental HoDs (5 HoDs; Mechanical's Programme Leader acts as HoD); the DSA and SSO see their own staff lists. An optional internal note is never shown to the student (FR-21).
 
 Staff users reached by reassignment (councillors, HoDs, estate staff) use the same queue screen, showing only reports assigned to them (FR-22, FR-23).
 

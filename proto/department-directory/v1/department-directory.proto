@@ -7,7 +7,7 @@ package jurwa.departmentdirectory.v1;
 option go_package = "github.com/jurwaCST/Jurwa/proto/gen/department-directory/v1;departmentdirectoryv1";
 
 service DepartmentDirectoryService {
-  // The 5 academic departments.
+  // The 6 academic departments.
   rpc ListDepartments(ListDepartmentsRequest) returns (ListDepartmentsResponse);
   // The Head of Department position for one department.
   // Errors: NOT_FOUND when the department or its HoD position is unknown.

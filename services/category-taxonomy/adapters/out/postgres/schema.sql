@@ -19,5 +19,12 @@ ALTER TABLE categories ADD COLUMN IF NOT EXISTS head_position TEXT NOT NULL DEFA
 INSERT INTO categories (code, name, description, sort_order, head_position) VALUES
     ('HOSTEL',         'Hostel',         'Rooms, bathrooms, water and electricity in the hostels', 1, 'DSA'),
     ('ACADEMIC_BLOCK', 'Academic Block', 'Classrooms, labs and equipment in the academic blocks',  2, 'DAA'),
-    ('OTHERS',         'Others',         'Campus-wide issues such as Wi-Fi, roads and grounds',    3, 'SSO')
+    ('OTHERS',         'Others',         'Campus places such as the library, mess, gym and sports grounds', 3, 'SSO')
 ON CONFLICT (code) DO NOTHING;
+
+-- SCRUM-150: Others are places, not services (docs/design/real-locations.md).
+-- A database seeded before this still has the old text, which the INSERT above
+-- does not change. This replaces only that old default, so an administrator's
+-- own wording is kept.
+UPDATE categories SET description = 'Campus places such as the library, mess, gym and sports grounds'
+WHERE code = 'OTHERS' AND description = 'Campus-wide issues such as Wi-Fi, roads and grounds';

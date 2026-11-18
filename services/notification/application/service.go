@@ -18,7 +18,12 @@ var (
 	ErrUnavailable      = errors.New("notification could not be delivered")
 	ErrInvalidPageSize  = errors.New("page_size must be 1 to 100")
 	ErrInvalidPageToken = errors.New("invalid page_token")
+	ErrMissingEventID   = errors.New("event id is required")
 )
+
+// eventSpace is the UUID namespace for ids made from event ids (SCRUM-155).
+// It never changes, so an event always gives the same notification id.
+var eventSpace = uuid.MustParse("6f1d4c2a-9b3e-4f5a-8c7d-0e1f2a3b4c5d")
 
 const (
 	defaultPageSize = 20
@@ -61,6 +66,37 @@ func (s *Service) Send(ctx context.Context, in domain.Input) (domain.Notificatio
 		return domain.Notification{}, fmt.Errorf("save notification: %w", err)
 	}
 	return n, nil
+}
+
+// SendForEvent sends the message made from one event, once. Its id is made
+// from the event id, so the same event read twice (the bus can deliver it
+// again, also after a restart) is skipped: sent is false then. When delivery
+// fails nothing is stored, so the bus's retry of the event sends it.
+func (s *Service) SendForEvent(ctx context.Context, eventID string, in domain.Input) (n domain.Notification, sent bool, err error) {
+	if eventID == "" {
+		return domain.Notification{}, false, ErrMissingEventID
+	}
+	id := uuid.NewSHA1(eventSpace, []byte(eventID)).String()
+	n, err = domain.NewNotification(id, in, s.now())
+	if err != nil {
+		return domain.Notification{}, false, err
+	}
+	has, err := s.repo.Exists(ctx, id)
+	if err != nil {
+		return domain.Notification{}, false, fmt.Errorf("find notification: %w", err)
+	}
+	if has {
+		return n, false, nil
+	}
+	if sendErr := s.sender.Send(ctx, n); sendErr != nil {
+		return domain.Notification{}, false, fmt.Errorf("%w: %v", ErrUnavailable, sendErr)
+	}
+	n = n.MarkSent(s.now())
+	created, err := s.repo.Create(ctx, n)
+	if err != nil {
+		return domain.Notification{}, false, fmt.Errorf("save notification: %w", err)
+	}
+	return n, created, nil
 }
 
 // List returns one user's notifications, newest first. pageToken is the

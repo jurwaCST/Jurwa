@@ -110,4 +110,4 @@ No review meeting was held; each member sent a written status. Highlights:
 
 ## 7. Sprint 3
 
-Sprint 3: 3 to 8 November 2026. Goal: deploy to k3d with Argo CD, real databases and Redis Streams events, the React PWA, the full test suite, and the final demo (presentation about 9 November).
+Sprint 3: 4 to 10 November 2026. Goal: deploy to k3d with Argo CD, real databases and Redis Streams events, the React PWA, the full test suite, and the final demo (presentation about 9 November).

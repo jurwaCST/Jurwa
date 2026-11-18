@@ -1,0 +1,30 @@
+# github.com/jurwaCST/Jurwa/services/notification/adapters/in/events [github.com/jurwaCST/Jurwa/services/notification/adapters/in/events.test]
+services\notification\adapters\in\events\consumer_test.go:40:70: undefined: ports.Report
+services\notification\adapters\in\events\consumer_test.go:43:16: undefined: ports.Report
+services\notification\adapters\in\events\consumer_test.go:45:15: undefined: ports.Report
+services\notification\adapters\in\events\consumer_test.go:48:16: undefined: Consumer
+services\notification\adapters\in\events\consumer_test.go:52:9: undefined: NewConsumer
+services\notification\adapters\in\events\consumer_test.go:83:88: undefined: Streams
+services\notification\adapters\in\events\consumer_test.go:84:34: undefined: Group
+services\notification\adapters\in\events\consumer_test.go:166:34: undefined: ports.ErrReportsUnavailable
+services\notification\adapters\in\events\consumer_test.go:169:31: undefined: ports.ErrReportsUnavailable
+services\notification\adapters\in\events\consumer_test.go:181:22: undefined: ports.ErrReportNotFound
+services\notification\adapters\in\events\consumer_test.go:181:22: too many errors
+FAIL	github.com/jurwaCST/Jurwa/services/notification/adapters/in/events [build failed]
+# github.com/jurwaCST/Jurwa/services/notification/adapters/out/repotest
+services\notification\adapters\out\repotest\contract.go:133:17: r.Exists undefined (type ports.NotificationRepository has no field or method Exists)
+services\notification\adapters\out\repotest\contract.go:137:21: r.Create undefined (type ports.NotificationRepository has no field or method Create)
+services\notification\adapters\out\repotest\contract.go:143:20: r.Create undefined (type ports.NotificationRepository has no field or method Create)
+services\notification\adapters\out\repotest\contract.go:147:16: r.Exists undefined (type ports.NotificationRepository has no field or method Exists)
+# github.com/jurwaCST/Jurwa/services/notification/application [github.com/jurwaCST/Jurwa/services/notification/application.test]
+services\notification\application\service_test.go:230:26: svc.SendForEvent undefined (type *Service has no field or method SendForEvent)
+services\notification\application\service_test.go:236:21: svc.SendForEvent undefined (type *Service has no field or method SendForEvent)
+services\notification\application\service_test.go:252:18: a.SendForEvent undefined (type *Service has no field or method SendForEvent)
+services\notification\application\service_test.go:254:18: b.SendForEvent undefined (type *Service has no field or method SendForEvent)
+services\notification\application\service_test.go:258:18: a.SendForEvent undefined (type *Service has no field or method SendForEvent)
+services\notification\application\service_test.go:268:19: svc.SendForEvent undefined (type *Service has no field or method SendForEvent)
+services\notification\application\service_test.go:272:22: svc.SendForEvent undefined (type *Service has no field or method SendForEvent)
+services\notification\application\service_test.go:286:19: svc.SendForEvent undefined (type *Service has no field or method SendForEvent)
+services\notification\application\service_test.go:287:25: undefined: ErrMissingEventID
+services\notification\application\service_test.go:291:18: svc.SendForEvent undefined (type *Service has no field or method SendForEvent)
+services\notification\application\service_test.go:291:18: too many errors
