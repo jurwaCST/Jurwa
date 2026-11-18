@@ -1,0 +1,9 @@
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/in/events	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/in/grpc	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/out/logsender	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/out/memory	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/out/postgres	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/out/reportclient	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/notification/application	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/notification/cmd/server	2.009s
+ok  	github.com/jurwaCST/Jurwa/services/notification/domain	(cached)
