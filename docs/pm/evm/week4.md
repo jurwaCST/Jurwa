@@ -1,4 +1,4 @@
-# EVM log: Sprint 4 (11 to 17 November 2026)
+# EVM log: Sprint 4 (11 to 20 November 2026)
 
 Card: SCRUM-153. Author: Nyendrak Yoezer Zangmo. Baseline: `docs/pm/schedule-evm.md`.
 Planned hours, logged hours and statuses were read from Jira on 18 November 2026 with `sprint = 69` (17 cards in Sprint 4), and again on 19 November after SCRUM-151 was logged. All values are person-hours.
@@ -66,7 +66,7 @@ Cumulative values add Sprints 1 to 3 from `week3.md` (EV 455.5 h, AC 424 h).
 | 2. Shared design before pages | Met. Gayley's pages (SCRUM-143, 144, 145) were built on the shared components, and SCRUM-152 started only after they were merged |
 | 3. List the gateway routes in each page card | Met. The notifications and feedback routes had their own card at planning (SCRUM-147) |
 | 4. Create Sprint 4 and move the carried cards | Met for SCRUM-98 and SCRUM-85. The admin editing card was not created: it needs gateway admin routes that nobody planned, so it goes to the closure report as future work |
-| 5. Log hours the same day | Not met. Most Sprint 4 hours were logged on 18 and 19 November, after the sprint ended and when asked for this log |
+| 5. Log hours the same day | Not met. Most Sprint 4 hours were logged together on 18 and 19 November, days after the work was done and when asked for this log |
 
 ## 5. Actions before the closure report
 
