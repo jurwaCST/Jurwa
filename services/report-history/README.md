@@ -97,3 +97,7 @@ go test ./services/report-history/... -cover
 ```
 
 Coverage: 100% on `domain` and both adapters, 97.6% on `application`. Evidence: `docs/evidence/sonam-choki/scrum-22-tests.txt` and `scrum-22-grpcurl.txt`.
+
+## Withdrawn reports (SCRUM-163)
+
+`events:report.withdrawn` removes the report from My reports and the staff board, with its timeline. The id is remembered, so a `report.submitted` read again after a restart does not bring it back.

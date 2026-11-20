@@ -32,7 +32,10 @@ const maxBody = 200
 // report.routed and report.reassigned: the student hears who has the report,
 // and the person it reaches hears that it arrived.
 func Streams() []string {
-	return []string{eventbus.StreamReportSubmitted, eventbus.StreamStatusChanged, eventbus.StreamReportRouted, eventbus.StreamReportReassigned}
+	return []string{
+		eventbus.StreamReportSubmitted, eventbus.StreamStatusChanged, eventbus.StreamReportRouted, eventbus.StreamReportReassigned,
+		eventbus.StreamReportWithdrawn, // SCRUM-163
+	}
 }
 
 // UseCases is what the consumer needs from the application layer.
@@ -60,6 +63,7 @@ func (c *Consumer) Run(ctx context.Context, sub eventbus.Subscriber, consumer st
 		eventbus.StreamStatusChanged:    c.StatusChanged,
 		eventbus.StreamReportRouted:     c.ReportRouted,
 		eventbus.StreamReportReassigned: c.ReportReassigned,
+		eventbus.StreamReportWithdrawn:  c.ReportWithdrawn,
 	}
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -162,6 +166,27 @@ func (c *Consumer) ReportReassigned(ctx context.Context, payload []byte) error {
 			"A late report was escalated to you", ": it passed its time limit. Open it on your board.")
 	}
 	return c.handOver(ctx, ev.GetMeta().GetEventId(), domain.EventReportReassigned, ev.GetReportId(), ev.GetToUserId(), "Your report was passed to ")
+}
+
+// ReportWithdrawn tells whoever held a report that its student deleted it
+// (SCRUM-163). The report is gone, so the message cannot name its place.
+func (c *Consumer) ReportWithdrawn(ctx context.Context, payload []byte) error {
+	var ev eventsv1.ReportWithdrawn
+	if err := proto.Unmarshal(payload, &ev); err != nil {
+		return fmt.Errorf("report.withdrawn: %w", err)
+	}
+	holder := ev.GetCurrentAssigneeId()
+	if holder == "" {
+		return nil
+	}
+	return c.send(ctx, ev.GetMeta().GetEventId()+"/holder", domain.Input{
+		RecipientUserID: holder,
+		Channel:         domain.InApp,
+		EventType:       domain.EventReportWithdrawn,
+		ReportID:        ev.GetReportId(),
+		Subject:         "Report removed by the student",
+		Body:            "The student deleted a report you held before work started, so it has left your board.",
+	})
 }
 
 // handOver sends two messages for one event: to the student, naming the post of

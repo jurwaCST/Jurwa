@@ -211,6 +211,7 @@ func TestStreamsAndGroup(t *testing.T) {
 	assert.Equal(t, "report-history", Group)
 	assert.ElementsMatch(t, []string{
 		eventbus.StreamReportSubmitted, eventbus.StreamReportRouted, eventbus.StreamStatusChanged, eventbus.StreamReportReassigned,
+		eventbus.StreamReportWithdrawn, // SCRUM-163
 	}, Streams())
 }
 

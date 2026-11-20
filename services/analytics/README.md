@@ -96,3 +96,7 @@ go test -tags=integration ./services/analytics/adapters/out/postgres/... -v
 ```
 
 Evidence: `docs/evidence/gayley/sprint3/db-adapters-3b-integration.txt` and `db-adapters-3b-live.txt`.
+
+## Withdrawn reports (SCRUM-163)
+
+`events:report.withdrawn` marks the report `withdrawn` (a new column, added to existing tables on start); no count includes it. A withdrawal read before its report keeps only the mark, so the report never comes back.

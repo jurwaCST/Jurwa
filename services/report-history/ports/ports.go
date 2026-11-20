@@ -22,4 +22,6 @@ type HistoryRepository interface {
 	AppendEntry(ctx context.Context, e domain.Entry) error
 	// ListEntries returns the entries of one report in the order they were appended.
 	ListEntries(ctx context.Context, reportID string) ([]domain.Entry, error)
+	// DeleteReport removes a report its student withdrew, for good (SCRUM-163).
+	DeleteReport(ctx context.Context, reportID string) error
 }

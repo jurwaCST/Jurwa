@@ -67,7 +67,7 @@ func summary(t *testing.T, app *application.Service) domain.Summary {
 }
 
 func TestStreamsAndGroup(t *testing.T) {
-	assert.Equal(t, []string{eventbus.StreamReportSubmitted, eventbus.StreamStatusChanged}, Streams())
+	assert.Equal(t, []string{eventbus.StreamReportSubmitted, eventbus.StreamStatusChanged, eventbus.StreamReportWithdrawn}, Streams())
 	assert.Equal(t, "analytics", Group)
 }
 

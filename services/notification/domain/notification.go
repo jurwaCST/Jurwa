@@ -74,6 +74,7 @@ const (
 	EventReportReassigned = "report.reassigned" // new assignee
 	EventSLALapsed        = "sla.lapsed"        // escalated
 	EventDigest           = "digest.daily"      // digest-dispatcher
+	EventReportWithdrawn  = "report.withdrawn"  // SCRUM-163: whoever held it
 )
 
 var eventTypes = map[string]bool{
@@ -83,6 +84,7 @@ var eventTypes = map[string]bool{
 	EventReportReassigned: true,
 	EventSLALapsed:        true,
 	EventDigest:           true,
+	EventReportWithdrawn:  true,
 }
 
 // Input is what a caller asks to send.

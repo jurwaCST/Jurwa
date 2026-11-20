@@ -31,6 +31,7 @@ func Streams() []string {
 		eventbus.StreamReportRouted,
 		eventbus.StreamStatusChanged,
 		eventbus.StreamReportReassigned,
+		eventbus.StreamReportWithdrawn, // SCRUM-163
 	}
 }
 
@@ -38,6 +39,7 @@ func Streams() []string {
 type UseCases interface {
 	RecordSubmitted(ctx context.Context, in application.SubmittedInput) (domain.Summary, error)
 	RecordEvent(ctx context.Context, eventID string, in domain.EntryInput) error
+	RecordWithdrawn(ctx context.Context, reportID string) error // SCRUM-163
 }
 
 // Consumer turns events into report-history records.
@@ -63,6 +65,7 @@ func (c *Consumer) Run(ctx context.Context, sub eventbus.Subscriber, consumer st
 		eventbus.StreamReportRouted:     c.ReportRouted,
 		eventbus.StreamStatusChanged:    c.StatusChanged,
 		eventbus.StreamReportReassigned: c.ReportReassigned,
+		eventbus.StreamReportWithdrawn:  c.ReportWithdrawn,
 	}
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -153,6 +156,15 @@ func (c *Consumer) ReportReassigned(ctx context.Context, payload []byte) error {
 		AssigneeID: ev.GetToUserId(),
 		Summary:    summary,
 	})
+}
+
+// ReportWithdrawn removes a report its student deleted (SCRUM-163).
+func (c *Consumer) ReportWithdrawn(ctx context.Context, payload []byte) error {
+	var ev eventsv1.ReportWithdrawn
+	if err := proto.Unmarshal(payload, &ev); err != nil {
+		return fmt.Errorf("report.withdrawn: %w", err)
+	}
+	return c.app.RecordWithdrawn(ctx, ev.GetReportId())
 }
 
 // record stores the entry. When the report is not known yet (its

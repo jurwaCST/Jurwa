@@ -24,7 +24,7 @@ var ErrUnknownReport = errors.New("status change for a report analytics does not
 
 // Streams returns the streams analytics reads.
 func Streams() []string {
-	return []string{eventbus.StreamReportSubmitted, eventbus.StreamStatusChanged}
+	return []string{eventbus.StreamReportSubmitted, eventbus.StreamStatusChanged, eventbus.StreamReportWithdrawn}
 }
 
 // UseCases is what the consumer needs from the application layer.
@@ -51,6 +51,7 @@ func (c *Consumer) Run(ctx context.Context, sub eventbus.Subscriber, consumer st
 	handlers := map[string]eventbus.Handler{
 		eventbus.StreamReportSubmitted: c.ReportSubmitted,
 		eventbus.StreamStatusChanged:   c.StatusChanged,
+		eventbus.StreamReportWithdrawn: c.ReportWithdrawn,
 	}
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -129,4 +130,20 @@ func (c *Consumer) waitFor(ctx context.Context, reportID string) error {
 		case <-time.After(20 * time.Millisecond):
 		}
 	}
+}
+
+// ReportWithdrawn takes a report its student deleted out of the counts
+// (SCRUM-163). It does not wait for the report: the mark is kept either way.
+func (c *Consumer) ReportWithdrawn(ctx context.Context, payload []byte) error {
+	var ev eventsv1.ReportWithdrawn
+	if err := proto.Unmarshal(payload, &ev); err != nil {
+		return fmt.Errorf("report.withdrawn: %w", err)
+	}
+	_, err := c.app.Record(ctx, domain.Event{
+		ID:         ev.GetMeta().GetEventId(),
+		Type:       domain.ReportWithdrawn,
+		ReportID:   ev.GetReportId(),
+		OccurredAt: ev.GetMeta().GetOccurredAt().AsTime(),
+	})
+	return err
 }
