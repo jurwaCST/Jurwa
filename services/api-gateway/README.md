@@ -27,6 +27,8 @@ Every gRPC client goes through `pkg/resilience` (2 s timeout, up to 3 attempts f
 | `GET /categories/{category}/locations` | location-taxonomy ListLocations | any signed-in user |
 | `POST /reports` | report-submission SubmitReport (returns 201) | Student |
 | `GET /reports/{reportId}` | report-submission GetReport | Student (own), Category Head, Staff, System Administrator |
+| `PATCH /reports/{reportId}` | report-submission UpdateDescription, after status-lifecycle says Open or Assigned (else 422) (SCRUM-163) | Student (own) |
+| `DELETE /reports/{reportId}` | report-submission WithdrawReport (204), with the holder from report-history, after status-lifecycle says Open or Assigned (else 422) (SCRUM-163) | Student (own) |
 | `POST /reports/{reportId}/notes` | internal-notes AddNote (returns 201) | Category Head, Staff |
 | `GET /reports/{reportId}/notes` | internal-notes ListNotes | Category Head, Staff, System Administrator |
 | `GET /me/reports` | report-history ListReportsByReporter (`?pageSize=` 1 to 100, `?pageToken=`) | Student; the reporter id comes from the JWT |

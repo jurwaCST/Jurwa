@@ -1,0 +1,28 @@
+SCRUM-163 round 1 (edit and delete) after the code change, 21 November 2026.
+$ go test -count=1 -p 1 ./services/report-submission/... ./services/api-gateway/... ./services/authorization/... ./pkg/eventbus/...
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/adapters/in/grpc	0.368s
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/eventpublisher	2.543s
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/logpublisher	2.069s
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/memory	1.709s
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/mongo	2.162s
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/adapters/out/uuid	1.836s
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/application	1.812s
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/cmd/server	0.532s
+ok  	github.com/jurwaCST/Jurwa/services/report-submission/domain	1.860s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http	0.553s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient	0.487s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients	0.531s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/application	0.477s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/cmd/server	0.508s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/domain	1.846s
+ok  	github.com/jurwaCST/Jurwa/services/authorization/adapters/in/grpc	0.496s
+ok  	github.com/jurwaCST/Jurwa/services/authorization/adapters/out/memory	1.769s
+ok  	github.com/jurwaCST/Jurwa/services/authorization/adapters/out/postgres	1.813s
+ok  	github.com/jurwaCST/Jurwa/services/authorization/application	1.783s
+ok  	github.com/jurwaCST/Jurwa/services/authorization/cmd/server	0.539s
+ok  	github.com/jurwaCST/Jurwa/services/authorization/domain	1.782s
+ok  	github.com/jurwaCST/Jurwa/pkg/eventbus	5.141s
+
+Web: npx tsc -b (no errors), npm run lint (oxlint, no errors), npx vitest run --maxWorkers=1:
+ Test Files  15 passed (15)
+      Tests  215 passed (215)

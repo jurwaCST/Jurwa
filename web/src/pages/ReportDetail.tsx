@@ -3,14 +3,17 @@
 // GET /photos/{photoId}. The gateway refuses a report that is not the student's
 // (403); that and a missing report (404) show the same kind message.
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api, ApiError } from '../api/client'
 import { useAuth } from '../auth/useAuth'
+import BottomSheet from '../components/BottomSheet'
+import Button from '../components/Button'
 import EmptyState from '../components/EmptyState'
 import ErrorState from '../components/ErrorState'
 import Icon from '../components/Icon'
 import Skeleton from '../components/Skeleton'
 import StatusBadge from '../components/StatusBadge'
+import TextArea from '../components/TextArea'
 import Timeline, { type TimelineEntry } from '../components/Timeline'
 import { LostArt } from '../components/Art'
 import Feedback from './Feedback'
@@ -56,6 +59,106 @@ function Photo({ photoId }: { photoId: string }) {
   return <img src={url} alt="The photo you added" className="rd-photo" />
 }
 
+// SCRUM-163: what the student sees when work started before their change arrived.
+const WORK_STARTED = 'Someone has started work on it, so it can no longer be changed.'
+const MAX_DESCRIPTION = 500
+
+function changeError(err: unknown): string {
+  if (err instanceof ApiError && err.status === 422) return WORK_STARTED
+  return messageFor(err)
+}
+
+interface ChangeProps {
+  reportId: string
+  description: string
+  onEdited: (text: string) => void
+}
+
+// ChangeReport lets the student change the description or delete the report
+// while nobody works on it yet (SCRUM-163): Open or Assigned only.
+function ChangeReport({ reportId, description, onEdited }: ChangeProps) {
+  const navigate = useNavigate()
+  const [editing, setEditing] = useState(false)
+  const [text, setText] = useState(description)
+  const [asking, setAsking] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function save() {
+    if (busy) return
+    setError(null)
+    if (!text.trim()) return setError('Describe the problem.')
+    setBusy(true)
+    try {
+      const saved = await api.patch<{ description?: string }>(`/reports/${reportId}`, { description: text })
+      onEdited(saved?.description ?? text)
+      setEditing(false)
+    } catch (err) {
+      setError(changeError(err))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function remove() {
+    if (busy) return
+    setError(null)
+    setBusy(true)
+    try {
+      await api.del(`/reports/${reportId}`)
+      navigate('/reports', { replace: true })
+    } catch (err) {
+      setError(changeError(err))
+      setAsking(false)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="rd-change">
+      {editing ? (
+        <>
+          <TextArea label="Description" value={text} onChange={setText} max={MAX_DESCRIPTION} rows={4} />
+          <div className="rd-change-actions">
+            <Button onClick={save} loading={busy} loadingText="Saving...">
+              Save description
+            </Button>
+            <Button variant="secondary" onClick={() => (setEditing(false), setText(description), setError(null))}>
+              Cancel
+            </Button>
+          </div>
+        </>
+      ) : (
+        <div className="rd-change-actions">
+          <Button variant="secondary" onClick={() => (setText(description), setEditing(true))}>
+            Edit description
+          </Button>
+          <Button variant="secondary" className="rd-delete" onClick={() => setAsking(true)}>
+            Delete report
+          </Button>
+        </div>
+      )}
+      {error && (
+        <p role="alert" className="field-error">
+          {error}
+        </p>
+      )}
+      <BottomSheet open={asking} title="Delete this report?" onClose={() => setAsking(false)}>
+        <p>It is removed for you and for the person who would fix it. This cannot be undone.</p>
+        <div className="rd-change-actions">
+          <Button onClick={remove} loading={busy} loadingText="Deleting...">
+            Yes, delete it
+          </Button>
+          <Button variant="secondary" onClick={() => setAsking(false)}>
+            Keep it
+          </Button>
+        </div>
+      </BottomSheet>
+    </div>
+  )
+}
+
 export default function ReportDetail() {
   const { reportId = '' } = useParams()
   const { user } = useAuth()
@@ -67,6 +170,8 @@ export default function ReportDetail() {
   const [history, setHistory] = useState<{ key: string; entries?: HistoryEntry[]; error?: string } | null>(null)
   const [attempt, setAttempt] = useState(0)
   const [historyAttempt, setHistoryAttempt] = useState(0)
+  // SCRUM-163: a description the student changed on this page, for this load.
+  const [edited, setEdited] = useState<{ key: string; text: string } | null>(null)
   const key = `${reportId}-${attempt}`
   const historyKey = `${reportId}-${historyAttempt}`
 
@@ -166,7 +271,15 @@ export default function ReportDetail() {
       <div className="rd-layout">
         <section className="card" aria-labelledby="rd-what">
           <h2 id="rd-what">What you reported</h2>
-          <p className="rd-description">{report.description}</p>
+          <p className="rd-description">{edited?.key === key ? edited.text : report.description}</p>
+          {/* SCRUM-163: changeable until someone starts work on it. */}
+          {(status === 'OPEN' || status === 'ASSIGNED') && (
+            <ChangeReport
+              reportId={reportId}
+              description={edited?.key === key ? edited.text : report.description}
+              onEdited={(text) => setEdited({ key, text })}
+            />
+          )}
           {report.photoId ? <Photo photoId={report.photoId} /> : <p className="muted">No photo added.</p>}
         </section>
 

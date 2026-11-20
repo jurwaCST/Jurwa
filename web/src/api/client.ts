@@ -73,6 +73,14 @@ export const api = {
   put<T>(path: string, body: unknown): Promise<T> {
     return request<T>('PUT', path, JSON.stringify(body), 'application/json')
   },
+  /** patch changes part of something, such as a report's description (SCRUM-163). */
+  patch<T>(path: string, body: unknown): Promise<T> {
+    return request<T>('PATCH', path, JSON.stringify(body), 'application/json')
+  },
+  /** del deletes something, such as the student's own report (SCRUM-163). */
+  del(path: string): Promise<void> {
+    return request<void>('DELETE', path)
+  },
   /** blob gets a file the gateway sends as it is, such as GET /photos/{photoId}. */
   blob(path: string): Promise<Blob> {
     return request<Blob>('GET', path, undefined, undefined, true)

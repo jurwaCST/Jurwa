@@ -45,7 +45,7 @@ func TestEditDescription(t *testing.T) {
 
 func TestWithdrawReport(t *testing.T) {
 	e := newEnv()
-	e.history.assignee = "u-sso"
+	e.history.holder = "u-sso"
 	rec := e.do("DELETE", "/reports/r1", "student-token", "")
 	require.Equal(t, http.StatusNoContent, rec.Code, rec.Body.String())
 	require.NotNil(t, e.reports.withdrawn)

@@ -29,3 +29,13 @@ func (p *Publisher) ReportSubmitted(ctx context.Context, r domain.Report) error 
 	)
 	return nil
 }
+
+// ReportWithdrawn writes report.withdrawn to the log (SCRUM-163).
+func (p *Publisher) ReportWithdrawn(ctx context.Context, r domain.Report, assigneeID string) error {
+	p.logger.InfoContext(ctx, "event published",
+		"stream", "events:report.withdrawn",
+		"report_id", r.ID,
+		"current_assignee_id", assigneeID,
+	)
+	return nil
+}

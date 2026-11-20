@@ -85,6 +85,8 @@ func NewRouter(d Deps) http.Handler {
 	mux.Handle("GET /categories/{category}/locations", r.protected(domain.ActionLocationList, r.listLocations))
 	mux.Handle("POST /reports", r.protected(domain.ActionReportSubmit, r.submitReport))
 	mux.Handle("GET /reports/{reportId}", r.protected(domain.ActionReportRead, r.getReport))
+	mux.Handle("PATCH /reports/{reportId}", r.protected(domain.ActionReportUpdate, r.editReport))
+	mux.Handle("DELETE /reports/{reportId}", r.protected(domain.ActionReportWithdraw, r.withdrawReport))
 	mux.Handle("POST /reports/{reportId}/notes", r.protected(domain.ActionReportNoteAdd, r.addNote))
 	mux.Handle("GET /reports/{reportId}/notes", r.protected(domain.ActionReportNoteRead, r.listNotes))
 	mux.Handle("GET /me/assigned-reports", r.protected(domain.ActionReportListAssigned, r.assignedReports))
@@ -223,6 +225,76 @@ func (r router) getReport(w http.ResponseWriter, req *http.Request) {
 		err = domain.ErrForbidden
 	}
 	reply(w, http.StatusOK, report, err)
+}
+
+// errWorkStarted: a report someone works on can no longer be changed (SCRUM-163).
+var errWorkStarted = status.Error(codes.FailedPrecondition, "someone has started work on this report, so it can no longer be changed")
+
+// checkNobodyWorksOnIt allows a change only while the report is Open or Assigned.
+func (r router) checkNobodyWorksOnIt(req *http.Request, reportID string) error {
+	resp, err := r.Status.GetStatus(req.Context(), reportID)
+	if err != nil {
+		return err
+	}
+	switch resp.GetStatus().GetStatus() {
+	case commonv1.Status_OPEN, commonv1.Status_ASSIGNED:
+		return nil
+	default:
+		return errWorkStarted
+	}
+}
+
+// editReport changes the description of the student's own report while nobody
+// works on it (SCRUM-163). 422 once it is In progress or later.
+func (r router) editReport(w http.ResponseWriter, req *http.Request) {
+	in := &reportsubmissionv1.UpdateDescriptionRequest{}
+	if !readJSON(w, req, in) {
+		return
+	}
+	reportID := req.PathValue("reportId")
+	if err := r.checkOwnReport(req, reportID); err != nil {
+		writeError(w, err)
+		return
+	}
+	if err := r.checkNobodyWorksOnIt(req, reportID); err != nil {
+		writeError(w, err)
+		return
+	}
+	in.ReportId = reportID
+	in.ReporterId = principal(req).UserID // never from the body (rule 2)
+	resp, err := r.Reports.UpdateDescription(req.Context(), in)
+	reply(w, http.StatusOK, resp.GetReport(), err)
+}
+
+// withdrawReport deletes the student's own report while nobody works on it
+// (SCRUM-163), telling report-submission who holds it so they are told. 204.
+func (r router) withdrawReport(w http.ResponseWriter, req *http.Request) {
+	reportID := req.PathValue("reportId")
+	if err := r.checkOwnReport(req, reportID); err != nil {
+		writeError(w, err)
+		return
+	}
+	if err := r.checkNobodyWorksOnIt(req, reportID); err != nil {
+		writeError(w, err)
+		return
+	}
+	me := principal(req).UserID
+	holder := ""
+	if mine, err := r.History.ListReportsByReporter(req.Context(), me, 100, ""); err == nil {
+		for _, s := range mine.GetReports() {
+			if s.GetReportId() == reportID {
+				holder = s.GetCurrentAssigneeId()
+			}
+		}
+	}
+	_, err := r.Reports.WithdrawReport(req.Context(), &reportsubmissionv1.WithdrawReportRequest{
+		ReportId: reportID, ReporterId: me, CurrentAssigneeId: holder,
+	})
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (r router) addNote(w http.ResponseWriter, req *http.Request) {

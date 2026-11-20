@@ -49,6 +49,8 @@ const (
 
 	ActionNotificationList     = "notification.list"
 	ActionReportFeedbackSubmit = "report.feedback.submit"
+	ActionReportUpdate         = "report.update"   // SCRUM-163: the student changes the description
+	ActionReportWithdraw       = "report.withdraw" // SCRUM-163: the student deletes the report
 	ActionReportFeedbackRead   = "report.feedback.read"
 )
 

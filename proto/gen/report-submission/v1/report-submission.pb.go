@@ -233,6 +233,206 @@ func (x *GetReportResponse) GetReport() *v1.Report {
 	return nil
 }
 
+type UpdateDescriptionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ReportId      string                 `protobuf:"bytes,1,opt,name=report_id,json=reportId,proto3" json:"report_id,omitempty"`       // required, UUID
+	ReporterId    string                 `protobuf:"bytes,2,opt,name=reporter_id,json=reporterId,proto3" json:"reporter_id,omitempty"` // required, set by api-gateway from the JWT
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`                 // required, not blank, at most 500 characters
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateDescriptionRequest) Reset() {
+	*x = UpdateDescriptionRequest{}
+	mi := &file_report_submission_v1_report_submission_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateDescriptionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateDescriptionRequest) ProtoMessage() {}
+
+func (x *UpdateDescriptionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_report_submission_v1_report_submission_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateDescriptionRequest.ProtoReflect.Descriptor instead.
+func (*UpdateDescriptionRequest) Descriptor() ([]byte, []int) {
+	return file_report_submission_v1_report_submission_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *UpdateDescriptionRequest) GetReportId() string {
+	if x != nil {
+		return x.ReportId
+	}
+	return ""
+}
+
+func (x *UpdateDescriptionRequest) GetReporterId() string {
+	if x != nil {
+		return x.ReporterId
+	}
+	return ""
+}
+
+func (x *UpdateDescriptionRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+type UpdateDescriptionResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Report        *v1.Report             `protobuf:"bytes,1,opt,name=report,proto3" json:"report,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateDescriptionResponse) Reset() {
+	*x = UpdateDescriptionResponse{}
+	mi := &file_report_submission_v1_report_submission_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateDescriptionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateDescriptionResponse) ProtoMessage() {}
+
+func (x *UpdateDescriptionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_report_submission_v1_report_submission_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateDescriptionResponse.ProtoReflect.Descriptor instead.
+func (*UpdateDescriptionResponse) Descriptor() ([]byte, []int) {
+	return file_report_submission_v1_report_submission_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *UpdateDescriptionResponse) GetReport() *v1.Report {
+	if x != nil {
+		return x.Report
+	}
+	return nil
+}
+
+type WithdrawReportRequest struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	ReportId          string                 `protobuf:"bytes,1,opt,name=report_id,json=reportId,proto3" json:"report_id,omitempty"`                              // required, UUID
+	ReporterId        string                 `protobuf:"bytes,2,opt,name=reporter_id,json=reporterId,proto3" json:"reporter_id,omitempty"`                        // required, set by api-gateway from the JWT
+	CurrentAssigneeId string                 `protobuf:"bytes,3,opt,name=current_assignee_id,json=currentAssigneeId,proto3" json:"current_assignee_id,omitempty"` // who holds it now, "" when nobody; told in report.withdrawn
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *WithdrawReportRequest) Reset() {
+	*x = WithdrawReportRequest{}
+	mi := &file_report_submission_v1_report_submission_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WithdrawReportRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WithdrawReportRequest) ProtoMessage() {}
+
+func (x *WithdrawReportRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_report_submission_v1_report_submission_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WithdrawReportRequest.ProtoReflect.Descriptor instead.
+func (*WithdrawReportRequest) Descriptor() ([]byte, []int) {
+	return file_report_submission_v1_report_submission_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *WithdrawReportRequest) GetReportId() string {
+	if x != nil {
+		return x.ReportId
+	}
+	return ""
+}
+
+func (x *WithdrawReportRequest) GetReporterId() string {
+	if x != nil {
+		return x.ReporterId
+	}
+	return ""
+}
+
+func (x *WithdrawReportRequest) GetCurrentAssigneeId() string {
+	if x != nil {
+		return x.CurrentAssigneeId
+	}
+	return ""
+}
+
+type WithdrawReportResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WithdrawReportResponse) Reset() {
+	*x = WithdrawReportResponse{}
+	mi := &file_report_submission_v1_report_submission_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WithdrawReportResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WithdrawReportResponse) ProtoMessage() {}
+
+func (x *WithdrawReportResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_report_submission_v1_report_submission_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WithdrawReportResponse.ProtoReflect.Descriptor instead.
+func (*WithdrawReportResponse) Descriptor() ([]byte, []int) {
+	return file_report_submission_v1_report_submission_proto_rawDescGZIP(), []int{7}
+}
+
 var File_report_submission_v1_report_submission_proto protoreflect.FileDescriptor
 
 const file_report_submission_v1_report_submission_proto_rawDesc = "" +
@@ -251,10 +451,25 @@ const file_report_submission_v1_report_submission_proto_rawDesc = "" +
 	"\x10GetReportRequest\x12\x1b\n" +
 	"\treport_id\x18\x01 \x01(\tR\breportId\"D\n" +
 	"\x11GetReportResponse\x12/\n" +
-	"\x06report\x18\x01 \x01(\v2\x17.jurwa.common.v1.ReportR\x06report2\xf2\x01\n" +
+	"\x06report\x18\x01 \x01(\v2\x17.jurwa.common.v1.ReportR\x06report\"z\n" +
+	"\x18UpdateDescriptionRequest\x12\x1b\n" +
+	"\treport_id\x18\x01 \x01(\tR\breportId\x12\x1f\n" +
+	"\vreporter_id\x18\x02 \x01(\tR\n" +
+	"reporterId\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\"L\n" +
+	"\x19UpdateDescriptionResponse\x12/\n" +
+	"\x06report\x18\x01 \x01(\v2\x17.jurwa.common.v1.ReportR\x06report\"\x85\x01\n" +
+	"\x15WithdrawReportRequest\x12\x1b\n" +
+	"\treport_id\x18\x01 \x01(\tR\breportId\x12\x1f\n" +
+	"\vreporter_id\x18\x02 \x01(\tR\n" +
+	"reporterId\x12.\n" +
+	"\x13current_assignee_id\x18\x03 \x01(\tR\x11currentAssigneeId\"\x18\n" +
+	"\x16WithdrawReportResponse2\xe9\x03\n" +
 	"\x17ReportSubmissionService\x12o\n" +
 	"\fSubmitReport\x12..jurwa.reportsubmission.v1.SubmitReportRequest\x1a/.jurwa.reportsubmission.v1.SubmitReportResponse\x12f\n" +
-	"\tGetReport\x12+.jurwa.reportsubmission.v1.GetReportRequest\x1a,.jurwa.reportsubmission.v1.GetReportResponseBMZKgithub.com/jurwaCST/Jurwa/proto/gen/report-submission/v1;reportsubmissionv1b\x06proto3"
+	"\tGetReport\x12+.jurwa.reportsubmission.v1.GetReportRequest\x1a,.jurwa.reportsubmission.v1.GetReportResponse\x12~\n" +
+	"\x11UpdateDescription\x123.jurwa.reportsubmission.v1.UpdateDescriptionRequest\x1a4.jurwa.reportsubmission.v1.UpdateDescriptionResponse\x12u\n" +
+	"\x0eWithdrawReport\x120.jurwa.reportsubmission.v1.WithdrawReportRequest\x1a1.jurwa.reportsubmission.v1.WithdrawReportResponseBMZKgithub.com/jurwaCST/Jurwa/proto/gen/report-submission/v1;reportsubmissionv1b\x06proto3"
 
 var (
 	file_report_submission_v1_report_submission_proto_rawDescOnce sync.Once
@@ -268,30 +483,39 @@ func file_report_submission_v1_report_submission_proto_rawDescGZIP() []byte {
 	return file_report_submission_v1_report_submission_proto_rawDescData
 }
 
-var file_report_submission_v1_report_submission_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_report_submission_v1_report_submission_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_report_submission_v1_report_submission_proto_goTypes = []any{
-	(*SubmitReportRequest)(nil),  // 0: jurwa.reportsubmission.v1.SubmitReportRequest
-	(*SubmitReportResponse)(nil), // 1: jurwa.reportsubmission.v1.SubmitReportResponse
-	(*GetReportRequest)(nil),     // 2: jurwa.reportsubmission.v1.GetReportRequest
-	(*GetReportResponse)(nil),    // 3: jurwa.reportsubmission.v1.GetReportResponse
-	(v1.Category)(0),             // 4: jurwa.common.v1.Category
-	(*v1.Location)(nil),          // 5: jurwa.common.v1.Location
-	(*v1.Report)(nil),            // 6: jurwa.common.v1.Report
+	(*SubmitReportRequest)(nil),       // 0: jurwa.reportsubmission.v1.SubmitReportRequest
+	(*SubmitReportResponse)(nil),      // 1: jurwa.reportsubmission.v1.SubmitReportResponse
+	(*GetReportRequest)(nil),          // 2: jurwa.reportsubmission.v1.GetReportRequest
+	(*GetReportResponse)(nil),         // 3: jurwa.reportsubmission.v1.GetReportResponse
+	(*UpdateDescriptionRequest)(nil),  // 4: jurwa.reportsubmission.v1.UpdateDescriptionRequest
+	(*UpdateDescriptionResponse)(nil), // 5: jurwa.reportsubmission.v1.UpdateDescriptionResponse
+	(*WithdrawReportRequest)(nil),     // 6: jurwa.reportsubmission.v1.WithdrawReportRequest
+	(*WithdrawReportResponse)(nil),    // 7: jurwa.reportsubmission.v1.WithdrawReportResponse
+	(v1.Category)(0),                  // 8: jurwa.common.v1.Category
+	(*v1.Location)(nil),               // 9: jurwa.common.v1.Location
+	(*v1.Report)(nil),                 // 10: jurwa.common.v1.Report
 }
 var file_report_submission_v1_report_submission_proto_depIdxs = []int32{
-	4, // 0: jurwa.reportsubmission.v1.SubmitReportRequest.category:type_name -> jurwa.common.v1.Category
-	5, // 1: jurwa.reportsubmission.v1.SubmitReportRequest.location:type_name -> jurwa.common.v1.Location
-	6, // 2: jurwa.reportsubmission.v1.SubmitReportResponse.report:type_name -> jurwa.common.v1.Report
-	6, // 3: jurwa.reportsubmission.v1.GetReportResponse.report:type_name -> jurwa.common.v1.Report
-	0, // 4: jurwa.reportsubmission.v1.ReportSubmissionService.SubmitReport:input_type -> jurwa.reportsubmission.v1.SubmitReportRequest
-	2, // 5: jurwa.reportsubmission.v1.ReportSubmissionService.GetReport:input_type -> jurwa.reportsubmission.v1.GetReportRequest
-	1, // 6: jurwa.reportsubmission.v1.ReportSubmissionService.SubmitReport:output_type -> jurwa.reportsubmission.v1.SubmitReportResponse
-	3, // 7: jurwa.reportsubmission.v1.ReportSubmissionService.GetReport:output_type -> jurwa.reportsubmission.v1.GetReportResponse
-	6, // [6:8] is the sub-list for method output_type
-	4, // [4:6] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	8,  // 0: jurwa.reportsubmission.v1.SubmitReportRequest.category:type_name -> jurwa.common.v1.Category
+	9,  // 1: jurwa.reportsubmission.v1.SubmitReportRequest.location:type_name -> jurwa.common.v1.Location
+	10, // 2: jurwa.reportsubmission.v1.SubmitReportResponse.report:type_name -> jurwa.common.v1.Report
+	10, // 3: jurwa.reportsubmission.v1.GetReportResponse.report:type_name -> jurwa.common.v1.Report
+	10, // 4: jurwa.reportsubmission.v1.UpdateDescriptionResponse.report:type_name -> jurwa.common.v1.Report
+	0,  // 5: jurwa.reportsubmission.v1.ReportSubmissionService.SubmitReport:input_type -> jurwa.reportsubmission.v1.SubmitReportRequest
+	2,  // 6: jurwa.reportsubmission.v1.ReportSubmissionService.GetReport:input_type -> jurwa.reportsubmission.v1.GetReportRequest
+	4,  // 7: jurwa.reportsubmission.v1.ReportSubmissionService.UpdateDescription:input_type -> jurwa.reportsubmission.v1.UpdateDescriptionRequest
+	6,  // 8: jurwa.reportsubmission.v1.ReportSubmissionService.WithdrawReport:input_type -> jurwa.reportsubmission.v1.WithdrawReportRequest
+	1,  // 9: jurwa.reportsubmission.v1.ReportSubmissionService.SubmitReport:output_type -> jurwa.reportsubmission.v1.SubmitReportResponse
+	3,  // 10: jurwa.reportsubmission.v1.ReportSubmissionService.GetReport:output_type -> jurwa.reportsubmission.v1.GetReportResponse
+	5,  // 11: jurwa.reportsubmission.v1.ReportSubmissionService.UpdateDescription:output_type -> jurwa.reportsubmission.v1.UpdateDescriptionResponse
+	7,  // 12: jurwa.reportsubmission.v1.ReportSubmissionService.WithdrawReport:output_type -> jurwa.reportsubmission.v1.WithdrawReportResponse
+	9,  // [9:13] is the sub-list for method output_type
+	5,  // [5:9] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_report_submission_v1_report_submission_proto_init() }
@@ -306,7 +530,7 @@ func file_report_submission_v1_report_submission_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_report_submission_v1_report_submission_proto_rawDesc), len(file_report_submission_v1_report_submission_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

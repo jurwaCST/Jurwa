@@ -73,6 +73,9 @@ var (
 // ErrReportNotFound is returned when no report has the requested id.
 var ErrReportNotFound = errors.New("report not found")
 
+// ErrNotReporter: only the student who sent a report may change or withdraw it (SCRUM-163).
+var ErrNotReporter = errors.New("only the student who sent the report can change it")
+
 var uuidPattern = regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`)
 
 // IsUUID reports whether s has the canonical UUID form.
@@ -136,4 +139,25 @@ type RoutingKey struct {
 // RoutingKey returns the part of the report that routing uses.
 func (r Report) RoutingKey() RoutingKey {
 	return RoutingKey{Category: r.Category, Location: r.Location}
+}
+
+// CheckReporter allows only the student who sent the report (SCRUM-163).
+func (r Report) CheckReporter(userID string) error {
+	if userID == "" || userID != r.ReporterID {
+		return ErrNotReporter
+	}
+	return nil
+}
+
+// WithDescription returns the report with a new description, checked with the
+// same rules as the form (SCRUM-163). Nothing else changes.
+func (r Report) WithDescription(description string) (Report, error) {
+	if strings.TrimSpace(description) == "" {
+		return Report{}, ErrMissingDescription
+	}
+	if utf8.RuneCountInString(description) > MaxDescriptionLength {
+		return Report{}, ErrDescriptionTooLong
+	}
+	r.Description = description
+	return r, nil
 }

@@ -217,3 +217,20 @@
 .nt-time {
   font-size: var(--text-sm);
 }
+
+/* SCRUM-163: edit or delete while nobody works on the report. */
+.rd-change {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: var(--s2);
+}
+
+.rd-change-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.rd-delete {
+  color: var(--danger);
+}

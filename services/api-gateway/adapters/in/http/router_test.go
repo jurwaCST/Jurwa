@@ -155,7 +155,7 @@ func (f *fakeNotes) ListNotes(_ context.Context, role, reportID string) (*intern
 
 // fakeHistory records what the gateway sends to report-history.
 type fakeHistory struct {
-	assignee string // current holder of r1 in the student's list (SCRUM-163)
+	holder    string // current holder of r1 in the student's list (SCRUM-163)
 	assignee  string
 	reporter  string
 	pageSize  int32
@@ -171,8 +171,8 @@ func (f *fakeHistory) ListReportsByReporter(_ context.Context, reporterID string
 		return &reporthistoryv1.ListReportsByReporterResponse{}, nil
 	}
 	r1 := &reporthistoryv1.ReportSummary{ReportId: "r1", ReporterId: reporterID}
-	if f.assignee != "" {
-		r1.CurrentAssigneeId = &f.assignee
+	if f.holder != "" {
+		r1.CurrentAssigneeId = &f.holder
 	}
 	return &reporthistoryv1.ListReportsByReporterResponse{Reports: []*reporthistoryv1.ReportSummary{r1}, NextPageToken: "next"}, nil
 }

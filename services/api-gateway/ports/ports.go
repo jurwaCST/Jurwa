@@ -49,6 +49,9 @@ type Locations interface {
 type Reports interface {
 	SubmitReport(ctx context.Context, in *reportsubmissionv1.SubmitReportRequest) (*reportsubmissionv1.SubmitReportResponse, error)
 	GetReport(ctx context.Context, reportID string) (*commonv1.Report, error)
+	// SCRUM-163: the student changes or withdraws their report.
+	UpdateDescription(ctx context.Context, in *reportsubmissionv1.UpdateDescriptionRequest) (*reportsubmissionv1.UpdateDescriptionResponse, error)
+	WithdrawReport(ctx context.Context, in *reportsubmissionv1.WithdrawReportRequest) (*reportsubmissionv1.WithdrawReportResponse, error)
 }
 
 // Notes is internal-notes (Choki). role is the caller's role, sent as the gRPC

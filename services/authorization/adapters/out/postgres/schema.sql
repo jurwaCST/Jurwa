@@ -46,6 +46,7 @@ INSERT INTO role_permissions (action, role_code) VALUES
     ('report.notes.add', 'CATEGORY_HEAD'), ('report.notes.add', 'STAFF'),
     ('report.notes.read', 'CATEGORY_HEAD'), ('report.notes.read', 'STAFF'), ('report.notes.read', 'SYSTEM_ADMIN'),
     ('report.feedback.submit', 'STUDENT'),
+    ('report.update', 'STUDENT'), ('report.withdraw', 'STUDENT'),
     ('report.feedback.read', 'STUDENT'), ('report.feedback.read', 'CATEGORY_HEAD'), ('report.feedback.read', 'STAFF'), ('report.feedback.read', 'SYSTEM_ADMIN'),
     ('report.audit.read', 'SYSTEM_ADMIN'),
     ('department.list', 'CATEGORY_HEAD'), ('department.list', 'SYSTEM_ADMIN'),

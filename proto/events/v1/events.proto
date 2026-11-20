@@ -44,6 +44,17 @@ message StatusChanged {
   int32 version = 6;
 }
 
+// Stream events:report.withdrawn, published by report-submission when the
+// student deletes a report nobody has started on (SCRUM-163). Readers drop it:
+// report-history, sla-tracking (no escalation), analytics, and notification
+// tells the current assignee.
+message ReportWithdrawn {
+  EventMeta meta = 1;
+  string report_id = 2;
+  string reporter_id = 3;
+  string current_assignee_id = 4; // "" when nobody held it
+}
+
 // Stream events:report.reassigned, published by reassignment.
 message ReportReassigned {
   EventMeta meta = 1;
