@@ -1,0 +1,16 @@
+﻿SCRUM-112: all web unit tests (Vitest) on the SCRUM-85-closure-report branch, which has main with every Sprint 4 card merged, 20 November 2026.
+$ npx vitest run --maxWorkers=2
+
+ RUN  v5.1.0 C:/Users/Acer/Desktop/Jurwa/web
+
+
+ Test Files  14 passed (14)
+      Tests  173 passed (173)
+   Start at  21:06:44
+   Duration  20.95s (tests 54%, environment 33%, setup 7%, import 5%, transform 1%)
+
+Environment  jsdom was created 14 times · 12.76s total, 33% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+
