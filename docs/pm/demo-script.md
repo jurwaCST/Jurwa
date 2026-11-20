@@ -18,7 +18,7 @@ The time limit for the presentation is not given yet. This outline assumes 15 mi
 | 6 | 2:00 | SLA escalation | Nyendrak Yoezer Zangmo | A report submitted before the demo has passed its SLA: it is ESCALATED, the timeline shows it, the Saga hands it back | "SLA escalation works automatically" |
 | 7 | 1:30 | Dashboard | Gayley Choden | System Administrator and President dashboards (counts per status and category) | Analytics |
 | 8 | 1:30 | Quality | Gayley Choden | SonarQube coverage, Cypress run, JMeter numbers, accessibility | "70% coverage, tests passing in CI" |
-| 9 | 1:00 | Observability | Sonam Choki | Grafana dashboard and a Jaeger trace of the submit in step 3 | NFR-08 |
+| 9 | 1:00 | Observability | Sonam Choki | Grafana dashboard and the authorization request logs (JSON, one line per request with a correlation id) | NFR-08 |
 | 10 | 1:00 | Project | Sonam Zangmo | EVM chart, risks closed, what we would do next | "Within budget, weekly EVM" |
 
 Presenters are a proposal: each person shows what they built. Change it at the first rehearsal.
@@ -48,7 +48,7 @@ Demo accounts come from identity's seed (`SEED_DEMO_USERS=true`, SCRUM-126). The
 | 6 | Nyendrak | Open the report prepared before the demo (section 3) | Status ESCALATED, timeline "SLA lapsed", reassigned by the Saga | sla-tracking, sla-escalation-checker, status-lifecycle, reassignment |
 | 7 | Gayley | Sign in as `admin.demo`, then `president.demo` | Counts per status and per category, including the reports from this demo | `GET /dashboard/summary`, `GET /dashboard/categories` |
 | 8 | Gayley | Slides from the evidence folders | SonarQube summary, Cypress video, JMeter table (p95 252 ms, 0 errors) | `docs/evidence/*/sprint3/` |
-| 9 | Choki | Grafana; Jaeger, search for the submit from step 3 | Request rate and latency; one trace across gateway and report-submission | Prometheus, Grafana, Jaeger |
+| 9 | Choki | Grafana; then `kubectl -n jurwa logs deploy/authorization --tail=5`. Say that distributed tracing with Jaeger is future work | Request rate and latency; JSON log lines with the service, method, result, duration and correlation id | Prometheus, Grafana, authorization logs (`pkg/observability`) |
 
 ## 3. Before the demo
 
@@ -87,6 +87,7 @@ These block parts of the script. Each owner says when it is merged.
 |---|---|---|---|
 | sla-tracking keeps timers in memory until its database adapter lands (see the T minus 90 rule) | 6 | Nyendrak | future work |
 | Gateway has no admin (SLA policy) routes; the SLA policy is set with grpcurl before the demo | 6 | Zangmo | future work |
+| Distributed tracing (Jaeger) is not deployed; step 9 shows Grafana and the authorization logs instead | 9 | Choki | future work |
 
 Done since Sprint 3 (checked on main, 18 November 2026, SCRUM-153):
 
