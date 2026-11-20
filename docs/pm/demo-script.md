@@ -18,7 +18,7 @@ The time limit for the presentation is not given yet. This outline assumes 15 mi
 | 6 | 2:00 | SLA escalation | Nyendrak Yoezer Zangmo | A report submitted before the demo has passed its SLA: it is ESCALATED, the timeline shows it, the Saga hands it back | "SLA escalation works automatically" |
 | 7 | 1:30 | Dashboard | Gayley Choden | System Administrator and President dashboards (counts per status and category) | Analytics |
 | 8 | 1:30 | Quality | Gayley Choden | SonarQube coverage, Cypress run, JMeter numbers, accessibility | "70% coverage, tests passing in CI" |
-| 9 | 1:00 | Observability | Sonam Choki | Grafana dashboard and the JSON log line of the submit in step 3 (no Jaeger: tracing was not built, `docs/ops/observability.md`) | NFR-08 |
+| 9 | 1:00 | Observability | Sonam Choki | Grafana dashboard and a Jaeger trace of the submit in step 3 | NFR-08 |
 | 10 | 1:00 | Project | Sonam Zangmo | EVM chart, risks closed, what we would do next | "Within budget, weekly EVM" |
 
 Presenters are a proposal: each person shows what they built. Change it at the first rehearsal.
@@ -48,7 +48,7 @@ Demo accounts come from identity's seed (`SEED_DEMO_USERS=true`, SCRUM-126). The
 | 6 | Nyendrak | Open the report prepared before the demo (section 3) | Status ESCALATED, timeline "SLA lapsed", reassigned by the Saga | sla-tracking, sla-escalation-checker, status-lifecycle, reassignment |
 | 7 | Gayley | Sign in as `admin.demo`, then `president.demo` | Counts per status and per category, including the reports from this demo | `GET /dashboard/summary`, `GET /dashboard/categories` |
 | 8 | Gayley | Slides from the evidence folders | SonarQube summary, Cypress video, JMeter table (p95 252 ms, 0 errors) | `docs/evidence/*/sprint3/` |
-| 9 | Choki | Grafana (`kubectl -n jurwa port-forward svc/grafana 3000:3000`, http://localhost:3000, dashboard "Jurwa services"); then `kubectl -n jurwa logs deploy/report-submission --tail=5` | Request rate, errors and latency per service; the log line of the step 3 submit with its correlation id | Prometheus, Grafana, JSON logs |
+| 9 | Choki | Grafana; Jaeger, search for the submit from step 3 | Request rate and latency; one trace across gateway and report-submission | Prometheus, Grafana, Jaeger |
 
 ## 3. Before the demo
 
@@ -64,58 +64,6 @@ Demo accounts come from identity's seed (`SEED_DEMO_USERS=true`, SCRUM-126). The
 | T minus 15 min | Zangmo | Create the demo student with `POST /auth/register` if it does not exist yet; sign in once with every demo account; phone and laptop on the same Wi-Fi; screen sharing tested |
 | T minus 5 min | All | Close other apps; notifications off; browser zoom 125% |
 
-## 3b. Commands, in order
-
-On the demo laptop, in the repo folder. Each block waits for the one before it.
-
-**A. Latest code on the cluster (about 30 to 45 minutes)**
-
-```bash
-git checkout main && git pull
-k3d cluster start jurwa                      # only if the cluster is stopped
-kubectl config current-context               # must say k3d-jurwa
-bash scripts/push-local-registry.sh          # all 20 services
-bash scripts/push-local-registry.sh web      # the web app
-docker build -f functions/sla-escalation-checker/Dockerfile -t localhost:5050/sla-escalation-checker:latest .
-docker push localhost:5050/sla-escalation-checker:latest
-kubectl -n jurwa delete pod --all            # new pods pull the new images
-kubectl -n jurwa get pods -w                 # wait until all are Running, then Ctrl+C
-```
-
-**B. Escalation runner, Grafana, Argo CD**
-
-```bash
-kubectl apply -f deploy/knative/cronjob-fallback.yaml
-kubectl get cronjob,pingsource -A            # only the CronJob may run the checker; delete a PingSource for it if one is listed
-kubectl apply -k deploy/observability        # Prometheus and Grafana (not part of the Argo CD app)
-kubectl -n argocd get applications           # jurwa: Synced, Healthy
-```
-
-**C. T minus 90: SLA window first, then the escalation report.** The timer reads the window when the report is routed, so the order matters.
-
-```bash
-kubectl -n jurwa port-forward svc/sla-policy 9013:9013      # keep open; then in a second terminal:
-grpcurl -plaintext -d '{"category":"HOSTEL","window_hours":1}' localhost:9013 jurwa.slapolicy.v1.SlaPolicyService/UpsertPolicy
-grpcurl -plaintext -d '{"category":"HOSTEL"}' localhost:9013 jurwa.slapolicy.v1.SlaPolicyService/GetPolicy
-```
-
-Then, in the app as the demo student, submit a HOSTEL report and a spare and note the time: step 6 is ready about 62 minutes later. From now on, no restarts.
-
-**D. Before the demo**
-
-```bash
-# demo student, once; the password comes from the group chat, never from this file
-curl -k -X POST https://localhost/api/auth/register -H "Content-Type: application/json" \
-  -d '{"email":"<demo student email>","fullName":"<name>","password":"<password>"}'
-kubectl -n jurwa get pods                                     # all Running, RESTARTS unchanged
-kubectl -n argocd port-forward svc/argocd-server 8443:443     # Argo CD UI, user admin
-kubectl -n jurwa port-forward svc/grafana 3000:3000           # Grafana
-```
-
-The Argo CD admin password is in the Secret `argocd-initial-admin-secret` of that cluster (`deploy/argocd/README.md`, section 5); type it in, never paste it in a chat.
-
-**E. During the demo:** step 2 `kubectl -n jurwa scale deploy/api-gateway --replicas=0`; step 9 `kubectl -n jurwa logs deploy/report-submission --tail=5`; step 6 fallback in section 4.
-
 ## 4. Fallback (risk R3)
 
 Each step has a fallback, so one failure never stops the demo. Switch without apologising and keep the timing.
@@ -126,7 +74,7 @@ Each step has a fallback, so one failure never stops the demo. Switch without ap
 | Argo CD UI | Show `kubectl -n argocd get applications` and `docs/evidence/sonam-zangmo/sprint3/argocd-ui-synced-healthy.png` |
 | The phone or Wi-Fi | Run the PWA in the laptop browser in a phone-sized window |
 | A route returns an error | Play that step from the recording; the evidence file of the route has the same call with its answer |
-| Escalation not visible in time | Run the checker once by hand: `kubectl -n jurwa create job --from=cronjob/sla-escalation-checker check-now`, wait 20 seconds and reload; or play step 6 from the recording |
+| Escalation not visible in time | Run the checker once by hand (`curl` its `/`), or play step 6 from the recording |
 | Everything | Play the full recording (about 12 minutes) and present over it |
 
 The recording is made at the full rehearsal (screen and voice, 1080p), saved in the team Drive, and linked from `docs/evidence/` (not committed: too large).
