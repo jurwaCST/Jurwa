@@ -298,3 +298,14 @@
   color: var(--accent);
   letter-spacing: 0.1em;
 }
+
+/* SCRUM-161: the same issue reported by more students. */
+.staff-card-more {
+  justify-self: start;
+  padding: 0.1rem 0.6rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+  color: var(--accent);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}

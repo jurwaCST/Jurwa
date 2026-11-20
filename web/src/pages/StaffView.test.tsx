@@ -519,9 +519,10 @@ describe('SCRUM-161 duplicate reports', () => {
 
   it('shows the same issue once, with how many more reported it', async () => {
     renderView()
-    const cards = await screen.findAllByRole('button', { name: /Hostel A, Wing 1, Bathroom 1/ })
-    expect(cards).toHaveLength(2) // the tap (r1 with r5) and the window (r6)
+    // The cards are grouped once the descriptions have loaded.
     expect(await screen.findByText('+1 more reported')).toBeInTheDocument()
+    const cards = screen.getAllByRole('button', { name: /Hostel A, Wing 1, Bathroom 1/ })
+    expect(cards).toHaveLength(2) // the tap (r1 with r5) and the window (r6)
     expect(screen.getAllByText(/more reported/)).toHaveLength(1)
   })
 
