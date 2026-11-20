@@ -15,9 +15,18 @@ func TestMatchDefaultRules(t *testing.T) {
 		want    string
 		wantErr error
 	}{
-		{name: "hostel goes to DSA", query: Query{Category: Hostel, Building: "Hostel B"}, want: "DSA"},
-		{name: "academic block goes to DAA", query: Query{Category: AcademicBlock, Building: "Block 2"}, want: "DAA"},
-		{name: "others goes to SSO", query: Query{Category: Others}, want: "SSO"},
+		// SCRUM-158: Hostel and Others go to the SSO, who hands them to a councillor.
+		{name: "hostel goes to SSO", query: Query{Category: Hostel, Building: "HA"}, want: "SSO"},
+		{name: "others goes to SSO", query: Query{Category: Others, Building: "Campus"}, want: "SSO"},
+		// SCRUM-158: the student picks the department, and it goes to its HoD.
+		{name: "architecture goes to its HoD", query: Query{Category: AcademicBlock, Building: "Architecture"}, want: "HOD_ARCH"},
+		{name: "civil goes to its HoD", query: Query{Category: AcademicBlock, Building: "Civil & Environmental Engineering"}, want: "HOD_CIVIL"},
+		{name: "computing goes to its HoD", query: Query{Category: AcademicBlock, Building: "Computing Technologies"}, want: "HOD_CT"},
+		{name: "electrical goes to its HoD", query: Query{Category: AcademicBlock, Building: "Electrical & Electronics Engineering"}, want: "HOD_EEE"},
+		{name: "mechanical goes to its HoD", query: Query{Category: AcademicBlock, Building: "Mechanical Engineering"}, want: "HOD_MECH"},
+		{name: "science and humanities goes to its HoD", query: Query{Category: AcademicBlock, Building: "Science & Humanities"}, want: "HOD_SH"},
+		// An old report that names no department still reaches someone.
+		{name: "academic block without a department goes to DAA", query: Query{Category: AcademicBlock, Building: "Academic Block"}, want: "DAA"},
 		{name: "unspecified category is invalid", query: Query{Category: ""}, wantErr: ErrInvalidCategory},
 		{name: "unknown category is invalid", query: Query{Category: "LIBRARY"}, wantErr: ErrInvalidCategory},
 	}
@@ -108,11 +117,26 @@ func TestRuleValidate(t *testing.T) {
 
 func TestDefaultRules(t *testing.T) {
 	rules := DefaultRules()
-	require.Len(t, rules, 3)
+	require.Len(t, rules, 9, "one rule per category, plus one per department")
 	for _, r := range rules {
 		assert.NoError(t, r.Validate())
 		assert.True(t, r.Active)
-		assert.Empty(t, r.Building)
 		assert.Equal(t, DefaultPriority, r.Priority)
+		if r.Building != "" {
+			assert.Equal(t, AcademicBlock, r.Category, "only the Academic Block has building rules")
+		}
 	}
+}
+
+// SCRUM-158: the department names are the buildings of the Academic Block in
+// location-taxonomy, and each goes to that department's HoD position.
+func TestDepartmentRules(t *testing.T) {
+	assert.Equal(t, map[string]string{
+		"Architecture":                         "HOD_ARCH",
+		"Civil & Environmental Engineering":    "HOD_CIVIL",
+		"Computing Technologies":               "HOD_CT",
+		"Electrical & Electronics Engineering": "HOD_EEE",
+		"Mechanical Engineering":               "HOD_MECH",
+		"Science & Humanities":                 "HOD_SH",
+	}, DepartmentHoDs)
 }

@@ -39,8 +39,9 @@ func TestGetRule(t *testing.T) {
 		want    string
 		wantErr error
 	}{
-		{name: "hostel", query: domain.Query{Category: domain.Hostel, Building: "Hostel B"}, want: "DSA"},
-		{name: "academic block", query: domain.Query{Category: domain.AcademicBlock}, want: "DAA"},
+		{name: "hostel", query: domain.Query{Category: domain.Hostel, Building: "HA"}, want: "SSO"},
+		{name: "academic block, computing", query: domain.Query{Category: domain.AcademicBlock, Building: "Computing Technologies"}, want: "HOD_CT"},
+		{name: "academic block without a department", query: domain.Query{Category: domain.AcademicBlock}, want: "DAA"},
 		{name: "others", query: domain.Query{Category: domain.Others}, want: "SSO"},
 		{name: "unspecified", query: domain.Query{}, wantErr: domain.ErrInvalidCategory},
 	}

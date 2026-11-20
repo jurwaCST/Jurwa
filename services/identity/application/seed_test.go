@@ -26,7 +26,7 @@ func TestSeedDemoUsersCreatesOneUserPerDemoAccount(t *testing.T) {
 
 	created, err := svc.SeedDemoUsers(ctx, demoPassword)
 	require.NoError(t, err)
-	assert.Equal(t, 6, created)
+	assert.Equal(t, 24, created)
 
 	want := []struct {
 		id    string
@@ -39,6 +39,26 @@ func TestSeedDemoUsersCreatesOneUserPerDemoAccount(t *testing.T) {
 		{"00000000-0000-4000-8000-000000000010", "staff.demo@jurwa.example", domain.RoleStaff},
 		{"00000000-0000-4000-8000-000000000020", "admin.demo@jurwa.example", domain.RoleSystemAdmin},
 		{"00000000-0000-4000-8000-000000000030", "president.demo@jurwa.example", domain.RolePresident},
+		// SCRUM-158: the HoDs get Academic Block reports, the councillors get
+		// Hostel and Others reports from the SSO. They fix them, so they are staff.
+		{"00000000-0000-4000-8000-000000000041", "hod.arch@jurwa.example", domain.RoleStaff},
+		{"00000000-0000-4000-8000-000000000042", "hod.civil@jurwa.example", domain.RoleStaff},
+		{"00000000-0000-4000-8000-000000000043", "hod.ct@jurwa.example", domain.RoleStaff},
+		{"00000000-0000-4000-8000-000000000044", "hod.eee@jurwa.example", domain.RoleStaff},
+		{"00000000-0000-4000-8000-000000000045", "hod.mech@jurwa.example", domain.RoleStaff},
+		{"00000000-0000-4000-8000-000000000046", "hod.sh@jurwa.example", domain.RoleStaff},
+		{"00000000-0000-4000-8000-000000000051", "councillor.ha@jurwa.example", domain.RoleStaff},
+		{"00000000-0000-4000-8000-000000000052", "councillor.hb@jurwa.example", domain.RoleStaff},
+		{"00000000-0000-4000-8000-000000000053", "councillor.hc@jurwa.example", domain.RoleStaff},
+		{"00000000-0000-4000-8000-000000000054", "councillor.hd@jurwa.example", domain.RoleStaff},
+		{"00000000-0000-4000-8000-000000000055", "councillor.he@jurwa.example", domain.RoleStaff},
+		{"00000000-0000-4000-8000-000000000056", "councillor.hf@jurwa.example", domain.RoleStaff},
+		{"00000000-0000-4000-8000-000000000057", "councillor.nk@jurwa.example", domain.RoleStaff},
+		{"00000000-0000-4000-8000-000000000058", "councillor.rka@jurwa.example", domain.RoleStaff},
+		{"00000000-0000-4000-8000-000000000059", "councillor.rkb@jurwa.example", domain.RoleStaff},
+		{"00000000-0000-4000-8000-000000000060", "councillor.games@jurwa.example", domain.RoleStaff},
+		{"00000000-0000-4000-8000-000000000061", "councillor.mess@jurwa.example", domain.RoleStaff},
+		{"00000000-0000-4000-8000-000000000062", "councillor.electrical@jurwa.example", domain.RoleStaff},
 	}
 	for _, w := range want {
 		u, err := svc.users.FindByID(ctx, w.id)
@@ -52,6 +72,20 @@ func TestSeedDemoUsersCreatesOneUserPerDemoAccount(t *testing.T) {
 		assert.NoError(t, u.CheckPassword(demoPassword))
 	}
 	assert.Len(t, DemoUsers, len(want), "the list in the test and in the code must match")
+}
+
+// SCRUM-158: an HoD or councillor is shown by their position, never as "Staff".
+func TestDemoStaffAreNamedByPosition(t *testing.T) {
+	names := map[string]string{}
+	for _, d := range DemoUsers {
+		names[d.Email] = d.FullName
+	}
+	assert.Equal(t, "Block Councillor (HA)", names["councillor.ha@jurwa.example"])
+	assert.Equal(t, "Games and Health Councillor", names["councillor.games@jurwa.example"])
+	assert.Equal(t, "Deputy Chief Councillor (Mess)", names["councillor.mess@jurwa.example"])
+	assert.Equal(t, "Electrical Maintenance Councillor", names["councillor.electrical@jurwa.example"])
+	assert.Equal(t, "HoD, Computing Technologies", names["hod.ct@jurwa.example"])
+	assert.Equal(t, "HoD, Mechanical Engineering (acting)", names["hod.mech@jurwa.example"])
 }
 
 func TestSeedDemoUsersTwiceCreatesNoDuplicates(t *testing.T) {

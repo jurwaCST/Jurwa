@@ -59,7 +59,7 @@ func withShared(roomList ...[]string) []string {
 
 func TestRealLocationCounts(t *testing.T) {
 	assert.Len(t, activeIn(domain.CategoryHostel), 525, "9 hostels: rooms plus 4 hallway and bathroom areas per floor")
-	assert.Len(t, activeIn(domain.CategoryAcademicBlock), 20, "CR1-5, IT1-5, Lab1-5, LH1-5")
+	assert.Len(t, activeIn(domain.CategoryAcademicBlock), 120, "6 departments, each with CR1-5, IT1-5, Lab1-5, LH1-5")
 	assert.Len(t, activeIn(domain.CategoryOthers), 7, "7 campus places")
 }
 
@@ -106,20 +106,29 @@ func TestHostelRoomsPerFloor(t *testing.T) {
 	}
 }
 
-func TestAcademicBlockIsOneBuildingWithoutWings(t *testing.T) {
-	var areas []string
-	for _, e := range activeIn(domain.CategoryAcademicBlock) {
-		assert.Equal(t, "Academic Block", e.Location.Building)
-		assert.Empty(t, e.Location.Wing, "academic rooms have no wing")
-		areas = append(areas, e.Location.Area)
-	}
-	var want []string
+// SCRUM-158: the student picks the department, so it can go to that
+// department's HoD. The department is the "building" of an Academic Block
+// report, and each department lists the same 20 rooms, without a wing.
+func TestAcademicBlockIsChosenByDepartment(t *testing.T) {
+	var wantRooms []string
 	for _, prefix := range []string{"CR", "IT", "Lab", "LH"} {
 		for n := 1; n <= 5; n++ {
-			want = append(want, fmt.Sprintf("%s%d", prefix, n))
+			wantRooms = append(wantRooms, fmt.Sprintf("%s%d", prefix, n))
 		}
 	}
-	assert.ElementsMatch(t, want, areas)
+	rooms := map[string][]string{}
+	for _, e := range activeIn(domain.CategoryAcademicBlock) {
+		assert.Empty(t, e.Location.Wing, "academic rooms have no wing")
+		rooms[e.Location.Building] = append(rooms[e.Location.Building], e.Location.Area)
+	}
+	departments := []string{
+		"Architecture", "Civil & Environmental Engineering", "Computing Technologies",
+		"Electrical & Electronics Engineering", "Mechanical Engineering", "Science & Humanities",
+	}
+	assert.Len(t, rooms, len(departments), "exactly the 6 CST departments")
+	for _, d := range departments {
+		assert.ElementsMatch(t, wantRooms, rooms[d], "rooms of %s", d)
+	}
 }
 
 func TestOthersAreTheSevenCampusPlaces(t *testing.T) {

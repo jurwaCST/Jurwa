@@ -11,14 +11,12 @@ vi.mock('../api/client', async (importOriginal) => {
   return { ...actual, api: { get: vi.fn(), post: vi.fn(), put: vi.fn(), upload: vi.fn() } }
 })
 
-// The signed-in Category Head.
+// The signed-in user: the DSA, unless a test signs in someone else.
 const ME = '00000000-0000-4000-8000-000000000001'
+const DSA = { id: ME, email: 'dsa.demo@jurwa.example', fullName: 'Dorji DSA', roles: ['CATEGORY_HEAD'] }
+const auth = vi.hoisted(() => ({ user: null as unknown }))
 vi.mock('../auth/useAuth', () => ({
-  useAuth: () => ({
-    user: { id: ME, email: 'dsa.demo@jurwa.example', fullName: 'Dorji DSA', roles: ['CATEGORY_HEAD'] },
-    login: vi.fn(),
-    logout: vi.fn(),
-  }),
+  useAuth: () => ({ user: auth.user, login: vi.fn(), logout: vi.fn() }),
 }))
 
 const get = vi.mocked(api.get)
@@ -55,9 +53,13 @@ let statuses: Record<string, { status: string; version: number }>
 const positions = {
   positions: [
     { code: 'DSA', title: 'Dean of Student Affairs', kind: 'CATEGORY_HEAD', holderUserId: ME },
-    { code: 'WARDEN_A', title: 'Warden, Hostel A', kind: 'STAFF', holderUserId: 'staff-8' },
-    { code: 'ESTATE', title: 'Estate officer', kind: 'STAFF' },
-    { code: 'SSO_MALE', title: 'SSO, male hostels', kind: 'STAFF', holderUserId: 'staff-7' },
+    { code: 'DAA', title: 'Dean of Academic Affairs', kind: 'CATEGORY_HEAD', holderUserId: 'head-daa' },
+    { code: 'SSO', title: 'Student Service Officer', kind: 'CATEGORY_HEAD', holderUserId: 'head-sso' },
+    { code: 'BLOCK_COUNCILLOR_HA', title: 'Block Councillor (HA)', kind: 'COUNCILLOR', holderUserId: 'staff-8' },
+    { code: 'GAMES_HEALTH_COUNCILLOR', title: 'Games and Health Councillor', kind: 'COUNCILLOR' },
+    { code: 'MAINTENANCE_COUNCILLOR', title: 'Electrical Maintenance Councillor', kind: 'COUNCILLOR', holderUserId: 'staff-7' },
+    { code: 'HOD_CT', title: 'Head of Department, Computing Technologies', kind: 'HOD', holderUserId: 'hod-ct' },
+    { code: 'SSO_MALE', title: 'Student Service Officer (male)', kind: 'STAFF', holderUserId: 'staff-10' },
   ],
 }
 
@@ -128,6 +130,7 @@ async function openReport(user: User, place: RegExp) {
 }
 
 beforeEach(() => {
+  auth.user = DSA
   statuses = {
     r1: { status: 'ASSIGNED', version: 2 },
     r2: { status: 'IN_PROGRESS', version: 3 },
@@ -139,6 +142,16 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.clearAllMocks()
+})
+
+// SCRUM-158: the board is headed with who is signed in, not "Staff view".
+describe('SCRUM-158 board heading', () => {
+  it('shows the name of the signed-in person', async () => {
+    auth.user = { id: 'staff-8', email: 'councillor.ha@jurwa.example', fullName: 'Block Councillor (HA)', roles: ['STAFF'] }
+    renderView()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Block Councillor (HA)' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Staff view' })).not.toBeInTheDocument()
+  })
 })
 
 describe('SCRUM-36 assigned reports', () => {
@@ -333,7 +346,9 @@ describe('SCRUM-36 reassign', () => {
     return screen.getByRole('dialog', { name: 'Reassign' })
   }
 
-  it('offers the positions that have someone in them, except my own', async () => {
+  // SCRUM-158: the SSO (and the DSA after an escalation) hand reports to the
+  // councillors who have someone in the post.
+  it('offers the councillors that have someone in them', async () => {
     const user = userEvent.setup()
     renderView()
     const sheet = await openSheet(user)
@@ -341,10 +356,25 @@ describe('SCRUM-36 reassign', () => {
     await waitFor(() => expect(within(to).getAllByRole('option')).toHaveLength(3))
     expect(within(to).getAllByRole('option').map((o) => o.textContent)).toEqual([
       'Choose a person',
-      'SSO, male hostels',
-      'Warden, Hostel A',
+      'Block Councillor (HA)',
+      'Electrical Maintenance Councillor',
     ])
     expect(get).toHaveBeenCalledWith('/positions')
+  })
+
+  // SCRUM-158: an escalated Academic Block report reaches the DAA, who hands it
+  // back to an HoD.
+  it('offers the DAA the HoDs', async () => {
+    auth.user = { id: 'head-daa', email: 'daa.demo@jurwa.example', fullName: 'DAA (demo)', roles: ['CATEGORY_HEAD'] }
+    const user = userEvent.setup()
+    renderView()
+    const sheet = await openSheet(user)
+    const to = await within(sheet).findByLabelText('Reassign to')
+    await waitFor(() => expect(within(to).getAllByRole('option')).toHaveLength(2))
+    expect(within(to).getAllByRole('option').map((o) => o.textContent)).toEqual([
+      'Choose a person',
+      'Head of Department, Computing Technologies',
+    ])
   })
 
   it('sends the chosen holder and the reason, then the report leaves my list', async () => {
@@ -353,11 +383,11 @@ describe('SCRUM-36 reassign', () => {
     renderView()
     const sheet = await openSheet(user)
     await user.selectOptions(await within(sheet).findByLabelText('Reassign to'), 'staff-7')
-    await user.type(within(sheet).getByLabelText('Why (the new person sees this)'), 'Male hostel plumbing')
+    await user.type(within(sheet).getByLabelText('Why (the new person sees this)'), 'Light in the corridor')
     await user.click(within(sheet).getByRole('button', { name: 'Reassign report' }))
 
-    expect(post).toHaveBeenCalledWith('/reports/r1/reassign', { toUserId: 'staff-7', reason: 'Male hostel plumbing' })
-    expect(await screen.findByText('Reassigned to SSO, male hostels')).toBeInTheDocument()
+    expect(post).toHaveBeenCalledWith('/reports/r1/reassign', { toUserId: 'staff-7', reason: 'Light in the corridor' })
+    expect(await screen.findByText('Reassigned to Electrical Maintenance Councillor')).toBeInTheDocument()
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Bathroom 1/ })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'All 3' })).toBeInTheDocument()
@@ -367,7 +397,7 @@ describe('SCRUM-36 reassign', () => {
     const user = userEvent.setup()
     renderView()
     const sheet = await openSheet(user)
-    await within(sheet).findByRole('option', { name: 'Warden, Hostel A' })
+    await within(sheet).findByRole('option', { name: 'Block Councillor (HA)' })
     await user.click(within(sheet).getByRole('button', { name: 'Reassign report' }))
     expect(await within(sheet).findByText('Choose who to reassign it to.')).toBeInTheDocument()
     await user.selectOptions(within(sheet).getByLabelText('Reassign to'), 'staff-8')
@@ -386,13 +416,21 @@ describe('SCRUM-36 reassign', () => {
     await user.selectOptions(await within(sheet).findByLabelText('Reassign to'), 'staff-8')
     await user.type(within(sheet).getByLabelText('Why (the new person sees this)'), 'Hostel A')
     await user.click(within(sheet).getByRole('button', { name: 'Reassign report' }))
-    expect(await within(sheet).findByRole('alert')).toHaveTextContent(
-      'Only the person this report is assigned to can reassign it.',
-    )
+    expect(await within(sheet).findByRole('alert')).toHaveTextContent('Only a Category Head can reassign a report.')
     await user.click(within(sheet).getByRole('button', { name: 'Reassign report' }))
     expect(await within(sheet).findByRole('alert')).toHaveTextContent(
       'Someone reassigned this report first. Go back to the list to see it.',
     )
+  })
+
+  // SCRUM-158: HoDs and councillors fix what they get; they do not pass it on.
+  it('gives staff no reassign, only the status', async () => {
+    auth.user = { id: 'staff-8', email: 'councillor.ha@jurwa.example', fullName: 'Block Councillor (HA)', roles: ['STAFF'] }
+    const user = userEvent.setup()
+    renderView()
+    await openReport(user, /Bathroom 1/)
+    expect(await screen.findByRole('button', { name: 'Update status' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Reassign' })).not.toBeInTheDocument()
   })
 
   it('has no reassign on a resolved report', async () => {

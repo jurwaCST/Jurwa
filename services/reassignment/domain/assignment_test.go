@@ -77,7 +77,9 @@ func TestCheckCanReassign(t *testing.T) {
 		allowed bool
 	}{
 		{"category head, not assignee", RoleCategoryHead, headID, true},
-		{"staff who is the assignee", RoleStaff, staffID, true},
+		// SCRUM-158: HoDs and councillors fix what they get; only a Category Head
+		// (the SSO, or the DSA or DAA after an escalation) hands a report on.
+		{"staff who is the assignee", RoleStaff, staffID, false},
 		{"staff who is not the assignee", RoleStaff, otherID, false},
 		{"student", RoleStudent, staffID, false},
 		{"system admin", RoleSystemAdmin, otherID, false},

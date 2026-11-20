@@ -113,4 +113,15 @@ describe('SCRUM-37 admin dashboard: counts', () => {
       'Editing them here comes next',
     )
   })
+
+  // SCRUM-158: the rules as they are now.
+  it('describes who receives each category and who a late report goes up to', async () => {
+    renderPage()
+    await screen.findByRole('region', { name: 'Report counts' })
+    const rules = screen.getByRole('region', { name: 'Routing rules and time limits' })
+    expect(rules).toHaveTextContent(
+      "Hostel and Others go to the SSO, who hands them to a councillor; the Academic Block goes to the HoD of the department the student picks.",
+    )
+    expect(rules).toHaveTextContent('A late report goes up to the DSA, or to the DAA for the Academic Block.')
+  })
 })

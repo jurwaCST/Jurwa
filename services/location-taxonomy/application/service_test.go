@@ -65,11 +65,12 @@ func TestValidateLocation(t *testing.T) {
 		wantReason string
 	}{
 		{name: "real hostel location", category: domain.CategoryHostel, location: domain.Location{Building: "HC", Wing: "Floor 1", Area: "Left wing bathroom"}, wantValid: true},
-		{name: "real block location", category: domain.CategoryAcademicBlock, location: domain.Location{Building: "Academic Block", Area: "LH1"}, wantValid: true},
+		{name: "real block location, by department", category: domain.CategoryAcademicBlock, location: domain.Location{Building: "Computing Technologies", Area: "LH1"}, wantValid: true},
+		{name: "the block without a department (SCRUM-158)", category: domain.CategoryAcademicBlock, location: domain.Location{Building: "Academic Block", Area: "LH1"}, wantReason: domain.ReasonUnknownBuilding},
 		{name: "campus-wide area", category: domain.CategoryOthers, location: domain.Location{Building: domain.CampusBuilding, Area: "Library"}, wantValid: true},
 		{name: "switched-off sample area", category: domain.CategoryOthers, location: domain.Location{Building: domain.CampusBuilding, Area: "Wi-Fi"}, wantReason: domain.ReasonUnknownArea},
 		{name: "switched-off sample building", category: domain.CategoryHostel, location: domain.Location{Building: "Hostel A", Wing: "Wing 1", Area: "Bathroom 1"}, wantReason: domain.ReasonUnknownBuilding},
-		{name: "building of another category", category: domain.CategoryHostel, location: domain.Location{Building: "Academic Block"}, wantReason: domain.ReasonUnknownBuilding},
+		{name: "building of another category", category: domain.CategoryHostel, location: domain.Location{Building: "Computing Technologies"}, wantReason: domain.ReasonUnknownBuilding},
 		{name: "floor the building does not have", category: domain.CategoryHostel, location: domain.Location{Building: "HE", Wing: "Floor 3"}, wantReason: domain.ReasonUnknownWing},
 		{name: "missing category", category: "", location: domain.Location{Building: "Hostel A"}, wantErr: domain.ErrMissingCategory},
 		{name: "empty building", category: domain.CategoryHostel, location: domain.Location{}, wantErr: domain.ErrMissingBuilding},

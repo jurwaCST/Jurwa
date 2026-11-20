@@ -26,9 +26,30 @@ func TestNewEscalated(t *testing.T) {
 	e := NewEscalated("a3", routed(), now)
 	assert.Equal(t, Assignment{
 		ID: "a3", ReportID: reportID, AssigneeUserID: headID, AssigneePositionCode: "DSA", Kind: Escalated,
-		Reason: "SLA lapsed: escalated to the Category Head", Current: true, AssignedAt: now,
+		Reason: "SLA lapsed: escalated to the DSA", Current: true, AssignedAt: now,
 	}, e)
 	assert.Empty(t, e.AssignedBy, "the system acted")
+
+	noPosition := routed()
+	noPosition.AssigneePositionCode = ""
+	assert.Equal(t, "SLA lapsed: escalated to the Category Head", NewEscalated("a3", noPosition, now).Reason)
+}
+
+// SCRUM-158: a report the SSO gave out goes up to the DSA when it is late, and
+// one an HoD holds goes up to the DAA. Any other position has nobody above it,
+// so escalation hands the report back to whoever routing chose.
+func TestEscalationPosition(t *testing.T) {
+	tests := map[string]string{
+		"SSO":      "DSA",
+		"HOD_CT":   "DAA",
+		"HOD_MECH": "DAA",
+		"DSA":      "",
+		"DAA":      "",
+		"":         "",
+	}
+	for routedTo, want := range tests {
+		assert.Equal(t, want, EscalationPosition(routedTo), "routed to %q", routedTo)
+	}
 }
 
 func TestNewCompensated(t *testing.T) {

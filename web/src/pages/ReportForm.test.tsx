@@ -34,6 +34,13 @@ const locations: Record<string, unknown> = {
       { id: 'h4', category: 'HOSTEL', location: { building: 'Hostel B', wing: 'Floor 1', area: 'Kitchen' } },
     ],
   },
+  // SCRUM-158: the Academic Block is picked by department, so it reaches the HoD.
+  ACADEMIC_BLOCK: {
+    locations: [
+      { id: 'a1', category: 'ACADEMIC_BLOCK', location: { building: 'Computing Technologies', area: 'LH1' } },
+      { id: 'a2', category: 'ACADEMIC_BLOCK', location: { building: 'Architecture', area: 'LH1' } },
+    ],
+  },
   OTHERS: {
     // OTHERS has no wing: building is "Campus" and the area is picked directly.
     locations: [
@@ -137,6 +144,23 @@ describe('SCRUM-65 category and location dropdowns', () => {
     await user.selectOptions(await screen.findByLabelText('Building'), 'Campus')
     expect(screen.queryByLabelText('Floor')).not.toBeInTheDocument()
     expect(within(screen.getByLabelText('Area')).getAllByRole('option')).toHaveLength(3)
+  })
+
+  // SCRUM-158: for the Academic Block the student picks their department.
+  it('asks for the department in the Academic Block', async () => {
+    const user = userEvent.setup()
+    renderForm()
+    await pickCategory(user, 'Academic Block')
+    const department = await screen.findByLabelText('Department')
+    expect(within(department).getAllByRole('option').map((o) => o.textContent)).toEqual([
+      'Choose your department',
+      'Architecture',
+      'Computing Technologies',
+    ])
+    expect(screen.queryByLabelText('Building')).not.toBeInTheDocument()
+    await user.selectOptions(department, 'Computing Technologies')
+    expect(screen.queryByLabelText('Floor')).not.toBeInTheDocument()
+    expect(within(screen.getByLabelText('Area')).getAllByRole('option')).toHaveLength(2)
   })
 
   it('needs a category and a full location before sending', async () => {

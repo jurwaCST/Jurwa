@@ -56,9 +56,10 @@ func TestGetStaff(t *testing.T) {
 	assert.Equal(t, domain.KindCategoryHead, got.Kind)
 	assert.NotEmpty(t, got.HolderUserID)
 
-	got, err = newService().GetStaff(ctx, "CHIEF_COUNCILLOR")
+	got, err = newService().GetStaff(ctx, "SSO_FEMALE")
 	require.NoError(t, err)
-	assert.Equal(t, "Chief Councillor", got.Title)
+	assert.Equal(t, "Student Service Officer (female)", got.Title)
+	assert.Empty(t, got.HolderUserID, "nobody holds it")
 
 	_, err = newService().GetStaff(ctx, "PRINCIPAL")
 	assert.ErrorIs(t, err, domain.ErrNotFound)
@@ -81,7 +82,7 @@ func TestRepositoryErrorsArePassedOn(t *testing.T) {
 func TestListPositions(t *testing.T) {
 	all, err := newService().ListPositions(context.Background(), false)
 	require.NoError(t, err)
-	assert.Len(t, all, 15, "3 Category Heads, 2 staff, 4 councillors, 6 HoDs")
+	assert.Len(t, all, 23, "3 Category Heads, 2 staff, 12 councillors, 6 HoDs")
 
 	held, err := newService().ListPositions(context.Background(), true)
 	require.NoError(t, err)
@@ -90,7 +91,13 @@ func TestListPositions(t *testing.T) {
 		assert.NotEmpty(t, p.HolderUserID)
 		codes = append(codes, p.Code)
 	}
-	assert.Equal(t, []string{"DAA", "DSA", "SSO", "SSO_MALE"}, codes, "ordered by code")
+	assert.Equal(t, []string{
+		"BLOCK_COUNCILLOR_HA", "BLOCK_COUNCILLOR_HB", "BLOCK_COUNCILLOR_HC", "BLOCK_COUNCILLOR_HD",
+		"BLOCK_COUNCILLOR_HE", "BLOCK_COUNCILLOR_HF", "BLOCK_COUNCILLOR_NK", "BLOCK_COUNCILLOR_RKA",
+		"BLOCK_COUNCILLOR_RKB", "DAA", "DEPUTY_CHIEF_COUNCILLOR_MESS", "DSA", "GAMES_HEALTH_COUNCILLOR",
+		"HOD_ARCH", "HOD_CIVIL", "HOD_CT", "HOD_EEE", "HOD_MECH", "HOD_SH", "MAINTENANCE_COUNCILLOR",
+		"SSO", "SSO_MALE",
+	}, codes, "ordered by code")
 
 	_, err = NewService(failingRepo{}).ListPositions(context.Background(), true)
 	assert.ErrorIs(t, err, errDB)

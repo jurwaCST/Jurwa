@@ -86,8 +86,8 @@ describe('role guards', () => {
   })
 
   it.each([
-    ['/staff', 'CATEGORY_HEAD', 'Staff view'],
-    ['/staff', 'STAFF', 'Staff view'],
+    ['/staff', 'CATEGORY_HEAD', 'Test User'], // SCRUM-158: headed with who is signed in
+    ['/staff', 'STAFF', 'Test User'],
     ['/admin', 'SYSTEM_ADMIN', 'Admin dashboard'],
     ['/president', 'PRESIDENT', 'President dashboard'],
     ['/reports', 'STUDENT', 'My reports'],

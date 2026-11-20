@@ -1,0 +1,84 @@
+SCRUM-158 tests first, before any code change, 21 November 2026.
+Go: go test -p 1 on the changed packages (only the result line of each package, then the reasons).
+
+--- FAIL: TestGetRule (0.00s)
+    --- FAIL: TestGetRule/hostel (0.00s)
+FAIL	github.com/jurwaCST/Jurwa/services/routing-rules/adapters/in/grpc	0.391s
+--- FAIL: TestRepository (0.00s)
+--- FAIL: TestRepositoryContract (0.00s)
+    --- FAIL: TestRepositoryContract/seeded_with_the_default_rules (0.00s)
+    --- FAIL: TestRepositoryContract/list_is_ordered_by_category_then_building (0.00s)
+FAIL	github.com/jurwaCST/Jurwa/services/routing-rules/adapters/out/memory	1.838s
+ok  	github.com/jurwaCST/Jurwa/services/routing-rules/adapters/out/postgres	(cached)
+--- FAIL: TestGetRule (0.00s)
+    --- FAIL: TestGetRule/hostel (0.00s)
+    --- FAIL: TestGetRule/academic_block,_computing (0.00s)
+FAIL	github.com/jurwaCST/Jurwa/services/routing-rules/application	1.785s
+ok  	github.com/jurwaCST/Jurwa/services/routing-rules/cmd/server	(cached)
+services\routing-rules\domain\rule_test.go:141:5: undefined: DepartmentHoDs
+FAIL	github.com/jurwaCST/Jurwa/services/routing-rules/domain [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/location-taxonomy/adapters/in/grpc	(cached)
+--- FAIL: TestRealLocationCounts (0.00s)
+--- FAIL: TestAcademicBlockIsChosenByDepartment (0.00s)
+FAIL	github.com/jurwaCST/Jurwa/services/location-taxonomy/adapters/out/memory	1.879s
+--- FAIL: TestValidateLocation (0.01s)
+    --- FAIL: TestValidateLocation/real_block_location,_by_department (0.00s)
+    --- FAIL: TestValidateLocation/the_block_without_a_department_(SCRUM-158) (0.00s)
+FAIL	github.com/jurwaCST/Jurwa/services/location-taxonomy/application	1.841s
+ok  	github.com/jurwaCST/Jurwa/services/location-taxonomy/cmd/server	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/location-taxonomy/domain	(cached)
+--- FAIL: TestListPositions (0.00s)
+FAIL	github.com/jurwaCST/Jurwa/services/department-directory/adapters/in/grpc	0.504s
+ok  	github.com/jurwaCST/Jurwa/services/department-directory/adapters/out/memory	(cached)
+--- FAIL: TestListPositions (0.00s)
+FAIL	github.com/jurwaCST/Jurwa/services/department-directory/application	1.896s
+ok  	github.com/jurwaCST/Jurwa/services/department-directory/cmd/server	(cached)
+--- FAIL: TestFindPosition (0.00s)
+    --- FAIL: TestFindPosition/block_councillor_HA (0.00s)
+    --- FAIL: TestFindPosition/block_councillor_RKB (0.00s)
+    --- FAIL: TestFindPosition/games_and_health_councillor (0.00s)
+    --- FAIL: TestFindPosition/one_block_councillor_per_hostel,_no_general_one (0.00s)
+--- FAIL: TestEveryHoDAndCouncillorHasADemoHolder (0.00s)
+--- FAIL: TestBlockCouncillorPerHostel (0.00s)
+FAIL	github.com/jurwaCST/Jurwa/services/department-directory/domain	1.812s
+--- FAIL: TestSeedDemoUsersCreatesOneUserPerDemoAccount (0.58s)
+--- FAIL: TestDemoStaffAreNamedByPosition (0.00s)
+FAIL	github.com/jurwaCST/Jurwa/services/identity/application	4.473s
+--- FAIL: TestSeedFromEnv (0.30s)
+    --- FAIL: TestSeedFromEnv/flag_true:_every_demo_user (0.30s)
+FAIL	github.com/jurwaCST/Jurwa/services/identity/cmd/server	0.943s
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/adapters/in/events	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/adapters/in/grpc	(cached)
+services\reassignment\adapters\out\directoryclient\client_test.go:36:14: undefined: New
+services\reassignment\adapters\out\directoryclient\client_test.go:44:13: undefined: New
+services\reassignment\adapters\out\directoryclient\client_test.go:54:15: undefined: New
+services\reassignment\adapters\out\directoryclient\client_test.go:59:13: undefined: New
+FAIL	github.com/jurwaCST/Jurwa/services/reassignment/adapters/out/directoryclient [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/adapters/out/eventpublisher	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/adapters/out/logpublisher	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/adapters/out/memory	(cached)
+services\reassignment\application\saga_test.go:168:39: newService(memory.New(), pub).UseEscalationTargets undefined (type *Service has no field or method UseEscalationTargets)
+FAIL	github.com/jurwaCST/Jurwa/services/reassignment/application [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/reassignment/cmd/server	(cached)
+services\reassignment\domain\escalation_test.go:51:25: undefined: EscalationPosition
+FAIL	github.com/jurwaCST/Jurwa/services/reassignment/domain [build failed]
+tests\spec\position_routing_test.go:80:36: undefined: reassignment.EscalationPosition
+FAIL	github.com/jurwaCST/Jurwa/tests/spec [build failed]
+
+Web: npx vitest run --maxWorkers=1 on the five changed test files.
+
+     × asks for the department in the Academic Block 1090ms
+     × shows the name of the signed-in person 1033ms
+     × offers the councillors that have someone in them 1175ms
+     × offers the DAA the HoDs 1140ms
+     × explains a 403 and a 409 408ms
+     × gives staff no reassign, only the status 92ms
+     × /staff is open to CATEGORY_HEAD 19ms
+     × /staff is open to STAFF 12ms
+     × describes who receives each category and who a late report goes up to 19ms
+     × takes CATEGORY_HEAD from home straight to their board 1022ms
+     × takes STAFF from home straight to their board 1016ms
+     × sends Hostel and Others to the SSO and the Academic Block to the department HoD 18ms
+     × says a late report goes up to the DSA or the DAA 9ms
+ Test Files  5 failed (5)
+      Tests  13 failed | 88 passed (101)
