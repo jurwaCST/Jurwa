@@ -489,3 +489,81 @@ describe('SCRUM-164 the reassign note and the stars', () => {
     expect(await screen.findByText('Not rated by the student yet.')).toBeInTheDocument()
   })
 })
+
+// SCRUM-161: reports about the same problem in the same place are one card,
+// and what is done to the card is done to every report in it.
+describe('SCRUM-161 duplicate reports', () => {
+  const place = { building: 'Hostel A', wing: 'Wing 1', area: 'Bathroom 1' }
+  const report = (id: string, description: string, createdAt: string) => ({
+    report: { id, category: 'HOSTEL', location: place, description, createdAt },
+  })
+
+  beforeEach(() => {
+    statuses.r5 = { status: 'ASSIGNED', version: 2 }
+    statuses.r6 = { status: 'ASSIGNED', version: 2 }
+    stubGet({
+      '/me/assigned-reports': {
+        reports: [
+          summary('r1', 'ASSIGNED', 'Hostel A', 'Bathroom 1'),
+          { ...summary('r5', 'ASSIGNED', 'Hostel A', 'Bathroom 1'), createdAt: '2026-11-08T09:30:00Z' },
+          { ...summary('r6', 'ASSIGNED', 'Hostel A', 'Bathroom 1'), createdAt: '2026-11-08T09:40:00Z' },
+          summary('r2', 'IN_PROGRESS', 'Hostel B', 'Kitchen'),
+        ],
+        nextPageToken: '',
+      },
+      '/reports/r1': report('r1', 'The tap has been leaking since Monday.', '2026-11-08T08:00:00Z'),
+      '/reports/r5': report('r5', 'Tap in the bathroom is leaking', '2026-11-08T09:30:00Z'),
+      '/reports/r6': report('r6', 'Window glass is broken', '2026-11-08T09:40:00Z'),
+    })
+  })
+
+  it('shows the same issue once, with how many more reported it', async () => {
+    renderView()
+    const cards = await screen.findAllByRole('button', { name: /Hostel A, Wing 1, Bathroom 1/ })
+    expect(cards).toHaveLength(2) // the tap (r1 with r5) and the window (r6)
+    expect(await screen.findByText('+1 more reported')).toBeInTheDocument()
+    expect(screen.getAllByText(/more reported/)).toHaveLength(1)
+  })
+
+  it('updates the status of every report in the card', async () => {
+    post.mockImplementation(async (path: string) => {
+      const id = path.split('/')[2]
+      return { status: { reportId: id, status: 'IN_PROGRESS', version: 3 } }
+    })
+    const user = userEvent.setup()
+    renderView()
+    await screen.findByText('+1 more reported')
+    await user.click(screen.getAllByRole('button', { name: /Hostel A, Wing 1, Bathroom 1/ })[0])
+    await user.click(await screen.findByRole('button', { name: 'Update status' }))
+    const sheet = screen.getByRole('dialog', { name: 'Update status' })
+    expect(within(sheet).getByText('Also for the 1 other report of the same issue.')).toBeInTheDocument()
+    await user.click(within(sheet).getByRole('radio', { name: 'In progress' }))
+    await user.click(within(sheet).getByRole('button', { name: 'Save status' }))
+
+    expect(await screen.findByText('Status updated')).toBeInTheDocument()
+    expect(post).toHaveBeenCalledWith('/reports/r1/status', { toStatus: 'IN_PROGRESS', expectedVersion: 2 })
+    expect(post).toHaveBeenCalledWith('/reports/r5/status', { toStatus: 'IN_PROGRESS', expectedVersion: 2 })
+    expect(post).not.toHaveBeenCalledWith('/reports/r6/status', expect.anything())
+  })
+
+  it('reassigns every report in the card', async () => {
+    post.mockImplementation(async (path: string) => {
+      if (path.endsWith('/notes')) return { note: {} }
+      return { assignment: { reportId: path.split('/')[2], assigneeUserId: 'staff-7', kind: 'REASSIGNED', current: true } }
+    })
+    const user = userEvent.setup()
+    renderView()
+    await screen.findByText('+1 more reported')
+    await user.click(screen.getAllByRole('button', { name: /Hostel A, Wing 1, Bathroom 1/ })[0])
+    await user.click(await screen.findByRole('button', { name: 'Reassign' }))
+    const sheet = screen.getByRole('dialog', { name: 'Reassign' })
+    await user.selectOptions(await within(sheet).findByLabelText('Reassign to'), 'staff-7')
+    await user.type(within(sheet).getByLabelText('Why (the new person sees this)'), 'Plumbing')
+    await user.click(within(sheet).getByRole('button', { name: 'Reassign report' }))
+
+    expect(await screen.findByText('Reassigned to Electrical Maintenance Councillor')).toBeInTheDocument()
+    expect(post).toHaveBeenCalledWith('/reports/r1/reassign', { toUserId: 'staff-7', reason: 'Plumbing' })
+    expect(post).toHaveBeenCalledWith('/reports/r5/reassign', { toUserId: 'staff-7', reason: 'Plumbing' })
+    expect(post).not.toHaveBeenCalledWith('/reports/r6/reassign', expect.anything())
+  })
+})
