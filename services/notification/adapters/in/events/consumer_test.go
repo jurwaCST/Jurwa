@@ -105,6 +105,7 @@ func TestReadsTheFourStreams(t *testing.T) {
 	assert.ElementsMatch(t, []string{
 		"events:report.submitted", "events:status.changed",
 		"events:report.routed", "events:report.reassigned", // SCRUM-162
+		"events:report.withdrawn", // SCRUM-163
 	}, Streams())
 	assert.Equal(t, "notification", Group)
 }
@@ -320,4 +321,33 @@ func TestBadRoutedOrReassignedPayloadIsAnError(t *testing.T) {
 	c, _, _, _ := setup()
 	assert.Error(t, c.ReportRouted(context.Background(), []byte("not a protobuf")))
 	assert.Error(t, c.ReportReassigned(context.Background(), []byte("not a protobuf")))
+}
+
+// SCRUM-163: when the student deletes a report, whoever held it is told.
+func withdrawnPayload(t *testing.T, eventID, holder string) []byte {
+	t.Helper()
+	b, err := proto.Marshal(&eventsv1.ReportWithdrawn{
+		Meta: &eventsv1.EventMeta{EventId: eventID, Producer: "report-submission"}, ReportId: reportID, ReporterId: student, CurrentAssigneeId: holder,
+	})
+	require.NoError(t, err)
+	return b
+}
+
+func TestWithdrawnTellsWhoHeldIt(t *testing.T) {
+	c, app, _, _ := setup()
+	require.NoError(t, c.ReportWithdrawn(context.Background(), withdrawnPayload(t, event1, sso)))
+
+	theirs := inboxOf(t, app, sso)
+	require.Len(t, theirs, 1)
+	assert.Equal(t, "Report removed by the student", theirs[0].Subject)
+	assert.Equal(t, reportID, theirs[0].ReportID)
+	assert.Empty(t, inboxOf(t, app, student), "the student deleted it themselves")
+}
+
+func TestWithdrawnWithNobodyHoldingItSendsNothing(t *testing.T) {
+	c, app, _, _ := setup()
+	require.NoError(t, c.ReportWithdrawn(context.Background(), withdrawnPayload(t, event1, "")))
+	assert.Empty(t, inboxOf(t, app, student))
+	assert.Contains(t, Streams(), "events:report.withdrawn")
+	assert.Error(t, c.ReportWithdrawn(context.Background(), []byte("not a protobuf")))
 }

@@ -154,3 +154,16 @@ func TestRunReadsBothStreams(t *testing.T) {
 	cancel()
 	assert.NoError(t, <-done)
 }
+
+// SCRUM-163: a withdrawn report leaves the counts.
+func TestAWithdrawnReportLeavesTheCounts(t *testing.T) {
+	c, app := setup(time.Second)
+	ctx := context.Background()
+	require.NoError(t, c.ReportSubmitted(ctx, submitted(t, "e1", commonv1.Category_HOSTEL)))
+	b, err := proto.Marshal(&eventsv1.ReportWithdrawn{Meta: &eventsv1.EventMeta{EventId: "e9", OccurredAt: timestamppb.New(sentAt)}, ReportId: reportID})
+	require.NoError(t, err)
+	require.NoError(t, c.ReportWithdrawn(ctx, b))
+	assert.EqualValues(t, 0, summary(t, app).Counts.Total)
+	assert.Contains(t, Streams(), eventbus.StreamReportWithdrawn)
+	assert.Error(t, c.ReportWithdrawn(ctx, []byte("not a protobuf")))
+}

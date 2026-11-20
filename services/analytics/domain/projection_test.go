@@ -249,3 +249,27 @@ func TestNext(t *testing.T) {
 		})
 	}
 }
+
+// SCRUM-163: a report its student deleted is not counted, and a late
+// report.submitted (after a restart) does not bring it back.
+func withdrawn(report string, at time.Time) Event {
+	evN++
+	return Event{ID: fmt.Sprintf("ev-%d", evN), Type: ReportWithdrawn, ReportID: report, OccurredAt: at}
+}
+
+func TestAWithdrawnReportIsNotCounted(t *testing.T) {
+	p := NewProjection()
+	apply(p, submitted("r1", Hostel, t0), submitted("r2", Others, t0), withdrawn("r1", t0.Add(time.Minute)))
+	s := Summarize(p.Reports(), Period{})
+	assert.EqualValues(t, 1, s.Counts.Total)
+	assert.EqualValues(t, 1, s.Counts.Open)
+	b := Breakdown(p.Reports(), Period{})
+	assert.EqualValues(t, 0, b[0].Counts.Total, "the Hostel report is gone")
+	assert.EqualValues(t, 1, b[2].Counts.Total)
+}
+
+func TestAWithdrawnReportDoesNotComeBack(t *testing.T) {
+	p := NewProjection()
+	apply(p, withdrawn("r1", t0), submitted("r1", Hostel, t0))
+	assert.EqualValues(t, 0, Summarize(p.Reports(), Period{}).Counts.Total)
+}
