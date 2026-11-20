@@ -151,7 +151,7 @@ func TestWithDemoHolders(t *testing.T) {
 	// reassign a report to a staff member who can log in.
 	staff, err := FindPosition(positions, "SSO_MALE")
 	require.NoError(t, err)
-	assert.Equal(t, "00000000-0000-4000-8000-000000000010", staff.HolderUserID)
+	assert.Equal(t, "00000000-0000-4000-8000-000000000110", staff.HolderUserID)
 	plain, err := FindPosition(DefaultPositions(), "DSA")
 	require.NoError(t, err)
 	assert.Empty(t, plain.HolderUserID, "the default list is not changed")

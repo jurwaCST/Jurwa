@@ -1,0 +1,10 @@
+﻿SCRUM-158 header tests first, 21 November 2026: an HoD or councillor sees only their position name in the header, no 'Staff' line.
+$ npx vitest run --maxWorkers=1 src/App.test.tsx
+node.exe : stderr | src/App.test.tsx > header for staff > shows the position name without a "Staff" line
+   ❯ header for staff (2)
+     × shows the position name without a "Staff" line 16ms
+ FAIL  src/App.test.tsx > header for staff > shows the position name without a "Staff" line
+Error: expect(element).not.toBeInTheDocument()
+     78|     expect(within(header).queryByText('Staff')).not.toBeInTheDocument()
+ Test Files  1 failed (1)
+      Tests  1 failed | 34 passed (35)

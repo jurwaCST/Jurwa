@@ -1,6 +1,6 @@
 // The College President's read-only dashboard (SCRUM-99, FR-29, FR-30).
 // Written before the page. fetch is faked per URL, like the gateway answers.
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -44,6 +44,21 @@ function renderPage() {
     </MemoryRouter>,
   )
 }
+
+// SCRUM-159: new reports show up without reloading the page.
+describe('SCRUM-159 President dashboard refreshes by itself', () => {
+  afterEach(() => vi.useRealTimers())
+
+  it('fetches the counts again every 15 seconds', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    renderPage()
+    await screen.findByRole('region', { name: 'Report counts' })
+    const calls = fetchMock.mock.calls.length
+    await vi.advanceTimersByTimeAsync(15_000)
+    await waitFor(() => expect(fetchMock.mock.calls.length).toBeGreaterThan(calls))
+    expect(screen.getByRole('region', { name: 'Report counts' })).toBeInTheDocument()
+  })
+})
 
 describe('President dashboard', () => {
   it('shows the counts, the resolution rate and the average time from analytics', async () => {

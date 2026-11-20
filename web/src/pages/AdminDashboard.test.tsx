@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -49,6 +49,25 @@ function renderPage() {
 
 beforeEach(() => stub())
 afterEach(() => vi.clearAllMocks())
+
+// SCRUM-159: new reports show up without reloading the page.
+describe('SCRUM-159 admin dashboard refreshes by itself', () => {
+  afterEach(() => vi.useRealTimers())
+
+  it('fetches the counts again every 15 seconds, without a loading screen', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    renderPage()
+    const tiles = await screen.findByRole('region', { name: 'Report counts' })
+    expect(within(tiles).getByText('Open').nextSibling).toHaveTextContent('1')
+
+    stub({ summary: { ...summary, counts: { ...summary.counts, open: '2' } } })
+    await vi.advanceTimersByTimeAsync(15_000)
+    await waitFor(() =>
+      expect(within(screen.getByRole('region', { name: 'Report counts' })).getByText('Open').nextSibling).toHaveTextContent('2'),
+    )
+    expect(screen.queryByRole('status', { name: 'Loading the dashboard' })).not.toBeInTheDocument()
+  })
+})
 
 describe('SCRUM-37 admin dashboard: counts', () => {
   it('shows a tile per status with its count', async () => {

@@ -92,7 +92,7 @@ func TestListPositions(t *testing.T) {
 	staff := resp.GetPositions()[21]
 	assert.Equal(t, "SSO_MALE", staff.GetCode())
 	assert.Equal(t, "STAFF", staff.GetKind())
-	assert.Equal(t, "00000000-0000-4000-8000-000000000010", staff.GetHolderUserId())
+	assert.Equal(t, "00000000-0000-4000-8000-000000000110", staff.GetHolderUserId())
 
 	all, err := newHandler().ListPositions(context.Background(), &departmentdirectoryv1.ListPositionsRequest{})
 	require.NoError(t, err)
