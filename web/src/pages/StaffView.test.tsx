@@ -441,3 +441,47 @@ describe('SCRUM-36 reassign', () => {
     expect(screen.queryByRole('button', { name: 'Reassign' })).not.toBeInTheDocument()
   })
 })
+
+// SCRUM-164: what the SSO writes when passing a report on reaches the
+// councillor as a note, and the student's stars show on a resolved report.
+describe('SCRUM-164 the reassign note and the stars', () => {
+  it('saves the reason as a note the councillor can read, then reassigns', async () => {
+    const calls: string[] = []
+    post.mockImplementation(async (path: string) => {
+      calls.push(path)
+      if (path.endsWith('/notes')) return { note: { id: 'n9', reportId: 'r1', authorId: ME, body: 'x', createdAt: '2026-11-21T09:00:00Z' } }
+      return { assignment: { reportId: 'r1', assigneeUserId: 'staff-7', kind: 'REASSIGNED', current: true } }
+    })
+    const user = userEvent.setup()
+    renderView()
+    await openReport(user, /Bathroom 1/)
+    await user.click(await screen.findByRole('button', { name: 'Reassign' }))
+    const sheet = screen.getByRole('dialog', { name: 'Reassign' })
+    await user.selectOptions(await within(sheet).findByLabelText('Reassign to'), 'staff-7')
+    await user.type(within(sheet).getByLabelText('Why (the new person sees this)'), 'Light in the corridor')
+    await user.click(within(sheet).getByRole('button', { name: 'Reassign report' }))
+
+    expect(await screen.findByText('Reassigned to Electrical Maintenance Councillor')).toBeInTheDocument()
+    expect(post).toHaveBeenCalledWith('/reports/r1/notes', {
+      body: 'Passed to Electrical Maintenance Councillor: Light in the corridor',
+    })
+    expect(calls).toEqual(['/reports/r1/notes', '/reports/r1/reassign'])
+  })
+
+  it('shows the stars the student gave on a resolved report', async () => {
+    stubGet({ '/reports/r4/feedback': { feedback: { reportId: 'r4', rating: 4, comment: 'Quick fix' } } })
+    const user = userEvent.setup()
+    renderView()
+    await openReport(user, /Room 12/)
+    expect(await screen.findByText('Rated 4 out of 5 by the student')).toBeInTheDocument()
+    expect(screen.getByText('Quick fix')).toBeInTheDocument()
+  })
+
+  it('says when a resolved report is not rated yet', async () => {
+    stubGet({ '/reports/r4/feedback': new ApiError(404, 'no feedback') })
+    const user = userEvent.setup()
+    renderView()
+    await openReport(user, /Room 12/)
+    expect(await screen.findByText('Not rated by the student yet.')).toBeInTheDocument()
+  })
+})

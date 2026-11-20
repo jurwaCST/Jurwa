@@ -28,7 +28,15 @@ let fetchMock: ReturnType<typeof vi.fn>
 
 beforeEach(() => {
   fetchMock = vi.fn((url: string) =>
-    Promise.resolve(json(url.includes('/dashboard/categories') ? categories : summary)),
+    Promise.resolve(
+      json(
+        url.includes('/dashboard/categories')
+          ? categories
+          : url.includes('/dashboard/ratings')
+            ? { count: '3', averageRating: 4.666 } // SCRUM-164
+            : summary,
+      ),
+    ),
   )
   vi.stubGlobal('fetch', fetchMock)
 })
@@ -138,5 +146,14 @@ describe('President dashboard', () => {
       </MemoryRouter>,
     )
     expect(screen.getByRole('heading', { name: 'Not allowed' })).toBeInTheDocument()
+  })
+})
+
+describe('SCRUM-164 President dashboard ratings', () => {
+  it('shows the average rating and how many reports were rated', async () => {
+    renderPage()
+    const tile = await screen.findByRole('region', { name: 'Student ratings' })
+    expect(tile).toHaveTextContent('4.7 / 5')
+    expect(tile).toHaveTextContent('3 rated reports')
   })
 })

@@ -38,6 +38,7 @@ func (failingRepo) Create(context.Context, domain.Feedback) error { return error
 func (failingRepo) GetByReport(context.Context, string) (domain.Feedback, error) {
 	return domain.Feedback{}, errors.New("db down")
 }
+func (failingRepo) List(context.Context) ([]domain.Feedback, error) { return nil, errors.New("db down") }
 
 func newTestService(status *fakeStatus) *Service {
 	svc := NewService(memory.New(), status)
@@ -144,4 +145,26 @@ func TestNewServiceDefaults(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotEmpty(t, f.ID)
 	assert.False(t, f.CreatedAt.IsZero())
+}
+
+// SCRUM-164: the average rating for the admin and President dashboards.
+func TestRatingSummary(t *testing.T) {
+	svc := newTestService(&fakeStatus{resolved: true})
+	ctx := context.Background()
+
+	got, err := svc.RatingSummary(ctx)
+	require.NoError(t, err)
+	assert.Equal(t, domain.RatingSummary{}, got)
+
+	_, err = svc.Submit(ctx, reportID, studentID, 5, "")
+	require.NoError(t, err)
+	_, err = svc.Submit(ctx, "44444444-4444-4444-8444-444444444444", studentID, 3, "")
+	require.NoError(t, err)
+
+	got, err = svc.RatingSummary(ctx)
+	require.NoError(t, err)
+	assert.Equal(t, domain.RatingSummary{Count: 2, Average: 4}, got)
+
+	_, err = NewService(failingRepo{}, &fakeStatus{resolved: true}).RatingSummary(ctx)
+	assert.ErrorContains(t, err, "db down")
 }

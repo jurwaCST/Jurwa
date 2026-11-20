@@ -89,3 +89,24 @@ func TestToStatusErrorInternal(t *testing.T) {
 	assert.Equal(t, codes.Internal, status.Code(err))
 	assert.NotContains(t, err.Error(), "db down")
 }
+
+// SCRUM-164: GetRatingSummary gives the count and the average.
+func TestGetRatingSummary(t *testing.T) {
+	h := newHandler(fakeStatus{resolved: true})
+	ctx := context.Background()
+
+	empty, err := h.GetRatingSummary(ctx, &feedbackv1.GetRatingSummaryRequest{})
+	require.NoError(t, err)
+	assert.Zero(t, empty.GetCount())
+	assert.Zero(t, empty.GetAverageRating())
+
+	_, err = h.SubmitFeedback(ctx, &feedbackv1.SubmitFeedbackRequest{
+		ReportId: "33333333-3333-4333-8333-333333333333", StudentUserId: "22222222-2222-4222-8222-222222222222", Rating: 4,
+	})
+	require.NoError(t, err)
+
+	got, err := h.GetRatingSummary(ctx, &feedbackv1.GetRatingSummaryRequest{})
+	require.NoError(t, err)
+	assert.EqualValues(t, 1, got.GetCount())
+	assert.InDelta(t, 4.0, got.GetAverageRating(), 1e-9)
+}

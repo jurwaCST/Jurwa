@@ -27,7 +27,10 @@ const categories = {
   ],
 }
 
-function stub(over: { summary?: unknown; categories?: unknown } = {}) {
+// SCRUM-164: the students' stars, from feedback.
+const ratings = { count: '7', averageRating: 4.2 }
+
+function stub(over: { summary?: unknown; categories?: unknown; ratings?: unknown } = {}) {
   get.mockImplementation(async (path: string) => {
     if (path.startsWith('/dashboard/summary')) {
       const v = over.summary ?? summary
@@ -35,6 +38,7 @@ function stub(over: { summary?: unknown; categories?: unknown } = {}) {
       return v
     }
     if (path.startsWith('/dashboard/categories')) return over.categories ?? categories
+    if (path === '/dashboard/ratings') return over.ratings ?? ratings
     throw new ApiError(404, 'not found')
   })
 }
@@ -142,5 +146,20 @@ describe('SCRUM-37 admin dashboard: counts', () => {
       "Hostel and Others go to the SSO, who hands them to a councillor; the Academic Block goes to the HoD of the department the student picks.",
     )
     expect(rules).toHaveTextContent('A late report goes up to the DSA, or to the DAA for the Academic Block.')
+  })
+})
+
+describe('SCRUM-164 admin dashboard ratings', () => {
+  it('shows the average rating and how many reports were rated', async () => {
+    renderPage()
+    const tile = await screen.findByRole('region', { name: 'Student ratings' })
+    expect(tile).toHaveTextContent('4.2 / 5')
+    expect(tile).toHaveTextContent('7 rated reports')
+  })
+
+  it('says when nothing is rated yet', async () => {
+    stub({ ratings: { averageRating: 0 } })
+    renderPage()
+    expect(await screen.findByRole('region', { name: 'Student ratings' })).toHaveTextContent('No ratings yet')
   })
 })
