@@ -37,6 +37,8 @@ var expected = map[string][]Role{
 	ActionReportNoteAdd:        {CH, SF},
 	ActionReportNoteRead:       {CH, SF, AD},
 	ActionReportFeedbackSubmit: {S},
+	ActionReportUpdate:         {S}, // SCRUM-163
+	ActionReportWithdraw:       {S}, // SCRUM-163
 	ActionReportFeedbackRead:   {S, CH, SF, AD}, // SCRUM-164: the HoD or councillor who fixed it
 	ActionReportAuditRead:      {AD},
 	ActionDepartmentList:       {CH, AD},

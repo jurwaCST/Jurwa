@@ -1,0 +1,18 @@
+SCRUM-163 round 1 tests first (edit and delete), 21 November 2026, before any code change.
+
+$ go vet ./services/report-submission/... ./services/api-gateway/adapters/in/http/ ./services/authorization/domain/
+services\report-submission\adapters\out\repotest\contract.go:64:27: repo.Delete undefined (type ports.ReportRepository has no field or method Delete)
+services\report-submission\adapters\out\repotest\contract.go:67:26: repo.Delete undefined (type ports.ReportRepository has no field or method Delete)
+vet.exe: services\authorization\domain\policy_test.go:40:2: undefined: ActionReportUpdate
+vet.exe: services\report-submission\application\service_test.go:175:18: svc.UpdateDescription undefined (type *Service has no field or method UpdateDescription)
+vet.exe: services\report-submission\domain\report_test.go:116:20: r.WithDescription undefined (type Report has no field or method WithDescription)
+vet.exe: services\report-submission\adapters\out\eventpublisher\publisher_test.go:119:35: undefined: eventbus.StreamReportWithdrawn
+vet.exe: services\report-submission\adapters\in\grpc\handler_test.go:120:15: h.UpdateDescription undefined (type *Handler has no field or method UpdateDescription)
+vet.exe: services\api-gateway\adapters\in\http\router_test.go:82:32: undefined: reportsubmissionv1.UpdateDescriptionRequest
+
+$ npx vitest run --maxWorkers=1 src/pages/ReportDetail.test.tsx
+     × changes the description 1020ms
+     × deletes the report after asking, then goes back to My reports 1020ms
+     × explains when work started meanwhile 1009ms
+ Test Files  1 failed (1)
+      Tests  3 failed | 11 passed (14)

@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"errors"
 	"strings"
 	"testing"
 	"time"
@@ -100,4 +101,32 @@ func TestRoutingKeyIgnoresDescription(t *testing.T) {
 
 	assert.Equal(t, ra.RoutingKey(), rb.RoutingKey(), "description must never change routing")
 	assert.Equal(t, RoutingKey{Category: CategoryHostel, Location: a.Location}, ra.RoutingKey())
+}
+
+// SCRUM-163: the student who sent a report can change its description, with the
+// same rules as the form, and nobody else can.
+func TestWithDescription(t *testing.T) {
+	r, err := NewReport("r1", NewReportInput{
+		ReporterID: "0b9e8d7c-6a5b-4c3d-9e2f-1a0b9c8d7e6f", Category: CategoryHostel,
+		Location: Location{Building: "HA"}, Description: "Tap leaking",
+	}, time.Date(2026, 11, 21, 9, 0, 0, 0, time.UTC))
+	if err != nil {
+		t.Fatal(err)
+	}
+	changed, err := r.WithDescription("Tap leaking, water on the floor")
+	if err != nil || changed.Description != "Tap leaking, water on the floor" || changed.ID != "r1" {
+		t.Fatalf("got %+v, %v", changed, err)
+	}
+	if _, err := r.WithDescription("   "); !errors.Is(err, ErrMissingDescription) {
+		t.Fatalf("blank: %v", err)
+	}
+	if _, err := r.WithDescription(strings.Repeat("a", MaxDescriptionLength+1)); !errors.Is(err, ErrDescriptionTooLong) {
+		t.Fatalf("too long: %v", err)
+	}
+	if err := r.CheckReporter("0b9e8d7c-6a5b-4c3d-9e2f-1a0b9c8d7e6f"); err != nil {
+		t.Fatalf("own report: %v", err)
+	}
+	if err := r.CheckReporter("11111111-1111-4111-8111-111111111111"); !errors.Is(err, ErrNotReporter) {
+		t.Fatalf("another student: %v", err)
+	}
 }

@@ -23,6 +23,7 @@ type fakeStatus struct {
 	asked     string
 	changeErr error
 	getErr    error
+	current   commonv1.Status // what GetStatus answers; ASSIGNED when unset (SCRUM-163)
 }
 
 func (f *fakeStatus) ChangeStatus(_ context.Context, in *statuslifecyclev1.ChangeStatusRequest) (*statuslifecyclev1.ChangeStatusResponse, error) {
@@ -41,7 +42,11 @@ func (f *fakeStatus) GetStatus(_ context.Context, reportID string) (*statuslifec
 	if f.getErr != nil {
 		return nil, f.getErr
 	}
-	return &statuslifecyclev1.GetStatusResponse{Status: &statuslifecyclev1.ReportStatus{ReportId: reportID, Status: commonv1.Status_ASSIGNED, Version: 1}}, nil
+	now := f.current
+	if now == commonv1.Status_STATUS_UNSPECIFIED {
+		now = commonv1.Status_ASSIGNED
+	}
+	return &statuslifecyclev1.GetStatusResponse{Status: &statuslifecyclev1.ReportStatus{ReportId: reportID, Status: now, Version: 1}}, nil
 }
 
 func TestStatusRoutesNeedAToken(t *testing.T) {
