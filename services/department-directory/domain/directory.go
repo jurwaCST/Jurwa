@@ -79,8 +79,14 @@ func DefaultDepartments() []Department {
 // The position code stays HOD_<dept>, so reassignment works the same way.
 var actingHoD = map[string]bool{"MECH": true}
 
+// hostelBlocks are the 9 CST hostels; each has a Block Councillor.
+var hostelBlocks = []string{"HA", "HB", "HC", "HD", "HE", "HF", "NK", "RKA", "RKB"}
+
 // DefaultPositions are the Category Heads (decision 2), one HoD per department
-// and the Hostel reassignment targets named in the proposal. Nobody holds them yet.
+// and the people a Category Head hands reports to (SCRUM-158): the SSO gives
+// Hostel and Others reports to a councillor from the student council list, the
+// DAA gives an escalated Academic Block report back to an HoD. Nobody holds
+// them yet (see WithDemoHolders).
 func DefaultPositions() []Position {
 	ps := []Position{
 		{Code: "DSA", Title: "Dean of Student Affairs", Kind: KindCategoryHead},
@@ -88,11 +94,15 @@ func DefaultPositions() []Position {
 		{Code: "SSO", Title: "Student Service Officer", Kind: KindCategoryHead},
 		{Code: "SSO_MALE", Title: "Student Service Officer (male)", Kind: KindStaff},
 		{Code: "SSO_FEMALE", Title: "Student Service Officer (female)", Kind: KindStaff},
-		{Code: "BLOCK_COUNCILLOR", Title: "Block Councillor", Kind: KindCouncillor},
-		{Code: "MAINTENANCE_COUNCILLOR", Title: "Maintenance Councillor", Kind: KindCouncillor},
-		{Code: "DEPUTY_CHIEF_COUNCILLOR_MESS", Title: "Deputy Chief Councillor (Mess)", Kind: KindCouncillor},
-		{Code: "CHIEF_COUNCILLOR", Title: "Chief Councillor", Kind: KindCouncillor},
 	}
+	for _, b := range hostelBlocks {
+		ps = append(ps, Position{Code: "BLOCK_COUNCILLOR_" + b, Title: "Block Councillor (" + b + ")", Kind: KindCouncillor})
+	}
+	ps = append(ps,
+		Position{Code: "GAMES_HEALTH_COUNCILLOR", Title: "Games and Health Councillor", Kind: KindCouncillor},
+		Position{Code: "DEPUTY_CHIEF_COUNCILLOR_MESS", Title: "Deputy Chief Councillor (Mess)", Kind: KindCouncillor},
+		Position{Code: "MAINTENANCE_COUNCILLOR", Title: "Electrical Maintenance Councillor", Kind: KindCouncillor},
+	)
 	for _, d := range DefaultDepartments() {
 		title := "Head of Department, " + d.Name
 		if actingHoD[d.Code] {
@@ -107,13 +117,35 @@ func DefaultPositions() []Position {
 }
 
 // demoHolderIDs are the demo accounts that identity seeds (SEED_DEMO_USERS): the
-// three Category Heads, so a report can be routed end to end, and the staff
-// account, so a report can be reassigned to someone who can log in. Not real people.
+// three Category Heads, the staff account, and since SCRUM-158 one account per
+// HoD and councillor, so every report reaches someone who can log in. Not real
+// people. The ids must match services/identity/application/seed.go (checked in
+// tests/spec).
 var demoHolderIDs = map[string]string{
 	"DSA":      "00000000-0000-4000-8000-000000000001",
 	"DAA":      "00000000-0000-4000-8000-000000000002",
 	"SSO":      "00000000-0000-4000-8000-000000000003",
 	"SSO_MALE": "00000000-0000-4000-8000-000000000010",
+
+	"HOD_ARCH":  "00000000-0000-4000-8000-000000000041",
+	"HOD_CIVIL": "00000000-0000-4000-8000-000000000042",
+	"HOD_CT":    "00000000-0000-4000-8000-000000000043",
+	"HOD_EEE":   "00000000-0000-4000-8000-000000000044",
+	"HOD_MECH":  "00000000-0000-4000-8000-000000000045",
+	"HOD_SH":    "00000000-0000-4000-8000-000000000046",
+
+	"BLOCK_COUNCILLOR_HA":          "00000000-0000-4000-8000-000000000051",
+	"BLOCK_COUNCILLOR_HB":          "00000000-0000-4000-8000-000000000052",
+	"BLOCK_COUNCILLOR_HC":          "00000000-0000-4000-8000-000000000053",
+	"BLOCK_COUNCILLOR_HD":          "00000000-0000-4000-8000-000000000054",
+	"BLOCK_COUNCILLOR_HE":          "00000000-0000-4000-8000-000000000055",
+	"BLOCK_COUNCILLOR_HF":          "00000000-0000-4000-8000-000000000056",
+	"BLOCK_COUNCILLOR_NK":          "00000000-0000-4000-8000-000000000057",
+	"BLOCK_COUNCILLOR_RKA":         "00000000-0000-4000-8000-000000000058",
+	"BLOCK_COUNCILLOR_RKB":         "00000000-0000-4000-8000-000000000059",
+	"GAMES_HEALTH_COUNCILLOR":      "00000000-0000-4000-8000-000000000060",
+	"DEPUTY_CHIEF_COUNCILLOR_MESS": "00000000-0000-4000-8000-000000000061",
+	"MAINTENANCE_COUNCILLOR":       "00000000-0000-4000-8000-000000000062",
 }
 
 // WithDemoHolders returns a copy of positions where the Category Heads have demo holders.

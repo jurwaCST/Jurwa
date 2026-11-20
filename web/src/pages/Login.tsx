@@ -9,10 +9,14 @@ import './Auth.css'
 // The demo accounts from the identity seed (SCRUM-126). Their password is
 // never written in the app; the team gives it out for the demo.
 const demoAccounts = [
-  ['Category Head, Hostel', 'dsa.demo@jurwa.example'],
-  ['Category Head, Academic Block', 'daa.demo@jurwa.example'],
-  ['Category Head, Others', 'sso.demo@jurwa.example'],
-  ['Staff', 'staff.demo@jurwa.example'],
+  // SCRUM-158: Hostel and Others go to the SSO, who hands them to a councillor;
+  // the Academic Block goes to the department's HoD. Late reports go up to the
+  // DSA or the DAA. Every HoD and councillor has an account like these two.
+  ['SSO, Hostel and Others', 'sso.demo@jurwa.example'],
+  ['Block Councillor (HA)', 'councillor.ha@jurwa.example'],
+  ['HoD, Computing Technologies', 'hod.ct@jurwa.example'],
+  ['DSA, late Hostel and Others reports', 'dsa.demo@jurwa.example'],
+  ['DAA, late Academic Block reports', 'daa.demo@jurwa.example'],
   ['System Administrator', 'admin.demo@jurwa.example'],
   ['College President', 'president.demo@jurwa.example'],
 ]

@@ -30,7 +30,7 @@ func TestListLocationsReturnsOnlyActiveRowsOfThatCategory(t *testing.T) {
 		wantLen  int
 	}{
 		{name: "hostel", category: domain.CategoryHostel, wantLen: 525},
-		{name: "academic block", category: domain.CategoryAcademicBlock, wantLen: 20},
+		{name: "academic block, 20 rooms in each of 6 departments", category: domain.CategoryAcademicBlock, wantLen: 120},
 		{name: "others leaves out the switched-off sample rows", category: domain.CategoryOthers, wantLen: 7},
 	}
 	for _, tt := range tests {

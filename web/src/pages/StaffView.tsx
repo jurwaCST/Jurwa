@@ -117,9 +117,13 @@ function ReassignSheet({ reportId, me, open, onClose, onDone }: ReassignProps) {
     }
   }, [open, positions, loadTry])
 
+  // SCRUM-158: the SSO (and the DSA after an escalation) hand reports to the
+  // councillors; the DAA hands an escalated Academic Block report to an HoD.
   // Only positions someone holds, never my own, by title.
+  const mine = (positions ?? []).find((p) => p.holderUserId === me)?.code
+  const kind = mine === 'DAA' ? 'HOD' : 'COUNCILLOR'
   const choices = (positions ?? [])
-    .filter((p) => p.holderUserId && p.holderUserId !== me)
+    .filter((p) => p.kind === kind && p.holderUserId && p.holderUserId !== me)
     .sort((a, b) => a.title.localeCompare(b.title))
 
   async function send(e: FormEvent<HTMLFormElement>) {
@@ -137,7 +141,7 @@ function ReassignSheet({ reportId, me, open, onClose, onDone }: ReassignProps) {
       onDone(reportId, to?.title ?? 'the new person')
     } catch (err) {
       if (err instanceof ApiError && err.status === 403) {
-        setError('Only the person this report is assigned to can reassign it.')
+        setError('Only a Category Head can reassign a report.')
       } else if (err instanceof ApiError && err.status === 409) {
         setError('Someone reassigned this report first. Go back to the list to see it.')
       } else {
@@ -203,13 +207,15 @@ const TABS: { id: Tab; label: string }[] = [
 interface DetailProps {
   summary: Summary
   me: string
+  /** SCRUM-158: only a Category Head hands a report on; HoDs and councillors fix it. */
+  canReassign: boolean
   onBack: () => void
   onStatus: (reportId: string, status: Status) => void
   onToast: (message: string) => void
   onReassigned: (reportId: string, toTitle: string) => void
 }
 
-function ReportDetail({ summary, me, onBack, onStatus, onToast, onReassigned }: DetailProps) {
+function ReportDetail({ summary, me, canReassign, onBack, onStatus, onToast, onReassigned }: DetailProps) {
   const id = summary.reportId
   const [report, setReport] = useState<Report | null>(null)
   const [current, setCurrent] = useState<ReportStatus>({ status: summary.status })
@@ -393,9 +399,11 @@ function ReportDetail({ summary, me, onBack, onStatus, onToast, onReassigned }: 
       ) : (
         <div className="staff-actions">
           {options.length > 0 && <Button onClick={openSheet}>Update status</Button>}
-          <Button variant="secondary" onClick={() => setReassignOpen(true)}>
-            Reassign
-          </Button>
+          {canReassign && (
+            <Button variant="secondary" onClick={() => setReassignOpen(true)}>
+              Reassign
+            </Button>
+          )}
         </div>
       )}
 
@@ -671,7 +679,11 @@ export default function StaffView() {
 
   return (
     <div className={opened ? 'staff-page has-detail' : 'staff-page'}>
-      <PageHeader title="Staff view" description="Reports assigned to you. Open one to read it, add a note or update its status." />
+      {/* SCRUM-158: headed with who is signed in, for example "Block Councillor (HA)". */}
+      <PageHeader
+        title={user?.fullName ?? 'Assigned to me'}
+        description="Reports assigned to you. Open one to read it, add a note or update its status."
+      />
       <div className="staff-layout">
         <div className="staff-list-pane">{list}</div>
         {opened && (
@@ -679,6 +691,7 @@ export default function StaffView() {
             key={opened.reportId}
             summary={opened}
             me={me}
+            canReassign={user?.roles.includes('CATEGORY_HEAD') ?? false}
             onBack={closeDetail}
             onStatus={updateStatus}
             onToast={showToast}

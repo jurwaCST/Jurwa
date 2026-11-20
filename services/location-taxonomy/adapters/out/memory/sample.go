@@ -78,11 +78,26 @@ func realHostels() []domain.Entry {
 }
 
 // The academic rooms are in one building named after the category, without wings.
+// academicDepartments are the 6 CST departments (department-directory). For the
+// Academic Block the student picks their department in place of a building, so
+// the report reaches that department's HoD (SCRUM-158, routing-rules
+// DepartmentHoDs). Each department lists the same rooms.
+var academicDepartments = []string{
+	"Architecture",
+	"Civil & Environmental Engineering",
+	"Computing Technologies",
+	"Electrical & Electronics Engineering",
+	"Mechanical Engineering",
+	"Science & Humanities",
+}
+
 func realAcademicBlock() []domain.Entry {
 	var out []domain.Entry
-	for _, prefix := range []string{"CR", "IT", "Lab", "LH"} {
-		for n := 1; n <= 5; n++ {
-			out = append(out, place(domain.CategoryAcademicBlock, domain.Location{Building: "Academic Block", Area: fmt.Sprintf("%s%d", prefix, n)}))
+	for _, dept := range academicDepartments {
+		for _, prefix := range []string{"CR", "IT", "Lab", "LH"} {
+			for n := 1; n <= 5; n++ {
+				out = append(out, place(domain.CategoryAcademicBlock, domain.Location{Building: dept, Area: fmt.Sprintf("%s%d", prefix, n)}))
+			}
 		}
 	}
 	return out

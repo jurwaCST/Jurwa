@@ -15,3 +15,4 @@ configMapGenerator:
       - PORT=9014
       - SERVICE_NAME=reassignment
       - LOG_LEVEL=info
+      - DEPARTMENT_DIRECTORY_ADDR=department-directory:9008

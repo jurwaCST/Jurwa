@@ -16,7 +16,7 @@ Each location is one row (category, building, wing, area), like the `locations` 
 | `ACADEMIC_BLOCK` | building and area, no wing | Academic Block / LH1 |
 | `OTHERS` | flat list of areas under building `Campus`, never a wing | Campus / Library |
 
-**The location list** (`adapters/out/memory/sample.go`) holds the real CST places from `docs/design/real-locations.md` (SCRUM-146, loaded in SCRUM-150): 552 places.
+**The location list** (`adapters/out/memory/sample.go`) holds the real CST places from `docs/design/real-locations.md` (SCRUM-146, loaded in SCRUM-150): 652 places. Since SCRUM-158 the Academic Block is picked by department (the 6 CST departments in place of a building, each with CR1-5, IT1-5, Lab1-5 and LH1-5), so the report reaches that department's HoD.
 
 | Category | What | Places |
 |---|---|---|

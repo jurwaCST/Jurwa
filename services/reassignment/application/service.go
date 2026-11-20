@@ -20,11 +20,21 @@ type Service struct {
 	now   func() time.Time
 	newID func() string
 	saga  sagaMemory // Saga events already handled (saga.go)
+	// above finds who holds the position a late report goes up to (SCRUM-158).
+	// nil: a late report goes back to its routed head, as before.
+	above ports.HolderLookup
 }
 
 // NewService wires the use cases. now is time.Now and newID is uuid.NewString outside tests.
 func NewService(repo ports.AssignmentRepository, pub ports.EventPublisher, now func() time.Time, newID func() string) *Service {
 	return &Service{repo: repo, pub: pub, now: now, newID: newID}
+}
+
+// UseEscalationTargets makes a late report go up to the DSA or the DAA (domain
+// EscalationPosition), whose holder is looked up in holders. It returns s.
+func (s *Service) UseEscalationTargets(holders ports.HolderLookup) *Service {
+	s.above = holders
+	return s
 }
 
 // RecordRouted saves the first assignment of a report. It is called for each

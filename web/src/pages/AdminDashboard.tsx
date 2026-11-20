@@ -133,7 +133,7 @@ export default function AdminDashboard() {
                     <Icon name="escalated" />
                     <span>
                       <strong>{reports(escalated)} escalated.</strong>
-                      <span className="muted"> The time limit passed, so it went back to the Category Head.</span>
+                      <span className="muted"> The time limit passed, so it went up to the DSA or the DAA.</span>
                     </span>
                   </li>
                 )}
@@ -188,9 +188,9 @@ export default function AdminDashboard() {
           <section className="card admin-settings" aria-labelledby="admin-settings-title">
             <h2 id="admin-settings-title">Routing rules and time limits</h2>
             <p className="muted">
-              Reports go by category: Hostel to the DSA, Academic Block to the DAA, Others to the SSO. Each category has a
-              time limit; when it passes, the report is escalated. Editing them here comes next, once the gateway has the
-              admin routes.
+              Hostel and Others go to the SSO, who hands them to a councillor; the Academic Block goes to the HoD of the
+              department the student picks. Each category has a time limit. A late report goes up to the DSA, or to the
+              DAA for the Academic Block. Editing them here comes next, once the gateway has the admin routes.
             </p>
           </section>
         </div>

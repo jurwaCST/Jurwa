@@ -34,6 +34,29 @@ var DemoUsers = []DemoUser{
 	{ID: "00000000-0000-4000-8000-000000000010", Email: "staff.demo@jurwa.example", FullName: "Staff (demo)", Role: domain.RoleStaff},
 	{ID: "00000000-0000-4000-8000-000000000020", Email: "admin.demo@jurwa.example", FullName: "System Administrator (demo)", Role: domain.RoleSystemAdmin},
 	{ID: "00000000-0000-4000-8000-000000000030", Email: "president.demo@jurwa.example", FullName: "College President (demo)", Role: domain.RolePresident},
+
+	// SCRUM-158: the HoDs receive Academic Block reports and the councillors
+	// receive Hostel and Others reports from the SSO. They fix them, so they are
+	// Staff, and each is named by position. The ids are the holders in
+	// services/department-directory (demoHolderIDs).
+	{ID: "00000000-0000-4000-8000-000000000041", Email: "hod.arch@jurwa.example", FullName: "HoD, Architecture", Role: domain.RoleStaff},
+	{ID: "00000000-0000-4000-8000-000000000042", Email: "hod.civil@jurwa.example", FullName: "HoD, Civil & Environmental Engineering", Role: domain.RoleStaff},
+	{ID: "00000000-0000-4000-8000-000000000043", Email: "hod.ct@jurwa.example", FullName: "HoD, Computing Technologies", Role: domain.RoleStaff},
+	{ID: "00000000-0000-4000-8000-000000000044", Email: "hod.eee@jurwa.example", FullName: "HoD, Electrical & Electronics Engineering", Role: domain.RoleStaff},
+	{ID: "00000000-0000-4000-8000-000000000045", Email: "hod.mech@jurwa.example", FullName: "HoD, Mechanical Engineering (acting)", Role: domain.RoleStaff},
+	{ID: "00000000-0000-4000-8000-000000000046", Email: "hod.sh@jurwa.example", FullName: "HoD, Science & Humanities", Role: domain.RoleStaff},
+	{ID: "00000000-0000-4000-8000-000000000051", Email: "councillor.ha@jurwa.example", FullName: "Block Councillor (HA)", Role: domain.RoleStaff},
+	{ID: "00000000-0000-4000-8000-000000000052", Email: "councillor.hb@jurwa.example", FullName: "Block Councillor (HB)", Role: domain.RoleStaff},
+	{ID: "00000000-0000-4000-8000-000000000053", Email: "councillor.hc@jurwa.example", FullName: "Block Councillor (HC)", Role: domain.RoleStaff},
+	{ID: "00000000-0000-4000-8000-000000000054", Email: "councillor.hd@jurwa.example", FullName: "Block Councillor (HD)", Role: domain.RoleStaff},
+	{ID: "00000000-0000-4000-8000-000000000055", Email: "councillor.he@jurwa.example", FullName: "Block Councillor (HE)", Role: domain.RoleStaff},
+	{ID: "00000000-0000-4000-8000-000000000056", Email: "councillor.hf@jurwa.example", FullName: "Block Councillor (HF)", Role: domain.RoleStaff},
+	{ID: "00000000-0000-4000-8000-000000000057", Email: "councillor.nk@jurwa.example", FullName: "Block Councillor (NK)", Role: domain.RoleStaff},
+	{ID: "00000000-0000-4000-8000-000000000058", Email: "councillor.rka@jurwa.example", FullName: "Block Councillor (RKA)", Role: domain.RoleStaff},
+	{ID: "00000000-0000-4000-8000-000000000059", Email: "councillor.rkb@jurwa.example", FullName: "Block Councillor (RKB)", Role: domain.RoleStaff},
+	{ID: "00000000-0000-4000-8000-000000000060", Email: "councillor.games@jurwa.example", FullName: "Games and Health Councillor", Role: domain.RoleStaff},
+	{ID: "00000000-0000-4000-8000-000000000061", Email: "councillor.mess@jurwa.example", FullName: "Deputy Chief Councillor (Mess)", Role: domain.RoleStaff},
+	{ID: "00000000-0000-4000-8000-000000000062", Email: "councillor.electrical@jurwa.example", FullName: "Electrical Maintenance Councillor", Role: domain.RoleStaff},
 }
 
 // SeedDemoUsers creates the DemoUsers that do not exist yet, all with the same

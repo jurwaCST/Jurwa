@@ -62,8 +62,10 @@ cmd/server/             starts the server and wires everything together
 | `staff.demo@jurwa.example` | Staff | `00000000-0000-4000-8000-000000000010` |
 | `admin.demo@jurwa.example` | System Administrator | `00000000-0000-4000-8000-000000000020` |
 | `president.demo@jurwa.example` | College President | `00000000-0000-4000-8000-000000000030` |
+| `hod.arch`, `hod.civil`, `hod.ct`, `hod.eee`, `hod.mech`, `hod.sh` `@jurwa.example` (SCRUM-158) | Staff, named "HoD, <department>" | `...000000000041` to `...000000000046` |
+| `councillor.ha`, `.hb`, `.hc`, `.hd`, `.he`, `.hf`, `.nk`, `.rka`, `.rkb`, `councillor.games`, `councillor.mess`, `councillor.electrical` `@jurwa.example` (SCRUM-158) | Staff, named by position, for example "Block Councillor (HA)" | `...000000000051` to `...000000000062` |
 
-The three Category Head ids are the holders of DSA, DAA and SSO in department-directory, so a routed report goes to a user who can log in. `.example` is a reserved domain, so these are never real mailboxes. There is no RPC that creates a privileged user.
+The Category Head, HoD and councillor ids are the holders of their positions in department-directory, so a routed, reassigned or escalated report goes to a user who can log in (checked in `tests/spec/position_routing_test.go`). `.example` is a reserved domain, so these are never real mailboxes. There is no RPC that creates a privileged user.
 
 ## Run
 

@@ -90,16 +90,14 @@ func NewRouted(id, reportID, assigneeUserID, positionCode string, now time.Time)
 	}
 }
 
-// CheckCanReassign allows a Category Head, or a staff member who is the current assignee.
-func CheckCanReassign(role Role, actorID string, current Assignment) error {
-	switch {
-	case role == RoleCategoryHead:
+// CheckCanReassign allows only a Category Head (SCRUM-158): the SSO hands
+// reports to councillors, and the DSA or DAA after an escalation. HoDs and
+// councillors (Staff) fix what they hold and do not pass it on.
+func CheckCanReassign(role Role, _ string, _ Assignment) error {
+	if role == RoleCategoryHead {
 		return nil
-	case role == RoleStaff && actorID == current.AssigneeUserID:
-		return nil
-	default:
-		return fmt.Errorf("%w: only a Category Head or the current assignee can reassign", ErrPermissionDenied)
 	}
+	return fmt.Errorf("%w: only a Category Head can reassign", ErrPermissionDenied)
 }
 
 // CheckCanList allows Category Head, Staff and System Administrator.
