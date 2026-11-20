@@ -10,9 +10,12 @@
 }
 
 /* Form and the "What happens next" card: one column on phones,
-   side by side on laptops. */
+   side by side on laptops. minmax(0, 1fr) keeps the column as wide as the
+   screen: without it the column grows to its widest content (a long building
+   name in a select, the file input), and the form is cut off on a phone. */
 .report-layout {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--s3);
   align-items: start;
 }
@@ -36,12 +39,22 @@
 
 .report-form {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--s3);
 }
 
 .report-section {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.75rem;
+}
+
+/* A select is as wide as its longest option; on a phone it must shrink to
+   the screen instead (the chosen name is cut, the list shows it in full). */
+.report-page select,
+.report-page input[type='file'] {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .report-section + .report-section {
@@ -72,6 +85,7 @@
 /* Building, wing and area: stacked on phones, in a row when there is room. */
 .report-place {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.75rem;
 }
 
