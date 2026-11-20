@@ -28,8 +28,8 @@ func TestGetRule(t *testing.T) {
 		want     string
 		wantCode codes.Code
 	}{
-		{name: "hostel", category: commonv1.Category_HOSTEL, want: "DSA"},
-		{name: "academic block", category: commonv1.Category_ACADEMIC_BLOCK, want: "DAA"},
+		{name: "hostel", category: commonv1.Category_HOSTEL, want: "SSO"},
+		{name: "academic block without a department", category: commonv1.Category_ACADEMIC_BLOCK, want: "DAA"},
 		{name: "others", category: commonv1.Category_OTHERS, want: "SSO"},
 		{name: "unspecified", category: commonv1.Category_CATEGORY_UNSPECIFIED, wantCode: codes.InvalidArgument},
 		{name: "unknown number", category: commonv1.Category(99), wantCode: codes.InvalidArgument},
@@ -58,10 +58,10 @@ func TestListAndUpsertRules(t *testing.T) {
 
 	list, err := h.ListRules(ctx, &routingrulesv1.ListRulesRequest{})
 	require.NoError(t, err)
-	assert.Len(t, list.GetRules(), 3)
+	assert.Len(t, list.GetRules(), len(domain.DefaultRules()))
 
 	up, err := h.UpsertRule(ctx, &routingrulesv1.UpsertRuleRequest{Rule: &routingrulesv1.Rule{
-		Category: commonv1.Category_HOSTEL, Building: "Hostel B", TargetPosition: "SSO", Active: true,
+		Category: commonv1.Category_HOSTEL, Building: "Hostel B", TargetPosition: "DSA", Active: true,
 	}})
 	require.NoError(t, err)
 	assert.Equal(t, int32(domain.DefaultPriority), up.GetRule().GetPriority())
@@ -71,7 +71,7 @@ func TestListAndUpsertRules(t *testing.T) {
 		Category: commonv1.Category_HOSTEL, Location: &commonv1.Location{Building: "Hostel B"},
 	})
 	require.NoError(t, err)
-	assert.Equal(t, "SSO", got.GetRule().GetTargetPosition())
+	assert.Equal(t, "DSA", got.GetRule().GetTargetPosition())
 
 	_, err = h.UpsertRule(ctx, &routingrulesv1.UpsertRuleRequest{})
 	assert.Equal(t, codes.InvalidArgument, status.Code(err))

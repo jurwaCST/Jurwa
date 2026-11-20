@@ -17,9 +17,22 @@ CREATE TABLE IF NOT EXISTS routing_rules (
 
 CREATE INDEX IF NOT EXISTS routing_rules_category_idx ON routing_rules (category_code) WHERE is_active;
 
--- The three agreed default rules (decision 2).
+-- The agreed default rules (SCRUM-158, domain.DefaultRules): Hostel and Others
+-- to the SSO, each department of the Academic Block to its HoD, and the DAA for
+-- an Academic Block report that names no department.
 INSERT INTO routing_rules (category_code, building, target_position) VALUES
-    ('HOSTEL',         '', 'DSA'),
+    ('HOSTEL',         '', 'SSO'),
     ('ACADEMIC_BLOCK', '', 'DAA'),
-    ('OTHERS',         '', 'SSO')
+    ('OTHERS',         '', 'SSO'),
+    ('ACADEMIC_BLOCK', 'Architecture',                         'HOD_ARCH'),
+    ('ACADEMIC_BLOCK', 'Civil & Environmental Engineering',    'HOD_CIVIL'),
+    ('ACADEMIC_BLOCK', 'Computing Technologies',               'HOD_CT'),
+    ('ACADEMIC_BLOCK', 'Electrical & Electronics Engineering', 'HOD_EEE'),
+    ('ACADEMIC_BLOCK', 'Mechanical Engineering',               'HOD_MECH'),
+    ('ACADEMIC_BLOCK', 'Science & Humanities',                 'HOD_SH')
 ON CONFLICT (category_code, building) DO NOTHING;
+
+-- A database seeded before SCRUM-158 sends Hostel to the DSA. Moved once to the
+-- SSO; a rule an administrator set to anything else is left alone.
+UPDATE routing_rules SET target_position = 'SSO', updated_at = now()
+WHERE category_code = 'HOSTEL' AND building = '' AND target_position = 'DSA';

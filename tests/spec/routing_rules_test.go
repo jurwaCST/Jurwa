@@ -11,15 +11,16 @@ import (
 	rules "github.com/jurwaCST/Jurwa/services/routing-rules/domain"
 )
 
-// Every category and building with the agreed default rules (decision 2):
-// the Category Head depends only on the category.
+// Every category and building with the default rules. SCRUM-158: Hostel and
+// Others go to the SSO whatever the building; the Academic Block goes by the
+// department the student picks, and without one to the DAA.
 func TestRoutingEveryCategoryAndLocation(t *testing.T) {
 	want := map[rules.Category]string{
-		rules.Hostel:        "DSA",
+		rules.Hostel:        "SSO",
 		rules.AcademicBlock: "DAA",
 		rules.Others:        "SSO",
 	}
-	buildings := []string{"Hostel A", "Hostel B", "Academic Block 2", "Football Ground", ""}
+	buildings := []string{"HA", "RKB", "Academic Block", "Campus", ""}
 
 	for category, head := range want {
 		for _, building := range buildings {

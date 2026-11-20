@@ -30,7 +30,7 @@ func TestSeedFromEnv(t *testing.T) {
 	}{
 		{name: "flag not set: nothing is created", env: map[string]string{}, wantCreated: 0},
 		{name: "flag false: nothing is created", env: map[string]string{"SEED_DEMO_USERS": "false", "SEED_DEMO_PASSWORD": "demo-pass-123"}, wantCreated: 0},
-		{name: "flag true: six users", env: map[string]string{"SEED_DEMO_USERS": "true", "SEED_DEMO_PASSWORD": "demo-pass-123"}, wantCreated: 6},
+		{name: "flag true: every demo user", env: map[string]string{"SEED_DEMO_USERS": "true", "SEED_DEMO_PASSWORD": "demo-pass-123"}, wantCreated: 24},
 		{name: "flag true without a password fails", env: map[string]string{"SEED_DEMO_USERS": "true"}, wantErr: "SEED_DEMO_PASSWORD"},
 		{name: "flag true with a short password fails", env: map[string]string{"SEED_DEMO_USERS": "true", "SEED_DEMO_PASSWORD": "short"}, wantErr: "SEED_DEMO_PASSWORD"},
 	}

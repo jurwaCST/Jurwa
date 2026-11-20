@@ -81,10 +81,13 @@ func TestFindPosition(t *testing.T) {
 		// Reassignment targets named in the proposal.
 		{name: "SSO male", code: "SSO_MALE", wantKind: KindStaff},
 		{name: "SSO female", code: "SSO_FEMALE", wantKind: KindStaff},
-		{name: "block councillor", code: "BLOCK_COUNCILLOR", wantKind: KindCouncillor},
-		{name: "maintenance councillor", code: "MAINTENANCE_COUNCILLOR", wantKind: KindCouncillor},
+		// SCRUM-158: the councillors the SSO hands Hostel and Others reports to.
+		{name: "block councillor HA", code: "BLOCK_COUNCILLOR_HA", wantKind: KindCouncillor},
+		{name: "block councillor RKB", code: "BLOCK_COUNCILLOR_RKB", wantKind: KindCouncillor},
+		{name: "games and health councillor", code: "GAMES_HEALTH_COUNCILLOR", wantKind: KindCouncillor},
+		{name: "electrical maintenance councillor", code: "MAINTENANCE_COUNCILLOR", wantKind: KindCouncillor},
 		{name: "deputy chief councillor mess", code: "DEPUTY_CHIEF_COUNCILLOR_MESS", wantKind: KindCouncillor},
-		{name: "chief councillor", code: "CHIEF_COUNCILLOR", wantKind: KindCouncillor},
+		{name: "one block councillor per hostel, no general one", code: "BLOCK_COUNCILLOR", wantErr: ErrNotFound},
 		{name: "code is case-insensitive", code: " dsa ", wantKind: KindCategoryHead},
 		{name: "empty code", code: "", wantErr: ErrInvalidCode},
 		{name: "unknown code", code: "PRINCIPAL", wantErr: ErrNotFound},
@@ -152,6 +155,34 @@ func TestWithDemoHolders(t *testing.T) {
 	plain, err := FindPosition(DefaultPositions(), "DSA")
 	require.NoError(t, err)
 	assert.Empty(t, plain.HolderUserID, "the default list is not changed")
+}
+
+// SCRUM-158: every HoD and councillor has a demo account, so a report can reach
+// them and they can log in. Two positions never share a holder.
+func TestEveryHoDAndCouncillorHasADemoHolder(t *testing.T) {
+	holders := map[string]string{}
+	for _, p := range WithDemoHolders(DefaultPositions()) {
+		if p.Kind != KindHoD && p.Kind != KindCouncillor {
+			continue
+		}
+		assert.NotEmpty(t, p.HolderUserID, "%s has a holder", p.Code)
+		if other, dup := holders[p.HolderUserID]; dup {
+			t.Errorf("%s and %s have the same holder", other, p.Code)
+		}
+		holders[p.HolderUserID] = p.Code
+	}
+	assert.Len(t, holders, 18, "6 HoDs and 12 councillors")
+}
+
+// SCRUM-158: one Block Councillor for each of the 9 hostels, titled as on the
+// student council list, for example "Block Councillor (HA)".
+func TestBlockCouncillorPerHostel(t *testing.T) {
+	for _, h := range []string{"HA", "HB", "HC", "HD", "HE", "HF", "NK", "RKA", "RKB"} {
+		p, err := FindPosition(DefaultPositions(), "BLOCK_COUNCILLOR_"+h)
+		require.NoError(t, err, h)
+		assert.Equal(t, "Block Councillor ("+h+")", p.Title)
+		assert.Equal(t, KindCouncillor, p.Kind)
+	}
 }
 
 // Mechanical has no HoD on the staff directory, so its Programme Leader acts as

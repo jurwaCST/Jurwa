@@ -14,13 +14,17 @@ import (
 	"github.com/google/uuid"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/jurwaCST/Jurwa/pkg/resilience"
+	departmentdirectoryv1 "github.com/jurwaCST/Jurwa/proto/gen/department-directory/v1"
 	reassignmentv1 "github.com/jurwaCST/Jurwa/proto/gen/reassignment/v1"
 	"github.com/jurwaCST/Jurwa/services/reassignment/adapters/in/events"
 	grpcadapter "github.com/jurwaCST/Jurwa/services/reassignment/adapters/in/grpc"
+	"github.com/jurwaCST/Jurwa/services/reassignment/adapters/out/directoryclient"
 	"github.com/jurwaCST/Jurwa/services/reassignment/adapters/out/eventpublisher"
 	"github.com/jurwaCST/Jurwa/services/reassignment/adapters/out/logpublisher"
 	"github.com/jurwaCST/Jurwa/services/reassignment/adapters/out/memory"
@@ -70,6 +74,20 @@ func main() {
 		pub = eventpublisher.New(bus, uuid.NewString, time.Now)
 	}
 	app := application.NewService(memory.New(), pub, time.Now, uuid.NewString)
+
+	// SCRUM-158: a late report goes up to the DSA or the DAA; department-directory
+	// says who holds those posts. grpc.NewClient connects lazily, so a directory
+	// that starts later is fine.
+	dirConn, err := grpc.NewClient(envOr("DEPARTMENT_DIRECTORY_ADDR", directoryclient.DefaultAddr),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithChainUnaryInterceptor(resilience.UnaryClientInterceptor(resilience.DefaultConfig())),
+	)
+	if err != nil {
+		slog.Error("cannot set up department-directory client", "error", err)
+		os.Exit(1)
+	}
+	defer dirConn.Close()
+	app.UseEscalationTargets(directoryclient.New(departmentdirectoryv1.NewDepartmentDirectoryServiceClient(dirConn)))
 	seedAssignments(app, os.Getenv("SEED_ASSIGNMENTS"))
 	if bus != nil {
 		// Escalation Saga: sla.lapsed escalates, escalation.compensated undoes it.

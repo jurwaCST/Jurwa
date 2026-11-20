@@ -15,23 +15,34 @@ import (
 )
 
 // Run checks repo behaviour. newRepo must return a repository holding only the
-// three default rules (domain.DefaultRules).
+// default rules (domain.DefaultRules).
 func Run(t *testing.T, newRepo func(t *testing.T) ports.RuleRepository) {
 	ctx := context.Background()
 
-	t.Run("seeded with the three default rules", func(t *testing.T) {
+	t.Run("seeded with the default rules", func(t *testing.T) {
 		repo := newRepo(t)
 		all, err := repo.List(ctx, false)
 		require.NoError(t, err)
-		require.Len(t, all, 3)
-		want := map[domain.Category]string{domain.Hostel: "DSA", domain.AcademicBlock: "DAA", domain.Others: "SSO"}
+		require.Len(t, all, len(domain.DefaultRules()))
+		// SCRUM-158: Hostel and Others to the SSO, each department to its HoD, and
+		// the DAA for an Academic Block report that names no department.
+		want := map[string]string{
+			"HOSTEL/": "SSO", "OTHERS/": "SSO", "ACADEMIC_BLOCK/": "DAA",
+			"ACADEMIC_BLOCK/Architecture":                         "HOD_ARCH",
+			"ACADEMIC_BLOCK/Civil & Environmental Engineering":    "HOD_CIVIL",
+			"ACADEMIC_BLOCK/Computing Technologies":               "HOD_CT",
+			"ACADEMIC_BLOCK/Electrical & Electronics Engineering": "HOD_EEE",
+			"ACADEMIC_BLOCK/Mechanical Engineering":               "HOD_MECH",
+			"ACADEMIC_BLOCK/Science & Humanities":                 "HOD_SH",
+		}
+		got := map[string]string{}
 		for _, r := range all {
 			assert.NotEmpty(t, r.ID, "every rule has an id")
-			assert.Equal(t, want[r.Category], r.TargetPosition)
-			assert.Empty(t, r.Building)
 			assert.Equal(t, domain.DefaultPriority, r.Priority)
 			assert.True(t, r.Active)
+			got[string(r.Category)+"/"+r.Building] = r.TargetPosition
 		}
+		assert.Equal(t, want, got)
 	})
 
 	t.Run("list is ordered by category then building", func(t *testing.T) {
@@ -44,7 +55,12 @@ func Run(t *testing.T, newRepo func(t *testing.T) ports.RuleRepository) {
 		for _, r := range all {
 			got = append(got, string(r.Category)+"/"+r.Building)
 		}
-		assert.Equal(t, []string{"ACADEMIC_BLOCK/", "HOSTEL/", "HOSTEL/Hostel B", "OTHERS/"}, got)
+		assert.Equal(t, []string{
+			"ACADEMIC_BLOCK/", "ACADEMIC_BLOCK/Architecture", "ACADEMIC_BLOCK/Civil & Environmental Engineering",
+			"ACADEMIC_BLOCK/Computing Technologies", "ACADEMIC_BLOCK/Electrical & Electronics Engineering",
+			"ACADEMIC_BLOCK/Mechanical Engineering", "ACADEMIC_BLOCK/Science & Humanities",
+			"HOSTEL/", "HOSTEL/Hostel B", "OTHERS/",
+		}, got)
 	})
 
 	t.Run("upsert of the same category and building keeps the id", func(t *testing.T) {
@@ -76,10 +92,10 @@ func Run(t *testing.T, newRepo func(t *testing.T) ports.RuleRepository) {
 
 		active, err := repo.List(ctx, false)
 		require.NoError(t, err)
-		assert.Len(t, active, 3, "the inactive rule is hidden")
+		assert.Len(t, active, len(domain.DefaultRules()), "the inactive rule is hidden")
 		everything, err := repo.List(ctx, true)
 		require.NoError(t, err)
-		assert.Len(t, everything, 4)
+		assert.Len(t, everything, len(domain.DefaultRules())+1)
 
 		byCategory, err := repo.FindByCategory(ctx, domain.Hostel)
 		require.NoError(t, err)

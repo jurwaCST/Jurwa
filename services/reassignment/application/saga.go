@@ -94,12 +94,37 @@ func (s *Service) EscalateOnLapse(ctx context.Context, ev SagaEvent) error {
 		return nil
 	}
 	current := history[len(history)-1]
+	head, err = s.escalationTarget(ctx, head)
+	if err != nil {
+		return err // the directory is down: the event bus tries again
+	}
 	next := domain.NewEscalated(s.newID(), head, s.now().UTC())
 	if err := s.repo.Replace(ctx, current.ID, next); err != nil {
 		return err
 	}
 	s.saga.markHandled(ev.EventID)
 	return s.publish(ctx, current, next, ev.CorrelationID)
+}
+
+// escalationTarget is who a late report goes up to: the holder of the DSA or DAA
+// position (SCRUM-158), or routed, the routed head, when nobody is above it or
+// the position is vacant.
+func (s *Service) escalationTarget(ctx context.Context, routed domain.Assignment) (domain.Assignment, error) {
+	position := domain.EscalationPosition(routed.AssigneePositionCode)
+	if s.above == nil || position == "" {
+		return routed, nil
+	}
+	holder, err := s.above.GetHolder(ctx, position)
+	if err != nil {
+		return domain.Assignment{}, fmt.Errorf("find the %s: %w", position, err)
+	}
+	if holder == "" {
+		return routed, nil
+	}
+	up := routed
+	up.AssigneeUserID = holder
+	up.AssigneePositionCode = position
+	return up, nil
 }
 
 // CompensateEscalation undoes the escalation of a Saga run when a later step

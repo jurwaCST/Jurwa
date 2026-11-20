@@ -18,7 +18,7 @@ func TestRepository(t *testing.T) {
 
 	all, err := repo.List(ctx, false)
 	require.NoError(t, err)
-	require.Len(t, all, 3)
+	require.Len(t, all, len(domain.DefaultRules()))
 	for _, r := range all {
 		assert.NotEmpty(t, r.ID, "seeded rules get an id")
 	}
@@ -26,10 +26,10 @@ func TestRepository(t *testing.T) {
 	hostel, err := repo.FindByCategory(ctx, domain.Hostel)
 	require.NoError(t, err)
 	require.Len(t, hostel, 1)
-	assert.Equal(t, "DSA", hostel[0].TargetPosition)
+	assert.Equal(t, "SSO", hostel[0].TargetPosition, "SCRUM-158: Hostel goes to the SSO")
 
 	// Upserting the same (category, building) keeps the id and replaces the rule.
-	updated, err := repo.Upsert(ctx, domain.Rule{Category: domain.Hostel, TargetPosition: "SSO", Priority: 100, Active: true})
+	updated, err := repo.Upsert(ctx, domain.Rule{Category: domain.Hostel, TargetPosition: "DSA", Priority: 100, Active: true})
 	require.NoError(t, err)
 	assert.Equal(t, hostel[0].ID, updated.ID)
 
@@ -40,11 +40,11 @@ func TestRepository(t *testing.T) {
 
 	active, err := repo.List(ctx, false)
 	require.NoError(t, err)
-	assert.Len(t, active, 3, "inactive rule is hidden")
+	assert.Len(t, active, len(domain.DefaultRules()), "inactive rule is hidden")
 
 	everything, err := repo.List(ctx, true)
 	require.NoError(t, err)
-	assert.Len(t, everything, 4)
+	assert.Len(t, everything, len(domain.DefaultRules())+1)
 }
 
 func TestRepositoryContract(t *testing.T) {

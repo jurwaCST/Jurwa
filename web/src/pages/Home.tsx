@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import type { Role } from '../auth/types'
 import { useAuth } from '../auth/useAuth'
 import Icon, { type IconName } from '../components/Icon'
@@ -39,32 +39,32 @@ function Route() {
       </ol>
       <p className="route-escalation">
         <strong>Nobody acting on it?</strong> Every category has a time limit. When it passes, the report is escalated
-        to the Category Head automatically.
+        to the DSA, or to the DAA for the Academic Block, automatically.
       </p>
     </section>
   )
 }
 
-// The three categories and who receives them (FR-12), with photos of the
-// places on the CST campus they cover.
+// The three categories and who receives them (FR-12, SCRUM-158), with photos of
+// the places on the CST campus they cover.
 const categories = [
   {
     name: 'Hostel',
-    head: 'DSA',
+    goesTo: 'the SSO',
     covers: 'Rooms, bathrooms, water and electricity in the hostels',
     photo: '/campus/hostels.jpg',
     alt: 'Red-roofed hostel blocks on the CST campus',
   },
   {
     name: 'Academic Block',
-    head: 'DAA',
+    goesTo: "your department's HoD",
     covers: 'Classrooms, labs and equipment in the academic blocks',
     photo: '/campus/academic-block.jpg',
     alt: 'The yellow and red academic block beside the lamp-lined road',
   },
   {
     name: 'Others',
-    head: 'SSO',
+    goesTo: 'the SSO',
     covers: 'Campus places such as the library, mess, gym and sports grounds',
     photo: '/campus/aerial.jpg',
     alt: 'The CST campus on its hillside from above, with the football ground and winding roads',
@@ -83,7 +83,7 @@ function Categories() {
               <h3>{c.name}</h3>
               <p>{c.covers}.</p>
               <p className="place-head">
-                Goes to the <strong>{c.head}</strong>
+                Goes to <strong>{c.goesTo}</strong>
               </p>
             </div>
           </li>
@@ -129,6 +129,12 @@ export default function Home() {
     )
   }
 
+  // SCRUM-158: a Category Head or a staff member (an HoD or a councillor) has one
+  // page, their board, so home takes them straight there.
+  if (!user.roles.includes('STUDENT') && user.roles.some((r) => r === 'CATEGORY_HEAD' || r === 'STAFF')) {
+    return <Navigate to="/staff" replace />
+  }
+
   // Category Head and Staff share one page, so drop the repeated action.
   const actions = actionsByRole
     .filter((a) => user.roles.includes(a.role))
@@ -169,14 +175,7 @@ export default function Home() {
         </ul>
       </nav>
 
-      {/* SCRUM-156: only students report, so only they see where a report goes.
-          A late report is escalated back to its Category Head, so they are told. */}
-      {user.roles.includes('CATEGORY_HEAD') && (
-        <p className="route-escalation">
-          <strong>A report waiting too long?</strong> When a report passes its time limit, it is escalated to you
-          automatically.
-        </p>
-      )}
+      {/* SCRUM-156: only students report, so only they see where a report goes. */}
       {user.roles.includes('STUDENT') && <Route />}
     </>
   )

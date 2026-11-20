@@ -2,7 +2,7 @@
 
 ## What it does
 
-Stores the routing rules: which Category Head position receives a report of each category, optionally for one building. Seeded with Hostel to DSA, Academic Block to DAA and Others to SSO.
+Stores the routing rules: which Category Head position receives a report of each category, optionally for one building. Seeded (SCRUM-158) with Hostel and Others to the SSO, each Academic Block department to its HoD (`DepartmentHoDs`: Architecture to `HOD_ARCH` and so on), and the Academic Block without a department to the DAA. A database seeded before SCRUM-158 has its Hostel rule moved from the DSA to the SSO on the next start.
 
 It never reads the description (routing uses only category and location, FR-11) and never knows who holds a position; department-directory does. routing-engine calls `GetRule` to route a new report.
 

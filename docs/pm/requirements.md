@@ -17,11 +17,15 @@ Routing uses only category and location, never the description.
 
 ## 2. Routing rules
 
-| Category | Routed to (Category Head) | Can reassign to |
-|---|---|---|
-| Hostel | DSA (Dean of Student Affairs) | SSOs (male and female), Block Councillor, Maintenance Councillor, Deputy Chief Councillor (Mess), Chief Councillor |
-| Academic Block | DAA (Dean of Academic Affairs) | One of the 6 departmental HoDs (5 HoDs; Mechanical's Programme Leader acts as HoD) |
-| Others (campus-wide) | SSO (Student Service Officer) | Relevant estate or administrative staff |
+Changed in SCRUM-158 (21 November 2026), asked by the Scrum Master: the report goes to the person who fixes it, and the Deans receive only late reports.
+
+| Category | Routed to | Who fixes it | If it passes its time limit |
+|---|---|---|---|
+| Hostel | SSO (Student Service Officer) | The SSO reassigns it to a councillor: the Block Councillor of the hostel (HA, HB, HC, HD, HE, HF, NK, RKA, RKB) or the Electrical Maintenance Councillor | Escalated to the DSA (Dean of Student Affairs) |
+| Others (campus-wide) | SSO | The SSO reassigns it to a councillor: the Games and Health Councillor (gym, courts, grounds), the Deputy Chief Councillor (Mess) or the Electrical Maintenance Councillor | Escalated to the DSA |
+| Academic Block | The HoD of the department the student picks (6 departments; Mechanical's Programme Leader acts as HoD) | The HoD; HoDs do not reassign | Escalated to the DAA (Dean of Academic Affairs) |
+
+An Academic Block report that names no department (made before SCRUM-158) goes to the DAA.
 
 ## 3. Status flow
 
@@ -49,10 +53,10 @@ Open, then Assigned, then In Progress, then Resolved. Escalated is set automatic
 | Id | Requirement | Priority |
 |---|---|---|
 | FR-11 | The system routes every new report using only category and location, never the description. | Must |
-| FR-12 | Hostel reports go to the DSA, Academic Block reports to the DAA, Others to the SSO. The report becomes Assigned. | Must |
+| FR-12 | Hostel and Others reports go to the SSO; an Academic Block report goes to the HoD of the department the student picks (SCRUM-158). The report becomes Assigned. | Must |
 | FR-13 | Each category has an SLA window, stored as policy. | Must |
 | FR-14 | An SLA timer starts when the report is routed and stops when it is Resolved. | Must |
-| FR-15 | A scheduled serverless function finds reports past their SLA window and sets them to Escalated, publishing an SLA-lapsed event. | Must |
+| FR-15 | A scheduled serverless function finds reports past their SLA window and sets them to Escalated, publishing an SLA-lapsed event. The report then goes up to the DSA (Hostel and Others) or the DAA (Academic Block) (SCRUM-158). | Must |
 | FR-16 | If a later step of the escalation flow fails, the earlier step is undone by a compensating action (Saga), for example an escalation reverts to the previous status. | Must |
 | FR-17 | Every status change, routing decision, reassignment and escalation is written to the audit log. | Must |
 
@@ -61,7 +65,7 @@ Open, then Assigned, then In Progress, then Resolved. Escalated is set automatic
 | Id | Requirement | Priority |
 |---|---|---|
 | FR-18 | A Category Head sees a queue of reports assigned to them, with status badges, and filters it by status. | Must |
-| FR-19 | A Category Head reassigns a report to a staff user. The DAA can reassign to one of the 6 departmental HoDs (5 HoDs; Mechanical's Programme Leader acts as HoD). | Must |
+| FR-19 | A Category Head reassigns a report: the SSO (and the DSA after an escalation) to a councillor, the DAA after an escalation to an HoD. Staff cannot reassign (SCRUM-158). | Must |
 | FR-20 | A Category Head moves a report to In Progress or Resolved. Invalid transitions are rejected. | Must |
 | FR-21 | A Category Head adds internal notes to a report. Internal notes are not visible to the student. | Should |
 
@@ -69,7 +73,7 @@ Open, then Assigned, then In Progress, then Resolved. Escalated is set automatic
 
 | Id | Requirement | Priority |
 |---|---|---|
-| FR-22 | Staff users sign in and see only the reports assigned to them. | Must |
+| FR-22 | Staff users sign in and see only the reports assigned to them. Signing in takes them, and a Category Head, straight to that list, headed with their position name (SCRUM-158). | Must |
 | FR-23 | Staff users update the status of their reports and add internal notes. | Must |
 | FR-24 | Staff without an institutional email (cooks, cleaners) are represented by their supervisor or HoD, who acts for them with a full audit trail (risk R5). | Could |
 

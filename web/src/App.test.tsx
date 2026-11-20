@@ -48,9 +48,9 @@ describe('routes', () => {
 
   // SCRUM-146: an escalated report goes back to its Category Head
   // (docs/design/escalation-saga.md), not to someone higher up.
-  it('home says an escalated report goes to the Category Head', () => {
+  it('home says an escalated report goes up to the DSA or the DAA (SCRUM-158)', () => {
     renderAt('/')
-    expect(screen.getByText(/the report is escalated to the Category Head automatically/)).toBeInTheDocument()
+    expect(screen.getByText(/the report is escalated to the DSA, or to the DAA for the Academic Block, automatically/)).toBeInTheDocument()
     expect(screen.queryByText(/next person up/)).not.toBeInTheDocument()
   })
 
@@ -86,8 +86,8 @@ describe('role guards', () => {
   })
 
   it.each([
-    ['/staff', 'CATEGORY_HEAD', 'Staff view'],
-    ['/staff', 'STAFF', 'Staff view'],
+    ['/staff', 'CATEGORY_HEAD', 'Test User'], // SCRUM-158: headed with who is signed in
+    ['/staff', 'STAFF', 'Test User'],
     ['/admin', 'SYSTEM_ADMIN', 'Admin dashboard'],
     ['/president', 'PRESIDENT', 'President dashboard'],
     ['/reports', 'STUDENT', 'My reports'],

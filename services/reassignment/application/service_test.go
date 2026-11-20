@@ -92,21 +92,16 @@ func TestReassignReport_HeadThenStaff(t *testing.T) {
 		ActorID: headID, Reason: "Plumbing", AssignedAt: t0,
 	}, pub.events[0])
 
-	// The staff member, now the assignee, passes it on.
+	// SCRUM-158: the staff member, now the assignee, cannot pass it on: only a
+	// Category Head hands reports out.
 	_, err = svc.ReassignReport(ctx, ReassignCommand{
 		ReportID: reportID, ToUserID: otherID, Reason: "Electrical", ActorID: staffID, Role: domain.RoleStaff,
 	})
-	require.NoError(t, err)
+	assert.ErrorIs(t, err, domain.ErrPermissionDenied)
 
 	list, _ := svc.ListReassignments(ctx, domain.RoleStaff, reportID)
-	require.Len(t, list, 3)
-	assert.Equal(t, []bool{false, false, true}, []bool{list[0].Current, list[1].Current, list[2].Current})
-
-	// The first staff member is no longer the assignee, so cannot reassign again.
-	_, err = svc.ReassignReport(ctx, ReassignCommand{
-		ReportID: reportID, ToUserID: staffID, Reason: "back", ActorID: staffID, Role: domain.RoleStaff,
-	})
-	assert.ErrorIs(t, err, domain.ErrPermissionDenied)
+	require.Len(t, list, 2)
+	assert.Equal(t, []bool{false, true}, []bool{list[0].Current, list[1].Current})
 }
 
 func TestReassignReport_Errors(t *testing.T) {

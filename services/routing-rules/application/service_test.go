@@ -39,8 +39,9 @@ func TestGetRule(t *testing.T) {
 		want    string
 		wantErr error
 	}{
-		{name: "hostel", query: domain.Query{Category: domain.Hostel, Building: "Hostel B"}, want: "DSA"},
-		{name: "academic block", query: domain.Query{Category: domain.AcademicBlock}, want: "DAA"},
+		{name: "hostel", query: domain.Query{Category: domain.Hostel, Building: "HA"}, want: "SSO"},
+		{name: "academic block, computing", query: domain.Query{Category: domain.AcademicBlock, Building: "Computing Technologies"}, want: "HOD_CT"},
+		{name: "academic block without a department", query: domain.Query{Category: domain.AcademicBlock}, want: "DAA"},
 		{name: "others", query: domain.Query{Category: domain.Others}, want: "SSO"},
 		{name: "unspecified", query: domain.Query{}, wantErr: domain.ErrInvalidCategory},
 	}
@@ -61,21 +62,21 @@ func TestUpsertRule(t *testing.T) {
 	ctx := context.Background()
 	s := newService()
 
-	saved, err := s.UpsertRule(ctx, domain.Rule{Category: domain.Hostel, Building: "Hostel B", TargetPosition: "SSO", Active: true})
+	saved, err := s.UpsertRule(ctx, domain.Rule{Category: domain.Hostel, Building: "Hostel B", TargetPosition: "DSA", Active: true})
 	require.NoError(t, err)
 	assert.Equal(t, domain.DefaultPriority, saved.Priority, "priority 0 becomes the default")
 	assert.Equal(t, s.now(), saved.UpdatedAt)
 
 	got, err := s.GetRule(ctx, domain.Query{Category: domain.Hostel, Building: "Hostel B"})
 	require.NoError(t, err)
-	assert.Equal(t, "SSO", got.TargetPosition, "new building rule is used")
+	assert.Equal(t, "DSA", got.TargetPosition, "new building rule is used")
 
 	_, err = s.UpsertRule(ctx, domain.Rule{Category: domain.Hostel})
 	assert.ErrorIs(t, err, domain.ErrInvalidRule)
 
 	rules, err := s.ListRules(ctx, false)
 	require.NoError(t, err)
-	assert.Len(t, rules, 4)
+	assert.Len(t, rules, len(domain.DefaultRules())+1)
 }
 
 func TestRepositoryErrorsArePassedOn(t *testing.T) {
