@@ -107,4 +107,6 @@ type Notifications interface {
 type Feedback interface {
 	SubmitFeedback(ctx context.Context, in *feedbackv1.SubmitFeedbackRequest) (*feedbackv1.SubmitFeedbackResponse, error)
 	GetFeedback(ctx context.Context, reportID string) (*feedbackv1.GetFeedbackResponse, error)
+	// GetRatingSummary is the count and average rating for the dashboards (SCRUM-164).
+	GetRatingSummary(ctx context.Context) (*feedbackv1.GetRatingSummaryResponse, error)
 }

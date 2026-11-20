@@ -71,3 +71,22 @@ func NewFeedback(id, reportID, studentID string, rating int32, comment string, n
 		CreatedAt:     now,
 	}, nil
 }
+
+// RatingSummary is how many reports were rated and their average rating, for the
+// admin and President dashboards (SCRUM-164).
+type RatingSummary struct {
+	Count   int64
+	Average float64 // 0 when Count is 0
+}
+
+// Summarize counts the feedback and averages its ratings.
+func Summarize(all []Feedback) RatingSummary {
+	if len(all) == 0 {
+		return RatingSummary{}
+	}
+	var sum int64
+	for _, f := range all {
+		sum += int64(f.Rating)
+	}
+	return RatingSummary{Count: int64(len(all)), Average: float64(sum) / float64(len(all))}
+}

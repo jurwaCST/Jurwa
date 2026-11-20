@@ -130,7 +130,7 @@ func DefaultPolicy() Policy {
 		ActionReportNoteAdd:        {CategoryHead, Staff},
 		ActionReportNoteRead:       {CategoryHead, Staff, SystemAdmin},
 		ActionReportFeedbackSubmit: {Student},
-		ActionReportFeedbackRead:   {Student, CategoryHead, SystemAdmin},
+		ActionReportFeedbackRead:   {Student, CategoryHead, Staff, SystemAdmin}, // SCRUM-164: Staff, who fixed it
 		ActionReportAuditRead:      {SystemAdmin},
 		ActionDepartmentList:       {CategoryHead, SystemAdmin},
 		ActionRoutingRuleRead:      {SystemAdmin},

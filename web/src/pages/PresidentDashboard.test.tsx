@@ -114,8 +114,9 @@ describe('President dashboard', () => {
     await user.click(screen.getByRole('button', { name: 'This week' }))
 
     expect(screen.getByRole('button', { name: 'This week' })).toHaveAttribute('aria-pressed', 'true')
-    const lastUrl = fetchMock.mock.calls.at(-1)![0] as string
-    expect(lastUrl).toMatch(/\?from=\d{4}-\d{2}-\d{2}T[\d:.]+Z$/)
+    // The last counts request (the ratings tile asks separately, SCRUM-164).
+    const counts = fetchMock.mock.calls.map((c) => c[0] as string).filter((u) => !u.includes('/dashboard/ratings'))
+    expect(counts.at(-1)).toMatch(/\?from=\d{4}-\d{2}-\d{2}T[\d:.]+Z$/)
   })
 
   it('shows an error with a way to try again when analytics cannot be reached', async () => {

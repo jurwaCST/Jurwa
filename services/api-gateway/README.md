@@ -41,6 +41,7 @@ Every gRPC client goes through `pkg/resilience` (2 s timeout, up to 3 attempts f
 | `GET /reports/{reportId}/feedback` | feedback GetFeedback | Student (own, checked with report-submission), Category Head, System Administrator |
 | `GET /dashboard/summary` | analytics GetSummary (optional `?from=` and `?to=`, RFC 3339) | System Administrator, College President |
 | `GET /dashboard/categories` | analytics GetCategoryBreakdown (same `?from=` and `?to=`) | System Administrator, College President |
+| `GET /dashboard/ratings` | feedback GetRatingSummary: `{"count": "7", "averageRating": 4.2}`, count left out when 0 (SCRUM-164) | System Administrator, College President |
 | `POST /photos` | photo-media UploadPhoto (returns 201 `{"photoId": "..."}`) | Student; the uploader id comes from the JWT |
 | `GET /photos/{photoId}` | photo-media GetPhoto (returns the raw image) | Student (own), Category Head, Staff, System Administrator |
 

@@ -408,8 +408,12 @@ describe('SCRUM-36 reassign', () => {
   })
 
   it('explains a 403 and a 409', async () => {
-    post.mockRejectedValueOnce(new ApiError(403, 'not allowed'))
-    post.mockRejectedValueOnce(new ApiError(409, 'already reassigned'))
+    // SCRUM-164: a note goes first; the reassign answers 403, then 409.
+    const answers = [new ApiError(403, 'not allowed'), new ApiError(409, 'already reassigned')]
+    post.mockImplementation(async (path: string) => {
+      if (path.endsWith('/notes')) return { note: {} }
+      throw answers.shift()
+    })
     const user = userEvent.setup()
     renderView()
     const sheet = await openSheet(user)

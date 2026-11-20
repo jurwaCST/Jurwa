@@ -83,6 +83,44 @@ function messageFor(err: unknown): string {
   return 'Something went wrong. Please try again.'
 }
 
+// ---- The student's stars (SCRUM-164) ----
+
+type Feedback = { rating?: number; comment?: string }
+
+// StudentRating shows the stars the student gave a resolved report, or that
+// they have not rated it yet (404 from feedback). Other errors show nothing.
+function StudentRating({ reportId }: { reportId: string }) {
+  const [state, setState] = useState<{ id: string; feedback: Feedback | null } | null>(null)
+  useEffect(() => {
+    let alive = true
+    api
+      .get<{ feedback?: Feedback }>(`/reports/${reportId}/feedback`)
+      .then((res) => alive && setState({ id: reportId, feedback: res.feedback ?? null }))
+      .catch((err) => {
+        if (alive && err instanceof ApiError && err.status === 404) setState({ id: reportId, feedback: null })
+      })
+    return () => {
+      alive = false
+    }
+  }, [reportId])
+
+  if (!state || state.id !== reportId) return null
+  const rating = state.feedback?.rating ?? 0
+  if (!rating) return <p className="staff-rating muted">Not rated by the student yet.</p>
+  return (
+    <div className="staff-rating">
+      <p>
+        <span aria-hidden="true" className="staff-stars">
+          {'\u2605'.repeat(rating)}
+          {'\u2606'.repeat(5 - rating)}
+        </span>{' '}
+        <strong>{`Rated ${rating} out of 5 by the student`}</strong>
+      </p>
+      {state.feedback?.comment && <p className="muted">{state.feedback.comment}</p>}
+    </div>
+  )
+}
+
 // ---- Reassign ----
 
 interface ReassignProps {
@@ -135,10 +173,14 @@ function ReassignSheet({ reportId, me, open, onClose, onDone }: ReassignProps) {
     if (!text) return setError('Write why you are reassigning it.')
     if (reason.length > REASON_MAX) return setError(`The reason can be at most ${REASON_MAX} characters.`)
     setBusy(true)
+    const to = choices.find((p) => p.holderUserId === toUserId)
+    const toTitle = to?.title ?? 'the new person'
     try {
+      // SCRUM-164: the reason is also an internal note, so the new person reads
+      // it under Notes. A note that fails does not stop the reassignment.
+      await api.post(`/reports/${reportId}/notes`, { body: `Passed to ${toTitle}: ${text}` }).catch(() => {})
       await api.post(`/reports/${reportId}/reassign`, { toUserId, reason: text })
-      const to = choices.find((p) => p.holderUserId === toUserId)
-      onDone(reportId, to?.title ?? 'the new person')
+      onDone(reportId, toTitle)
     } catch (err) {
       if (err instanceof ApiError && err.status === 403) {
         setError('Only a Category Head can reassign a report.')
@@ -392,10 +434,13 @@ function ReportDetail({ summary, me, canReassign, onBack, onStatus, onToast, onR
       </div>
 
       {current.status === 'RESOLVED' ? (
-        <p className="staff-done">
-          <Icon name="resolved" />
-          Resolved. Nothing more to do.
-        </p>
+        <>
+          <p className="staff-done">
+            <Icon name="resolved" />
+            Resolved. Nothing more to do.
+          </p>
+          <StudentRating reportId={id} />
+        </>
       ) : (
         <div className="staff-actions">
           {options.length > 0 && <Button onClick={openSheet}>Update status</Button>}

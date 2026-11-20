@@ -38,7 +38,9 @@ func (failingRepo) Create(context.Context, domain.Feedback) error { return error
 func (failingRepo) GetByReport(context.Context, string) (domain.Feedback, error) {
 	return domain.Feedback{}, errors.New("db down")
 }
-func (failingRepo) List(context.Context) ([]domain.Feedback, error) { return nil, errors.New("db down") }
+func (failingRepo) List(context.Context) ([]domain.Feedback, error) {
+	return nil, errors.New("db down")
+}
 
 func newTestService(status *fakeStatus) *Service {
 	svc := NewService(memory.New(), status)
@@ -131,7 +133,8 @@ type raceRepo struct{}
 func (raceRepo) GetByReport(context.Context, string) (domain.Feedback, error) {
 	return domain.Feedback{}, domain.ErrNotFound
 }
-func (raceRepo) Create(context.Context, domain.Feedback) error { return domain.ErrAlreadyExists }
+func (raceRepo) Create(context.Context, domain.Feedback) error   { return domain.ErrAlreadyExists }
+func (raceRepo) List(context.Context) ([]domain.Feedback, error) { return nil, nil }
 
 func TestTwoSubmitsAtTheSameTime(t *testing.T) {
 	svc := NewService(raceRepo{}, &fakeStatus{resolved: true})

@@ -288,3 +288,13 @@
 .staff-sheet-form .btn-primary {
   width: 100%;
 }
+
+/* SCRUM-164: the student's stars on a resolved report. */
+.staff-rating p {
+  margin: 0.25rem 0 0;
+}
+
+.staff-stars {
+  color: var(--accent);
+  letter-spacing: 0.1em;
+}

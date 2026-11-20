@@ -22,8 +22,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	FeedbackService_SubmitFeedback_FullMethodName = "/jurwa.feedback.v1.FeedbackService/SubmitFeedback"
-	FeedbackService_GetFeedback_FullMethodName    = "/jurwa.feedback.v1.FeedbackService/GetFeedback"
+	FeedbackService_SubmitFeedback_FullMethodName   = "/jurwa.feedback.v1.FeedbackService/SubmitFeedback"
+	FeedbackService_GetFeedback_FullMethodName      = "/jurwa.feedback.v1.FeedbackService/GetFeedback"
+	FeedbackService_GetRatingSummary_FullMethodName = "/jurwa.feedback.v1.FeedbackService/GetRatingSummary"
 )
 
 // FeedbackServiceClient is the client API for FeedbackService service.
@@ -36,6 +37,9 @@ type FeedbackServiceClient interface {
 	SubmitFeedback(ctx context.Context, in *SubmitFeedbackRequest, opts ...grpc.CallOption) (*SubmitFeedbackResponse, error)
 	// Errors: NOT_FOUND when the report has no feedback.
 	GetFeedback(ctx context.Context, in *GetFeedbackRequest, opts ...grpc.CallOption) (*GetFeedbackResponse, error)
+	// How many reports were rated and the average rating, for the admin and
+	// President dashboards (SCRUM-164). 0 and 0 when nothing is rated.
+	GetRatingSummary(ctx context.Context, in *GetRatingSummaryRequest, opts ...grpc.CallOption) (*GetRatingSummaryResponse, error)
 }
 
 type feedbackServiceClient struct {
@@ -66,6 +70,16 @@ func (c *feedbackServiceClient) GetFeedback(ctx context.Context, in *GetFeedback
 	return out, nil
 }
 
+func (c *feedbackServiceClient) GetRatingSummary(ctx context.Context, in *GetRatingSummaryRequest, opts ...grpc.CallOption) (*GetRatingSummaryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetRatingSummaryResponse)
+	err := c.cc.Invoke(ctx, FeedbackService_GetRatingSummary_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // FeedbackServiceServer is the server API for FeedbackService service.
 // All implementations must embed UnimplementedFeedbackServiceServer
 // for forward compatibility.
@@ -76,6 +90,9 @@ type FeedbackServiceServer interface {
 	SubmitFeedback(context.Context, *SubmitFeedbackRequest) (*SubmitFeedbackResponse, error)
 	// Errors: NOT_FOUND when the report has no feedback.
 	GetFeedback(context.Context, *GetFeedbackRequest) (*GetFeedbackResponse, error)
+	// How many reports were rated and the average rating, for the admin and
+	// President dashboards (SCRUM-164). 0 and 0 when nothing is rated.
+	GetRatingSummary(context.Context, *GetRatingSummaryRequest) (*GetRatingSummaryResponse, error)
 	mustEmbedUnimplementedFeedbackServiceServer()
 }
 
@@ -91,6 +108,9 @@ func (UnimplementedFeedbackServiceServer) SubmitFeedback(context.Context, *Submi
 }
 func (UnimplementedFeedbackServiceServer) GetFeedback(context.Context, *GetFeedbackRequest) (*GetFeedbackResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetFeedback not implemented")
+}
+func (UnimplementedFeedbackServiceServer) GetRatingSummary(context.Context, *GetRatingSummaryRequest) (*GetRatingSummaryResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetRatingSummary not implemented")
 }
 func (UnimplementedFeedbackServiceServer) mustEmbedUnimplementedFeedbackServiceServer() {}
 func (UnimplementedFeedbackServiceServer) testEmbeddedByValue()                         {}
@@ -149,6 +169,24 @@ func _FeedbackService_GetFeedback_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _FeedbackService_GetRatingSummary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRatingSummaryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FeedbackServiceServer).GetRatingSummary(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FeedbackService_GetRatingSummary_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FeedbackServiceServer).GetRatingSummary(ctx, req.(*GetRatingSummaryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // FeedbackService_ServiceDesc is the grpc.ServiceDesc for FeedbackService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -163,6 +201,10 @@ var FeedbackService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetFeedback",
 			Handler:    _FeedbackService_GetFeedback_Handler,
+		},
+		{
+			MethodName: "GetRatingSummary",
+			Handler:    _FeedbackService_GetRatingSummary_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

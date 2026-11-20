@@ -93,6 +93,7 @@ func NewRouter(d Deps) http.Handler {
 	mux.Handle("GET /reports/{reportId}/status", r.protected(domain.ActionReportStatusRead, r.getStatus))
 	mux.Handle("GET /dashboard/summary", r.protected(domain.ActionDashboardRead, r.dashboardSummary))
 	mux.Handle("GET /dashboard/categories", r.protected(domain.ActionDashboardRead, r.dashboardCategories))
+	mux.Handle("GET /dashboard/ratings", r.protected(domain.ActionDashboardRead, r.dashboardRatings))
 	mux.Handle("POST /photos", r.protected(domain.ActionPhotoUpload, r.uploadPhoto))
 	mux.Handle("GET /photos/{photoId}", r.protected(domain.ActionPhotoRead, r.getPhoto))
 	mux.Handle("GET /reports/{reportId}/timeline", r.protected(domain.ActionReportTimelineRead, r.timeline))
@@ -409,6 +410,13 @@ func (r router) getFeedback(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	resp, err := r.Feedback.GetFeedback(req.Context(), reportID)
+	reply(w, http.StatusOK, resp, err)
+}
+
+// dashboardRatings is the students' average rating for the admin and President
+// dashboards (SCRUM-164).
+func (r router) dashboardRatings(w http.ResponseWriter, req *http.Request) {
+	resp, err := r.Feedback.GetRatingSummary(req.Context())
 	reply(w, http.StatusOK, resp, err)
 }
 

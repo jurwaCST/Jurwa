@@ -3,6 +3,7 @@ import { api, ApiError } from '../api/client'
 import ErrorState from '../components/ErrorState'
 import Icon from '../components/Icon'
 import PageHeader from '../components/PageHeader'
+import RatingTile from '../components/RatingTile'
 import Skeleton from '../components/Skeleton'
 import StatTile from '../components/StatTile'
 import './PresidentDashboard.css'
@@ -180,6 +181,8 @@ export default function PresidentDashboard() {
             <StatTile label="Resolved" value={String(n(c.resolved))} icon="resolved" tone="resolved" />
             <StatTile label="Escalated" value={String(n(c.escalated))} icon="escalated" tone="escalated" />
           </section>
+          {/* SCRUM-164: how the students rated the fixes. */}
+          <RatingTile />
 
           <section className="dash-pair" aria-label="Resolution">
             <div className="card dash-rate">

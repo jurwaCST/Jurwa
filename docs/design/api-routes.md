@@ -46,6 +46,7 @@ The React PWA calls only the api-gateway over HTTP (port 8080, JSON). The gatewa
 | `PUT /admin/sla-policies/{category}` | sla-policy | UpsertPolicy | System Administrator |
 | `GET /dashboard/summary` | analytics | GetSummary | System Administrator, College President |
 | `GET /dashboard/categories` | analytics | GetCategoryBreakdown | System Administrator, College President |
+| `GET /dashboard/ratings` | feedback | GetRatingSummary: count and average rating (SCRUM-164) | System Administrator, College President |
 
 ## Not exposed to the PWA
 

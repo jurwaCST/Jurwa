@@ -11,6 +11,7 @@ import { api, ApiError } from '../api/client'
 import ErrorState from '../components/ErrorState'
 import Icon from '../components/Icon'
 import PageHeader from '../components/PageHeader'
+import RatingTile from '../components/RatingTile'
 import Skeleton from '../components/Skeleton'
 import StatTile from '../components/StatTile'
 import './AdminDashboard.css'
@@ -133,6 +134,8 @@ export default function AdminDashboard() {
             <StatTile label="Resolved" value={String(n(c.resolved))} icon="resolved" tone="resolved" />
             <StatTile label="Escalated" value={String(escalated)} icon="escalated" tone="escalated" />
           </section>
+          {/* SCRUM-164: how the students rated the fixes. */}
+          <RatingTile />
 
           <section className="card admin-attention" aria-labelledby="admin-attention-title">
             <h2 id="admin-attention-title">Needs attention</h2>

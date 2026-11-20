@@ -13,6 +13,8 @@ type FeedbackRepository interface {
 	Create(ctx context.Context, f domain.Feedback) error
 	// GetByReport returns domain.ErrNotFound when the report has no feedback.
 	GetByReport(ctx context.Context, reportID string) (domain.Feedback, error)
+	// List returns every feedback, for the rating summary (SCRUM-164).
+	List(ctx context.Context) ([]domain.Feedback, error)
 }
 
 // StatusChecker says whether a report is RESOLVED. The real one calls

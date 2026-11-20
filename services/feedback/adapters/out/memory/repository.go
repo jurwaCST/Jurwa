@@ -41,3 +41,14 @@ func (r *Repository) GetByReport(_ context.Context, reportID string) (domain.Fee
 	}
 	return f, nil
 }
+
+// List returns every feedback (SCRUM-164).
+func (r *Repository) List(_ context.Context) ([]domain.Feedback, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	out := make([]domain.Feedback, 0, len(r.byReport))
+	for _, f := range r.byReport {
+		out = append(out, f)
+	}
+	return out, nil
+}
