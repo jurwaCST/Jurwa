@@ -97,6 +97,9 @@ function MixBar({ c }: { c: Counts }) {
   )
 }
 
+/** How often the counts are fetched again (SCRUM-159). */
+const REFRESH_MS = 15_000
+
 export default function PresidentDashboard() {
   const [period, setPeriod] = useState<Period>('all')
   const [attempt, setAttempt] = useState(0)
@@ -105,6 +108,18 @@ export default function PresidentDashboard() {
     { key: string; summary: Summary; breakdown: Breakdown } | { key: string; error: string } | null
   >(null)
   const key = `${period}-${attempt}`
+
+  // SCRUM-159: fetch again every 15 seconds, so a report that is resolved or in
+  // progress shows up without a reload. The old counts stay on screen meanwhile.
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const q = query(period)
+      Promise.all([api.get<Summary>(`/dashboard/summary${q}`), api.get<Breakdown>(`/dashboard/categories${q}`)])
+        .then(([summary, breakdown]) => setResult((r) => (r?.key === key ? { key, summary, breakdown } : r)))
+        .catch(() => {}) // keep the last counts; the next refresh tries again
+    }, REFRESH_MS)
+    return () => clearInterval(timer)
+  }, [period, key])
 
   useEffect(() => {
     let current = true

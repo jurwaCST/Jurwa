@@ -237,8 +237,9 @@ describe('login', () => {
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit]
     expect(url).toMatch(/\/auth\/login$/)
     expect(init.body).toBe(JSON.stringify({ email: 'pema@cst.edu.bt', password: 'secret-pass' }))
-    // The password is never kept in the browser.
-    expect(sessionStorage.getItem(SESSION_KEY)).not.toContain('secret-pass')
+    // The sign-in is kept for every tab (SCRUM-159), and the password never is.
+    expect(localStorage.getItem(SESSION_KEY)).toContain('jwt-123')
+    expect(localStorage.getItem(SESSION_KEY)).not.toContain('secret-pass')
   })
 
   it('shows the gateway error when the password is wrong', async () => {

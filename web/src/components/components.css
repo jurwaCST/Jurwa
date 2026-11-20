@@ -139,6 +139,21 @@
   color: #b9c1d8;
 }
 
+/* SCRUM-159: back to the page before. */
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  margin-bottom: var(--s2);
+  padding: 0 0.85rem 0 0.6rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 700;
+}
+
 .signout {
   display: inline-flex;
   align-items: center;

@@ -26,7 +26,7 @@ routing-engine calls `GetStaff` to find who holds the Category Head position of 
 
 The proposal mentions 5 departmental HoDs, and https://cst.edu.bt/staff-directory/ lists exactly 5. Mechanical Engineering has none listed, so its Programme Leader acts as HoD: the position keeps the code `HOD_MECH` (reassignment works the same way) and its title is "Head of Department, Mechanical Engineering (Programme Leader, acting)". Staff names are not stored here: holders are user ids from identity, assigned by the System Administrator.
 
-**Demo holders:** the positions are held by the demo accounts that identity seeds (`SEED_DEMO_USERS`): DSA, DAA and SSO by the three Category Heads (`00000000-0000-4000-8000-00000000000{1,2,3}`), so a report is routed end to end, `SSO_MALE` by the staff account (`...000000000010`), and since SCRUM-158 every HoD (`...041` to `...046`) and councillor (`...051` to `...062`) by its own demo account, so the SSO can hand a report to a councillor and an Academic Block report reaches its HoD. `SSO_FEMALE` has no holder.
+**Demo holders:** the positions are held by the demo accounts that identity seeds (`SEED_DEMO_USERS`): DSA, DAA and SSO by the three Category Heads (`00000000-0000-4000-8000-00000000010{1,2,3}`), so a report is routed end to end, `SSO_MALE` by the staff account (`...000000000110`), and since SCRUM-158 every HoD (`...141` to `...146`) and councillor (`...151` to `...162`) by its own demo account, so the SSO can hand a report to a councillor and an Academic Block report reaches its HoD. `SSO_FEMALE` has no holder.
 
 Sprint 2 keeps everything in memory (`adapters/out/memory`). The PostgreSQL adapter from `docs/design/schema/department-directory.sql` comes in Sprint 3.
 

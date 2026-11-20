@@ -1,0 +1,18 @@
+SCRUM-159 after the code change, 21 November 2026.
+
+ok  	github.com/jurwaCST/Jurwa/services/identity/adapters/in/grpc	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/identity/adapters/out/memory	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/identity/adapters/out/postgres	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/identity/application	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/identity/cmd/server	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/identity/domain	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/department-directory/adapters/in/grpc	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/department-directory/adapters/out/memory	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/department-directory/application	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/department-directory/cmd/server	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/department-directory/domain	(cached)
+ok  	github.com/jurwaCST/Jurwa/tests/spec	(cached)
+
+Web: npx tsc -b (no errors), npm run lint (oxlint, no errors), npx vitest run --maxWorkers=1:
+ Test Files  14 passed (14)
+      Tests  188 passed (188)

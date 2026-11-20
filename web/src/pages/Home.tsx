@@ -134,6 +134,9 @@ export default function Home() {
   if (!user.roles.includes('STUDENT') && user.roles.some((r) => r === 'CATEGORY_HEAD' || r === 'STAFF')) {
     return <Navigate to="/staff" replace />
   }
+  // SCRUM-159: the admin and the President also have one page each.
+  if (user.roles.length === 1 && user.roles[0] === 'SYSTEM_ADMIN') return <Navigate to="/admin" replace />
+  if (user.roles.length === 1 && user.roles[0] === 'PRESIDENT') return <Navigate to="/president" replace />
 
   // Category Head and Staff share one page, so drop the repeated action.
   const actions = actionsByRole

@@ -7,7 +7,7 @@ Owner: Sonam Choki. Goal (proposal objective 2): a student submits a report with
 | Code | Role | How many |
 |---|---|---|
 | P1 to P5 (or more) | Students | at least 5 |
-| C1, C2 | Category Head or staff (demo account `dsa.demo@jurwa.example` or `staff.demo@jurwa.example`) | 1 or 2 |
+| C1, C2 | Category Head or staff (demo account `dsa.cst@rub.edu.bt` or `staff.cst@rub.edu.bt`) | 1 or 2 |
 
 **Consent (read out before starting):** "This tests the app, not you. We time the task and write down what is unclear. We do not record your name or face; you are P1 to P6 in our notes. You can stop at any time." Start only after a yes.
 

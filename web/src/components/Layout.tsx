@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import type { Role } from '../auth/types'
 import { useAuth } from '../auth/useAuth'
 import Icon, { type IconName } from './Icon'
@@ -34,13 +34,37 @@ function tabsFor(roles: Role[]): Tab[] {
   return tabs
 }
 
+// initials takes the first letters of the capitalised words, so "Dean of Student
+// Affairs" is "DS" and "Block Councillor (HA)" is "BC". A name in lower case
+// falls back to its first words.
 function initials(name: string): string {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
+  const words = name.split(/\s+/).filter((w) => /^[A-Za-z]/.test(w))
+  const capital = words.filter((w) => /^[A-Z]/.test(w))
+  return (capital.length ? capital : words)
     .slice(0, 2)
     .map((w) => w[0]!.toUpperCase())
     .join('')
+}
+
+// The page each role starts on. It has no back button: there is nothing before it.
+const startPages = new Set(['/', '/staff', '/admin', '/president'])
+
+// BackButton goes to the page before (SCRUM-159): the installed app on a phone has
+// no browser back button. Opened straight from a link, it goes home.
+function BackButton() {
+  const navigate = useNavigate()
+  const location = useLocation()
+  if (startPages.has(location.pathname)) return null
+  return (
+    <button
+      type="button"
+      className="back-button"
+      onClick={() => (location.key === 'default' ? navigate('/') : navigate(-1))}
+    >
+      <Icon name="back" size={18} />
+      <span>Back</span>
+    </button>
+  )
 }
 
 function TabLinks({ tabs }: { tabs: Tab[] }) {
@@ -95,7 +119,15 @@ export default function Layout() {
               </span>
               <span className="profile-text">
                 <span className="profile-name">Signed in as {user.fullName}</span>
-                <span className="profile-role">{user.roles.map((r) => roleNames[r] ?? r).join(', ')}</span>
+                {/* SCRUM-159: an HoD or councillor is named by position, so "Staff" adds nothing. */}
+                {user.roles.some((r) => r !== 'STAFF') && (
+                  <span className="profile-role">
+                    {user.roles
+                      .filter((r) => r !== 'STAFF')
+                      .map((r) => roleNames[r] ?? r)
+                      .join(', ')}
+                  </span>
+                )}
               </span>
               <button type="button" className="signout" onClick={logout}>
                 <Icon name="signout" size={18} />
@@ -107,6 +139,7 @@ export default function Layout() {
       </header>
 
       <main id="main" className="page" tabIndex={-1}>
+        <BackButton />
         <Outlet />
       </main>
 

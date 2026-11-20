@@ -48,7 +48,7 @@ func TestSeedFromEnv(t *testing.T) {
 			}
 			require.NoError(t, err)
 			assert.Equal(t, tt.wantCreated, created)
-			_, findErr := users.FindByEmail(context.Background(), "dsa.demo@jurwa.example")
+			_, findErr := users.FindByEmail(context.Background(), "dsa.cst@rub.edu.bt")
 			if tt.wantCreated == 0 {
 				assert.ErrorIs(t, findErr, domain.ErrUserNotFound)
 			} else {
