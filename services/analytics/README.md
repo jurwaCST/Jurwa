@@ -26,7 +26,7 @@ Serves the dashboard counts for the System Administrator and the read-only Colle
 | Sprint | Source |
 |---|---|
 | 2 | `SEED_DEMO_DATA=true` loads 15 demo events (6 reports) at start-up, see `cmd/server/demo.go` |
-| 3 | A Redis Streams consumer reads `events:report.submitted` and `events:status.changed` and calls `application.Service.Record` |
+| 4 (SCRUM-160) | With `REDIS_URL` set, a Redis Streams consumer (`adapters/in/events`, group `analytics`) reads `events:report.submitted` and `events:status.changed` and calls `application.Service.Record`. Planned for Sprint 3 but only built in SCRUM-160: until then new reports never reached the dashboards. The two streams are read at the same time, so a status change that arrives before its report waits up to 5 seconds for it; if the report never comes, the event is retried and then kept in `.dead`. In memory, both streams are read again from the start on every start, so the counts survive a restart |
 
 ## RPCs
 
