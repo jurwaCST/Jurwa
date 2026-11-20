@@ -31,7 +31,7 @@ reassignment|9014|postgres|reassignment|DEPARTMENT_DIRECTORY_ADDR=department-dir
 audit-log|9015|mongo|audit_log|
 identity|9016|postgres|identity|
 authorization|9017|postgres|authorization_db|
-notification|9018|postgres|notification|
+notification|9018|postgres|notification|REPORT_SUBMISSION_ADDR=report-submission:9001 DEPARTMENT_DIRECTORY_ADDR=department-directory:9008
 feedback|9019|postgres|feedback|STATUS_LIFECYCLE_ADDR=status-lifecycle:9011
 analytics|9020|postgres|analytics|
 "

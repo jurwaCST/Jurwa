@@ -113,7 +113,8 @@ export default function Layout() {
           )}
           {user && (
             <div className="profile">
-              {user.roles.includes('STUDENT') && <NotificationBell userId={user.id} />}
+              {/* SCRUM-162: the bell is for every role. */}
+              <NotificationBell userId={user.id} />
               <span className="avatar" aria-hidden="true">
                 {initials(user.fullName)}
               </span>

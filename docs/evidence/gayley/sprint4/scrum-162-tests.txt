@@ -1,0 +1,16 @@
+SCRUM-162 after the code change, 21 November 2026.
+$ go test -count=1 ./services/notification/...
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/in/events	2.876s
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/in/grpc	0.607s
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/out/directoryclient	0.556s
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/out/logsender	2.094s
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/out/memory	1.751s
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/out/postgres	1.783s
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/out/reportclient	0.606s
+ok  	github.com/jurwaCST/Jurwa/services/notification/application	1.762s
+ok  	github.com/jurwaCST/Jurwa/services/notification/cmd/server	0.629s
+ok  	github.com/jurwaCST/Jurwa/services/notification/domain	1.751s
+
+Web: npx tsc -b (no errors), npm run lint (oxlint, no errors), npx vitest run --maxWorkers=1:
+ Test Files  15 passed (15)
+      Tests  211 passed (211)

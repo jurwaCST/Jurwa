@@ -11,14 +11,16 @@ import (
 
 	"github.com/jurwaCST/Jurwa/pkg/eventbus"
 	"github.com/jurwaCST/Jurwa/pkg/resilience"
+	departmentdirectoryv1 "github.com/jurwaCST/Jurwa/proto/gen/department-directory/v1"
 	reportsubmissionv1 "github.com/jurwaCST/Jurwa/proto/gen/report-submission/v1"
 	"github.com/jurwaCST/Jurwa/services/notification/adapters/in/events"
+	"github.com/jurwaCST/Jurwa/services/notification/adapters/out/directoryclient"
 	"github.com/jurwaCST/Jurwa/services/notification/adapters/out/reportclient"
 	"github.com/jurwaCST/Jurwa/services/notification/application"
 )
 
-// startConsumers reads report.submitted and status.changed when REDIS_URL is
-// set (SCRUM-155). With the store in memory every stream is read again from
+// startConsumers reads report.submitted and status.changed (SCRUM-155), and
+// report.routed and report.reassigned (SCRUM-162), when REDIS_URL is set. With the store in memory every stream is read again from
 // its first event on start (Rewind), so messages come back after a restart;
 // events seen before are skipped by their id. With PostgreSQL the group
 // carries on where it stopped.
@@ -58,6 +60,18 @@ func startConsumers(ctx context.Context, app *application.Service, serviceName s
 	}
 	reports := reportclient.New(reportsubmissionv1.NewReportSubmissionServiceClient(conn))
 
+	// SCRUM-162: the post of the person a report reaches, for the message.
+	dirConn, err := grpc.NewClient(envOr("DEPARTMENT_DIRECTORY_ADDR", directoryclient.DefaultAddr),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithChainUnaryInterceptor(resilience.UnaryClientInterceptor(resilience.DefaultConfig())),
+	)
+	if err != nil {
+		_ = bus.Close()
+		_ = conn.Close()
+		return err
+	}
+	positions := directoryclient.New(departmentdirectoryv1.NewDepartmentDirectoryServiceClient(dirConn))
+
 	consumer, _ := os.Hostname()
 	if consumer == "" {
 		consumer = serviceName
@@ -65,7 +79,8 @@ func startConsumers(ctx context.Context, app *application.Service, serviceName s
 	go func() {
 		defer bus.Close()
 		defer conn.Close()
-		if err := events.NewConsumer(app, reports).Run(ctx, bus, consumer); err != nil {
+		defer dirConn.Close()
+		if err := events.NewConsumer(app, reports, positions).Run(ctx, bus, consumer); err != nil {
 			slog.Error("event consumer stopped", "error", err)
 			os.Exit(1)
 		}

@@ -50,3 +50,9 @@ var (
 type Reports interface {
 	GetReport(ctx context.Context, reportID string) (Report, error)
 }
+
+// Positions names the post a user holds, for example "Block Councillor (HC)",
+// from department-directory (SCRUM-162). "" when the user holds none.
+type Positions interface {
+	TitleOf(ctx context.Context, userID string) (string, error)
+}

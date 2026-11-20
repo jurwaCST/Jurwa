@@ -410,9 +410,4 @@ describe('notifications bell', () => {
     expect(await screen.findByRole('link', { name: 'Notifications' })).toBeInTheDocument()
   })
 
-  it('gives staff no bell', () => {
-    signInAs('STAFF')
-    renderAt('/')
-    expect(screen.queryByRole('link', { name: /^Notifications/ })).not.toBeInTheDocument()
-  })
 })
