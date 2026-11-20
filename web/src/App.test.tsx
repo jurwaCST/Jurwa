@@ -170,6 +170,11 @@ describe('role guards', () => {
     ['/president', 'PRESIDENT', 'President dashboard'],
     ['/reports', 'STUDENT', 'My reports'],
     ['/notifications', 'STUDENT', 'Notifications'],
+    // SCRUM-162: everyone gets messages about the reports that reach them.
+    ['/notifications', 'STAFF', 'Notifications'],
+    ['/notifications', 'CATEGORY_HEAD', 'Notifications'],
+    ['/notifications', 'SYSTEM_ADMIN', 'Notifications'],
+    ['/notifications', 'PRESIDENT', 'Notifications'],
   ])('%s is open to %s', (path, role, heading) => {
     signInAs(role)
     renderAt(path)
@@ -182,7 +187,6 @@ describe('role guards', () => {
     ['/president', 'SYSTEM_ADMIN'],
     ['/reports', 'STAFF'],
     ['/reports/r1', 'CATEGORY_HEAD'],
-    ['/notifications', 'STAFF'],
   ])('%s is refused to %s', (path, role) => {
     signInAs(role)
     renderAt(path)
@@ -374,6 +378,14 @@ describe('notifications bell', () => {
 
     expect(await screen.findByRole('link', { name: 'Notifications, new' })).toHaveAttribute('href', '/notifications')
     expect((fetchMock.mock.calls[0] as [string])[0]).toMatch(/\/me\/notifications\?pageSize=1$/)
+  })
+
+  // SCRUM-162: the bell is for every role, not only students.
+  it.each(['CATEGORY_HEAD', 'STAFF'])('shows the bell to %s too', async (role) => {
+    vi.stubGlobal('fetch', answer([newest]))
+    signInAs(role)
+    renderAt('/staff')
+    expect(await screen.findByRole('link', { name: 'Notifications, new' })).toHaveAttribute('href', '/notifications')
   })
 
   it('shows no dot when the newest message was already seen', async () => {

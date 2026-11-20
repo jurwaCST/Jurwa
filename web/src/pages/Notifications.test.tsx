@@ -13,12 +13,10 @@ vi.mock('../api/client', async (importOriginal) => {
 })
 
 const ME = 'student-1'
+const STUDENT = { id: ME, email: 'pema@rub.edu.bt', fullName: 'Pema Lhamo', roles: ['STUDENT'] }
+const auth = vi.hoisted(() => ({ user: null as unknown }))
 vi.mock('../auth/useAuth', () => ({
-  useAuth: () => ({
-    user: { id: ME, email: 'pema@rub.edu.bt', fullName: 'Pema Lhamo', roles: ['STUDENT'] },
-    login: vi.fn(),
-    logout: vi.fn(),
-  }),
+  useAuth: () => ({ user: auth.user, login: vi.fn(), logout: vi.fn() }),
 }))
 
 const get = vi.mocked(api.get)
@@ -58,6 +56,7 @@ function renderPage() {
 }
 
 beforeEach(() => {
+  auth.user = STUDENT
   get.mockReset()
   localStorage.clear()
   // Only the date is fixed, so "Today" and "Yesterday" do not depend on the day the test runs.
@@ -129,5 +128,34 @@ describe('SCRUM-144 notifications page', () => {
 
     await screen.findByRole('link', { name: 'Your report is resolved' })
     expect(lastSeen(ME)).toBe(resolved.createdAt)
+  })
+})
+
+// SCRUM-162: staff and heads read their messages here too. Their report opens
+// on their board, and they have nothing to report.
+describe('SCRUM-162 notifications for staff', () => {
+  const COUNCILLOR = { id: 'u-hc', email: 'hc.cst@rub.edu.bt', fullName: 'Block Councillor (HC)', roles: ['STAFF'] }
+  const assignedToYou = {
+    id: 'n9',
+    eventType: 'report.reassigned',
+    reportId: 'r1',
+    subject: 'New report assigned to you',
+    body: 'HC, Floor 1, Left wing bathroom: open it on your board.',
+    createdAt: '2026-11-12T08:00:00Z',
+  }
+
+  it('links a message to the board', async () => {
+    auth.user = COUNCILLOR
+    get.mockResolvedValue({ notifications: [assignedToYou], nextPageToken: '' })
+    renderPage()
+    expect(await screen.findByRole('link', { name: 'New report assigned to you' })).toHaveAttribute('href', '/staff')
+  })
+
+  it('offers no "Report an issue" when there is nothing yet', async () => {
+    auth.user = COUNCILLOR
+    get.mockResolvedValue({ notifications: [], nextPageToken: '' })
+    renderPage()
+    expect(await screen.findByRole('heading', { name: 'No notifications yet' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Report an issue' })).not.toBeInTheDocument()
   })
 })

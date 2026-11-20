@@ -1,0 +1,38 @@
+SCRUM-162 tests first, 21 November 2026, before any code change.
+
+$ go test ./services/notification/...
+services\notification\adapters\out\directoryclient\client_test.go:37:7: undefined: New
+services\notification\adapters\out\directoryclient\client_test.go:49:12: undefined: New
+services\notification\adapters\in\events\consumer_test.go:74:35: too many arguments in call to NewConsumer
+services\notification\adapters\in\events\consumer_test.go:250:23: c.ReportRouted undefined (type *Consumer has no field or method ReportRouted)
+services\notification\adapters\in\events\consumer_test.go:268:23: c.ReportReassigned undefined (type *Consumer has no field or method ReportReassigned)
+services\notification\adapters\in\events\consumer_test.go:283:23: c.ReportReassigned undefined (type *Consumer has no field or method ReportReassigned)
+services\notification\adapters\in\events\consumer_test.go:293:23: c.ReportReassigned undefined (type *Consumer has no field or method ReportReassigned)
+services\notification\adapters\in\events\consumer_test.go:300:23: c.ReportRouted undefined (type *Consumer has no field or method ReportRouted)
+services\notification\adapters\in\events\consumer_test.go:301:23: c.ReportRouted undefined (type *Consumer has no field or method ReportRouted)
+services\notification\adapters\in\events\consumer_test.go:310:40: too many arguments in call to NewConsumer
+services\notification\adapters\in\events\consumer_test.go:311:23: c.ReportRouted undefined (type *Consumer has no field or method ReportRouted)
+services\notification\adapters\in\events\consumer_test.go:321:20: c.ReportRouted undefined (type *Consumer has no field or method ReportRouted)
+services\notification\adapters\in\events\consumer_test.go:321:20: too many errors
+FAIL	github.com/jurwaCST/Jurwa/services/notification/adapters/in/events [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/in/grpc	1.980s
+FAIL	github.com/jurwaCST/Jurwa/services/notification/adapters/out/directoryclient [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/out/logsender	2.939s
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/out/memory	2.518s
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/out/postgres	2.495s
+ok  	github.com/jurwaCST/Jurwa/services/notification/adapters/out/reportclient	1.692s
+ok  	github.com/jurwaCST/Jurwa/services/notification/application	2.544s
+ok  	github.com/jurwaCST/Jurwa/services/notification/cmd/server	2.010s
+ok  	github.com/jurwaCST/Jurwa/services/notification/domain	2.529s
+
+$ npx vitest run --maxWorkers=1 src/App.test.tsx src/pages/Notifications.test.tsx
+     × /notifications is open to STAFF 14ms
+     × /notifications is open to CATEGORY_HEAD 9ms
+     × /notifications is open to SYSTEM_ADMIN 8ms
+     × /notifications is open to PRESIDENT 10ms
+     × shows the bell to CATEGORY_HEAD too 1022ms
+     × shows the bell to STAFF too 1011ms
+     × links a message to the board 22ms
+     × offers no "Report an issue" when there is nothing yet 12ms
+ Test Files  2 failed (2)
+      Tests  8 failed | 44 passed (52)
