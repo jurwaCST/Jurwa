@@ -70,3 +70,12 @@ func (s *Service) Get(ctx context.Context, reportID string) (domain.Feedback, er
 	}
 	return s.repo.GetByReport(ctx, reportID)
 }
+
+// RatingSummary is how many reports were rated and the average (SCRUM-164).
+func (s *Service) RatingSummary(ctx context.Context) (domain.RatingSummary, error) {
+	all, err := s.repo.List(ctx)
+	if err != nil {
+		return domain.RatingSummary{}, fmt.Errorf("list feedback: %w", err)
+	}
+	return domain.Summarize(all), nil
+}

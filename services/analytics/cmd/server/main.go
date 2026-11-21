@@ -78,6 +78,12 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
+	// SCRUM-160: new reports and status changes from the event bus.
+	if err := startConsumers(ctx, app, serviceName, os.Getenv("DATABASE_URL") == ""); err != nil {
+		slog.Error("cannot read the event bus", "error", err)
+		os.Exit(1)
+	}
+
 	go func() {
 		<-ctx.Done()
 		slog.Info("shutting down")

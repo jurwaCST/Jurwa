@@ -1,0 +1,7 @@
+SCRUM-163 round 2 tests first (clean-up after a delete), 21 November 2026, before any code change.
+$ go vet on the four consumers and the analytics domain
+vet.exe: services\analytics\domain\projection_test.go:257:52: undefined: ReportWithdrawn
+vet.exe: services\sla-tracking\adapters\in\events\consumer_test.go:140:20: undefined: OnReportWithdrawn
+vet.exe: services\analytics\adapters\in\events\consumer_test.go:165:23: c.ReportWithdrawn undefined (type *Consumer has no field or method ReportWithdrawn)
+vet.exe: services\notification\adapters\in\events\consumer_test.go:338:23: c.ReportWithdrawn undefined (type *Consumer has no field or method ReportWithdrawn)
+vet.exe: services\report-history\adapters\in\events\consumer_test.go:230:23: c.ReportWithdrawn undefined (type *Consumer has no field or method ReportWithdrawn)

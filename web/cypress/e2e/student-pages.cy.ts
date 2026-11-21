@@ -98,9 +98,9 @@ describe('student pages', () => {
   it('on a resolved report the student gives four stars and sees the thank-you', () => {
     cy.apiLogin(email, password).then((token) => {
       sendHostelReport(token, `E2E ${Date.now()}: a broken window, now fixed`).then((id) => {
-        // The DSA Category Head (Hostel rule) moves it to Resolved.
+        // The SSO (Hostel rule since SCRUM-158) moves it to Resolved.
         cy.fixture('users.json').then((users) => {
-          cy.apiLogin(users.categoryHeadDSA, demoPassword()).then((head) => {
+          cy.apiLogin(users.categoryHeadSSO, demoPassword()).then((head) => {
             waitForStatus(head, id, 'ASSIGNED')
               .then((s) => changeStatus(head, id, s, 'IN_PROGRESS'))
               .then((s) => changeStatus(head, id, s, 'RESOLVED'))

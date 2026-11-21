@@ -1,0 +1,15 @@
+SCRUM-160 tests first, 21 November 2026: analytics has no event consumer yet, so the new tests do not build.
+$ go test ./services/analytics/...
+services\analytics\adapters\in\events\consumer_test.go:28:34: undefined: Consumer
+services\analytics\adapters\in\events\consumer_test.go:30:9: undefined: NewConsumer
+services\analytics\adapters\in\events\consumer_test.go:70:90: undefined: Streams
+services\analytics\adapters\in\events\consumer_test.go:71:31: undefined: Group
+services\analytics\adapters\in\events\consumer_test.go:132:25: undefined: ErrUnknownReport
+FAIL	github.com/jurwaCST/Jurwa/services/analytics/adapters/in/events [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/analytics/adapters/in/grpc	2.202s
+ok  	github.com/jurwaCST/Jurwa/services/analytics/adapters/out/memory	2.788s
+ok  	github.com/jurwaCST/Jurwa/services/analytics/adapters/out/postgres	3.098s
+ok  	github.com/jurwaCST/Jurwa/services/analytics/application	2.804s
+ok  	github.com/jurwaCST/Jurwa/services/analytics/cmd/server	2.298s
+ok  	github.com/jurwaCST/Jurwa/services/analytics/domain	2.835s
+FAIL

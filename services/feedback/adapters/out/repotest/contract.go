@@ -64,6 +64,27 @@ func Run(t *testing.T, newRepo func(t *testing.T) ports.FeedbackRepository) {
 		assert.Equal(t, int32(5), got.Rating)
 	})
 
+	// SCRUM-164: the rating summary reads every feedback.
+	t.Run("list returns every feedback", func(t *testing.T) {
+		r := newRepo(t)
+		empty, err := r.List(ctx)
+		require.NoError(t, err)
+		assert.Empty(t, empty)
+
+		require.NoError(t, r.Create(ctx, feedback("eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee", 4, "")))
+		other := feedback("ffffffff-ffff-4fff-8fff-ffffffffffff", 2, "")
+		other.ReportID = "44444444-4444-4444-8444-444444444444"
+		require.NoError(t, r.Create(ctx, other))
+
+		all, err := r.List(ctx)
+		require.NoError(t, err)
+		ratings := []int32{}
+		for _, f := range all {
+			ratings = append(ratings, f.Rating)
+		}
+		assert.ElementsMatch(t, []int32{4, 2}, ratings)
+	})
+
 	t.Run("a report with no feedback is not found", func(t *testing.T) {
 		_, err := newRepo(t).GetByReport(ctx, report)
 		assert.ErrorIs(t, err, domain.ErrNotFound)

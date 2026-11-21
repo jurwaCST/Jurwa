@@ -1,0 +1,47 @@
+SCRUM-164 tests first, 21 November 2026, before any code change.
+
+$ go test -p 1 ./services/feedback/... ./services/api-gateway/adapters/in/http/ ./services/authorization/...
+services\feedback\adapters\in\grpc\handler_test.go:98:18: h.GetRatingSummary undefined (type *Handler has no field or method GetRatingSummary)
+services\feedback\adapters\in\grpc\handler_test.go:98:52: undefined: feedbackv1.GetRatingSummaryRequest
+services\feedback\adapters\in\grpc\handler_test.go:108:16: h.GetRatingSummary undefined (type *Handler has no field or method GetRatingSummary)
+services\feedback\adapters\in\grpc\handler_test.go:108:50: undefined: feedbackv1.GetRatingSummaryRequest
+FAIL	github.com/jurwaCST/Jurwa/services/feedback/adapters/in/grpc [build failed]
+services\feedback\adapters\out\repotest\contract.go:70:19: r.List undefined (type ports.FeedbackRepository has no field or method List)
+services\feedback\adapters\out\repotest\contract.go:79:17: r.List undefined (type ports.FeedbackRepository has no field or method List)
+FAIL	github.com/jurwaCST/Jurwa/services/feedback/adapters/out/memory [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/feedback/adapters/out/postgres	(cached)
+FAIL	github.com/jurwaCST/Jurwa/services/feedback/adapters/out/repotest [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/feedback/adapters/out/statusclient	(cached)
+services\feedback\application\service_test.go:155:18: svc.RatingSummary undefined (type *Service has no field or method RatingSummary)
+services\feedback\application\service_test.go:157:25: undefined: domain.RatingSummary
+services\feedback\application\service_test.go:164:17: svc.RatingSummary undefined (type *Service has no field or method RatingSummary)
+services\feedback\application\service_test.go:166:25: undefined: domain.RatingSummary
+services\feedback\application\service_test.go:168:66: NewService(failingRepo{}, &fakeStatus{…}).RatingSummary undefined (type *Service has no field or method RatingSummary)
+FAIL	github.com/jurwaCST/Jurwa/services/feedback/application [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/feedback/cmd/server	(cached)
+services\feedback\domain\feedback_test.go:108:9: undefined: Summarize
+services\feedback\domain\feedback_test.go:109:18: undefined: RatingSummary
+services\feedback\domain\feedback_test.go:111:8: undefined: Summarize
+services\feedback\domain\feedback_test.go:115:18: undefined: RatingSummary
+services\feedback\domain\feedback_test.go:115:35: undefined: Summarize
+FAIL	github.com/jurwaCST/Jurwa/services/feedback/domain [build failed]
+services\api-gateway\adapters\in\http\router_feedback_test.go:41:71: undefined: feedbackv1.GetRatingSummaryResponse
+services\api-gateway\adapters\in\http\router_feedback_test.go:46:21: undefined: feedbackv1.GetRatingSummaryResponse
+FAIL	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http [build failed]
+ok  	github.com/jurwaCST/Jurwa/services/authorization/adapters/in/grpc	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/authorization/adapters/out/memory	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/authorization/adapters/out/postgres	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/authorization/application	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/authorization/cmd/server	(cached)
+--- FAIL: TestEveryRoleAgainstEveryAction (0.00s)
+FAIL	github.com/jurwaCST/Jurwa/services/authorization/domain	1.814s
+
+$ npx vitest run --maxWorkers=1 src/pages/StaffView.test.tsx src/pages/AdminDashboard.test.tsx src/pages/PresidentDashboard.test.tsx
+     × saves the reason as a note the councillor can read, then reassigns 603ms
+     × shows the stars the student gave on a resolved report 1053ms
+     × says when a resolved report is not rated yet 1088ms
+     × shows the average rating and how many reports were rated 1020ms
+     × shows the average rating and how many reports were rated 1016ms
+     × says when nothing is rated yet 1015ms
+ Test Files  3 failed (3)
+      Tests  6 failed | 39 passed (45)

@@ -235,7 +235,13 @@ export default function ReportForm() {
     }
   }, [preview])
 
-  const buildings = useMemo(() => unique(locations.map((l) => l.location.building)), [locations])
+  // SCRUM-158: in the Academic Block the student picks their department (in
+  // place of a building), so the report reaches that department's HoD.
+  const byDepartment = category === 'ACADEMIC_BLOCK'
+  const buildings = useMemo(() => {
+    const list = unique(locations.map((l) => l.location.building))
+    return byDepartment ? [...list].sort((a, b) => a.localeCompare(b)) : list
+  }, [locations, byDepartment])
   const inBuilding = locations.filter((l) => l.location.building === building)
   const wings = unique(inBuilding.map((l) => l.location.wing))
   const inWing = wings.length ? inBuilding.filter((l) => l.location.wing === wing) : inBuilding
@@ -437,7 +443,7 @@ export default function ReportForm() {
             {!category && <p className="field-hint">Choose a category first.</p>}
             <div className="report-place">
               {category && buildings.length > 0 && (
-                <Field label="Building" error={missing === 'building' ? locationError : null}>
+                <Field label={byDepartment ? 'Department' : 'Building'} error={missing === 'building' ? locationError : null}>
                   <select
                     value={building}
                     onChange={(e) => {
@@ -446,7 +452,7 @@ export default function ReportForm() {
                       setArea('')
                     }}
                   >
-                    <option value="">Choose a building</option>
+                    <option value="">{byDepartment ? 'Choose your department' : 'Choose a building'}</option>
                     {buildings.map((b) => (
                       <option key={b} value={b}>
                         {b}

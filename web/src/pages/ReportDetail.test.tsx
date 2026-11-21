@@ -8,7 +8,7 @@ import ReportDetail from './ReportDetail'
 // The API client is replaced, so no gateway is needed. ApiError stays real.
 vi.mock('../api/client', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../api/client')>()
-  return { ...actual, api: { get: vi.fn(), post: vi.fn(), put: vi.fn(), upload: vi.fn(), blob: vi.fn() } }
+  return { ...actual, api: { get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn(), del: vi.fn(), upload: vi.fn(), blob: vi.fn() } }
 })
 
 const ME = 'student-1'
@@ -198,5 +198,81 @@ describe('SCRUM-143 report detail', () => {
     expect(await screen.findByText(/service is busy or unreachable/i)).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Try again' }))
     expect(await screen.findByText('The drain is clogged.')).toBeInTheDocument()
+  })
+})
+
+// SCRUM-163: the student changes or deletes their report while nobody has
+// started work on it (Open or Assigned).
+describe('SCRUM-163 edit or delete my report', () => {
+  const patch = vi.mocked(api.patch)
+  const del = vi.mocked(api.del)
+  const assigned = { [`/reports/${ID}/status`]: { status: { reportId: ID, status: 'ASSIGNED', version: 1 } } }
+
+  function renderWithList() {
+    return render(
+      <MemoryRouter initialEntries={[`/reports/${ID}`]}>
+        <Routes>
+          <Route path="/reports/:reportId" element={<ReportDetail />} />
+          <Route path="/reports" element={<h1>My reports list</h1>} />
+        </Routes>
+      </MemoryRouter>,
+    )
+  }
+
+  beforeEach(() => {
+    patch.mockReset()
+    del.mockReset()
+  })
+
+  it('changes the description', async () => {
+    stubGet(assigned)
+    patch.mockResolvedValue({ ...report, description: 'The drain is clogged and smells.' })
+    const user = userEvent.setup()
+    renderAt()
+    await user.click(await screen.findByRole('button', { name: 'Edit description' }))
+    const box = screen.getByLabelText('Description')
+    expect(box).toHaveValue('The drain is clogged.')
+    await user.clear(box)
+    await user.type(box, 'The drain is clogged and smells.')
+    await user.click(screen.getByRole('button', { name: 'Save description' }))
+
+    expect(patch).toHaveBeenCalledWith(`/reports/${ID}`, { description: 'The drain is clogged and smells.' })
+    expect(await screen.findByText('The drain is clogged and smells.')).toBeInTheDocument()
+    expect(screen.queryByLabelText('Description')).not.toBeInTheDocument()
+  })
+
+  it('deletes the report after asking, then goes back to My reports', async () => {
+    stubGet(assigned)
+    del.mockResolvedValue(undefined)
+    const user = userEvent.setup()
+    renderWithList()
+    await user.click(await screen.findByRole('button', { name: 'Delete report' }))
+    const ask = screen.getByRole('dialog', { name: 'Delete this report?' })
+    expect(del).not.toHaveBeenCalled()
+    await user.click(within(ask).getByRole('button', { name: 'Yes, delete it' }))
+
+    expect(del).toHaveBeenCalledWith(`/reports/${ID}`)
+    expect(await screen.findByRole('heading', { name: 'My reports list' })).toBeInTheDocument()
+  })
+
+  it('offers neither once someone works on it', async () => {
+    stubGet() // In progress
+    renderAt()
+    await screen.findByText('The drain is clogged.')
+    expect(screen.queryByRole('button', { name: 'Edit description' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Delete report' })).not.toBeInTheDocument()
+  })
+
+  it('explains when work started meanwhile', async () => {
+    stubGet(assigned)
+    patch.mockRejectedValue(new ApiError(422, 'report is in progress'))
+    const user = userEvent.setup()
+    renderAt()
+    await user.click(await screen.findByRole('button', { name: 'Edit description' }))
+    await user.type(screen.getByLabelText('Description'), ' Please hurry.')
+    await user.click(screen.getByRole('button', { name: 'Save description' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Someone has started work on it, so it can no longer be changed.',
+    )
   })
 })

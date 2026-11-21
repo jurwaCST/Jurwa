@@ -105,3 +105,33 @@ func TestPublishErrorIsReturned(t *testing.T) {
 	pub := New(failingBus{}, func() string { return "evt-1" }, time.Now)
 	assert.Error(t, pub.ReportSubmitted(context.Background(), sampleReport()))
 }
+
+// SCRUM-163: a withdrawn report goes on events:report.withdrawn with who held it.
+func TestReportWithdrawnGoesOnTheStream(t *testing.T) {
+	bus := eventbus.NewMemory()
+	now := time.Date(2026, 11, 21, 9, 0, 0, 0, time.UTC)
+	pub := New(bus, func() string { return "evt-9" }, func() time.Time { return now })
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	got := make(chan []byte, 1)
+	go func() {
+		_ = bus.Subscribe(ctx, eventbus.StreamReportWithdrawn, "test", "c1", func(_ context.Context, p []byte) error {
+			got <- p
+			return nil
+		})
+	}()
+	require.NoError(t, pub.ReportWithdrawn(ctx, sampleReport(), "user-sso"))
+
+	var ev eventsv1.ReportWithdrawn
+	select {
+	case p := <-got:
+		require.NoError(t, proto.Unmarshal(p, &ev))
+	case <-time.After(2 * time.Second):
+		t.Fatal("no event")
+	}
+	assert.Equal(t, "evt-9", ev.GetMeta().GetEventId())
+	assert.Equal(t, sampleReport().ID, ev.GetReportId())
+	assert.Equal(t, sampleReport().ReporterID, ev.GetReporterId())
+	assert.Equal(t, "user-sso", ev.GetCurrentAssigneeId())
+}

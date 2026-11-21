@@ -27,6 +27,8 @@ Every gRPC client goes through `pkg/resilience` (2 s timeout, up to 3 attempts f
 | `GET /categories/{category}/locations` | location-taxonomy ListLocations | any signed-in user |
 | `POST /reports` | report-submission SubmitReport (returns 201) | Student |
 | `GET /reports/{reportId}` | report-submission GetReport | Student (own), Category Head, Staff, System Administrator |
+| `PATCH /reports/{reportId}` | report-submission UpdateDescription, after status-lifecycle says Open or Assigned (else 422) (SCRUM-163) | Student (own) |
+| `DELETE /reports/{reportId}` | report-submission WithdrawReport (204), with the holder from report-history, after status-lifecycle says Open or Assigned (else 422) (SCRUM-163) | Student (own) |
 | `POST /reports/{reportId}/notes` | internal-notes AddNote (returns 201) | Category Head, Staff |
 | `GET /reports/{reportId}/notes` | internal-notes ListNotes | Category Head, Staff, System Administrator |
 | `GET /me/reports` | report-history ListReportsByReporter (`?pageSize=` 1 to 100, `?pageToken=`) | Student; the reporter id comes from the JWT |
@@ -41,6 +43,7 @@ Every gRPC client goes through `pkg/resilience` (2 s timeout, up to 3 attempts f
 | `GET /reports/{reportId}/feedback` | feedback GetFeedback | Student (own, checked with report-submission), Category Head, System Administrator |
 | `GET /dashboard/summary` | analytics GetSummary (optional `?from=` and `?to=`, RFC 3339) | System Administrator, College President |
 | `GET /dashboard/categories` | analytics GetCategoryBreakdown (same `?from=` and `?to=`) | System Administrator, College President |
+| `GET /dashboard/ratings` | feedback GetRatingSummary: `{"count": "7", "averageRating": 4.2}`, count left out when 0 (SCRUM-164) | System Administrator, College President |
 | `POST /photos` | photo-media UploadPhoto (returns 201 `{"photoId": "..."}`) | Student; the uploader id comes from the JWT |
 | `GET /photos/{photoId}` | photo-media GetPhoto (returns the raw image) | Student (own), Category Head, Staff, System Administrator |
 

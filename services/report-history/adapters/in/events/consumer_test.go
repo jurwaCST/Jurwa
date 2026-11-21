@@ -211,5 +211,48 @@ func TestStreamsAndGroup(t *testing.T) {
 	assert.Equal(t, "report-history", Group)
 	assert.ElementsMatch(t, []string{
 		eventbus.StreamReportSubmitted, eventbus.StreamReportRouted, eventbus.StreamStatusChanged, eventbus.StreamReportReassigned,
+		eventbus.StreamReportWithdrawn, // SCRUM-163
 	}, Streams())
+}
+
+// ---- SCRUM-163: a withdrawn report leaves My reports and the staff board ----
+
+func withdrawnEvent(n int) *eventsv1.ReportWithdrawn {
+	return &eventsv1.ReportWithdrawn{Meta: meta(n, t0.Add(2*time.Minute)), ReportId: reportA, ReporterId: studentA, CurrentAssigneeId: dsa}
+}
+
+func TestAWithdrawnReportLeavesBothLists(t *testing.T) {
+	app := newApp()
+	c := NewConsumer(app)
+	ctx := context.Background()
+	require.NoError(t, c.ReportSubmitted(ctx, payload(t, submittedEvent(1))))
+	require.NoError(t, c.ReportRouted(ctx, payload(t, routedEvent(2))))
+
+	require.NoError(t, c.ReportWithdrawn(ctx, payload(t, withdrawnEvent(3))))
+
+	mine, _, err := app.ListReportsByReporter(ctx, studentA, 0, "")
+	require.NoError(t, err)
+	assert.Empty(t, mine, "gone from My reports")
+	theirs, _, err := app.ListReportsByAssignee(ctx, dsa, 0, "")
+	require.NoError(t, err)
+	assert.Empty(t, theirs, "gone from the board")
+}
+
+// After a restart the streams are read again, side by side, so the withdrawal
+// can come before the report: the report must not come back.
+func TestAWithdrawnReportDoesNotComeBack(t *testing.T) {
+	app := newApp()
+	c := NewConsumer(app)
+	ctx := context.Background()
+	require.NoError(t, c.ReportWithdrawn(ctx, payload(t, withdrawnEvent(3))))
+	require.NoError(t, c.ReportSubmitted(ctx, payload(t, submittedEvent(1))))
+
+	mine, _, err := app.ListReportsByReporter(ctx, studentA, 0, "")
+	require.NoError(t, err)
+	assert.Empty(t, mine)
+	assert.Error(t, c.ReportWithdrawn(ctx, []byte("not a protobuf")))
+}
+
+func TestReadsTheWithdrawnStream(t *testing.T) {
+	assert.Contains(t, Streams(), eventbus.StreamReportWithdrawn)
 }

@@ -75,6 +75,8 @@ const (
 	ActionReportNoteAdd        = "report.notes.add"
 	ActionReportNoteRead       = "report.notes.read"
 	ActionReportFeedbackSubmit = "report.feedback.submit"
+	ActionReportUpdate         = "report.update"   // SCRUM-163
+	ActionReportWithdraw       = "report.withdraw" // SCRUM-163
 	ActionReportFeedbackRead   = "report.feedback.read"
 	ActionReportAuditRead      = "report.audit.read"
 	ActionDepartmentList       = "department.list"
@@ -130,7 +132,9 @@ func DefaultPolicy() Policy {
 		ActionReportNoteAdd:        {CategoryHead, Staff},
 		ActionReportNoteRead:       {CategoryHead, Staff, SystemAdmin},
 		ActionReportFeedbackSubmit: {Student},
-		ActionReportFeedbackRead:   {Student, CategoryHead, SystemAdmin},
+		ActionReportUpdate:         {Student},                                   // SCRUM-163: the student who sent it, checked by the gateway
+		ActionReportWithdraw:       {Student},                                   // SCRUM-163
+		ActionReportFeedbackRead:   {Student, CategoryHead, Staff, SystemAdmin}, // SCRUM-164: Staff, who fixed it
 		ActionReportAuditRead:      {SystemAdmin},
 		ActionDepartmentList:       {CategoryHead, SystemAdmin},
 		ActionRoutingRuleRead:      {SystemAdmin},

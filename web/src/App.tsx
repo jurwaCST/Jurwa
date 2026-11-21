@@ -50,10 +50,11 @@ export default function App() {
               </RequireRole>
             }
           />
+          {/* SCRUM-162: every role gets messages about the reports that reach them. */}
           <Route
             path="notifications"
             element={
-              <RequireRole roles={['STUDENT']}>
+              <RequireRole roles={['STUDENT', 'CATEGORY_HEAD', 'STAFF', 'SYSTEM_ADMIN', 'PRESIDENT']}>
                 <Notifications />
               </RequireRole>
             }

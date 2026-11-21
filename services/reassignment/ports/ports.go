@@ -34,6 +34,13 @@ type ReportReassigned struct {
 	CorrelationID string
 }
 
+// HolderLookup finds who holds a position in department-directory (SCRUM-158).
+// It returns "" when the position is vacant, inactive or unknown, and an error
+// when the directory cannot be reached.
+type HolderLookup interface {
+	GetHolder(ctx context.Context, positionCode string) (string, error)
+}
+
 // EventPublisher sends events to the event bus (Redis Streams later).
 type EventPublisher interface {
 	PublishReportReassigned(ctx context.Context, ev ReportReassigned) error

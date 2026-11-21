@@ -1,6 +1,6 @@
 // The College President's read-only dashboard (SCRUM-99, FR-29, FR-30).
 // Written before the page. fetch is faked per URL, like the gateway answers.
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -28,7 +28,15 @@ let fetchMock: ReturnType<typeof vi.fn>
 
 beforeEach(() => {
   fetchMock = vi.fn((url: string) =>
-    Promise.resolve(json(url.includes('/dashboard/categories') ? categories : summary)),
+    Promise.resolve(
+      json(
+        url.includes('/dashboard/categories')
+          ? categories
+          : url.includes('/dashboard/ratings')
+            ? { count: '3', averageRating: 4.666 } // SCRUM-164
+            : summary,
+      ),
+    ),
   )
   vi.stubGlobal('fetch', fetchMock)
 })
@@ -44,6 +52,21 @@ function renderPage() {
     </MemoryRouter>,
   )
 }
+
+// SCRUM-159: new reports show up without reloading the page.
+describe('SCRUM-159 President dashboard refreshes by itself', () => {
+  afterEach(() => vi.useRealTimers())
+
+  it('fetches the counts again every 15 seconds', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    renderPage()
+    await screen.findByRole('region', { name: 'Report counts' })
+    const calls = fetchMock.mock.calls.length
+    await vi.advanceTimersByTimeAsync(15_000)
+    await waitFor(() => expect(fetchMock.mock.calls.length).toBeGreaterThan(calls))
+    expect(screen.getByRole('region', { name: 'Report counts' })).toBeInTheDocument()
+  })
+})
 
 describe('President dashboard', () => {
   it('shows the counts, the resolution rate and the average time from analytics', async () => {
@@ -91,8 +114,9 @@ describe('President dashboard', () => {
     await user.click(screen.getByRole('button', { name: 'This week' }))
 
     expect(screen.getByRole('button', { name: 'This week' })).toHaveAttribute('aria-pressed', 'true')
-    const lastUrl = fetchMock.mock.calls.at(-1)![0] as string
-    expect(lastUrl).toMatch(/\?from=\d{4}-\d{2}-\d{2}T[\d:.]+Z$/)
+    // The last counts request (the ratings tile asks separately, SCRUM-164).
+    const counts = fetchMock.mock.calls.map((c) => c[0] as string).filter((u) => !u.includes('/dashboard/ratings'))
+    expect(counts.at(-1)).toMatch(/\?from=\d{4}-\d{2}-\d{2}T[\d:.]+Z$/)
   })
 
   it('shows an error with a way to try again when analytics cannot be reached', async () => {
@@ -123,5 +147,14 @@ describe('President dashboard', () => {
       </MemoryRouter>,
     )
     expect(screen.getByRole('heading', { name: 'Not allowed' })).toBeInTheDocument()
+  })
+})
+
+describe('SCRUM-164 President dashboard ratings', () => {
+  it('shows the average rating and how many reports were rated', async () => {
+    renderPage()
+    const tile = await screen.findByRole('region', { name: 'Student ratings' })
+    expect(tile).toHaveTextContent('4.7 / 5')
+    expect(tile).toHaveTextContent('3 rated reports')
   })
 })

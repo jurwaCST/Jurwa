@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import App from '../App'
@@ -26,8 +26,7 @@ describe('home page categories', () => {
 })
 
 // SCRUM-156: only students report, so only they see where a report goes.
-// The other roles see their own pages, and a Category Head is told that late
-// reports come back to them.
+// The other roles see their own pages.
 function signInAs(role: string) {
   sessionStorage.setItem(
     SESSION_KEY,
@@ -48,7 +47,6 @@ function renderHome() {
 }
 
 const routeHeading = { level: 2, name: 'Where your report goes' }
-const escalatedToYou = /passes its time limit, it is escalated to you automatically/
 
 describe('SCRUM-156 signed-in home by role', () => {
   afterEach(() => {
@@ -62,23 +60,52 @@ describe('SCRUM-156 signed-in home by role', () => {
     expect(screen.getByRole('heading', routeHeading)).toBeInTheDocument()
   })
 
-  it('tells a Category Head that late reports come to them, without the student route', () => {
-    signInAs('CATEGORY_HEAD')
-    renderHome()
-    expect(screen.getByRole('link', { name: 'Staff view' })).toBeInTheDocument()
-    expect(screen.getByText(escalatedToYou)).toBeInTheDocument()
-    expect(screen.queryByRole('heading', routeHeading)).not.toBeInTheDocument()
-  })
-
+  // SCRUM-159: the admin and the President have one page each, so home takes
+  // them straight to their dashboard.
   it.each([
-    ['STAFF', 'Staff view'],
     ['SYSTEM_ADMIN', 'Admin dashboard'],
     ['PRESIDENT', 'President dashboard'],
-  ])('gives %s only their page', (role, tile) => {
+  ])('takes %s straight to their dashboard', async (role, heading) => {
     signInAs(role)
     renderHome()
-    expect(screen.getByRole('link', { name: tile })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: heading })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /Kuzuzangpo/ })).not.toBeInTheDocument()
     expect(screen.queryByRole('heading', routeHeading)).not.toBeInTheDocument()
-    expect(screen.queryByText(escalatedToYou)).not.toBeInTheDocument()
+  })
+})
+
+// SCRUM-158: a Category Head or a staff member (an HoD or a councillor) has one
+// page, their board, so signing in takes them straight there, under their name.
+describe('SCRUM-158 heads and staff land on their board', () => {
+  afterEach(() => {
+    sessionStorage.clear()
+  })
+
+  it.each(['CATEGORY_HEAD', 'STAFF'])('takes %s from home straight to their board', async (role) => {
+    signInAs(role)
+    renderHome()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Test User' })).toBeInTheDocument()
+    expect(screen.getByText(/Reports assigned to you/)).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /Kuzuzangpo/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', routeHeading)).not.toBeInTheDocument()
+  })
+})
+
+// SCRUM-158: who receives each category, as the routing rules send it.
+describe('SCRUM-158 who fixes what', () => {
+  it('sends Hostel and Others to the SSO and the Academic Block to the department HoD', () => {
+    renderHome()
+    const places = screen.getByRole('region', { name: 'Who fixes what' })
+    const hostel = within(places).getByRole('heading', { level: 3, name: 'Hostel' }).closest('li')!
+    const block = within(places).getByRole('heading', { level: 3, name: 'Academic Block' }).closest('li')!
+    const others = within(places).getByRole('heading', { level: 3, name: 'Others' }).closest('li')!
+    expect(hostel).toHaveTextContent('Goes to the SSO')
+    expect(block).toHaveTextContent("Goes to your department's HoD")
+    expect(others).toHaveTextContent('Goes to the SSO')
+  })
+
+  it('says a late report goes up to the DSA or the DAA', () => {
+    renderHome()
+    expect(screen.getByText(/escalated to the DSA, or to the DAA for the Academic Block/)).toBeInTheDocument()
   })
 })

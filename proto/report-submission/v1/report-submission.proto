@@ -13,6 +13,14 @@ service ReportSubmissionService {
   rpc SubmitReport(SubmitReportRequest) returns (SubmitReportResponse);
   // Errors: NOT_FOUND when the id is unknown.
   rpc GetReport(GetReportRequest) returns (GetReportResponse);
+  // Changes the description, with the same rules as the form (SCRUM-163). Only
+  // the student who sent it; the api-gateway checks first that nobody works on it yet.
+  // Errors: NOT_FOUND, PERMISSION_DENIED for another student, INVALID_ARGUMENT.
+  rpc UpdateDescription(UpdateDescriptionRequest) returns (UpdateDescriptionResponse);
+  // Deletes the report and publishes report.withdrawn (SCRUM-163). Only the
+  // student who sent it; the api-gateway checks first that nobody works on it yet.
+  // Errors: NOT_FOUND, PERMISSION_DENIED for another student.
+  rpc WithdrawReport(WithdrawReportRequest) returns (WithdrawReportResponse);
 }
 
 // The report form.
@@ -35,3 +43,21 @@ message GetReportRequest {
 message GetReportResponse {
   jurwa.common.v1.Report report = 1;
 }
+
+message UpdateDescriptionRequest {
+  string report_id = 1; // required, UUID
+  string reporter_id = 2; // required, set by api-gateway from the JWT
+  string description = 3; // required, not blank, at most 500 characters
+}
+
+message UpdateDescriptionResponse {
+  jurwa.common.v1.Report report = 1;
+}
+
+message WithdrawReportRequest {
+  string report_id = 1; // required, UUID
+  string reporter_id = 2; // required, set by api-gateway from the JWT
+  string current_assignee_id = 3; // who holds it now, "" when nobody; told in report.withdrawn
+}
+
+message WithdrawReportResponse {}

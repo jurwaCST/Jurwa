@@ -38,3 +38,14 @@ func (r *Repository) FindByID(_ context.Context, id string) (domain.Report, erro
 	}
 	return report, nil
 }
+
+// Delete removes the report or returns domain.ErrReportNotFound (SCRUM-163).
+func (r *Repository) Delete(_ context.Context, id string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if _, ok := r.reports[id]; !ok {
+		return domain.ErrReportNotFound
+	}
+	delete(r.reports, id)
+	return nil
+}

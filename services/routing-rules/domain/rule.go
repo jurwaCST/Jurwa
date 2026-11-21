@@ -3,6 +3,7 @@ package domain
 import (
 	"errors"
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 )
@@ -60,12 +61,39 @@ func (r Rule) Validate() error {
 	return nil
 }
 
-// DefaultRules are the three agreed rules (decision 2): Hostel to DSA,
-// Academic Block to DAA, Others to SSO.
+// DepartmentHoDs maps each CST department, as the student picks it for an
+// Academic Block report, to its HoD position in department-directory
+// (SCRUM-158). The names are the Academic Block "buildings" in location-taxonomy.
+var DepartmentHoDs = map[string]string{
+	"Architecture":                         "HOD_ARCH",
+	"Civil & Environmental Engineering":    "HOD_CIVIL",
+	"Computing Technologies":               "HOD_CT",
+	"Electrical & Electronics Engineering": "HOD_EEE",
+	"Mechanical Engineering":               "HOD_MECH",
+	"Science & Humanities":                 "HOD_SH",
+}
+
+// DefaultRules are the agreed rules (SCRUM-158): Hostel and Others go to the
+// SSO, who hands them to a councillor; an Academic Block report goes to the HoD
+// of the department the student picked. The Academic Block rule without a
+// building catches a report that names no department (an old one): the DAA.
 func DefaultRules() []Rule {
-	return []Rule{
-		{Category: Hostel, TargetPosition: "DSA", Priority: DefaultPriority, Active: true},
+	rules := []Rule{
+		{Category: Hostel, TargetPosition: "SSO", Priority: DefaultPriority, Active: true},
 		{Category: AcademicBlock, TargetPosition: "DAA", Priority: DefaultPriority, Active: true},
 		{Category: Others, TargetPosition: "SSO", Priority: DefaultPriority, Active: true},
 	}
+	for _, d := range sortedDepartments() {
+		rules = append(rules, Rule{Category: AcademicBlock, Building: d, TargetPosition: DepartmentHoDs[d], Priority: DefaultPriority, Active: true})
+	}
+	return rules
+}
+
+func sortedDepartments() []string {
+	out := make([]string, 0, len(DepartmentHoDs))
+	for d := range DepartmentHoDs {
+		out = append(out, d)
+	}
+	sort.Strings(out)
+	return out
 }

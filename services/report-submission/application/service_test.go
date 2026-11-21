@@ -29,7 +29,22 @@ var fixedNow = time.Date(2026, 10, 27, 10, 0, 0, 0, time.UTC)
 // recordingPublisher remembers every published report, or fails when err is set.
 type recordingPublisher struct {
 	published []domain.Report
+	withdrawn []withdrawn
 	err       error
+}
+
+// withdrawn is one report.withdrawn the service published (SCRUM-163).
+type withdrawn struct {
+	report   domain.Report
+	assignee string
+}
+
+func (p *recordingPublisher) ReportWithdrawn(_ context.Context, r domain.Report, assignee string) error {
+	if p.err != nil {
+		return p.err
+	}
+	p.withdrawn = append(p.withdrawn, withdrawn{r, assignee})
+	return nil
 }
 
 func (p *recordingPublisher) ReportSubmitted(_ context.Context, r domain.Report) error {
@@ -138,4 +153,54 @@ func TestGetReport(t *testing.T) {
 
 	_, err = svc.GetReport(context.Background(), "11111111-1111-4111-8111-111111111111")
 	assert.ErrorIs(t, err, domain.ErrReportNotFound)
+}
+
+// ---- SCRUM-163: the student edits or withdraws their own report ----
+
+const otherStudent = "11111111-1111-4111-8111-111111111111"
+
+func submittedReport(t *testing.T) (*Service, *recordingPublisher, domain.Report) {
+	t.Helper()
+	pub := &recordingPublisher{}
+	svc := NewService(memory.NewRepository(), fixedIDs{}, pub, func() time.Time { return fixedNow })
+	r, err := svc.SubmitReport(context.Background(), validForm())
+	require.NoError(t, err)
+	return svc, pub, r
+}
+
+func TestUpdateDescription(t *testing.T) {
+	svc, _, r := submittedReport(t)
+	ctx := context.Background()
+
+	got, err := svc.UpdateDescription(ctx, r.ID, r.ReporterID, "Projector and speakers do not turn on.")
+	require.NoError(t, err)
+	assert.Equal(t, "Projector and speakers do not turn on.", got.Description)
+	stored, err := svc.GetReport(ctx, r.ID)
+	require.NoError(t, err)
+	assert.Equal(t, "Projector and speakers do not turn on.", stored.Description)
+	assert.Equal(t, r.Location, stored.Location, "only the description changes")
+
+	_, err = svc.UpdateDescription(ctx, r.ID, otherStudent, "mine now")
+	assert.ErrorIs(t, err, domain.ErrNotReporter)
+	_, err = svc.UpdateDescription(ctx, r.ID, r.ReporterID, " ")
+	assert.ErrorIs(t, err, domain.ErrMissingDescription)
+	_, err = svc.UpdateDescription(ctx, "6f1c2a7e-3b4d-4c5e-8f90-000000000000", r.ReporterID, "x")
+	assert.ErrorIs(t, err, domain.ErrReportNotFound)
+}
+
+func TestWithdrawReport(t *testing.T) {
+	svc, pub, r := submittedReport(t)
+	ctx := context.Background()
+
+	assert.ErrorIs(t, svc.WithdrawReport(ctx, r.ID, otherStudent, ""), domain.ErrNotReporter)
+	assert.Empty(t, pub.withdrawn, "nothing published for a refused withdrawal")
+
+	require.NoError(t, svc.WithdrawReport(ctx, r.ID, r.ReporterID, "user-sso"))
+	_, err := svc.GetReport(ctx, r.ID)
+	assert.ErrorIs(t, err, domain.ErrReportNotFound, "the report is gone")
+	require.Len(t, pub.withdrawn, 1)
+	assert.Equal(t, r.ID, pub.withdrawn[0].report.ID)
+	assert.Equal(t, "user-sso", pub.withdrawn[0].assignee, "so the person holding it is told")
+
+	assert.ErrorIs(t, svc.WithdrawReport(ctx, r.ID, r.ReporterID, ""), domain.ErrReportNotFound)
 }

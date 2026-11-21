@@ -1,0 +1,4 @@
+SCRUM-161 after the code change, 21 November 2026.
+Web: npx tsc -b (no errors), npm run lint (oxlint, no errors), npx vitest run --maxWorkers=1:
+ Test Files  15 passed (15)
+      Tests  205 passed (205)

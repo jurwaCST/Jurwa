@@ -23,7 +23,7 @@ Tests: `tests/saga/flow_test.go` (submitted and routed, then escalated after the
 ## Happy path
 
 1. The `sla-escalation-checker` function calls sla-tracking `ListDueTimers`. sla-tracking marks the timer LAPSED and publishes `events:sla.lapsed`. That event starts one Saga run: it gets a new `correlation_id`, and every later event of the run repeats it.
-2. **reassignment** (group `reassignment`) hands the report back to the Category Head: the first ROUTED assignee, with its position code. It saves an ESCALATED assignment and publishes `events:report.reassigned` with no `actor_id`, because the system acted.
+2. **reassignment** (group `reassignment`) hands the report up. Since SCRUM-158 that is the DSA for a report routed to the SSO (Hostel and Others), and the DAA for one routed to an HoD (Academic Block); reassignment asks department-directory `GetStaff` who holds the post. When the post is vacant, or the report was routed to anyone else, it goes back to the first ROUTED assignee, as before. A directory that cannot be reached returns an error, so the event bus tries again. It saves an ESCALATED assignment and publishes `events:report.reassigned` with no `actor_id`, because the system acted.
 3. **status-lifecycle** (group `status-lifecycle`) sets the status to ESCALATED as the system, saves `previous_status`, and publishes `events:status.changed`.
 
 Steps 2 and 3 run in parallel. Neither waits for the other.

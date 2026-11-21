@@ -1,0 +1,19 @@
+SCRUM-160 after the code change, 21 November 2026.
+$ go test -count=1 ./services/analytics/...
+ok  	github.com/jurwaCST/Jurwa/services/analytics/adapters/in/events	2.749s
+ok  	github.com/jurwaCST/Jurwa/services/analytics/adapters/in/grpc	0.378s
+ok  	github.com/jurwaCST/Jurwa/services/analytics/adapters/out/memory	1.468s
+ok  	github.com/jurwaCST/Jurwa/services/analytics/adapters/out/postgres	1.584s
+ok  	github.com/jurwaCST/Jurwa/services/analytics/application	1.481s
+ok  	github.com/jurwaCST/Jurwa/services/analytics/cmd/server	2.107s
+ok  	github.com/jurwaCST/Jurwa/services/analytics/domain	1.467s
+$ go test -count=1 -v -run . ./services/analytics/adapters/in/events/
+--- PASS: TestStreamsAndGroup (0.00s)
+--- PASS: TestANewReportIsCounted (0.00s)
+--- PASS: TestAStatusChangeMovesTheCount (0.00s)
+--- PASS: TestAnEventTwiceIsCountedOnce (0.00s)
+--- PASS: TestAStatusChangeBeforeItsReportWaitsForIt (0.10s)
+--- PASS: TestAStatusChangeForAReportThatNeverArrivesFails (0.06s)
+--- PASS: TestABrokenEventIsAnError (0.00s)
+--- PASS: TestRunReadsBothStreams (0.02s)
+ok  	github.com/jurwaCST/Jurwa/services/analytics/adapters/in/events	2.843s

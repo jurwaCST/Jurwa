@@ -27,11 +27,11 @@ api-gateway|9010|redis||IDENTITY_ADDR=identity:9016 AUTHORIZATION_ADDR=authoriza
 status-lifecycle|9011|postgres|status_lifecycle|
 sla-tracking|9012|redis||SLA_POLICY_ADDR=sla-policy:9013
 sla-policy|9013|postgres|sla_policy|
-reassignment|9014|postgres|reassignment|
+reassignment|9014|postgres|reassignment|DEPARTMENT_DIRECTORY_ADDR=department-directory:9008
 audit-log|9015|mongo|audit_log|
 identity|9016|postgres|identity|
 authorization|9017|postgres|authorization_db|
-notification|9018|postgres|notification|
+notification|9018|postgres|notification|REPORT_SUBMISSION_ADDR=report-submission:9001 DEPARTMENT_DIRECTORY_ADDR=department-directory:9008
 feedback|9019|postgres|feedback|STATUS_LIFECYCLE_ADDR=status-lifecycle:9011
 analytics|9020|postgres|analytics|
 "

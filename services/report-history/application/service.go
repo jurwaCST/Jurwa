@@ -155,3 +155,11 @@ func (s *Service) GetReportTimeline(ctx context.Context, reportID string) ([]dom
 	domain.SortTimeline(entries)
 	return entries, nil
 }
+
+// RecordWithdrawn removes a report its student deleted from every list
+// (SCRUM-163).
+func (s *Service) RecordWithdrawn(ctx context.Context, reportID string) error {
+	s.writeMu.Lock()
+	defer s.writeMu.Unlock()
+	return s.repo.DeleteReport(ctx, reportID)
+}

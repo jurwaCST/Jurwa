@@ -22,6 +22,7 @@ import TextArea from '../components/TextArea'
 import Timeline, { type TimelineEntry } from '../components/Timeline'
 import Toast from '../components/Toast'
 import { statusLooks, type Status } from '../components/labels'
+import { groupDuplicates, needsDescription } from './duplicates'
 import './StaffView.css'
 
 // Shapes as the gateway sends them (protojson, lowerCamelCase, enums by name).
@@ -83,19 +84,59 @@ function messageFor(err: unknown): string {
   return 'Something went wrong. Please try again.'
 }
 
+// ---- The student's stars (SCRUM-164) ----
+
+type Feedback = { rating?: number; comment?: string }
+
+// StudentRating shows the stars the student gave a resolved report, or that
+// they have not rated it yet (404 from feedback). Other errors show nothing.
+function StudentRating({ reportId }: { reportId: string }) {
+  const [state, setState] = useState<{ id: string; feedback: Feedback | null } | null>(null)
+  useEffect(() => {
+    let alive = true
+    api
+      .get<{ feedback?: Feedback }>(`/reports/${reportId}/feedback`)
+      .then((res) => alive && setState({ id: reportId, feedback: res.feedback ?? null }))
+      .catch((err) => {
+        if (alive && err instanceof ApiError && err.status === 404) setState({ id: reportId, feedback: null })
+      })
+    return () => {
+      alive = false
+    }
+  }, [reportId])
+
+  if (!state || state.id !== reportId) return null
+  const rating = state.feedback?.rating ?? 0
+  if (!rating) return <p className="staff-rating muted">Not rated by the student yet.</p>
+  return (
+    <div className="staff-rating">
+      <p>
+        <span aria-hidden="true" className="staff-stars">
+          {'\u2605'.repeat(rating)}
+          {'\u2606'.repeat(5 - rating)}
+        </span>{' '}
+        <strong>{`Rated ${rating} out of 5 by the student`}</strong>
+      </p>
+      {state.feedback?.comment && <p className="muted">{state.feedback.comment}</p>}
+    </div>
+  )
+}
+
 // ---- Reassign ----
 
 interface ReassignProps {
   reportId: string
+  /** SCRUM-161: the other reports of the same issue, reassigned with it. */
+  others: string[]
   me: string
   open: boolean
   onClose: () => void
-  onDone: (reportId: string, toTitle: string) => void
+  onDone: (reportId: string, toTitle: string, others: string[]) => void
 }
 
 // ReassignSheet moves a report to the holder of another position. The report
 // then leaves this person's list.
-function ReassignSheet({ reportId, me, open, onClose, onDone }: ReassignProps) {
+function ReassignSheet({ reportId, others, me, open, onClose, onDone }: ReassignProps) {
   const [positions, setPositions] = useState<Position[] | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [toUserId, setToUserId] = useState('')
@@ -117,9 +158,13 @@ function ReassignSheet({ reportId, me, open, onClose, onDone }: ReassignProps) {
     }
   }, [open, positions, loadTry])
 
+  // SCRUM-158: the SSO (and the DSA after an escalation) hand reports to the
+  // councillors; the DAA hands an escalated Academic Block report to an HoD.
   // Only positions someone holds, never my own, by title.
+  const mine = (positions ?? []).find((p) => p.holderUserId === me)?.code
+  const kind = mine === 'DAA' ? 'HOD' : 'COUNCILLOR'
   const choices = (positions ?? [])
-    .filter((p) => p.holderUserId && p.holderUserId !== me)
+    .filter((p) => p.kind === kind && p.holderUserId && p.holderUserId !== me)
     .sort((a, b) => a.title.localeCompare(b.title))
 
   async function send(e: FormEvent<HTMLFormElement>) {
@@ -131,13 +176,28 @@ function ReassignSheet({ reportId, me, open, onClose, onDone }: ReassignProps) {
     if (!text) return setError('Write why you are reassigning it.')
     if (reason.length > REASON_MAX) return setError(`The reason can be at most ${REASON_MAX} characters.`)
     setBusy(true)
+    const to = choices.find((p) => p.holderUserId === toUserId)
+    const toTitle = to?.title ?? 'the new person'
     try {
+      // SCRUM-164: the reason is also an internal note, so the new person reads
+      // it under Notes. A note that fails does not stop the reassignment.
+      await api.post(`/reports/${reportId}/notes`, { body: `Passed to ${toTitle}: ${text}` }).catch(() => {})
       await api.post(`/reports/${reportId}/reassign`, { toUserId, reason: text })
-      const to = choices.find((p) => p.holderUserId === toUserId)
-      onDone(reportId, to?.title ?? 'the new person')
+      // SCRUM-161: the other reports of the same issue go with it. One that
+      // fails stays on the board, so it can be passed on by hand.
+      const moved: string[] = []
+      for (const other of others) {
+        try {
+          await api.post(`/reports/${other}/reassign`, { toUserId, reason: text })
+          moved.push(other)
+        } catch {
+          // left on the board
+        }
+      }
+      onDone(reportId, toTitle, moved)
     } catch (err) {
       if (err instanceof ApiError && err.status === 403) {
-        setError('Only the person this report is assigned to can reassign it.')
+        setError('Only a Category Head can reassign a report.')
       } else if (err instanceof ApiError && err.status === 409) {
         setError('Someone reassigned this report first. Go back to the list to see it.')
       } else {
@@ -202,14 +262,18 @@ const TABS: { id: Tab; label: string }[] = [
 
 interface DetailProps {
   summary: Summary
+  /** SCRUM-161: the other reports of the same issue; what is done here is done to them too. */
+  others: string[]
   me: string
+  /** SCRUM-158: only a Category Head hands a report on; HoDs and councillors fix it. */
+  canReassign: boolean
   onBack: () => void
   onStatus: (reportId: string, status: Status) => void
   onToast: (message: string) => void
-  onReassigned: (reportId: string, toTitle: string) => void
+  onReassigned: (reportId: string, toTitle: string, others: string[]) => void
 }
 
-function ReportDetail({ summary, me, onBack, onStatus, onToast, onReassigned }: DetailProps) {
+function ReportDetail({ summary, others, me, canReassign, onBack, onStatus, onToast, onReassigned }: DetailProps) {
   const id = summary.reportId
   const [report, setReport] = useState<Report | null>(null)
   const [current, setCurrent] = useState<ReportStatus>({ status: summary.status })
@@ -319,6 +383,21 @@ function ReportDetail({ summary, me, onBack, onStatus, onToast, onReassigned }: 
       })
       setCurrent(res.status)
       onStatus(id, res.status.status)
+      // SCRUM-161: the other reports of the same issue move too, each with its
+      // own version. One that fails keeps its status, to be changed by hand.
+      for (const other of others) {
+        try {
+          const now = await api.get<{ status: ReportStatus }>(`/reports/${other}/status`)
+          const moved = await api.post<{ status: ReportStatus }>(`/reports/${other}/status`, {
+            toStatus: choice,
+            expectedVersion: now.status.version ?? 0,
+            ...(text && { reason: text }),
+          })
+          onStatus(other, moved.status.status)
+        } catch {
+          // left as it was
+        }
+      }
       setHistory(null) // the history has a new entry
       setSheetOpen(false)
       onToast('Status updated')
@@ -386,16 +465,21 @@ function ReportDetail({ summary, me, onBack, onStatus, onToast, onReassigned }: 
       </div>
 
       {current.status === 'RESOLVED' ? (
-        <p className="staff-done">
-          <Icon name="resolved" />
-          Resolved. Nothing more to do.
-        </p>
+        <>
+          <p className="staff-done">
+            <Icon name="resolved" />
+            Resolved. Nothing more to do.
+          </p>
+          <StudentRating reportId={id} />
+        </>
       ) : (
         <div className="staff-actions">
           {options.length > 0 && <Button onClick={openSheet}>Update status</Button>}
-          <Button variant="secondary" onClick={() => setReassignOpen(true)}>
-            Reassign
-          </Button>
+          {canReassign && (
+            <Button variant="secondary" onClick={() => setReassignOpen(true)}>
+              Reassign
+            </Button>
+          )}
         </div>
       )}
 
@@ -497,6 +581,9 @@ function ReportDetail({ summary, me, onBack, onStatus, onToast, onReassigned }: 
 
       <BottomSheet open={sheetOpen} title="Update status" onClose={closeSheet}>
         <form className="staff-sheet-form" onSubmit={saveStatus} noValidate>
+          {others.length > 0 && (
+            <p className="muted">{`Also for the ${others.length} other ${others.length === 1 ? 'report' : 'reports'} of the same issue.`}</p>
+          )}
           <fieldset className="staff-choices">
             <legend>New status</legend>
             {options.map((s) => (
@@ -531,7 +618,7 @@ function ReportDetail({ summary, me, onBack, onStatus, onToast, onReassigned }: 
         </form>
       </BottomSheet>
 
-      <ReassignSheet reportId={id} me={me} open={reassignOpen} onClose={closeReassign} onDone={onReassigned} />
+      <ReassignSheet reportId={id} others={others} me={me} open={reassignOpen} onClose={closeReassign} onDone={onReassigned} />
     </section>
   )
 }
@@ -588,26 +675,54 @@ export default function StaffView() {
     }
   }
 
+  // SCRUM-161: the descriptions of reports that share their place with another
+  // open report, to find the same issue reported twice. Fetched once each.
+  const [descriptions, setDescriptions] = useState<Record<string, string>>({})
+  const requested = useRef(new Set<string>())
+  const mounted = useRef(true)
+  useEffect(() => {
+    mounted.current = true
+    return () => {
+      mounted.current = false
+    }
+  }, [])
+  useEffect(() => {
+    if (!reports) return
+    for (const rid of needsDescription(reports)) {
+      if (requested.current.has(rid)) continue
+      requested.current.add(rid)
+      const keep = (text: string) => mounted.current && setDescriptions((d) => ({ ...d, [rid]: text }))
+      api
+        .get<{ report: Report }>(`/reports/${rid}`)
+        .then((res) => keep(res.report.description ?? ''))
+        .catch(() => keep(''))
+    }
+  }, [reports])
+
   // Stable functions: the detail and the toast keep them in effects.
   const updateStatus = useCallback((reportId: string, status: Status) => {
     setReports((list) => list?.map((r) => (r.reportId === reportId ? { ...r, status } : r)) ?? list)
   }, [])
   const showToast = useCallback((message: string) => setToast(message), [])
   // A reassigned report is no longer mine: it leaves the list.
-  const reassigned = useCallback((reportId: string, toTitle: string) => {
-    setReports((list) => list?.filter((r) => r.reportId !== reportId) ?? list)
+  const reassigned = useCallback((reportId: string, toTitle: string, others: string[] = []) => {
+    const gone = new Set([reportId, ...others])
+    setReports((list) => list?.filter((r) => !gone.has(r.reportId)) ?? list)
     setOpenId(null)
     setToast(`Reassigned to ${toTitle}`)
   }, [])
   const hideToast = useCallback(() => setToast(null), [])
   const closeDetail = useCallback(() => setOpenId(null), [])
 
-  const counts = (reports ?? []).reduce<Record<string, number>>((acc, r) => {
-    acc[r.status] = (acc[r.status] ?? 0) + 1
+  // SCRUM-161: one card per issue; the counts count cards.
+  const groups = groupDuplicates(reports ?? [], descriptions)
+  const counts = groups.reduce<Record<string, number>>((acc, g) => {
+    acc[g.leader.status] = (acc[g.leader.status] ?? 0) + 1
     return acc
   }, {})
-  const shown = (reports ?? []).filter((r) => filter === 'ALL' || r.status === filter)
-  const opened = reports?.find((r) => r.reportId === openId) ?? null
+  const shown = groups.filter((g) => filter === 'ALL' || g.leader.status === filter)
+  const openGroup = groups.find((g) => g.leader.reportId === openId) ?? null
+  const opened = openGroup?.leader ?? null
 
   let list
   if (loadError) {
@@ -625,7 +740,7 @@ export default function StaffView() {
       <>
         <div className="chips staff-chips" aria-label="Filter by status" role="group">
           <button type="button" className="chip" aria-pressed={filter === 'ALL'} onClick={() => setFilter('ALL')}>
-            All <span className="chip-count">{reports.length}</span>
+            All <span className="chip-count">{groups.length}</span>
           </button>
           {CHIP_ORDER.filter((s) => counts[s]).map((s) => (
             <button
@@ -641,7 +756,7 @@ export default function StaffView() {
         </div>
 
         <ul className="staff-list">
-          {shown.map((r) => (
+          {shown.map(({ leader: r, others }) => (
             <li key={r.reportId}>
               <button
                 type="button"
@@ -654,6 +769,7 @@ export default function StaffView() {
                   {CATEGORY_NAMES[r.category] ?? r.category}
                   {r.updatedAt && <>, updated {dateText(r.updatedAt)}</>}
                 </span>
+                {others.length > 0 && <span className="staff-card-more">{`+${others.length} more reported`}</span>}
                 <StatusBadge status={r.status} />
               </button>
             </li>
@@ -671,14 +787,20 @@ export default function StaffView() {
 
   return (
     <div className={opened ? 'staff-page has-detail' : 'staff-page'}>
-      <PageHeader title="Staff view" description="Reports assigned to you. Open one to read it, add a note or update its status." />
+      {/* SCRUM-158: headed with who is signed in, for example "Block Councillor (HA)". */}
+      <PageHeader
+        title={user?.fullName ?? 'Assigned to me'}
+        description="Reports assigned to you. Open one to read it, add a note or update its status."
+      />
       <div className="staff-layout">
         <div className="staff-list-pane">{list}</div>
         {opened && (
           <ReportDetail
             key={opened.reportId}
             summary={opened}
+            others={openGroup?.others.map((o) => o.reportId) ?? []}
             me={me}
+            canReassign={user?.roles.includes('CATEGORY_HEAD') ?? false}
             onBack={closeDetail}
             onStatus={updateStatus}
             onToast={showToast}

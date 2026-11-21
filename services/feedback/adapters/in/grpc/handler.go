@@ -40,6 +40,15 @@ func (h *Handler) GetFeedback(ctx context.Context, req *feedbackv1.GetFeedbackRe
 	return &feedbackv1.GetFeedbackResponse{Feedback: toProto(f)}, nil
 }
 
+// GetRatingSummary gives the count and the average rating (SCRUM-164).
+func (h *Handler) GetRatingSummary(ctx context.Context, _ *feedbackv1.GetRatingSummaryRequest) (*feedbackv1.GetRatingSummaryResponse, error) {
+	s, err := h.app.RatingSummary(ctx)
+	if err != nil {
+		return nil, toStatusError(err)
+	}
+	return &feedbackv1.GetRatingSummaryResponse{Count: s.Count, AverageRating: s.Average}, nil
+}
+
 func toProto(f domain.Feedback) *feedbackv1.Feedback {
 	return &feedbackv1.Feedback{
 		Id:            f.ID,

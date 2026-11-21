@@ -5,6 +5,9 @@
 #   export SEED_DEMO_PASSWORD='<any 8+ characters, never commit it>'
 #   bash web/cypress/start-stack.sh          # Ctrl+C stops everything
 #
+# Or save it once in dev/.env (ignored by Git), as SEED_DEMO_PASSWORD=...,
+# and leave out the export: the script reads it from there (SCRUM-159).
+#
 # Ports can be moved when one is taken, for example GATEWAY_HTTP_PORT=18080.
 #
 # With events (My reports, routing to the Category Head, status changes,
@@ -15,6 +18,9 @@
 #   export REDIS_URL=redis://localhost:6379
 set -euo pipefail
 
+if [ -z "${SEED_DEMO_PASSWORD:-}" ] && [ -f dev/.env ]; then
+  SEED_DEMO_PASSWORD="$(sed -n 's/^SEED_DEMO_PASSWORD=//p' dev/.env | tail -n 1 | tr -d '\r')"
+fi
 : "${SEED_DEMO_PASSWORD:?set SEED_DEMO_PASSWORD first, the password of the demo accounts}"
 GATEWAY_HTTP_PORT="${GATEWAY_HTTP_PORT:-8080}"
 GATEWAY_GRPC_PORT="${GATEWAY_GRPC_PORT:-9010}" # the gateway's gRPC health check

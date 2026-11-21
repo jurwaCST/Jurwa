@@ -56,6 +56,17 @@ func RunRepoContract(t *testing.T, newRepo func(t *testing.T) ports.ReportReposi
 		assert.Nil(t, got.PhotoID)
 	})
 
+	// SCRUM-163: a withdrawn report is deleted.
+	t.Run("delete removes the report, and an unknown id is ErrReportNotFound", func(t *testing.T) {
+		ctx := context.Background()
+		repo := newRepo(t)
+		require.NoError(t, repo.Save(ctx, full))
+		require.NoError(t, repo.Delete(ctx, full.ID))
+		_, err := repo.FindByID(ctx, full.ID)
+		assert.ErrorIs(t, err, domain.ErrReportNotFound)
+		assert.ErrorIs(t, repo.Delete(ctx, full.ID), domain.ErrReportNotFound)
+	})
+
 	t.Run("unknown id is ErrReportNotFound", func(t *testing.T) {
 		repo := newRepo(t)
 		_, err := repo.FindByID(context.Background(), "99999999-9999-4999-8999-999999999999")

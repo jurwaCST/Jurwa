@@ -1,0 +1,32 @@
+SCRUM-159 tests first, 21 November 2026, before any code change.
+
+Go: go test -p 1 ./services/identity/application/ ./services/identity/cmd/... ./services/department-directory/...
+--- FAIL: TestSeedDemoUsersCreatesOneUserPerDemoAccount (1.06s)
+--- FAIL: TestDemoStaffAreNamedByPosition (0.00s)
+--- FAIL: TestDemoEmailsUseTheCSTFormat (0.00s)
+--- FAIL: TestSeedDemoUsersTwiceCreatesNoDuplicates (1.07s)
+--- FAIL: TestSeedDemoUsersRefusesAnEmailHeldByAnotherAccount (1.10s)
+--- FAIL: TestSeededUserCanLogInWithTheRightRoleAndID (1.09s)
+FAIL	github.com/jurwaCST/Jurwa/services/identity/application	8.133s
+--- FAIL: TestDefaultTokenLifetimeIsEightHours (0.00s)
+--- FAIL: TestSeedFromEnv (1.07s)
+FAIL	github.com/jurwaCST/Jurwa/services/identity/cmd/server	1.612s
+--- FAIL: TestListPositions (0.00s)
+FAIL	github.com/jurwaCST/Jurwa/services/department-directory/adapters/in/grpc	0.482s
+ok  	github.com/jurwaCST/Jurwa/services/department-directory/adapters/out/memory	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/department-directory/application	(cached)
+ok  	github.com/jurwaCST/Jurwa/services/department-directory/cmd/server	(cached)
+--- FAIL: TestWithDemoHolders (0.00s)
+FAIL	github.com/jurwaCST/Jurwa/services/department-directory/domain	1.813s
+
+Web: npx vitest run --maxWorkers=1 src/App.test.tsx src/pages/Home.test.tsx src/pages/AdminDashboard.test.tsx src/pages/PresidentDashboard.test.tsx
+     × reads a sign-in saved by another tab 24ms
+     × forgets an expired sign-in 7ms
+     × goes back to the page before 29ms
+     × shows the position name without a "Staff" line 7ms
+     × fetches the counts again every 15 seconds, without a loading screen 1619ms
+     × fetches the counts again every 15 seconds 1657ms
+     × takes SYSTEM_ADMIN straight to their dashboard 1015ms
+     × takes PRESIDENT straight to their dashboard 1008ms
+ Test Files  4 failed (4)
+      Tests  8 failed | 55 passed (63)

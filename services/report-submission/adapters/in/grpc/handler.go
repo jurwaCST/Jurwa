@@ -18,6 +18,8 @@ import (
 type UseCases interface {
 	SubmitReport(ctx context.Context, in domain.NewReportInput) (domain.Report, error)
 	GetReport(ctx context.Context, id string) (domain.Report, error)
+	UpdateDescription(ctx context.Context, reportID, reporterID, description string) (domain.Report, error) // SCRUM-163
+	WithdrawReport(ctx context.Context, reportID, reporterID, assigneeID string) error                      // SCRUM-163
 }
 
 // Handler implements reportsubmissionv1.ReportSubmissionServiceServer.
@@ -64,12 +66,37 @@ func (h *Handler) GetReport(ctx context.Context, req *reportsubmissionv1.GetRepo
 }
 
 // toStatus maps domain errors to gRPC status codes and hides internal details.
+// UpdateDescription changes the description of the student's own report (SCRUM-163).
+func (h *Handler) UpdateDescription(ctx context.Context, req *reportsubmissionv1.UpdateDescriptionRequest) (*reportsubmissionv1.UpdateDescriptionResponse, error) {
+	if !domain.IsUUID(req.GetReportId()) {
+		return nil, status.Error(codes.InvalidArgument, "report_id must be a UUID")
+	}
+	report, err := h.app.UpdateDescription(ctx, req.GetReportId(), req.GetReporterId(), req.GetDescription())
+	if err != nil {
+		return nil, toStatus(err)
+	}
+	return &reportsubmissionv1.UpdateDescriptionResponse{Report: reportToProto(report)}, nil
+}
+
+// WithdrawReport deletes the student's own report (SCRUM-163).
+func (h *Handler) WithdrawReport(ctx context.Context, req *reportsubmissionv1.WithdrawReportRequest) (*reportsubmissionv1.WithdrawReportResponse, error) {
+	if !domain.IsUUID(req.GetReportId()) {
+		return nil, status.Error(codes.InvalidArgument, "report_id must be a UUID")
+	}
+	if err := h.app.WithdrawReport(ctx, req.GetReportId(), req.GetReporterId(), req.GetCurrentAssigneeId()); err != nil {
+		return nil, toStatus(err)
+	}
+	return &reportsubmissionv1.WithdrawReportResponse{}, nil
+}
+
 func toStatus(err error) error {
 	switch {
 	case errors.Is(err, domain.ErrInvalidReport):
 		return status.Error(codes.InvalidArgument, err.Error())
 	case errors.Is(err, domain.ErrReportNotFound):
 		return status.Error(codes.NotFound, err.Error())
+	case errors.Is(err, domain.ErrNotReporter):
+		return status.Error(codes.PermissionDenied, err.Error())
 	default:
 		return status.Error(codes.Internal, "internal error")
 	}
