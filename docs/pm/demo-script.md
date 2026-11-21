@@ -109,7 +109,7 @@ Done since Sprint 3 (checked on main, 18 November 2026, SCRUM-153):
 |---|---|---|---|---|
 | 21 November 2026 | Sonam Zangmo, Sonam Choki, Nyendrak Yoezer Zangmo, Gayley Choden | 10:51 with step 5c (10:19 without), against 15:00 planned | Step 6 needs a one-hour wait; live runs of the quality tools were too slow (step 8); live Grafana did not load (step 9) | See the rows below |
 
-Recording (silent screen recording, evidence for SCRUM-149): [Final_Project_Group6 > Demo rehearsal recording](https://drive.google.com/drive/folders/1Ik78Q2HMvP5tD6eA-YjEFnx4srbCllLm?usp=drive_link).
+Recording (screen recording with voice-over, evidence for SCRUM-149): [Final_Project_Group6 > Demo rehearsal recording](https://drive.google.com/drive/folders/1Ik78Q2HMvP5tD6eA-YjEFnx4srbCllLm?usp=drive_link).
 
 The rehearsal used the flow on main after SCRUM-158 to SCRUM-164: the Hostel report goes to the SSO, who reassigns it to the Block Councillor (HA); the SSO and the councillor were signed in in two different browsers, because the sign-in is now shared by every tab of one browser (SCRUM-159).
 
