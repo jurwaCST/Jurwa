@@ -132,8 +132,8 @@ func DefaultPolicy() Policy {
 		ActionReportNoteAdd:        {CategoryHead, Staff},
 		ActionReportNoteRead:       {CategoryHead, Staff, SystemAdmin},
 		ActionReportFeedbackSubmit: {Student},
-		ActionReportUpdate:         {Student}, // SCRUM-163: the student who sent it, checked by the gateway
-		ActionReportWithdraw:       {Student}, // SCRUM-163
+		ActionReportUpdate:         {Student},                                   // SCRUM-163: the student who sent it, checked by the gateway
+		ActionReportWithdraw:       {Student},                                   // SCRUM-163
 		ActionReportFeedbackRead:   {Student, CategoryHead, Staff, SystemAdmin}, // SCRUM-164: Staff, who fixed it
 		ActionReportAuditRead:      {SystemAdmin},
 		ActionDepartmentList:       {CategoryHead, SystemAdmin},
