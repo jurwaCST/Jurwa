@@ -60,13 +60,16 @@ describe('SCRUM-156 signed-in home by role', () => {
     expect(screen.getByRole('heading', routeHeading)).toBeInTheDocument()
   })
 
+  // SCRUM-159: the admin and the President have one page each, so home takes
+  // them straight to their dashboard.
   it.each([
     ['SYSTEM_ADMIN', 'Admin dashboard'],
     ['PRESIDENT', 'President dashboard'],
-  ])('gives %s only their page', (role, tile) => {
+  ])('takes %s straight to their dashboard', async (role, heading) => {
     signInAs(role)
     renderHome()
-    expect(screen.getByRole('link', { name: tile })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: heading })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /Kuzuzangpo/ })).not.toBeInTheDocument()
     expect(screen.queryByRole('heading', routeHeading)).not.toBeInTheDocument()
   })
 })

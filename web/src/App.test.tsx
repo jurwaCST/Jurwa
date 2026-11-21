@@ -67,6 +67,84 @@ describe('routes', () => {
   })
 })
 
+// SCRUM-158: an HoD or councillor is named by their position, so the header
+// shows only that, never the word "Staff" under it.
+// SCRUM-159: a sign-in is kept for every tab and the home-screen icon, so a
+// new tab does not ask to sign in again.
+describe('sign-in kept across tabs', () => {
+  afterEach(() => {
+    localStorage.clear()
+    sessionStorage.clear()
+  })
+
+  it('reads a sign-in saved by another tab', () => {
+    localStorage.setItem(
+      SESSION_KEY,
+      JSON.stringify({
+        token: 'test-token',
+        expiresAt: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
+        user: { id: 'u1', email: '02240300.cst@rub.edu.bt', fullName: 'Demo Student', roles: ['STUDENT'] },
+      }),
+    )
+    renderAt('/reports')
+    expect(screen.getByRole('heading', { name: 'My reports' })).toBeInTheDocument()
+  })
+
+  it('forgets an expired sign-in', () => {
+    localStorage.setItem(
+      SESSION_KEY,
+      JSON.stringify({
+        token: 'old-token',
+        expiresAt: new Date(Date.now() - 1000).toISOString(),
+        user: { id: 'u1', email: '02240300.cst@rub.edu.bt', fullName: 'Demo Student', roles: ['STUDENT'] },
+      }),
+    )
+    renderAt('/reports')
+    expect(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument()
+    expect(localStorage.getItem(SESSION_KEY)).toBeNull()
+  })
+})
+
+// SCRUM-159: phones have no browser back button inside the installed app, so
+// every page but home has one.
+describe('back button', () => {
+  afterEach(() => sessionStorage.clear())
+
+  it('goes back to the page before', async () => {
+    signInAs('STUDENT')
+    render(
+      <MemoryRouter initialEntries={['/', '/reports']} initialIndex={1}>
+        <App />
+      </MemoryRouter>,
+    )
+    expect(screen.getByRole('heading', { name: 'My reports' })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Back' }))
+    expect(await screen.findByRole('heading', { name: /Kuzuzangpo/ })).toBeInTheDocument()
+  })
+
+  it('is not on the home page', () => {
+    signInAs('STUDENT')
+    renderAt('/')
+    expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument()
+  })
+})
+
+describe('header for staff', () => {
+  it('shows the position name without a "Staff" line', async () => {
+    signInAs('STAFF', 'Block Councillor (HA)')
+    renderAt('/staff')
+    const header = screen.getAllByRole('banner')[0]
+    expect(within(header).getByText('Signed in as Block Councillor (HA)')).toBeInTheDocument()
+    expect(within(header).queryByText('Staff')).not.toBeInTheDocument()
+  })
+
+  it('still shows the role of a Category Head', () => {
+    signInAs('CATEGORY_HEAD', 'SSO (demo)')
+    renderAt('/staff')
+    expect(within(screen.getAllByRole('banner')[0]).getByText('Category Head')).toBeInTheDocument()
+  })
+})
+
 describe('role guards', () => {
   it('sends a visitor who is not signed in to /login', () => {
     renderAt('/report/new')
@@ -92,6 +170,11 @@ describe('role guards', () => {
     ['/president', 'PRESIDENT', 'President dashboard'],
     ['/reports', 'STUDENT', 'My reports'],
     ['/notifications', 'STUDENT', 'Notifications'],
+    // SCRUM-162: everyone gets messages about the reports that reach them.
+    ['/notifications', 'STAFF', 'Notifications'],
+    ['/notifications', 'CATEGORY_HEAD', 'Notifications'],
+    ['/notifications', 'SYSTEM_ADMIN', 'Notifications'],
+    ['/notifications', 'PRESIDENT', 'Notifications'],
   ])('%s is open to %s', (path, role, heading) => {
     signInAs(role)
     renderAt(path)
@@ -104,7 +187,6 @@ describe('role guards', () => {
     ['/president', 'SYSTEM_ADMIN'],
     ['/reports', 'STAFF'],
     ['/reports/r1', 'CATEGORY_HEAD'],
-    ['/notifications', 'STAFF'],
   ])('%s is refused to %s', (path, role) => {
     signInAs(role)
     renderAt(path)
@@ -159,8 +241,9 @@ describe('login', () => {
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit]
     expect(url).toMatch(/\/auth\/login$/)
     expect(init.body).toBe(JSON.stringify({ email: 'pema@cst.edu.bt', password: 'secret-pass' }))
-    // The password is never kept in the browser.
-    expect(sessionStorage.getItem(SESSION_KEY)).not.toContain('secret-pass')
+    // The sign-in is kept for every tab (SCRUM-159), and the password never is.
+    expect(localStorage.getItem(SESSION_KEY)).toContain('jwt-123')
+    expect(localStorage.getItem(SESSION_KEY)).not.toContain('secret-pass')
   })
 
   it('shows the gateway error when the password is wrong', async () => {
@@ -297,6 +380,14 @@ describe('notifications bell', () => {
     expect((fetchMock.mock.calls[0] as [string])[0]).toMatch(/\/me\/notifications\?pageSize=1$/)
   })
 
+  // SCRUM-162: the bell is for every role, not only students.
+  it.each(['CATEGORY_HEAD', 'STAFF'])('shows the bell to %s too', async (role) => {
+    vi.stubGlobal('fetch', answer([newest]))
+    signInAs(role)
+    renderAt('/staff')
+    expect(await screen.findByRole('link', { name: 'Notifications, new' })).toHaveAttribute('href', '/notifications')
+  })
+
   it('shows no dot when the newest message was already seen', async () => {
     const fetchMock = answer([newest])
     vi.stubGlobal('fetch', fetchMock)
@@ -319,9 +410,4 @@ describe('notifications bell', () => {
     expect(await screen.findByRole('link', { name: 'Notifications' })).toBeInTheDocument()
   })
 
-  it('gives staff no bell', () => {
-    signInAs('STAFF')
-    renderAt('/')
-    expect(screen.queryByRole('link', { name: /^Notifications/ })).not.toBeInTheDocument()
-  })
 })

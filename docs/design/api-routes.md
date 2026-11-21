@@ -26,6 +26,8 @@ The React PWA calls only the api-gateway over HTTP (port 8080, JSON). The gatewa
 | `GET /photos/{photoId}` | photo-media | GetPhoto | Student (own), Category Head, Staff, System Administrator |
 | `POST /reports` | report-submission | SubmitReport | Student |
 | `GET /reports/{reportId}` | report-submission | GetReport | Student (own), Category Head, Staff, System Administrator |
+| `PATCH /reports/{reportId}` | report-submission | UpdateDescription: `{"description": "..."}`, only while Open or Assigned, else 422 (SCRUM-163) | Student (own) |
+| `DELETE /reports/{reportId}` | report-submission | WithdrawReport: 204, publishes report.withdrawn, only while Open or Assigned, else 422 (SCRUM-163) | Student (own) |
 | `GET /me/reports` | report-history | ListReportsByReporter | Student |
 | `GET /reports/{reportId}/timeline` | report-history | GetReportTimeline | Student (own), Category Head, Staff, System Administrator |
 | `GET /reports/{reportId}/status` | status-lifecycle | GetStatus | Student (own), Category Head, Staff, System Administrator |
@@ -46,6 +48,7 @@ The React PWA calls only the api-gateway over HTTP (port 8080, JSON). The gatewa
 | `PUT /admin/sla-policies/{category}` | sla-policy | UpsertPolicy | System Administrator |
 | `GET /dashboard/summary` | analytics | GetSummary | System Administrator, College President |
 | `GET /dashboard/categories` | analytics | GetCategoryBreakdown | System Administrator, College President |
+| `GET /dashboard/ratings` | feedback | GetRatingSummary: count and average rating (SCRUM-164) | System Administrator, College President |
 
 ## Not exposed to the PWA
 

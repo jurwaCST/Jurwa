@@ -3,17 +3,20 @@ import { api, setToken } from '../api/client'
 import type { LoginResponse, Session, User } from './types'
 import { AuthContext, type AuthValue } from './useAuth'
 
-/** sessionStorage key. The session ends when the browser tab is closed. */
+/** Storage key of the sign-in. SCRUM-159: kept in localStorage, so every tab and
+ *  the home-screen icon share it until it expires (8 hours) or the user signs out.
+ *  A sign-in saved per tab (sessionStorage) by an older version is still read. */
 export const SESSION_KEY = 'jurwa.session'
 
 // loadSession reads a saved, unexpired session. Storage can be blocked
 // (private mode, strict settings), so every access is guarded.
 function loadSession(): Session | null {
   try {
-    const raw = sessionStorage.getItem(SESSION_KEY)
+    const raw = localStorage.getItem(SESSION_KEY) ?? sessionStorage.getItem(SESSION_KEY)
     if (!raw) return null
     const s = JSON.parse(raw) as Session
     if (!s.token || !s.user || Date.parse(s.expiresAt) <= Date.now()) {
+      localStorage.removeItem(SESSION_KEY)
       sessionStorage.removeItem(SESSION_KEY)
       return null
     }
@@ -25,8 +28,9 @@ function loadSession(): Session | null {
 
 function saveSession(s: Session | null): void {
   try {
-    if (s) sessionStorage.setItem(SESSION_KEY, JSON.stringify(s))
-    else sessionStorage.removeItem(SESSION_KEY)
+    sessionStorage.removeItem(SESSION_KEY)
+    if (s) localStorage.setItem(SESSION_KEY, JSON.stringify(s))
+    else localStorage.removeItem(SESSION_KEY)
   } catch {
     // the session then lives in memory only
   }

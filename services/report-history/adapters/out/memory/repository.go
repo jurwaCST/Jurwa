@@ -15,19 +15,20 @@ type Repository struct {
 	mu        sync.RWMutex
 	summaries map[string]domain.Summary
 	entries   map[string][]domain.Entry // by report id, in append order
+	withdrawn map[string]bool           // deleted by their student (SCRUM-163); never stored again
 }
 
 // NewRepository returns an empty repository.
 func NewRepository() *Repository {
-	return &Repository{summaries: make(map[string]domain.Summary), entries: make(map[string][]domain.Entry)}
+	return &Repository{summaries: make(map[string]domain.Summary), entries: make(map[string][]domain.Entry), withdrawn: make(map[string]bool)}
 }
 
 // CreateSummary stores a new summary or returns domain.ErrReportExists.
 func (r *Repository) CreateSummary(_ context.Context, s domain.Summary) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	if _, ok := r.summaries[s.ReportID]; ok {
-		return domain.ErrReportExists
+	if _, ok := r.summaries[s.ReportID]; ok || r.withdrawn[s.ReportID] {
+		return domain.ErrReportExists // a withdrawn report never comes back (SCRUM-163)
 	}
 	r.summaries[s.ReportID] = s
 	return nil
@@ -100,4 +101,16 @@ func (r *Repository) ListEntries(_ context.Context, reportID string) ([]domain.E
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	return slices.Clone(r.entries[reportID]), nil
+}
+
+// DeleteReport removes a withdrawn report, its summary and its timeline, and
+// remembers it, so a report.submitted read again after a restart does not bring
+// it back (SCRUM-163). Deleting an unknown report only remembers it.
+func (r *Repository) DeleteReport(_ context.Context, reportID string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	delete(r.summaries, reportID)
+	delete(r.entries, reportID)
+	r.withdrawn[reportID] = true
+	return nil
 }

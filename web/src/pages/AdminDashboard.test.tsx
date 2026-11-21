@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -27,7 +27,10 @@ const categories = {
   ],
 }
 
-function stub(over: { summary?: unknown; categories?: unknown } = {}) {
+// SCRUM-164: the students' stars, from feedback.
+const ratings = { count: '7', averageRating: 4.2 }
+
+function stub(over: { summary?: unknown; categories?: unknown; ratings?: unknown } = {}) {
   get.mockImplementation(async (path: string) => {
     if (path.startsWith('/dashboard/summary')) {
       const v = over.summary ?? summary
@@ -35,6 +38,7 @@ function stub(over: { summary?: unknown; categories?: unknown } = {}) {
       return v
     }
     if (path.startsWith('/dashboard/categories')) return over.categories ?? categories
+    if (path === '/dashboard/ratings') return over.ratings ?? ratings
     throw new ApiError(404, 'not found')
   })
 }
@@ -49,6 +53,25 @@ function renderPage() {
 
 beforeEach(() => stub())
 afterEach(() => vi.clearAllMocks())
+
+// SCRUM-159: new reports show up without reloading the page.
+describe('SCRUM-159 admin dashboard refreshes by itself', () => {
+  afterEach(() => vi.useRealTimers())
+
+  it('fetches the counts again every 15 seconds, without a loading screen', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    renderPage()
+    const tiles = await screen.findByRole('region', { name: 'Report counts' })
+    expect(within(tiles).getByText('Open').nextSibling).toHaveTextContent('1')
+
+    stub({ summary: { ...summary, counts: { ...summary.counts, open: '2' } } })
+    await vi.advanceTimersByTimeAsync(15_000)
+    await waitFor(() =>
+      expect(within(screen.getByRole('region', { name: 'Report counts' })).getByText('Open').nextSibling).toHaveTextContent('2'),
+    )
+    expect(screen.queryByRole('status', { name: 'Loading the dashboard' })).not.toBeInTheDocument()
+  })
+})
 
 describe('SCRUM-37 admin dashboard: counts', () => {
   it('shows a tile per status with its count', async () => {
@@ -123,5 +146,20 @@ describe('SCRUM-37 admin dashboard: counts', () => {
       "Hostel and Others go to the SSO, who hands them to a councillor; the Academic Block goes to the HoD of the department the student picks.",
     )
     expect(rules).toHaveTextContent('A late report goes up to the DSA, or to the DAA for the Academic Block.')
+  })
+})
+
+describe('SCRUM-164 admin dashboard ratings', () => {
+  it('shows the average rating and how many reports were rated', async () => {
+    renderPage()
+    const tile = await screen.findByRole('region', { name: 'Student ratings' })
+    expect(tile).toHaveTextContent('4.2 / 5')
+    expect(tile).toHaveTextContent('7 rated reports')
+  })
+
+  it('says when nothing is rated yet', async () => {
+    stub({ ratings: { averageRating: 0 } })
+    renderPage()
+    expect(await screen.findByRole('region', { name: 'Student ratings' })).toHaveTextContent('No ratings yet')
   })
 })

@@ -1,0 +1,8 @@
+SCRUM-161 tests first, 21 November 2026, before any code change.
+$ npx vitest run --maxWorkers=1 src/pages/duplicates.test.ts src/pages/StaffView.test.tsx
+     × shows the same issue once, with how many more reported it 27ms
+     × updates the status of every report in the card 1005ms
+     × reassigns every report in the card 1012ms
+Error: Failed to resolve import "./duplicates" from "src/pages/duplicates.test.ts". Does the file exist?
+ Test Files  2 failed (2)
+      Tests  3 failed | 26 passed (29)

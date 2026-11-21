@@ -60,6 +60,16 @@ func (r Reports) SubmitReport(ctx context.Context, in *reportsubmissionv1.Submit
 	return r.C.SubmitReport(ctx, in)
 }
 
+// UpdateDescription changes a report's description (SCRUM-163).
+func (r Reports) UpdateDescription(ctx context.Context, in *reportsubmissionv1.UpdateDescriptionRequest) (*reportsubmissionv1.UpdateDescriptionResponse, error) {
+	return r.C.UpdateDescription(ctx, in)
+}
+
+// WithdrawReport deletes a report (SCRUM-163).
+func (r Reports) WithdrawReport(ctx context.Context, in *reportsubmissionv1.WithdrawReportRequest) (*reportsubmissionv1.WithdrawReportResponse, error) {
+	return r.C.WithdrawReport(ctx, in)
+}
+
 func (r Reports) GetReport(ctx context.Context, reportID string) (*commonv1.Report, error) {
 	resp, err := r.C.GetReport(ctx, &reportsubmissionv1.GetReportRequest{ReportId: reportID})
 	if err != nil {

@@ -15,3 +15,5 @@ configMapGenerator:
       - PORT=9018
       - SERVICE_NAME=notification
       - LOG_LEVEL=info
+      - REPORT_SUBMISSION_ADDR=report-submission:9001
+      - DEPARTMENT_DIRECTORY_ADDR=department-directory:9008

@@ -108,3 +108,28 @@ func TestToStatusHidesInternalErrors(t *testing.T) {
 	assert.Equal(t, codes.Internal, status.Code(err))
 	assert.NotContains(t, err.Error(), assert.AnError.Error())
 }
+
+// SCRUM-163: UpdateDescription and WithdrawReport, with their error codes.
+func TestUpdateAndWithdraw(t *testing.T) {
+	h := newTestHandler()
+	ctx := context.Background()
+	sent, err := h.SubmitReport(ctx, validRequest())
+	require.NoError(t, err)
+	id := sent.GetReport().GetId()
+
+	up, err := h.UpdateDescription(ctx, &reportsubmissionv1.UpdateDescriptionRequest{ReportId: id, ReporterId: reporter, Description: "Now also the light"})
+	require.NoError(t, err)
+	assert.Equal(t, "Now also the light", up.GetReport().GetDescription())
+
+	_, err = h.UpdateDescription(ctx, &reportsubmissionv1.UpdateDescriptionRequest{ReportId: id, ReporterId: "11111111-1111-4111-8111-111111111111", Description: "x"})
+	assert.Equal(t, codes.PermissionDenied, status.Code(err))
+	_, err = h.UpdateDescription(ctx, &reportsubmissionv1.UpdateDescriptionRequest{ReportId: id, ReporterId: reporter, Description: ""})
+	assert.Equal(t, codes.InvalidArgument, status.Code(err))
+
+	_, err = h.WithdrawReport(ctx, &reportsubmissionv1.WithdrawReportRequest{ReportId: id, ReporterId: reporter, CurrentAssigneeId: "user-sso"})
+	require.NoError(t, err)
+	_, err = h.GetReport(ctx, &reportsubmissionv1.GetReportRequest{ReportId: id})
+	assert.Equal(t, codes.NotFound, status.Code(err))
+	_, err = h.WithdrawReport(ctx, &reportsubmissionv1.WithdrawReportRequest{ReportId: id, ReporterId: reporter})
+	assert.Equal(t, codes.NotFound, status.Code(err))
+}

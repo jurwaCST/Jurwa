@@ -1,10 +1,10 @@
 {
   "_note": "Test accounts only, never real ones. The demo accounts come from the identity seed (SEED_DEMO_USERS, SCRUM-126). The student is registered fresh on every run.",
-  "admin": "admin.demo@jurwa.example",
-  "categoryHeadDSA": "dsa.demo@jurwa.example",
-  "categoryHeadSSO": "sso.demo@jurwa.example",
-  "staff": "staff.demo@jurwa.example",
-  "president": "president.demo@jurwa.example",
+  "admin": "admin.cst@rub.edu.bt",
+  "categoryHeadDSA": "dsa.cst@rub.edu.bt",
+  "categoryHeadSSO": "sso.cst@rub.edu.bt",
+  "staff": "staff.cst@rub.edu.bt",
+  "president": "president.cst@rub.edu.bt",
   "studentEmailDomain": "e2e.jurwa.example",
   "studentPassword": "e2e-student-pass-1"
 }

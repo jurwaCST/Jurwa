@@ -49,6 +49,9 @@ type Locations interface {
 type Reports interface {
 	SubmitReport(ctx context.Context, in *reportsubmissionv1.SubmitReportRequest) (*reportsubmissionv1.SubmitReportResponse, error)
 	GetReport(ctx context.Context, reportID string) (*commonv1.Report, error)
+	// SCRUM-163: the student changes or withdraws their report.
+	UpdateDescription(ctx context.Context, in *reportsubmissionv1.UpdateDescriptionRequest) (*reportsubmissionv1.UpdateDescriptionResponse, error)
+	WithdrawReport(ctx context.Context, in *reportsubmissionv1.WithdrawReportRequest) (*reportsubmissionv1.WithdrawReportResponse, error)
 }
 
 // Notes is internal-notes (Choki). role is the caller's role, sent as the gRPC
@@ -107,4 +110,6 @@ type Notifications interface {
 type Feedback interface {
 	SubmitFeedback(ctx context.Context, in *feedbackv1.SubmitFeedbackRequest) (*feedbackv1.SubmitFeedbackResponse, error)
 	GetFeedback(ctx context.Context, reportID string) (*feedbackv1.GetFeedbackResponse, error)
+	// GetRatingSummary is the count and average rating for the dashboards (SCRUM-164).
+	GetRatingSummary(ctx context.Context) (*feedbackv1.GetRatingSummaryResponse, error)
 }

@@ -1,0 +1,25 @@
+SCRUM-164 after the code change, 21 November 2026.
+$ go test -count=1 -p 1 ./services/feedback/... ./services/api-gateway/... ./services/authorization/...
+ok  	github.com/jurwaCST/Jurwa/services/feedback/adapters/in/grpc	0.363s
+ok  	github.com/jurwaCST/Jurwa/services/feedback/adapters/out/memory	1.797s
+ok  	github.com/jurwaCST/Jurwa/services/feedback/adapters/out/postgres	1.839s
+ok  	github.com/jurwaCST/Jurwa/services/feedback/adapters/out/statusclient	1.667s
+ok  	github.com/jurwaCST/Jurwa/services/feedback/application	1.809s
+ok  	github.com/jurwaCST/Jurwa/services/feedback/cmd/server	0.513s
+ok  	github.com/jurwaCST/Jurwa/services/feedback/domain	1.768s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/in/http	0.539s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/authzclient	1.498s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/adapters/out/grpcclients	0.518s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/application	0.485s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/cmd/server	0.497s
+ok  	github.com/jurwaCST/Jurwa/services/api-gateway/domain	2.387s
+ok  	github.com/jurwaCST/Jurwa/services/authorization/adapters/in/grpc	0.495s
+ok  	github.com/jurwaCST/Jurwa/services/authorization/adapters/out/memory	1.782s
+ok  	github.com/jurwaCST/Jurwa/services/authorization/adapters/out/postgres	1.828s
+ok  	github.com/jurwaCST/Jurwa/services/authorization/application	1.745s
+ok  	github.com/jurwaCST/Jurwa/services/authorization/cmd/server	0.574s
+ok  	github.com/jurwaCST/Jurwa/services/authorization/domain	1.813s
+
+Web: npx tsc -b (no errors), npm run lint (oxlint, no errors), npx vitest run --maxWorkers=1:
+ Test Files  14 passed (14)
+      Tests  194 passed (194)

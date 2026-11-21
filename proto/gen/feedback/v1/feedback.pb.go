@@ -309,6 +309,94 @@ func (x *GetFeedbackResponse) GetFeedback() *Feedback {
 	return nil
 }
 
+type GetRatingSummaryRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetRatingSummaryRequest) Reset() {
+	*x = GetRatingSummaryRequest{}
+	mi := &file_feedback_v1_feedback_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetRatingSummaryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetRatingSummaryRequest) ProtoMessage() {}
+
+func (x *GetRatingSummaryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_feedback_v1_feedback_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetRatingSummaryRequest.ProtoReflect.Descriptor instead.
+func (*GetRatingSummaryRequest) Descriptor() ([]byte, []int) {
+	return file_feedback_v1_feedback_proto_rawDescGZIP(), []int{5}
+}
+
+type GetRatingSummaryResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Count         int64                  `protobuf:"varint,1,opt,name=count,proto3" json:"count,omitempty"`                                       // reports with a rating
+	AverageRating float64                `protobuf:"fixed64,2,opt,name=average_rating,json=averageRating,proto3" json:"average_rating,omitempty"` // 1 to 5, 0 when count is 0
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetRatingSummaryResponse) Reset() {
+	*x = GetRatingSummaryResponse{}
+	mi := &file_feedback_v1_feedback_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetRatingSummaryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetRatingSummaryResponse) ProtoMessage() {}
+
+func (x *GetRatingSummaryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_feedback_v1_feedback_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetRatingSummaryResponse.ProtoReflect.Descriptor instead.
+func (*GetRatingSummaryResponse) Descriptor() ([]byte, []int) {
+	return file_feedback_v1_feedback_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *GetRatingSummaryResponse) GetCount() int64 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
+func (x *GetRatingSummaryResponse) GetAverageRating() float64 {
+	if x != nil {
+		return x.AverageRating
+	}
+	return 0
+}
+
 var File_feedback_v1_feedback_proto protoreflect.FileDescriptor
 
 const file_feedback_v1_feedback_proto_rawDesc = "" +
@@ -332,10 +420,15 @@ const file_feedback_v1_feedback_proto_rawDesc = "" +
 	"\x12GetFeedbackRequest\x12\x1b\n" +
 	"\treport_id\x18\x01 \x01(\tR\breportId\"N\n" +
 	"\x13GetFeedbackResponse\x127\n" +
-	"\bfeedback\x18\x01 \x01(\v2\x1b.jurwa.feedback.v1.FeedbackR\bfeedback2\xd6\x01\n" +
+	"\bfeedback\x18\x01 \x01(\v2\x1b.jurwa.feedback.v1.FeedbackR\bfeedback\"\x19\n" +
+	"\x17GetRatingSummaryRequest\"W\n" +
+	"\x18GetRatingSummaryResponse\x12\x14\n" +
+	"\x05count\x18\x01 \x01(\x03R\x05count\x12%\n" +
+	"\x0eaverage_rating\x18\x02 \x01(\x01R\raverageRating2\xc3\x02\n" +
 	"\x0fFeedbackService\x12e\n" +
 	"\x0eSubmitFeedback\x12(.jurwa.feedback.v1.SubmitFeedbackRequest\x1a).jurwa.feedback.v1.SubmitFeedbackResponse\x12\\\n" +
-	"\vGetFeedback\x12%.jurwa.feedback.v1.GetFeedbackRequest\x1a&.jurwa.feedback.v1.GetFeedbackResponseB<Z:github.com/jurwaCST/Jurwa/proto/gen/feedback/v1;feedbackv1b\x06proto3"
+	"\vGetFeedback\x12%.jurwa.feedback.v1.GetFeedbackRequest\x1a&.jurwa.feedback.v1.GetFeedbackResponse\x12k\n" +
+	"\x10GetRatingSummary\x12*.jurwa.feedback.v1.GetRatingSummaryRequest\x1a+.jurwa.feedback.v1.GetRatingSummaryResponseB<Z:github.com/jurwaCST/Jurwa/proto/gen/feedback/v1;feedbackv1b\x06proto3"
 
 var (
 	file_feedback_v1_feedback_proto_rawDescOnce sync.Once
@@ -349,25 +442,29 @@ func file_feedback_v1_feedback_proto_rawDescGZIP() []byte {
 	return file_feedback_v1_feedback_proto_rawDescData
 }
 
-var file_feedback_v1_feedback_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_feedback_v1_feedback_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_feedback_v1_feedback_proto_goTypes = []any{
-	(*Feedback)(nil),               // 0: jurwa.feedback.v1.Feedback
-	(*SubmitFeedbackRequest)(nil),  // 1: jurwa.feedback.v1.SubmitFeedbackRequest
-	(*SubmitFeedbackResponse)(nil), // 2: jurwa.feedback.v1.SubmitFeedbackResponse
-	(*GetFeedbackRequest)(nil),     // 3: jurwa.feedback.v1.GetFeedbackRequest
-	(*GetFeedbackResponse)(nil),    // 4: jurwa.feedback.v1.GetFeedbackResponse
-	(*timestamppb.Timestamp)(nil),  // 5: google.protobuf.Timestamp
+	(*Feedback)(nil),                 // 0: jurwa.feedback.v1.Feedback
+	(*SubmitFeedbackRequest)(nil),    // 1: jurwa.feedback.v1.SubmitFeedbackRequest
+	(*SubmitFeedbackResponse)(nil),   // 2: jurwa.feedback.v1.SubmitFeedbackResponse
+	(*GetFeedbackRequest)(nil),       // 3: jurwa.feedback.v1.GetFeedbackRequest
+	(*GetFeedbackResponse)(nil),      // 4: jurwa.feedback.v1.GetFeedbackResponse
+	(*GetRatingSummaryRequest)(nil),  // 5: jurwa.feedback.v1.GetRatingSummaryRequest
+	(*GetRatingSummaryResponse)(nil), // 6: jurwa.feedback.v1.GetRatingSummaryResponse
+	(*timestamppb.Timestamp)(nil),    // 7: google.protobuf.Timestamp
 }
 var file_feedback_v1_feedback_proto_depIdxs = []int32{
-	5, // 0: jurwa.feedback.v1.Feedback.created_at:type_name -> google.protobuf.Timestamp
+	7, // 0: jurwa.feedback.v1.Feedback.created_at:type_name -> google.protobuf.Timestamp
 	0, // 1: jurwa.feedback.v1.SubmitFeedbackResponse.feedback:type_name -> jurwa.feedback.v1.Feedback
 	0, // 2: jurwa.feedback.v1.GetFeedbackResponse.feedback:type_name -> jurwa.feedback.v1.Feedback
 	1, // 3: jurwa.feedback.v1.FeedbackService.SubmitFeedback:input_type -> jurwa.feedback.v1.SubmitFeedbackRequest
 	3, // 4: jurwa.feedback.v1.FeedbackService.GetFeedback:input_type -> jurwa.feedback.v1.GetFeedbackRequest
-	2, // 5: jurwa.feedback.v1.FeedbackService.SubmitFeedback:output_type -> jurwa.feedback.v1.SubmitFeedbackResponse
-	4, // 6: jurwa.feedback.v1.FeedbackService.GetFeedback:output_type -> jurwa.feedback.v1.GetFeedbackResponse
-	5, // [5:7] is the sub-list for method output_type
-	3, // [3:5] is the sub-list for method input_type
+	5, // 5: jurwa.feedback.v1.FeedbackService.GetRatingSummary:input_type -> jurwa.feedback.v1.GetRatingSummaryRequest
+	2, // 6: jurwa.feedback.v1.FeedbackService.SubmitFeedback:output_type -> jurwa.feedback.v1.SubmitFeedbackResponse
+	4, // 7: jurwa.feedback.v1.FeedbackService.GetFeedback:output_type -> jurwa.feedback.v1.GetFeedbackResponse
+	6, // 8: jurwa.feedback.v1.FeedbackService.GetRatingSummary:output_type -> jurwa.feedback.v1.GetRatingSummaryResponse
+	6, // [6:9] is the sub-list for method output_type
+	3, // [3:6] is the sub-list for method input_type
 	3, // [3:3] is the sub-list for extension type_name
 	3, // [3:3] is the sub-list for extension extendee
 	0, // [0:3] is the sub-list for field type_name
@@ -384,7 +481,7 @@ func file_feedback_v1_feedback_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_feedback_v1_feedback_proto_rawDesc), len(file_feedback_v1_feedback_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -115,3 +115,28 @@ func TestStart_SubscriptionError(t *testing.T) {
 		}
 	}
 }
+
+// SCRUM-163: a report the student deleted stops its timer, so it is never escalated.
+func TestStart_WithdrawnStopsTheTimer(t *testing.T) {
+	bus := eventbus.NewMemory()
+	app := &fakeTimers{}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	Start(ctx, bus, "test", app)
+
+	require.NoError(t, bus.Publish(ctx, eventbus.StreamReportWithdrawn, &eventsv1.ReportWithdrawn{
+		Meta: &eventsv1.EventMeta{EventId: "e9"}, ReportId: "r1", ReporterId: "s1",
+	}))
+	assert.Eventually(t, func() bool { _, p := app.counts(); return p == 1 }, 2*time.Second, 5*time.Millisecond)
+	app.mu.Lock()
+	defer app.mu.Unlock()
+	assert.Equal(t, []string{"r1"}, app.stopped)
+}
+
+func TestOnReportWithdrawn_NoTimerIsFine(t *testing.T) {
+	app := &fakeTimers{stopErr: domain.ErrNotFound}
+	b, err := proto.Marshal(&eventsv1.ReportWithdrawn{Meta: &eventsv1.EventMeta{EventId: "e9"}, ReportId: "r1"})
+	require.NoError(t, err)
+	assert.NoError(t, OnReportWithdrawn(app)(context.Background(), b), "withdrawn before it was routed")
+	assert.Error(t, OnReportWithdrawn(app)(context.Background(), []byte("not a protobuf")))
+}

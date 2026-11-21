@@ -52,6 +52,8 @@ function byDay(list: Note[]): { label: string; notes: Note[] }[] {
 export default function Notifications() {
   const { user } = useAuth()
   const me = user?.id ?? ''
+  // SCRUM-162: a student opens the report itself; staff and heads open their board.
+  const isStudent = user?.roles.includes('STUDENT') ?? false
   const [notes, setNotes] = useState<Note[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [nextToken, setNextToken] = useState('')
@@ -105,10 +107,16 @@ export default function Notifications() {
   } else if (notes.length === 0) {
     body = (
       <EmptyState title="No notifications yet">
-        <p>When something happens to a report you sent, you will see it here.</p>
-        <Link to="/report/new" className="action">
-          Report an issue
-        </Link>
+        {isStudent ? (
+          <>
+            <p>When something happens to a report you sent, you will see it here.</p>
+            <Link to="/report/new" className="action">
+              Report an issue
+            </Link>
+          </>
+        ) : (
+          <p>When a report reaches you, you will see it here.</p>
+        )}
       </EmptyState>
     )
   } else {
@@ -121,7 +129,7 @@ export default function Notifications() {
               {g.notes.map((n) => (
                 <li key={n.id} className="nt-item card">
                   {n.reportId ? (
-                    <Link to={`/reports/${n.reportId}`} className="nt-subject">
+                    <Link to={isStudent ? `/reports/${n.reportId}` : '/staff'} className="nt-subject">
                       {n.subject}
                     </Link>
                   ) : (

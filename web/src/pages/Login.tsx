@@ -12,13 +12,14 @@ const demoAccounts = [
   // SCRUM-158: Hostel and Others go to the SSO, who hands them to a councillor;
   // the Academic Block goes to the department's HoD. Late reports go up to the
   // DSA or the DAA. Every HoD and councillor has an account like these two.
-  ['SSO, Hostel and Others', 'sso.demo@jurwa.example'],
-  ['Block Councillor (HA)', 'councillor.ha@jurwa.example'],
-  ['HoD, Computing Technologies', 'hod.ct@jurwa.example'],
-  ['DSA, late Hostel and Others reports', 'dsa.demo@jurwa.example'],
-  ['DAA, late Academic Block reports', 'daa.demo@jurwa.example'],
-  ['System Administrator', 'admin.demo@jurwa.example'],
-  ['College President', 'president.demo@jurwa.example'],
+  ['Student', '02240300.cst@rub.edu.bt'],
+  ['SSO, Hostel and Others', 'sso.cst@rub.edu.bt'],
+  ['Block Councillor (HA)', 'ha.cst@rub.edu.bt'],
+  ['HoD, Computing Technologies', 'hod.ct.cst@rub.edu.bt'],
+  ['DSA, late Hostel and Others reports', 'dsa.cst@rub.edu.bt'],
+  ['DAA, late Academic Block reports', 'daa.cst@rub.edu.bt'],
+  ['System Administrator', 'admin.cst@rub.edu.bt'],
+  ['College President', 'president.cst@rub.edu.bt'],
 ]
 
 export default function Login() {

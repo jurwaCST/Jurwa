@@ -25,6 +25,7 @@ type fakeFeedback struct {
 	asked     string
 	submitErr error
 	getErr    error
+	summaries int // GetRatingSummary calls (SCRUM-164)
 }
 
 func (f *fakeFeedback) SubmitFeedback(_ context.Context, in *feedbackv1.SubmitFeedbackRequest) (*feedbackv1.SubmitFeedbackResponse, error) {
@@ -35,6 +36,14 @@ func (f *fakeFeedback) SubmitFeedback(_ context.Context, in *feedbackv1.SubmitFe
 	return &feedbackv1.SubmitFeedbackResponse{Feedback: &feedbackv1.Feedback{
 		Id: "f1", ReportId: in.GetReportId(), StudentUserId: in.GetStudentUserId(), Rating: in.GetRating(), Comment: in.GetComment(),
 	}}, nil
+}
+
+func (f *fakeFeedback) GetRatingSummary(context.Context) (*feedbackv1.GetRatingSummaryResponse, error) {
+	f.summaries++
+	if f.getErr != nil {
+		return nil, f.getErr
+	}
+	return &feedbackv1.GetRatingSummaryResponse{Count: 7, AverageRating: 4.2}, nil
 }
 
 func (f *fakeFeedback) GetFeedback(_ context.Context, reportID string) (*feedbackv1.GetFeedbackResponse, error) {
@@ -138,4 +147,26 @@ func TestSubmitFeedbackRejectsBadJSON(t *testing.T) {
 	e := newEnv()
 	assert.Equal(t, http.StatusBadRequest, e.do("POST", feedbackPath, "student-token", `{"rating":`).Code)
 	assert.Nil(t, e.feedback.submitted)
+}
+
+// SCRUM-164: the average rating for the admin and President dashboards.
+func TestDashboardRatings(t *testing.T) {
+	withPresident(t)
+	for token, want := range map[string]int{
+		"admin-token":     http.StatusOK,
+		"president-token": http.StatusOK,
+		"student-token":   http.StatusForbidden,
+		"head-token":      http.StatusForbidden,
+		"staff-token":     http.StatusForbidden,
+	} {
+		e := newEnv()
+		rec := e.do("GET", "/dashboard/ratings", token, "")
+		assert.Equal(t, want, rec.Code, token)
+		if want == http.StatusOK {
+			assert.JSONEq(t, `{"count":"7","averageRating":4.2}`, rec.Body.String())
+		} else {
+			assert.Zero(t, e.feedback.summaries, token+" never reaches feedback")
+		}
+	}
+	assert.Equal(t, http.StatusUnauthorized, newEnv().do("GET", "/dashboard/ratings", "", "").Code)
 }

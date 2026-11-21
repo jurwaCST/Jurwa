@@ -70,14 +70,15 @@ func (r *Repository) Apply(ctx context.Context, e domain.Event) (bool, error) {
 		return false, nil // rolled back by the deferred Rollback
 	}
 	_, err = tx.Exec(ctx, `
-		INSERT INTO report_facts (report_id, category_code, status, was_escalated, created_at, resolved_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, now())
+		INSERT INTO report_facts (report_id, category_code, status, was_escalated, created_at, resolved_at, withdrawn, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, now())
 		ON CONFLICT (report_id) DO UPDATE SET
 			status        = EXCLUDED.status,
 			was_escalated = EXCLUDED.was_escalated,
 			resolved_at   = EXCLUDED.resolved_at,
+			withdrawn     = EXCLUDED.withdrawn,
 			updated_at    = now()`,
-		next.ID, next.Category.String(), next.Status.String(), next.WasEscalated, next.CreatedAt, nullTime(next.ResolvedAt))
+		next.ID, next.Category.String(), next.Status.String(), next.WasEscalated, next.CreatedAt, nullTime(next.ResolvedAt), next.Withdrawn)
 	if err != nil {
 		return false, fmt.Errorf("save report: %w", err)
 	}
@@ -87,7 +88,7 @@ func (r *Repository) Apply(ctx context.Context, e domain.Event) (bool, error) {
 	return true, nil
 }
 
-const columns = `report_id, category_code, status, was_escalated, created_at, resolved_at`
+const columns = `report_id, category_code, status, was_escalated, created_at, resolved_at, withdrawn`
 
 // find reads one report and locks its row until the transaction ends, so two
 // events for the same report are applied one after the other.
@@ -123,7 +124,7 @@ func scan(row pgx.CollectableRow) (domain.Report, error) {
 	var rep domain.Report
 	var category, status string
 	var resolvedAt *time.Time
-	if err := row.Scan(&rep.ID, &category, &status, &rep.WasEscalated, &rep.CreatedAt, &resolvedAt); err != nil {
+	if err := row.Scan(&rep.ID, &category, &status, &rep.WasEscalated, &rep.CreatedAt, &resolvedAt, &rep.Withdrawn); err != nil {
 		return rep, err
 	}
 	rep.Category = categories[category]

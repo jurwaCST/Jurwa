@@ -21,8 +21,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ReportSubmissionService_SubmitReport_FullMethodName = "/jurwa.reportsubmission.v1.ReportSubmissionService/SubmitReport"
-	ReportSubmissionService_GetReport_FullMethodName    = "/jurwa.reportsubmission.v1.ReportSubmissionService/GetReport"
+	ReportSubmissionService_SubmitReport_FullMethodName      = "/jurwa.reportsubmission.v1.ReportSubmissionService/SubmitReport"
+	ReportSubmissionService_GetReport_FullMethodName         = "/jurwa.reportsubmission.v1.ReportSubmissionService/GetReport"
+	ReportSubmissionService_UpdateDescription_FullMethodName = "/jurwa.reportsubmission.v1.ReportSubmissionService/UpdateDescription"
+	ReportSubmissionService_WithdrawReport_FullMethodName    = "/jurwa.reportsubmission.v1.ReportSubmissionService/WithdrawReport"
 )
 
 // ReportSubmissionServiceClient is the client API for ReportSubmissionService service.
@@ -34,6 +36,14 @@ type ReportSubmissionServiceClient interface {
 	SubmitReport(ctx context.Context, in *SubmitReportRequest, opts ...grpc.CallOption) (*SubmitReportResponse, error)
 	// Errors: NOT_FOUND when the id is unknown.
 	GetReport(ctx context.Context, in *GetReportRequest, opts ...grpc.CallOption) (*GetReportResponse, error)
+	// Changes the description, with the same rules as the form (SCRUM-163). Only
+	// the student who sent it; the api-gateway checks first that nobody works on it yet.
+	// Errors: NOT_FOUND, PERMISSION_DENIED for another student, INVALID_ARGUMENT.
+	UpdateDescription(ctx context.Context, in *UpdateDescriptionRequest, opts ...grpc.CallOption) (*UpdateDescriptionResponse, error)
+	// Deletes the report and publishes report.withdrawn (SCRUM-163). Only the
+	// student who sent it; the api-gateway checks first that nobody works on it yet.
+	// Errors: NOT_FOUND, PERMISSION_DENIED for another student.
+	WithdrawReport(ctx context.Context, in *WithdrawReportRequest, opts ...grpc.CallOption) (*WithdrawReportResponse, error)
 }
 
 type reportSubmissionServiceClient struct {
@@ -64,6 +74,26 @@ func (c *reportSubmissionServiceClient) GetReport(ctx context.Context, in *GetRe
 	return out, nil
 }
 
+func (c *reportSubmissionServiceClient) UpdateDescription(ctx context.Context, in *UpdateDescriptionRequest, opts ...grpc.CallOption) (*UpdateDescriptionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateDescriptionResponse)
+	err := c.cc.Invoke(ctx, ReportSubmissionService_UpdateDescription_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *reportSubmissionServiceClient) WithdrawReport(ctx context.Context, in *WithdrawReportRequest, opts ...grpc.CallOption) (*WithdrawReportResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WithdrawReportResponse)
+	err := c.cc.Invoke(ctx, ReportSubmissionService_WithdrawReport_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ReportSubmissionServiceServer is the server API for ReportSubmissionService service.
 // All implementations must embed UnimplementedReportSubmissionServiceServer
 // for forward compatibility.
@@ -73,6 +103,14 @@ type ReportSubmissionServiceServer interface {
 	SubmitReport(context.Context, *SubmitReportRequest) (*SubmitReportResponse, error)
 	// Errors: NOT_FOUND when the id is unknown.
 	GetReport(context.Context, *GetReportRequest) (*GetReportResponse, error)
+	// Changes the description, with the same rules as the form (SCRUM-163). Only
+	// the student who sent it; the api-gateway checks first that nobody works on it yet.
+	// Errors: NOT_FOUND, PERMISSION_DENIED for another student, INVALID_ARGUMENT.
+	UpdateDescription(context.Context, *UpdateDescriptionRequest) (*UpdateDescriptionResponse, error)
+	// Deletes the report and publishes report.withdrawn (SCRUM-163). Only the
+	// student who sent it; the api-gateway checks first that nobody works on it yet.
+	// Errors: NOT_FOUND, PERMISSION_DENIED for another student.
+	WithdrawReport(context.Context, *WithdrawReportRequest) (*WithdrawReportResponse, error)
 	mustEmbedUnimplementedReportSubmissionServiceServer()
 }
 
@@ -88,6 +126,12 @@ func (UnimplementedReportSubmissionServiceServer) SubmitReport(context.Context, 
 }
 func (UnimplementedReportSubmissionServiceServer) GetReport(context.Context, *GetReportRequest) (*GetReportResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetReport not implemented")
+}
+func (UnimplementedReportSubmissionServiceServer) UpdateDescription(context.Context, *UpdateDescriptionRequest) (*UpdateDescriptionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateDescription not implemented")
+}
+func (UnimplementedReportSubmissionServiceServer) WithdrawReport(context.Context, *WithdrawReportRequest) (*WithdrawReportResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method WithdrawReport not implemented")
 }
 func (UnimplementedReportSubmissionServiceServer) mustEmbedUnimplementedReportSubmissionServiceServer() {
 }
@@ -147,6 +191,42 @@ func _ReportSubmissionService_GetReport_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ReportSubmissionService_UpdateDescription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateDescriptionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReportSubmissionServiceServer).UpdateDescription(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReportSubmissionService_UpdateDescription_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReportSubmissionServiceServer).UpdateDescription(ctx, req.(*UpdateDescriptionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ReportSubmissionService_WithdrawReport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WithdrawReportRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReportSubmissionServiceServer).WithdrawReport(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReportSubmissionService_WithdrawReport_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReportSubmissionServiceServer).WithdrawReport(ctx, req.(*WithdrawReportRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ReportSubmissionService_ServiceDesc is the grpc.ServiceDesc for ReportSubmissionService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -161,6 +241,14 @@ var ReportSubmissionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetReport",
 			Handler:    _ReportSubmissionService_GetReport_Handler,
+		},
+		{
+			MethodName: "UpdateDescription",
+			Handler:    _ReportSubmissionService_UpdateDescription_Handler,
+		},
+		{
+			MethodName: "WithdrawReport",
+			Handler:    _ReportSubmissionService_WithdrawReport_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

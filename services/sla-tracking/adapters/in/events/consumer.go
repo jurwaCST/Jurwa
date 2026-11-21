@@ -1,5 +1,6 @@
 // Package events reads the report flow from the shared event bus: report.routed
-// starts a report's SLA timer and status.changed to RESOLVED stops it. The
+// starts a report's SLA timer, and status.changed to RESOLVED or report.withdrawn
+// (SCRUM-163) stops it. The
 // consumer group is "sla-tracking".
 package events
 
@@ -30,6 +31,7 @@ type Timers interface {
 func Start(ctx context.Context, bus eventbus.Subscriber, consumer string, app Timers) {
 	go subscribe(ctx, bus, eventbus.StreamReportRouted, consumer, OnReportRouted(app))
 	go subscribe(ctx, bus, eventbus.StreamStatusChanged, consumer, OnStatusChanged(app))
+	go subscribe(ctx, bus, eventbus.StreamReportWithdrawn, consumer, OnReportWithdrawn(app))
 }
 
 func subscribe(ctx context.Context, bus eventbus.Subscriber, stream, consumer string, h eventbus.Handler) {
@@ -69,6 +71,23 @@ func OnStatusChanged(app Timers) eventbus.Handler {
 		}
 		if e.GetToStatus() != commonv1.Status_RESOLVED {
 			return nil
+		}
+		_, err := app.StopTimer(ctx, e.GetReportId())
+		if errors.Is(err, domain.ErrNotFound) {
+			return nil
+		}
+		return err
+	}
+}
+
+// OnReportWithdrawn stops the timer of a report its student deleted, so it is
+// never escalated (SCRUM-163). A report withdrawn before it was routed has no
+// timer, which is fine.
+func OnReportWithdrawn(app Timers) eventbus.Handler {
+	return func(ctx context.Context, payload []byte) error {
+		var e eventsv1.ReportWithdrawn
+		if err := proto.Unmarshal(payload, &e); err != nil {
+			return err
 		}
 		_, err := app.StopTimer(ctx, e.GetReportId())
 		if errors.Is(err, domain.ErrNotFound) {

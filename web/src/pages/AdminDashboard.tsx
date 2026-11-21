@@ -11,6 +11,7 @@ import { api, ApiError } from '../api/client'
 import ErrorState from '../components/ErrorState'
 import Icon from '../components/Icon'
 import PageHeader from '../components/PageHeader'
+import RatingTile from '../components/RatingTile'
 import Skeleton from '../components/Skeleton'
 import StatTile from '../components/StatTile'
 import './AdminDashboard.css'
@@ -65,12 +66,27 @@ function messageFor(err: unknown): string {
 
 type Result = { key: string; summary: Summary; breakdown: Breakdown } | { key: string; error: string }
 
+/** How often the counts are fetched again (SCRUM-159). */
+const REFRESH_MS = 15_000
+
 export default function AdminDashboard() {
   const [period, setPeriod] = useState<Period>('all')
   const [attempt, setAttempt] = useState(0)
   const [result, setResult] = useState<Result | null>(null)
   // A result for another period or attempt counts as still loading.
   const key = `${period}-${attempt}`
+
+  // SCRUM-159: fetch again every 15 seconds, so new reports and status changes
+  // show up without a reload. The old counts stay on screen meanwhile.
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const q = query(period)
+      Promise.all([api.get<Summary>(`/dashboard/summary${q}`), api.get<Breakdown>(`/dashboard/categories${q}`)])
+        .then(([summary, breakdown]) => setResult((r) => (r?.key === key ? { key, summary, breakdown } : r)))
+        .catch(() => {}) // keep the last counts; the next refresh tries again
+    }, REFRESH_MS)
+    return () => clearInterval(timer)
+  }, [period, key])
 
   useEffect(() => {
     let alive = true
@@ -118,6 +134,8 @@ export default function AdminDashboard() {
             <StatTile label="Resolved" value={String(n(c.resolved))} icon="resolved" tone="resolved" />
             <StatTile label="Escalated" value={String(escalated)} icon="escalated" tone="escalated" />
           </section>
+          {/* SCRUM-164: how the students rated the fixes. */}
+          <RatingTile />
 
           <section className="card admin-attention" aria-labelledby="admin-attention-title">
             <h2 id="admin-attention-title">Needs attention</h2>

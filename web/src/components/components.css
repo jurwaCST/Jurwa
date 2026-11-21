@@ -139,6 +139,21 @@
   color: #b9c1d8;
 }
 
+/* SCRUM-159: back to the page before. */
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  margin-bottom: var(--s2);
+  padding: 0 0.85rem 0 0.6rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 700;
+}
+
 .signout {
   display: inline-flex;
   align-items: center;
@@ -852,4 +867,21 @@
 
 .notice-page h1 {
   margin-top: var(--s2);
+}
+
+/* SCRUM-164: the students' average rating on the dashboards. */
+.rating-tile {
+  margin-block: var(--s3);
+}
+
+.rating-tile h2 {
+  margin: 0 0 0.25rem;
+  font-size: var(--text-lg);
+}
+
+.rating-value {
+  margin: 0;
+  font-size: var(--text-2xl, 2rem);
+  font-weight: 800;
+  color: var(--accent);
 }

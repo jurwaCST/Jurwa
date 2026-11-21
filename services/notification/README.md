@@ -121,3 +121,16 @@ go test -tags=integration ./services/notification/adapters/out/postgres/... -v
 ```
 
 Evidence: `docs/evidence/gayley/sprint3/db-adapters-3b-integration.txt` and `db-adapters-3b-live.txt`.
+
+## Messages for every role (SCRUM-162)
+
+Besides `report.submitted` and `status.changed`, the consumer reads `report.routed` and `report.reassigned`:
+
+| Event | Student gets | The person it reaches gets |
+|---|---|---|
+| `report.routed` | "Your report was sent to the Student Service Officer" (or the HoD) | "New report assigned to you" |
+| `report.reassigned` by a person | "Your report was passed to the Block Councillor (HC)" | "New report assigned to you" |
+| `report.reassigned` by the system, reason "SLA lapsed..." | nothing (status.changed ESCALATED tells them) | "A late report was escalated to you" |
+| `report.reassigned` undoing an escalation | nothing | nothing |
+
+The post name comes from department-directory (`DEPARTMENT_DIRECTORY_ADDR`, `ListPositions` held only). When it cannot be reached the message still goes, naming "the person who will fix it". The second message of an event gets the id of the event plus `/holder`, so both are kept once each. In the cluster, `REPORT_SUBMISSION_ADDR` and `DEPARTMENT_DIRECTORY_ADDR` are now set (before SCRUM-162 notification had no `REPORT_SUBMISSION_ADDR` there, so status messages could not find the student).

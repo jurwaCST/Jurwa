@@ -70,6 +70,18 @@ func (r *Repository) FindByID(ctx context.Context, id string) (domain.Report, er
 	return doc.toReport(), nil
 }
 
+// Delete removes the report or returns domain.ErrReportNotFound (SCRUM-163).
+func (r *Repository) Delete(ctx context.Context, id string) error {
+	res, err := r.coll.DeleteOne(ctx, bson.D{{Key: "_id", Value: id}})
+	if err != nil {
+		return err
+	}
+	if res.DeletedCount == 0 {
+		return domain.ErrReportNotFound
+	}
+	return nil
+}
+
 // Close ends the connection.
 func (r *Repository) Close(ctx context.Context) error {
 	return r.client.Disconnect(ctx)

@@ -102,3 +102,15 @@ func TestValidateReportID(t *testing.T) {
 	assert.NoError(t, ValidateReportID(reportID))
 	assert.ErrorIs(t, ValidateReportID("x"), ErrInvalidReportID)
 }
+
+// SCRUM-164: the dashboards show how many reports were rated and the average.
+func TestSummarize(t *testing.T) {
+	got := Summarize([]Feedback{{Rating: 4}, {Rating: 5}, {Rating: 3}})
+	assert.Equal(t, RatingSummary{Count: 3, Average: 4}, got)
+
+	got = Summarize([]Feedback{{Rating: 5}, {Rating: 4}})
+	assert.Equal(t, int64(2), got.Count)
+	assert.InDelta(t, 4.5, got.Average, 1e-9)
+
+	assert.Equal(t, RatingSummary{}, Summarize(nil), "nothing rated: 0 and 0")
+}

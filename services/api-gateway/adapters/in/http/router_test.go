@@ -79,6 +79,8 @@ func (f *fakeLocations) ListLocations(_ context.Context, c commonv1.Category) (*
 type fakeReports struct {
 	submitted *reportsubmissionv1.SubmitReportRequest
 	getErr    error
+	updated   *reportsubmissionv1.UpdateDescriptionRequest // SCRUM-163
+	withdrawn *reportsubmissionv1.WithdrawReportRequest    // SCRUM-163
 }
 
 func (f *fakeReports) SubmitReport(_ context.Context, in *reportsubmissionv1.SubmitReportRequest) (*reportsubmissionv1.SubmitReportResponse, error) {
@@ -123,7 +125,7 @@ func (fakeAuthz) CheckPermission(_ context.Context, role, action, _ string) (boo
 		return role == domain.RoleCategoryHead || role == domain.RoleStaff, nil
 	case domain.ActionNotificationList: // same rules as the authorization policy
 		return true, nil
-	case domain.ActionReportFeedbackSubmit:
+	case domain.ActionReportFeedbackSubmit, domain.ActionReportUpdate, domain.ActionReportWithdraw: // SCRUM-163
 		return role == domain.RoleStudent, nil
 	case domain.ActionReportFeedbackRead:
 		return role == domain.RoleStudent || role == domain.RoleCategoryHead || role == domain.RoleSystemAdmin, nil
@@ -153,6 +155,7 @@ func (f *fakeNotes) ListNotes(_ context.Context, role, reportID string) (*intern
 
 // fakeHistory records what the gateway sends to report-history.
 type fakeHistory struct {
+	holder    string // current holder of r1 in the student's list (SCRUM-163)
 	assignee  string
 	reporter  string
 	pageSize  int32
@@ -167,7 +170,11 @@ func (f *fakeHistory) ListReportsByReporter(_ context.Context, reporterID string
 	if f.empty {
 		return &reporthistoryv1.ListReportsByReporterResponse{}, nil
 	}
-	return &reporthistoryv1.ListReportsByReporterResponse{Reports: []*reporthistoryv1.ReportSummary{{ReportId: "r1", ReporterId: reporterID}}, NextPageToken: "next"}, nil
+	r1 := &reporthistoryv1.ReportSummary{ReportId: "r1", ReporterId: reporterID}
+	if f.holder != "" {
+		r1.CurrentAssigneeId = &f.holder
+	}
+	return &reporthistoryv1.ListReportsByReporterResponse{Reports: []*reporthistoryv1.ReportSummary{r1}, NextPageToken: "next"}, nil
 }
 
 func (f *fakeHistory) GetReportTimeline(_ context.Context, reportID string) (*reporthistoryv1.GetReportTimelineResponse, error) {

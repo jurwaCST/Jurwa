@@ -90,3 +90,7 @@ docker run --rm -p 9012:9012 -e SLA_POLICY_ADDR=host.docker.internal:9013 jurwa/
 ```powershell
 go test ./services/sla-tracking/... -cover
 ```
+
+## Withdrawn reports (SCRUM-163)
+
+`events:report.withdrawn` stops the timer of a report its student deleted, so it is never escalated. A report withdrawn before it was routed has no timer; if its `report.routed` still arrives later, a timer starts (a rare race, noted as future work).

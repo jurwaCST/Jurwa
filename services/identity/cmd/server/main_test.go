@@ -44,6 +44,12 @@ func TestNewTokenIssuer(t *testing.T) {
 	}
 }
 
+// SCRUM-159: a sign-in lasts a working day, so nobody is sent back to the
+// sign-in page during a demo or a shift.
+func TestDefaultTokenLifetimeIsEightHours(t *testing.T) {
+	assert.Equal(t, "8h", defaultJWTTTL)
+}
+
 func TestOpenRepoWithoutDatabaseURLUsesMemory(t *testing.T) {
 	repo, closeRepo, err := openRepo("")
 	assert.NoError(t, err)

@@ -74,6 +74,7 @@ type EventType int32
 const (
 	ReportSubmitted EventType = 1 // events:report.submitted
 	StatusChanged   EventType = 2 // events:status.changed
+	ReportWithdrawn EventType = 3 // events:report.withdrawn (SCRUM-163)
 )
 
 // Event is the part of an event analytics needs. The Redis Streams consumer
@@ -95,6 +96,9 @@ type Report struct {
 	CreatedAt    time.Time
 	ResolvedAt   time.Time // zero unless Status is Resolved
 	WasEscalated bool
+	// Withdrawn: its student deleted it (SCRUM-163). It is kept so a late
+	// report.submitted cannot bring it back, and no count includes it.
+	Withdrawn bool
 }
 
 // Projection is the state built from events.
@@ -135,6 +139,15 @@ func Next(current Report, exists bool, e Event) (Report, bool) {
 		return Report{}, false
 	}
 	switch e.Type {
+	case ReportWithdrawn:
+		if exists {
+			r := current
+			r.Withdrawn = true
+			return r, true
+		}
+		// Withdrawn before its report arrived (streams read again after a
+		// restart): keep only the mark. Hostel is a placeholder, never counted.
+		return Report{ID: e.ReportID, Category: Hostel, Status: Open, CreatedAt: e.OccurredAt, Withdrawn: true}, true
 	case ReportSubmitted:
 		if exists || !e.Category.valid() {
 			return Report{}, false
@@ -233,7 +246,7 @@ func Summarize(reports []Report, period Period) Summary {
 	var s Summary
 	var resolvedHours float64
 	for _, r := range reports {
-		if !period.contains(r.CreatedAt) {
+		if r.Withdrawn || !period.contains(r.CreatedAt) { // SCRUM-163: deleted reports are not counted
 			continue
 		}
 		s.Counts.add(r)
@@ -263,7 +276,7 @@ func Breakdown(reports []Report, period Period) []CategoryCounts {
 		index[c] = i
 	}
 	for _, r := range reports {
-		if !period.contains(r.CreatedAt) {
+		if r.Withdrawn || !period.contains(r.CreatedAt) { // SCRUM-163: deleted reports are not counted
 			continue
 		}
 		if i, ok := index[r.Category]; ok {

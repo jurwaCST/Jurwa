@@ -80,3 +80,22 @@ func (r *Repository) GetByReport(ctx context.Context, reportID string) (domain.F
 	f.CreatedAt = f.CreatedAt.UTC()
 	return f, nil
 }
+
+// List returns every feedback (SCRUM-164).
+func (r *Repository) List(ctx context.Context) ([]domain.Feedback, error) {
+	rows, err := r.pool.Query(ctx, `
+		SELECT id::text, report_id::text, student_user_id::text, rating, comment, created_at FROM feedback`)
+	if err != nil {
+		return nil, fmt.Errorf("list feedback: %w", err)
+	}
+	all, err := pgx.CollectRows(rows, func(row pgx.CollectableRow) (domain.Feedback, error) {
+		var f domain.Feedback
+		err := row.Scan(&f.ID, &f.ReportID, &f.StudentUserID, &f.Rating, &f.Comment, &f.CreatedAt)
+		f.CreatedAt = f.CreatedAt.UTC()
+		return f, err
+	})
+	if err != nil {
+		return nil, fmt.Errorf("list feedback: %w", err)
+	}
+	return all, nil
+}

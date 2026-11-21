@@ -42,6 +42,21 @@ func (p *Publisher) ReportSubmitted(ctx context.Context, r domain.Report) error 
 	})
 }
 
+// ReportWithdrawn publishes events:report.withdrawn (SCRUM-163).
+func (p *Publisher) ReportWithdrawn(ctx context.Context, r domain.Report, assigneeID string) error {
+	return p.bus.Publish(ctx, eventbus.StreamReportWithdrawn, &eventsv1.ReportWithdrawn{
+		Meta: &eventsv1.EventMeta{
+			EventId:       p.eventID(),
+			OccurredAt:    timestamppb.New(p.now()),
+			Producer:      "report-submission",
+			CorrelationId: r.ID,
+		},
+		ReportId:          r.ID,
+		ReporterId:        r.ReporterID,
+		CurrentAssigneeId: assigneeID,
+	})
+}
+
 func toProto(r domain.Report) *commonv1.Report {
 	return &commonv1.Report{
 		Id:          r.ID,

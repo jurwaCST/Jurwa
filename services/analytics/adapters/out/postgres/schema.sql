@@ -22,6 +22,10 @@ CREATE INDEX IF NOT EXISTS report_facts_category_status_idx ON report_facts (cat
 CREATE INDEX IF NOT EXISTS report_facts_created_idx         ON report_facts (created_at);
 CREATE INDEX IF NOT EXISTS report_facts_escalated_idx       ON report_facts (report_id) WHERE was_escalated;
 
+-- SCRUM-163: a report its student deleted. Kept, so a late report.submitted
+-- cannot bring it back; no count includes it. Added to existing tables too.
+ALTER TABLE report_facts ADD COLUMN IF NOT EXISTS withdrawn BOOLEAN NOT NULL DEFAULT FALSE;
+
 -- Event ids already applied, so a repeated event (Redis Streams can deliver
 -- one more than once) is counted only once, also after a restart.
 CREATE TABLE IF NOT EXISTS processed_events (

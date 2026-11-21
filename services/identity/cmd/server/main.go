@@ -30,7 +30,7 @@ import (
 const (
 	defaultServiceName = "identity"
 	defaultPort        = "9016"
-	defaultJWTTTL      = "15m"
+	defaultJWTTTL      = "8h" // SCRUM-159: a working day, so nobody is signed out mid-demo
 )
 
 func main() {

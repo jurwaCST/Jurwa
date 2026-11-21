@@ -17,6 +17,7 @@ const (
 	StreamReportReassigned      = "events:report.reassigned"
 	StreamSlaLapsed             = "events:sla.lapsed"
 	StreamEscalationCompensated = "events:escalation.compensated"
+	StreamReportWithdrawn       = "events:report.withdrawn" // SCRUM-163
 )
 
 const (

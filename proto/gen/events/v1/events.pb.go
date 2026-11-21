@@ -319,6 +319,78 @@ func (x *StatusChanged) GetVersion() int32 {
 	return 0
 }
 
+// Stream events:report.withdrawn, published by report-submission when the
+// student deletes a report nobody has started on (SCRUM-163). Readers drop it:
+// report-history, sla-tracking (no escalation), analytics, and notification
+// tells the current assignee.
+type ReportWithdrawn struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Meta              *EventMeta             `protobuf:"bytes,1,opt,name=meta,proto3" json:"meta,omitempty"`
+	ReportId          string                 `protobuf:"bytes,2,opt,name=report_id,json=reportId,proto3" json:"report_id,omitempty"`
+	ReporterId        string                 `protobuf:"bytes,3,opt,name=reporter_id,json=reporterId,proto3" json:"reporter_id,omitempty"`
+	CurrentAssigneeId string                 `protobuf:"bytes,4,opt,name=current_assignee_id,json=currentAssigneeId,proto3" json:"current_assignee_id,omitempty"` // "" when nobody held it
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *ReportWithdrawn) Reset() {
+	*x = ReportWithdrawn{}
+	mi := &file_events_v1_events_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReportWithdrawn) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReportWithdrawn) ProtoMessage() {}
+
+func (x *ReportWithdrawn) ProtoReflect() protoreflect.Message {
+	mi := &file_events_v1_events_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReportWithdrawn.ProtoReflect.Descriptor instead.
+func (*ReportWithdrawn) Descriptor() ([]byte, []int) {
+	return file_events_v1_events_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ReportWithdrawn) GetMeta() *EventMeta {
+	if x != nil {
+		return x.Meta
+	}
+	return nil
+}
+
+func (x *ReportWithdrawn) GetReportId() string {
+	if x != nil {
+		return x.ReportId
+	}
+	return ""
+}
+
+func (x *ReportWithdrawn) GetReporterId() string {
+	if x != nil {
+		return x.ReporterId
+	}
+	return ""
+}
+
+func (x *ReportWithdrawn) GetCurrentAssigneeId() string {
+	if x != nil {
+		return x.CurrentAssigneeId
+	}
+	return ""
+}
+
 // Stream events:report.reassigned, published by reassignment.
 type ReportReassigned struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -334,7 +406,7 @@ type ReportReassigned struct {
 
 func (x *ReportReassigned) Reset() {
 	*x = ReportReassigned{}
-	mi := &file_events_v1_events_proto_msgTypes[4]
+	mi := &file_events_v1_events_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -346,7 +418,7 @@ func (x *ReportReassigned) String() string {
 func (*ReportReassigned) ProtoMessage() {}
 
 func (x *ReportReassigned) ProtoReflect() protoreflect.Message {
-	mi := &file_events_v1_events_proto_msgTypes[4]
+	mi := &file_events_v1_events_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -359,7 +431,7 @@ func (x *ReportReassigned) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportReassigned.ProtoReflect.Descriptor instead.
 func (*ReportReassigned) Descriptor() ([]byte, []int) {
-	return file_events_v1_events_proto_rawDescGZIP(), []int{4}
+	return file_events_v1_events_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ReportReassigned) GetMeta() *EventMeta {
@@ -418,7 +490,7 @@ type SlaLapsed struct {
 
 func (x *SlaLapsed) Reset() {
 	*x = SlaLapsed{}
-	mi := &file_events_v1_events_proto_msgTypes[5]
+	mi := &file_events_v1_events_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -430,7 +502,7 @@ func (x *SlaLapsed) String() string {
 func (*SlaLapsed) ProtoMessage() {}
 
 func (x *SlaLapsed) ProtoReflect() protoreflect.Message {
-	mi := &file_events_v1_events_proto_msgTypes[5]
+	mi := &file_events_v1_events_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -443,7 +515,7 @@ func (x *SlaLapsed) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SlaLapsed.ProtoReflect.Descriptor instead.
 func (*SlaLapsed) Descriptor() ([]byte, []int) {
-	return file_events_v1_events_proto_rawDescGZIP(), []int{5}
+	return file_events_v1_events_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *SlaLapsed) GetMeta() *EventMeta {
@@ -489,7 +561,7 @@ type EscalationCompensated struct {
 
 func (x *EscalationCompensated) Reset() {
 	*x = EscalationCompensated{}
-	mi := &file_events_v1_events_proto_msgTypes[6]
+	mi := &file_events_v1_events_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -501,7 +573,7 @@ func (x *EscalationCompensated) String() string {
 func (*EscalationCompensated) ProtoMessage() {}
 
 func (x *EscalationCompensated) ProtoReflect() protoreflect.Message {
-	mi := &file_events_v1_events_proto_msgTypes[6]
+	mi := &file_events_v1_events_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -514,7 +586,7 @@ func (x *EscalationCompensated) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EscalationCompensated.ProtoReflect.Descriptor instead.
 func (*EscalationCompensated) Descriptor() ([]byte, []int) {
-	return file_events_v1_events_proto_rawDescGZIP(), []int{6}
+	return file_events_v1_events_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *EscalationCompensated) GetMeta() *EventMeta {
@@ -581,7 +653,13 @@ const file_events_v1_events_proto_rawDesc = "" +
 	"\tto_status\x18\x04 \x01(\x0e2\x17.jurwa.common.v1.StatusR\btoStatus\x12\x1e\n" +
 	"\bactor_id\x18\x05 \x01(\tH\x00R\aactorId\x88\x01\x01\x12\x18\n" +
 	"\aversion\x18\x06 \x01(\x05R\aversionB\v\n" +
-	"\t_actor_id\"\xe4\x01\n" +
+	"\t_actor_id\"\xaf\x01\n" +
+	"\x0fReportWithdrawn\x12.\n" +
+	"\x04meta\x18\x01 \x01(\v2\x1a.jurwa.events.v1.EventMetaR\x04meta\x12\x1b\n" +
+	"\treport_id\x18\x02 \x01(\tR\breportId\x12\x1f\n" +
+	"\vreporter_id\x18\x03 \x01(\tR\n" +
+	"reporterId\x12.\n" +
+	"\x13current_assignee_id\x18\x04 \x01(\tR\x11currentAssigneeId\"\xe4\x01\n" +
 	"\x10ReportReassigned\x12.\n" +
 	"\x04meta\x18\x01 \x01(\v2\x1a.jurwa.events.v1.EventMetaR\x04meta\x12\x1b\n" +
 	"\treport_id\x18\x02 \x01(\tR\breportId\x12 \n" +
@@ -618,39 +696,41 @@ func file_events_v1_events_proto_rawDescGZIP() []byte {
 	return file_events_v1_events_proto_rawDescData
 }
 
-var file_events_v1_events_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_events_v1_events_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_events_v1_events_proto_goTypes = []any{
 	(*EventMeta)(nil),             // 0: jurwa.events.v1.EventMeta
 	(*ReportSubmitted)(nil),       // 1: jurwa.events.v1.ReportSubmitted
 	(*ReportRouted)(nil),          // 2: jurwa.events.v1.ReportRouted
 	(*StatusChanged)(nil),         // 3: jurwa.events.v1.StatusChanged
-	(*ReportReassigned)(nil),      // 4: jurwa.events.v1.ReportReassigned
-	(*SlaLapsed)(nil),             // 5: jurwa.events.v1.SlaLapsed
-	(*EscalationCompensated)(nil), // 6: jurwa.events.v1.EscalationCompensated
-	(*timestamppb.Timestamp)(nil), // 7: google.protobuf.Timestamp
-	(*v1.Report)(nil),             // 8: jurwa.common.v1.Report
-	(v1.Category)(0),              // 9: jurwa.common.v1.Category
-	(v1.Status)(0),                // 10: jurwa.common.v1.Status
+	(*ReportWithdrawn)(nil),       // 4: jurwa.events.v1.ReportWithdrawn
+	(*ReportReassigned)(nil),      // 5: jurwa.events.v1.ReportReassigned
+	(*SlaLapsed)(nil),             // 6: jurwa.events.v1.SlaLapsed
+	(*EscalationCompensated)(nil), // 7: jurwa.events.v1.EscalationCompensated
+	(*timestamppb.Timestamp)(nil), // 8: google.protobuf.Timestamp
+	(*v1.Report)(nil),             // 9: jurwa.common.v1.Report
+	(v1.Category)(0),              // 10: jurwa.common.v1.Category
+	(v1.Status)(0),                // 11: jurwa.common.v1.Status
 }
 var file_events_v1_events_proto_depIdxs = []int32{
-	7,  // 0: jurwa.events.v1.EventMeta.occurred_at:type_name -> google.protobuf.Timestamp
+	8,  // 0: jurwa.events.v1.EventMeta.occurred_at:type_name -> google.protobuf.Timestamp
 	0,  // 1: jurwa.events.v1.ReportSubmitted.meta:type_name -> jurwa.events.v1.EventMeta
-	8,  // 2: jurwa.events.v1.ReportSubmitted.report:type_name -> jurwa.common.v1.Report
+	9,  // 2: jurwa.events.v1.ReportSubmitted.report:type_name -> jurwa.common.v1.Report
 	0,  // 3: jurwa.events.v1.ReportRouted.meta:type_name -> jurwa.events.v1.EventMeta
-	9,  // 4: jurwa.events.v1.ReportRouted.category:type_name -> jurwa.common.v1.Category
+	10, // 4: jurwa.events.v1.ReportRouted.category:type_name -> jurwa.common.v1.Category
 	0,  // 5: jurwa.events.v1.StatusChanged.meta:type_name -> jurwa.events.v1.EventMeta
-	10, // 6: jurwa.events.v1.StatusChanged.from_status:type_name -> jurwa.common.v1.Status
-	10, // 7: jurwa.events.v1.StatusChanged.to_status:type_name -> jurwa.common.v1.Status
-	0,  // 8: jurwa.events.v1.ReportReassigned.meta:type_name -> jurwa.events.v1.EventMeta
-	0,  // 9: jurwa.events.v1.SlaLapsed.meta:type_name -> jurwa.events.v1.EventMeta
-	9,  // 10: jurwa.events.v1.SlaLapsed.category:type_name -> jurwa.common.v1.Category
-	7,  // 11: jurwa.events.v1.SlaLapsed.deadline:type_name -> google.protobuf.Timestamp
-	0,  // 12: jurwa.events.v1.EscalationCompensated.meta:type_name -> jurwa.events.v1.EventMeta
-	13, // [13:13] is the sub-list for method output_type
-	13, // [13:13] is the sub-list for method input_type
-	13, // [13:13] is the sub-list for extension type_name
-	13, // [13:13] is the sub-list for extension extendee
-	0,  // [0:13] is the sub-list for field type_name
+	11, // 6: jurwa.events.v1.StatusChanged.from_status:type_name -> jurwa.common.v1.Status
+	11, // 7: jurwa.events.v1.StatusChanged.to_status:type_name -> jurwa.common.v1.Status
+	0,  // 8: jurwa.events.v1.ReportWithdrawn.meta:type_name -> jurwa.events.v1.EventMeta
+	0,  // 9: jurwa.events.v1.ReportReassigned.meta:type_name -> jurwa.events.v1.EventMeta
+	0,  // 10: jurwa.events.v1.SlaLapsed.meta:type_name -> jurwa.events.v1.EventMeta
+	10, // 11: jurwa.events.v1.SlaLapsed.category:type_name -> jurwa.common.v1.Category
+	8,  // 12: jurwa.events.v1.SlaLapsed.deadline:type_name -> google.protobuf.Timestamp
+	0,  // 13: jurwa.events.v1.EscalationCompensated.meta:type_name -> jurwa.events.v1.EventMeta
+	14, // [14:14] is the sub-list for method output_type
+	14, // [14:14] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_events_v1_events_proto_init() }
@@ -659,14 +739,14 @@ func file_events_v1_events_proto_init() {
 		return
 	}
 	file_events_v1_events_proto_msgTypes[3].OneofWrappers = []any{}
-	file_events_v1_events_proto_msgTypes[4].OneofWrappers = []any{}
+	file_events_v1_events_proto_msgTypes[5].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_events_v1_events_proto_rawDesc), len(file_events_v1_events_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -8,7 +8,7 @@ Holds user accounts, checks passwords and issues JSON Web Tokens (JWTs). Users s
 
 - Passwords are stored only as bcrypt hashes and are never logged or returned.
 - New accounts get the `STUDENT` role.
-- Tokens are signed with HS256 using `JWT_SECRET` and expire after `JWT_TTL` (15 minutes by default).
+- Tokens are signed with HS256 using `JWT_SECRET` and expire after `JWT_TTL` (8 hours by default since SCRUM-159).
 - A wrong email and a wrong password give the same error, so callers cannot tell which accounts exist.
 
 Storage: when `DATABASE_URL` is set, users are kept in PostgreSQL (`adapters/out/postgres`, database `identity`, table `users`, which also holds each user's roles). On start the service runs `docs/design/schema/identity.sql` (embedded as `adapters/out/postgres/schema.sql`, a test keeps the two equal), which creates the table if needed. Without `DATABASE_URL` users are kept in memory and lost when the server stops. Both adapters pass the same checks (`adapters/out/repotest`).
@@ -45,7 +45,7 @@ cmd/server/             starts the server and wires everything together
 | `PORT` | `9016` | gRPC port |
 | `SERVICE_NAME` | `identity` | Name written in every log line |
 | `JWT_SECRET` | none, required | Signing secret, at least 32 bytes. The server will not start without it. Never commit it; in Kubernetes it comes from a Secret |
-| `JWT_TTL` | `15m` | Token lifetime as a Go duration, for example `15m` or `1h` |
+| `JWT_TTL` | `8h` | Token lifetime as a Go duration, for example `15m` or `1h` (8 hours since SCRUM-159) |
 | `DATABASE_URL` | none | For example `postgres://jurwa:<password>@localhost:5432/identity?sslmode=disable`. Unset: users in memory. A wrong URL stops the service instead of falling back. Never commit the password; in Kubernetes it comes from a Secret |
 | `SEED_DEMO_USERS` | off | `true` creates the demo accounts below at startup. **For the demo only, never enable it in production** |
 | `SEED_DEMO_PASSWORD` | none, required when seeding | The one password of all demo accounts, at least 8 characters. There is no default. Never commit it |
@@ -56,14 +56,17 @@ cmd/server/             starts the server and wires everything together
 
 | Email | Role | User id |
 |---|---|---|
-| `dsa.demo@jurwa.example` | Category Head | `00000000-0000-4000-8000-000000000001` |
-| `daa.demo@jurwa.example` | Category Head | `00000000-0000-4000-8000-000000000002` |
-| `sso.demo@jurwa.example` | Category Head | `00000000-0000-4000-8000-000000000003` |
-| `staff.demo@jurwa.example` | Staff | `00000000-0000-4000-8000-000000000010` |
-| `admin.demo@jurwa.example` | System Administrator | `00000000-0000-4000-8000-000000000020` |
-| `president.demo@jurwa.example` | College President | `00000000-0000-4000-8000-000000000030` |
-| `hod.arch`, `hod.civil`, `hod.ct`, `hod.eee`, `hod.mech`, `hod.sh` `@jurwa.example` (SCRUM-158) | Staff, named "HoD, <department>" | `...000000000041` to `...000000000046` |
-| `councillor.ha`, `.hb`, `.hc`, `.hd`, `.he`, `.hf`, `.nk`, `.rka`, `.rkb`, `councillor.games`, `councillor.mess`, `councillor.electrical` `@jurwa.example` (SCRUM-158) | Staff, named by position, for example "Block Councillor (HA)" | `...000000000051` to `...000000000062` |
+| `dsa.cst@rub.edu.bt` | Category Head, "Dean of Student Affairs" | `00000000-0000-4000-8000-000000000101` |
+| `daa.cst@rub.edu.bt` | Category Head, "Dean of Academic Affairs" | `...000000000102` |
+| `sso.cst@rub.edu.bt` | Category Head, "Student Service Officer" | `...000000000103` |
+| `staff.cst@rub.edu.bt` | Staff, "Student Service Officer (male)" | `...000000000110` |
+| `admin.cst@rub.edu.bt` | System Administrator | `...000000000120` |
+| `president.cst@rub.edu.bt` | College President | `...000000000130` |
+| `hod.arch.cst`, `hod.civil.cst`, `hod.ct.cst`, `hod.eee.cst`, `hod.mech.cst`, `hod.sh.cst` `@rub.edu.bt` (SCRUM-158) | Staff, named "HoD, <department>" | `...000000000141` to `...000000000146` |
+| `ha.cst`, `hb.cst`, `hc.cst`, `hd.cst`, `he.cst`, `hf.cst`, `nk.cst`, `rka.cst`, `rkb.cst`, `games.cst`, `mess.cst`, `electrical.cst` `@rub.edu.bt` (SCRUM-158) | Staff, named by position, for example "Block Councillor (HA)" | `...000000000151` to `...000000000162` |
+| `02240300.cst@rub.edu.bt` (SCRUM-159) | Student, "Demo Student" (not a real student) | `...000000000199` |
+
+SCRUM-159 moved the accounts to the CST format with new ids (`...01NN`). A database seeded earlier keeps its `@jurwa.example` accounts (`...00NN`); they are no longer used and do not clash. Jurwa sends no email, so these addresses never receive mail. The password of every demo account is `SEED_DEMO_PASSWORD`, set when the service starts (never in the repository).
 
 The Category Head, HoD and councillor ids are the holders of their positions in department-directory, so a routed, reassigned or escalated report goes to a user who can log in (checked in `tests/spec/position_routing_test.go`). `.example` is a reserved domain, so these are never real mailboxes. There is no RPC that creates a privileged user.
 
@@ -89,7 +92,7 @@ With the demo accounts (pick your own password):
 
 ```bash
 SEED_DEMO_USERS=true SEED_DEMO_PASSWORD='<your demo password>' make run SERVICE=identity
-grpcurl -plaintext -d '{"email":"dsa.demo@jurwa.example","password":"<your demo password>"}' localhost:9016 jurwa.identity.v1.IdentityService/Login
+grpcurl -plaintext -d '{"email":"dsa.cst@rub.edu.bt","password":"<your demo password>"}' localhost:9016 jurwa.identity.v1.IdentityService/Login
 ```
 
 Docker:

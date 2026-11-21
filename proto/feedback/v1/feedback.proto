@@ -15,6 +15,9 @@ service FeedbackService {
   rpc SubmitFeedback(SubmitFeedbackRequest) returns (SubmitFeedbackResponse);
   // Errors: NOT_FOUND when the report has no feedback.
   rpc GetFeedback(GetFeedbackRequest) returns (GetFeedbackResponse);
+  // How many reports were rated and the average rating, for the admin and
+  // President dashboards (SCRUM-164). 0 and 0 when nothing is rated.
+  rpc GetRatingSummary(GetRatingSummaryRequest) returns (GetRatingSummaryResponse);
 }
 
 message Feedback {
@@ -43,4 +46,11 @@ message GetFeedbackRequest {
 
 message GetFeedbackResponse {
   Feedback feedback = 1;
+}
+
+message GetRatingSummaryRequest {}
+
+message GetRatingSummaryResponse {
+  int64 count = 1; // reports with a rating
+  double average_rating = 2; // 1 to 5, 0 when count is 0
 }
