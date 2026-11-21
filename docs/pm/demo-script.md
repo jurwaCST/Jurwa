@@ -1,6 +1,6 @@
 # Final demo: outline, script and fallback
 
-Card: SCRUM-84 (work package 1.8, epic SCRUM-70). Owner: Sonam Zangmo. Presentation: about 9 November 2026 (charter, section 7).
+Card: SCRUM-84 (work package 1.8, epic SCRUM-70). Owner: Sonam Zangmo. Presentation: date not decided yet, tentatively after 26 November 2026 (it was about 9 November in the charter, section 7; see change C4 in `schedule-evm.md`).
 
 The demo shows the full life of one report, in the order a real report lives it, and proves each success criterion of the charter (section 10) on screen. It runs on Sonam Choki's 16 GB laptop with everything from `deploy/k8s`, deployed by Argo CD (`deploy/argocd/application.yaml`). Sonam Zangmo's 8 GB laptop with the small demo set (`deploy/argocd/application-demo.yaml`) is the second machine.
 
@@ -107,4 +107,25 @@ Done since Sprint 3 (checked on main, 18 November 2026, SCRUM-153):
 
 | Date | Who was there | Total time | What went wrong | Fixed by |
 |---|---|---|---|---|
-| | | | | |
+| 21 November 2026 | Sonam Zangmo, Sonam Choki, Nyendrak Yoezer Zangmo, Gayley Choden | 10:51 with step 5c (10:19 without), against 15:00 planned | Step 6 needs a one-hour wait; live runs of the quality tools were too slow (step 8); live Grafana did not load (step 9) | See the rows below |
+
+Recording (silent screen recording, evidence for SCRUM-149): [Final_Project_Group6 > Demo rehearsal recording](https://drive.google.com/drive/folders/1Ik78Q2HMvP5tD6eA-YjEFnx4srbCllLm?usp=drive_link).
+
+The rehearsal used the flow on main after SCRUM-158 to SCRUM-164: the Hostel report goes to the SSO, who reassigns it to the Block Councillor (HA); the SSO and the councillor were signed in in two different browsers, because the sign-in is now shared by every tab of one browser (SCRUM-159).
+
+| Step | Presenter | Planned | Actual | Worked | Problem | Fix or fallback |
+|---|---|---|---|---|---|---|
+| 1 Problem and architecture | Zangmo | 1:00 | 0:55 | yes | none | none |
+| 2 GitOps | Zangmo | 1:00 | 0:44 | yes | none | none |
+| 3 Student submits with a photo | Nyendrak | 2:00 | 0:56 | yes | none | none |
+| 4 Routing to the SSO | Choki | 1:00 | 0:40 | yes | none | none |
+| 5a SSO adds a note and reassigns to the councillor | Zangmo | 1:30 | 1:17 | yes | none | none |
+| 5b Councillor sets In Progress, then Resolved | Choki | 1:30 | 1:24 | yes | none | none |
+| 5c Student rates the report | Nyendrak | 1:00 | 0:32 | yes | none | Kept: the councillor sees the stars, the admin and President see the average |
+| 6 SLA escalation | Nyendrak | 2:00 | 0:47 | yes | The escalation needs the one-hour SLA window to pass (1 hour is the smallest window) | The window was set and the escalation report submitted early, before the run. On the day: set the window and submit the report at least 65 minutes before the demo, and restart nothing after it (section 3) |
+| 7 Dashboards | Gayley | 1:30 | 1:00 | yes | none | none |
+| 8 Quality | Gayley | 2:00 | 1:20 | yes | Running the tools live took too long | Show the reports and evidence that already exist (CI run, SonarQube, Cypress video, JMeter report, Lighthouse report) |
+| 9 Observability | Choki | 1:00 | 0:38 | yes | Live Grafana did not load | Showed the evidence (`docs/evidence/gayley/sprint3/observability-grafana.png`) and the authorization JSON logs with correlation ids. Before the day: `kubectl apply -k deploy/observability` and check it (`docs/ops/observability.md`). No Jaeger trace is promised: tracing was not built |
+| 10 Project | Zangmo | 1:00 | 0:38 | yes | none | none |
+
+Every step worked, so the run fits the 15-minute slot with about 4 minutes to spare for questions or a slow step.
