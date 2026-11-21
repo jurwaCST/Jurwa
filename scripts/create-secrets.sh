@@ -57,5 +57,5 @@ kubectl -n "$NS" create secret generic jurwa-secrets \
 
 echo "Secret jurwa-secrets is ready in namespace $NS (keys only):"
 kubectl -n "$NS" describe secret jurwa-secrets | sed -n '/^Data/,$p'
-echo "Demo accounts password (dsa.demo@jurwa.example and the others):"
+echo "Demo accounts password (dsa.cst@rub.edu.bt and the others):"
 echo "  kubectl -n $NS get secret jurwa-secrets -o jsonpath='{.data.demo-password}' | base64 --decode; echo"
