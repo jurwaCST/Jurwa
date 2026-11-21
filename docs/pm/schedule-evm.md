@@ -31,7 +31,7 @@ The proposal planned 8 weeks (8 October to 30 November 2026). The charter replac
 | Sprint 1 | 22 to 27 Oct | 1.1, 1.2, 1.3, start of 1.4 and 1.6, 1.7 | Charter, requirements, plans, wireframes, service template, gRPC contracts, k3d cluster, CI, one thin-slice service per owner |
 | Sprint 2 | 28 Oct to 3 Nov | 1.4, 1.5, 1.7 | Core services implemented with unit tests, databases, PWA front end |
 | Sprint 3 | 4 to 10 Nov | 1.4 (serverless), 1.5, 1.6, 1.7 | Serverless functions, full deployment through Argo CD, full test suite, observability |
-| Presentation | about 9 Nov | 1.8 | Final presentation, live demo and closure report |
+| Presentation | not decided, tentatively after 26 Nov (C4) | 1.8 | Final presentation, live demo and closure report |
 
 ```mermaid
 gantt
@@ -111,6 +111,7 @@ Check of the proposal's own Week 4 example: CPI = 160 / 188 = 0.851 (0.85), SPI 
 | C1 | Services cut | 25 services | 20 services (export, holiday-calendar, digest, email-template and user-profile removed; digest emails handled by the `digest-dispatcher` function) | Less time is available (C2). Risk R4 says the lowest-priority services are cut first; testing and documentation are never cut | Charter, full team |
 | C2 | Schedule compressed | 8 weeks (8 Oct to 30 Nov), presentation 26 to 30 Nov | 3 five-day sprints (22 Oct to 10 Nov), presentation about 9 Nov | Presentation date moved to about 9 Nov. **Team to confirm the exact reason before merge** | Charter, full team |
 | C3 | Work split | 6 or 7 services per member (25 total) | 5 services per member, plus one serverless function for two members | 20 services split evenly, so each member has the same load (about 23 h per sprint) and every member owns part of the critical path | Charter, full team |
+| C4 | Presentation date | about 9 Nov | Not decided yet, tentatively after 26 Nov | The date has not been set by the module tutors; Sprint 4 ran 11 to 20 Nov and the demo rehearsal was on 21 Nov | Full team |
 
 ## 6. Current state of Jira (checked 26 Oct 2026)
 
